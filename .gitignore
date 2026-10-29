@@ -47,3 +47,8 @@ htmlcov/
 .env
 .env.local
 .env.*.local
+
+# Vector index & databases
+data/processed/*.db
+data/processed/*.sqlite*
+
