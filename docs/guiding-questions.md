@@ -1,79 +1,79 @@
-# Guiding Questions e Fundamentacao Conceitual
+# Guiding Questions e Fundamentação Conceitual
 
-Este documento detalha as **Guiding Questions** (questoes norteadoras) do Challenge 2, fundamentando a escolha do tema de gestao fiscal para pequenos negocios e as decisoes de engenharia, ciencia de dados, arquitetura e MLOps adotadas pelo Grupo 08.
+Este documento detalha as **Guiding Questions** (questões norteadoras) do Challenge 2, fundamentando a escolha do tema de gestão fiscal para pequenos negócios e as decisões de engenharia, ciência de dados, arquitetura e MLOps adotadas pelo Grupo 08.
 
 ---
 
-## 1. O que e Qualidade de Vida?
+## 1. O que é Qualidade de Vida?
 
-O conceito de qualidade de vida varia de acordo com a dimensao analisada:
-- **Abordagem Socioeconomica:** Medida pelo Indice de Desenvolvimento Humano (IDH), considerando renda, educacao e longevidade.
-- **Abordagem Psicologica e de Saude:** Medida por instrumentos padronizados como o SF-36 e os dominios psicologico e de meio ambiente do WHOQOL (Organizacao Mundial da Saude).
+O conceito de qualidade de vida varia de acordo com a dimensão analisada:
+- **Abordagem Socioeconômica:** Medida pelo Índice de Desenvolvimento Humano (IDH), considerando renda, educação e longevidade.
+- **Abordagem Psicológica e de Saúde:** Medida por instrumentos padronizados como o SF-36 e os domínios psicológico e de meio ambiente do WHOQOL (Organização Mundial da Saúde).
 
 ### Ponto Focal Escolhido pelo Grupo 08
-O grupo optou pelo impacto direto do **estresse financeiro-tributario na qualidade de vida do micro e pequeno empreendedor**. No Brasil, abrir um negocio por necessidade e a realidade de milhoes de familias. Quando o empreendedor vive sob o medo constante da Receita Federal, sem compreender se seus tributos estao corretos e temendo multas que podem levar a insolvencia familiar, sua qualidade de vida (sono, saude emocional e convivio familiar) entra em colapso. 
+O grupo optou pelo impacto direto do **estresse financeiro-tributário na qualidade de vida do micro e pequeno empreendedor**. No Brasil, abrir um negócio por necessidade é a realidade de milhões de famílias. Quando o empreendedor vive sob o medo constante da Receita Federal, sem compreender se seus tributos estão corretos e temendo multas que podem levar à insolvência familiar, sua qualidade de vida (sono, saúde emocional e convívio familiar) entra em colapso. 
 
-Capacitar o cidadao a entender e controlar a saude fiscal de sua empresa e resgatar sua dignidade, seguranca patrimonial e estabilidade emocional.
+Capacitar o cidadão a entender e controlar a saúde fiscal de sua empresa é resgatar sua dignidade, segurança patrimonial e estabilidade emocional.
 
 ---
 
 ## 2. Esferas Analisadas e Justificativa da Escolha
 
-| Esfera de Qualidade de Vida | Problema Observado | Potencial de Impacto da Solucao |
+| Esfera de Qualidade de Vida | Problema Observado | Potencial de Impacto da Solução |
 | :--- | :--- | :--- |
-| **Educacao Geral** | Cursos genericos de capacitacao empresarial. | Baixo impacto imediato; taxa de conclusao baixa e pouca aplicabilidade pratica. |
-| **Poder Economico / Gestao Fiscal (Escolhida)** | **95% a 99% das empresas sao pequenos negocios; contabilidade nao e ensinada e o empresario depende cegamente do contador, vivendo sob terror fiscal.** | **Critico e Transformador: protege a fonte de renda da familia, reduz estresse cronico e previne o fechamento do negocio.** |
-| **Saude Estritamente Clinica** | Busca de apoio medico/terapeutico. | Tema amplamente discutido, com alta barreira regulatoria medica e necessidade de intervencao presencial. |
-| **Ambiente e Seguranca** | Infraestrutura urbana e seguranca publica. | Depende fundamentalmente de politicas publicas de obras e policiamento. |
+| **Educação Geral** | Cursos genéricos de capacitação empresarial. | Baixo impacto imediato; taxa de conclusão baixa e pouca aplicabilidade prática. |
+| **Poder Econômico / Gestão Fiscal (Escolhida)** | **95% a 99% das empresas são pequenos negócios; contabilidade não é ensinada e o empresário depende cegamente do contador, vivendo sob terror fiscal.** | **Crítico e Transformador: protege a fonte de renda da família, reduz estresse crônico e previne o fechamento do negócio.** |
+| **Saúde Estritamente Clínica** | Busca de apoio médico/terapêutico. | Tema amplamente discutido, com alta barreira regulatória médica e necessidade de intervenção presencial. |
+| **Ambiente e Segurança** | Infraestrutura urbana e segurança pública. | Depende fundamentalmente de políticas públicas de obras e policiamento. |
 
 ---
 
-## 3. Analise Detalhada das Questoes do Projeto (Socio Digital)
+## 3. Análise Detalhada das Questões do Projeto (Sócio Digital)
 
 ### Qual o tamanho do problema no Brasil?
-- Mais de 95% das empresas ativas no Brasil sao micro e pequenos negocios (MEIs, MEs e EPPs), somando mais de 15 milhoes de CNPJs ativos.
-- O Brasil ocupa as piores posicoes globais em tempo gasto para pagar tributos (mais de 1.500 horas/ano em empresas de medio porte).
-- Mais de 60% dos pequenos negocios encerram suas atividades antes de completar 5 anos de vida, sendo a ma gestao tributaria e a inadimplencia fiscal causas centrais.
+- Mais de 95% das empresas ativas no Brasil são micro e pequenos negócios (MEIs, MEs e EPPs), somando mais de 24 milhões de empresas ativas [1].
+- O Brasil ocupa posições críticas globais em tempo gasto para apurar e pagar tributos.
+- Mais de 60% dos pequenos negócios encerram suas atividades antes de completar 5 anos de vida, sendo a má gestão tributária e a inadimplência fiscal causas preponderantes.
 
-### Por que o pequeno empreendedor nao entende sua contabilidade?
-- **Ausencia de Ensino:** A educacao basica e superior nao ensina o basico de tributacao nacional (Simples Nacional, DAS, ISS, ICMS, Fator R).
-- **Concentracao no Contador:** O contador torna-se o unico detentor do conhecimento, utilizando jargoes tecnicos que intimidam o cliente.
-- **Sobrecarga Operacional:** O microempreendedor atua sozinho ou com equipe reduzida, executando compras, vendas, producao e atendimento, sem tempo para decifrar a legislacao.
+### Por que o pequeno empreendedor não entende sua contabilidade?
+- **Ausência de Ensino:** A educação básica e superior não ensina o funcionamento da tributação nacional (Simples Nacional, DAS, ISS, ICMS, Fator R).
+- **Concentração no Contador:** O contador torna-se o único detentor do conhecimento, frequentemente utilizando jargões técnicos que intimidam o cliente.
+- **Sobrecarga Operacional:** O microempreendedor atua sozinho ou com equipe reduzida, executando compras, vendas, produção e atendimento, sem tempo hábil para decifrar a legislação.
 
-### O que o LLM + RAG resolve e o que expressamente NAO resolve?
+### O que o LLM + RAG resolve e o que expressamente NÃO resolve?
 - **O que resolve:**
-  - Traduz jargoes tecnicos (ex.: "Fator R", "Anexo V", "Substituicao Tributaria") para explicacoes simples e simulacoes reais em Reais (R$).
-  - Analisa o enquadramento ideal de CNAE e regime tributario para evitar pagamento indevido de impostos.
-  - Gera planos de acao claros em ate 3 passos para regularizacao de dividas, parcelamentos e emissao de certidoes.
-  - Alimenta o painel de saude da empresa com alertas preventivos de vencimentos e limite de faturamento.
-- **O que NAO resolve:**
-  - Nao assina demonstrativos contabeis oficiais (exclusividade de profissionais registrados no CRC).
-  - Nao executa pagamentos bancarios nem transmite declaracoes fiscais sem consentimento.
-  - Nao substitui o relacionamento humano entre o cliente e seu escritorio contabil.
+  - Traduz jargões técnicos (ex.: "Fator R", "Anexo V", "Substituição Tributária") para explicações simples e simulações reais em Reais (R$).
+  - Analisa o enquadramento ideal de CNAE e regime tributário para evitar pagamento indevido de impostos.
+  - Gera planos de ação claros em até 3 passos para regularização de dívidas, parcelamentos e emissão de certidões.
+  - Alimenta o painel de saúde da empresa com alertas preventivos de vencimentos e limite de faturamento.
+- **O que NÃO resolve:**
+  - Não assina demonstrativos contábeis oficiais (atribuição privativa de profissionais registrados no CRC).
+  - Não executa pagamentos bancários nem transmite declarações fiscais sem consentimento explícito.
+  - Não substitui o relacionamento humano e estratégico entre o cliente e seu escritório contábil.
 
 ---
 
-## 4. Fluxo de Decisao do Copiloto Sem Exercicio Ilegal da Contabilidade
+## 4. Fluxo de Decisão do Copiloto Sem Exercício Ilegal da Contabilidade
 
-A logica do Socio Digital divide-se entre analise consultiva de dados e roteamento de regularizacao:
+A lógica do Sócio Digital divide-se entre análise consultiva de dados e roteamento de regularização:
 
 ```mermaid
 flowchart TD
-    Entrada["Entrada de Dados: Atividade, Faturamento, CNPJ ou Intencao de Abertura"] --> RAG["Motor RAG: Base Legal (LC 123/2006, CGSN, CNAEs)"]
+    Entrada["Entrada de Dados: Atividade, Faturamento, CNPJ ou Intenção de Abertura"] --> RAG["Motor RAG: Base Legal (LC 123/2006, CGSN, CNAEs)"]
     
-    RAG --> Analise{"Qual e a situacao da empresa?"}
+    RAG --> Analise{"Qual é a situação da empresa?"}
     
-    Analise -- Abertura / Enquadramento --> Simula["Simulador de Regime\n- MEI vs Simples Nacional\n- Recomendacao de CNAE\n- Calculo de Fator R"]
+    Analise -- Abertura / Enquadramento --> Simula["Simulador de Regime\n- MEI vs Simples Nacional\n- Recomendação de CNAE\n- Cálculo de Fator R"]
     
-    Analise -- Pendencia / Divida --> Regulariza["Plano de Acao de Regularizacao\n- Passo 1: Onde consultar o debito\n- Passo 2: Como parcelar no Portal e-CAC\n- Passo 3: Emissao da CND"]
+    Analise -- Pendência / Dívida --> Regulariza["Plano de Ação de Regularização\n- Passo 1: Onde consultar o débito\n- Passo 2: Como parcelar no Portal e-CAC\n- Passo 3: Emissão da CND"]
     
-    Analise -- Operacao Regular --> Painel["Painel de Saude Fiscal\n- Semaforo de conformidade\n- Monitoramento do teto anual\n- Calendario de guias (DAS)"]
+    Analise -- Operação Regular --> Painel["Painel de Saúde Fiscal\n- Semáforo de conformidade\n- Monitoramento do teto anual\n- Calendário de guias (DAS)"]
 ```
 
 ---
 
 ## 5. Como Medir o Impacto na Qualidade de Vida?
 
-1. **Indice de Reducao de Incerteza (Pesquisa Perceptiva):** Proporcao de usuarios que declaram ter compreendido com clareza o que estao pagando.
-2. **Economia Financeira Identificada:** Montante em Reais (R$) de reducao de custo tributario legal gerado pela adocao de enquadramentos adequados.
-3. **Reducao de Ocorrencia de Multas por Atraso:** Proporcao de usuarios que mantem as guias em dia por meio dos lembretes do painel.
+1. **Índice de Redução de Incerteza (Pesquisa Perceptiva):** Proporção de usuários que declaram ter compreendido com clareza o que estão pagando e qual o próximo passo a seguir.
+2. **Economia Financeira Identificada:** Montante em Reais (R$) de redução de custo tributário legal gerado pela adoção de enquadramentos adequados.
+3. **Redução de Ocorrência de Multas por Atraso:** Proporção de usuários que mantêm as guias em dia por meio dos lembretes e tarefas estruturadas no painel.
