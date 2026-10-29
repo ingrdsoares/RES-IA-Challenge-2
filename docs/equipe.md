@@ -9,8 +9,8 @@ Este documento detalha os papéis, focos de atuação e atribuições dos integr
 | Integrante | Papel / Frente | Foco Principal | Status |
 | :--- | :--- | :--- | :---: |
 | **Lucas** | **Engenheiro de Dados & Dev** | Construção das pipelines de dados, saneamento, implementação da API / backend e lógica de negócio. | Ativo |
-| *(A preencher)* | **Cientista de Dados** | Análise exploratória de dados, engenharia de atributos (feature engineering), experimentação e calibração de modelos de Machine Learning / Deep Learning. | A preencher |
-| *(A preencher)* | **Arquiteto de Software / Soluções** | Definição de padrões de projeto, topologia de microsserviços/módulos, segurança, escalabilidade e requisitos não-funcionais. | A preencher |
+| **Jhessica** | **Cientista de Dados** | Análise exploratória de dados, engenharia de atributos (feature engineering), experimentação e calibração de modelos de Machine Learning / Deep Learning. | Ativo |
+| **Clara e Nasser** | **Arquiteto de Software / Soluções** | Definição de padrões de projeto, topologia de microsserviços/módulos, segurança, escalabilidade e requisitos não-funcionais. | Ativo |
 | **Ingrid** | **Ops (DevOps & MLOps)** | Esteiras de CI/CD, infraestrutura em nuvem, conteinerização (Docker), rastreamento de modelos (MLflow), versionamento de dados (DVC) e GitHub Pages. | Ativo |
 
 ---
@@ -22,12 +22,12 @@ Este documento detalha os papéis, focos de atuação e atribuições dos integr
 - **Desenvolvimento da Aplicação**: Construção das interfaces programáticas (ex.: FastAPI/Uvicorn ou Flask), rotas e regras de negócio.
 - **Qualidade de Código**: Criação de testes unitários para os componentes de engenharia e integração de módulos.
 
-### 2. Ciência de Dados — *(A preencher)*
+### 2. Ciência de Dados — Jhessica
 - **Exploração e Formulação**: Análise exploratória dos datasets disponibilizados para o Challenge 2, identificando vieses, correlações e distribuições.
 - **Modelagem**: Treinamento de baselines e modelos avançados de IA/ML para atender aos requisitos de acurácia, precisão, recall e latência.
 - **Relatório Técnico**: Consolidação das métricas de desempenho e decisões metodológicas de modelagem.
 
-### 3. Arquitetura de Software — *(A preencher)*
+### 3. Arquitetura de Software — Clara e Nasser
 - **Design de Solução**: Elaboração dos diagramas de arquitetura (C4 Model, diagramas de sequência e fluxo).
 - **Decisões Técnicas (ADRs)**: Documentação de Architectural Decision Records para justificar escolhas de bibliotecas, bancos e integrações.
 - **Alinhamento Interfrentes**: Garantir que as interfaces entre dados, IA e backend sejam desacopladas e eficientes.

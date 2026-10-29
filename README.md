@@ -11,8 +11,8 @@ Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Intelig�
 | Papel / Frente | Integrante | Foco de Atuação |
 | :--- | :--- | :--- |
 | **Engenheiro de Dados, Dev** | **Lucas** | Ingestão e pipelines de dados, backend/API e regras de negócio. |
-| **Cientista de Dados** | *(a preencher)* | Análise exploratória, engenharia de atributos e modelos preditivos de IA. |
-| **Arquiteto** | *(a preencher)* | Desenho de solução, padrões arquiteturais, integração e requisitos não-funcionais. |
+| **Cientista de Dados** | **Jhessica** | Análise exploratória, engenharia de atributos e modelos preditivos de IA. |
+| **Arquiteto** | **Clara e Nasser** | Desenho de solução, padrões arquiteturais, integração e requisitos não-funcionais. |
 | **Ops (DevOps & MLOps)** | **Ingrid** | CI/CD, governança de modelos/dados (MLflow/DVC), infraestrutura e automação do GitHub Pages. |
 
 ---

@@ -1,6 +1,6 @@
 # Arquitetura e Engenharia de Dados
 
-> **Frentes:** Arquiteto (a preencher) & Engenheiro de Dados / Dev (Lucas)  
+> **Frentes:** Arquiteto (Clara e Nasser) & Engenheiro de Dados / Dev (Lucas)  
 > **Objetivo:** Estabelecer a topologia, os fluxos de dados e os contratos de serviço para a solução do Challenge 2.
 
 ---
@@ -41,7 +41,7 @@ flowchart TD
 
 ---
 
-## Diretrizes de Arquitetura (A preencher)
+## Diretrizes de Arquitetura (Clara e Nasser)
 
 - **Padrões de Projeto:** Módulos independentes com interfaces abstratas para algoritmos de IA, facilitando a substituição e comparação de modelos.
 - **Segurança e Conformidade:** Não armazenamento de dados sensíveis não-anonimizados (LGPD).

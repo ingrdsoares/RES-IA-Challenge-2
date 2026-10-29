@@ -28,8 +28,8 @@ A distribuição inicial das responsabilidades dos integrantes está estruturada
 | Papel / Frente | Integrante | Responsabilidades e Foco Principal |
 | :--- | :--- | :--- |
 | **Engenheiro de Dados & Dev** | **Lucas** | Construção e ingestão de pipelines de dados, saneamento, desenvolvimento de serviços/APIs e integração da aplicação. |
-| **Cientista de Dados** | *(a preencher)* | Formulação de hipóteses, modelagem estatística/aprendizado de máquina, análise exploratória e validação de métricas. |
-| **Arquiteto** | *(a preencher)* | Definição de padrões arquiteturais, integração entre componentes, diagramação técnica e garantia de requisitos não-funcionais. |
+| **Cientista de Dados** | **Jhessica** | Formulação de hipóteses, modelagem estatística/aprendizado de máquina, análise exploratória e validação de métricas. |
+| **Arquiteto** | **Clara e Nasser** | Definição de padrões arquiteturais, integração entre componentes, diagramação técnica e garantia de requisitos não-funcionais. |
 | **Ops (DevOps & MLOps)** | **Ingrid** | Automação de CI/CD, esteiras de build/test/deploy, governança e versionamento de dados/modelos (DVC/MLflow) e infraestrutura em nuvem. |
 
 ---
@@ -39,8 +39,8 @@ A distribuição inicial das responsabilidades dos integrantes está estruturada
 ```mermaid
 flowchart LR
     Lucas["Eng. de Dados & Dev\n(Lucas)"]
-    DataScientist["Cientista de Dados\n(A preencher)"]
-    Arquiteto["Arquiteto\n(A preencher)"]
+    DataScientist["Cientista de Dados\n(Jhessica)"]
+    Arquiteto["Arquiteto\n(Clara e Nasser)"]
     Ingrid["Ops / MLOps\n(Ingrid)"]
 
     Arquiteto -->|Diretrizes e Padrões| Lucas
