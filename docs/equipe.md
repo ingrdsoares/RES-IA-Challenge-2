@@ -1,46 +1,46 @@
 # Equipe e Responsabilidades — Grupo 08
 
-Este documento detalha os papéis, focos de atuação e atribuições dos integrantes do **Grupo 08** no **Challenge 2** da Residência em Inteligência Artificial.
+Este documento detalha os papeis, focos de atuacao e atribuicoes dos integrantes do **Grupo 08** no projeto **Socio Digital: Copiloto de Gestao Fiscal para Pequenos Negocios** (Challenge 2 da Residencia em IA).
 
 ---
 
-## Matriz de Papéis
+## Matriz de Papeis
 
 | Integrante | Papel / Frente | Foco Principal | Status |
 | :--- | :--- | :--- | :---: |
-| **Lucas** | **Engenheiro de Dados & Dev** | Construção das pipelines de dados, saneamento, implementação da API / backend e lógica de negócio. | Ativo |
-| **Jhessica** | **Cientista de Dados** | Análise exploratória de dados, engenharia de atributos (feature engineering), experimentação e calibração de modelos de Machine Learning / Deep Learning. | Ativo |
-| **Clara e Nasser** | **Arquiteto de Software / Soluções** | Definição de padrões de projeto, topologia de microsserviços/módulos, segurança, escalabilidade e requisitos não-funcionais. | Ativo |
-| **Ingrid** | **Ops (DevOps & MLOps)** | Esteiras de CI/CD, infraestrutura em nuvem, conteinerização (Docker), rastreamento de modelos (MLflow), versionamento de dados (DVC) e GitHub Pages. | Ativo |
+| **Lucas** | **Engenheiro de Dados & Dev** | Ingestao de dados fiscais (CNAEs, tabelas da LC 123/2006), construcao das APIs (FastAPI) e persistencia do painel do empreendedor. | Ativo |
+| **Jhessica** | **Cientista de Dados** | Modelagem do RAG tributario, chunking e embeddings da legislacao, avaliacao de fidelidade factual e prevencao de alucinacao. | Ativo |
+| **Clara e Nasser** | **Arquitetura de Solucoes** | Topologia da arquitetura, desacoplamento entre calculo deterministico e LLM, seguranca/LGPD e contratos de servico. | Ativo |
+| **Ingrid** | **Ops (DevOps & MLOps)** | Esteiras de CI/CD (GitHub Actions), rastreamento de experimentos/prompts (MLflow), versionamento de dados fiscais (DVC) e publicacao no GitHub Pages. | Ativo |
 
 ---
 
-## Detalhamento das Atribuições por Frente
+## Detalhamento das Atribuicoes por Frente
 
 ### 1. Engenharia de Dados e Desenvolvimento (Dev) — Lucas
-- **Ingestão e Processamento**: Implementar rotinas confiáveis de ingestão de dados brutos e estruturação de bases para modelagem.
-- **Desenvolvimento da Aplicação**: Construção das interfaces programáticas (ex.: FastAPI/Uvicorn ou Flask), rotas e regras de negócio.
-- **Qualidade de Código**: Criação de testes unitários para os componentes de engenharia e integração de módulos.
+- **Ingestao e Processamento:** Estruturar a base de dados de CNAEs e aliquotas nominais/efetivas do Simples Nacional.
+- **Desenvolvimento da Aplicacao:** Construir os endpoints da API para receber dados da empresa, consultar situacao e retornar roteiros de regularizacao.
+- **Painel de Controle:** Implementar a logica de persistencia que armazena a situacao do CNPJ e exibe o semaforo de conformidade no dashboard.
 
-### 2. Ciência de Dados — Jhessica
-- **Exploração e Formulação**: Análise exploratória dos datasets disponibilizados para o Challenge 2, identificando vieses, correlações e distribuições.
-- **Modelagem**: Treinamento de baselines e modelos avançados de IA/ML para atender aos requisitos de acurácia, precisão, recall e latência.
-- **Relatório Técnico**: Consolidação das métricas de desempenho e decisões metodológicas de modelagem.
+### 2. Ciencia de Dados — Jhessica
+- **Pipeline de RAG Factual:** Indexacao dos manuais oficiais da Receita Federal e resolucoes do CGSN em banco vetorial.
+- **Engenharia de Prompt e Guardrails:** Construcao de prompts restritivos com verificacao de citacao legal para eliminar alucinacoes.
+- **Metricas de Avaliacao:** Monitoramento de metricas de recuperacao (context precision, context recall) e fidelidade da resposta (faithfulness).
 
-### 3. Arquitetura de Software — Clara e Nasser
-- **Design de Solução**: Elaboração dos diagramas de arquitetura (C4 Model, diagramas de sequência e fluxo).
-- **Decisões Técnicas (ADRs)**: Documentação de Architectural Decision Records para justificar escolhas de bibliotecas, bancos e integrações.
-- **Alinhamento Interfrentes**: Garantir que as interfaces entre dados, IA e backend sejam desacopladas e eficientes.
+### 3. Arquitetura de Software e Solucoes — Clara e Nasser
+- **Design de Solucao:** Elaboracao dos diagramas de arquitetura (C4 Model, diagramas de sequencia e fluxo de dados).
+- **Decisoes Arquiteturais (ADRs):** Documentacao de decisoes sobre integracao do banco vetorial, persistencia de perfil de usuario e isolamento de tenants.
+- **Fronteira Etica:** Garantia arquitetural de que o sistema atue como copiloto de letramento sem violar atribuicoes do Conselho Regional de Contabilidade.
 
 ### 4. Ops (DevOps e MLOps) — Ingrid
-- **Automação de CI/CD**: Manutenção de fluxos no GitHub Actions para validação estática de código (linting), execução de suítes de testes (`pytest`) e deploy.
-- **MLOps & Governança**: Rastreamento de experimentos e artefatos de IA, versionamento de datasets (`DVC`) e gerenciamento de ciclo de vida de modelos (`MLflow`).
-- **Infraestrutura**: Provisionamento de serviços em nuvem (ex.: Azure) e publicação da documentação no GitHub Pages.
+- **Automacao de CI/CD:** Configuracao e manutencao dos workflows no GitHub Actions para validacao estatica (flake8/black), testes unitarios (`pytest`) e deploy.
+- **MLOps e Governanca:** Versionamento de dados fiscais (`DVC`), rastreamento de prompts e modelos (`MLflow`) e controle de releases.
+- **Infraestrutura e Documentacao:** Gestao do portal no GitHub Pages e conteinerizacao da aplicacao (`Docker`).
 
 ---
 
 ## Modelo de Trabalho em Equipe
 
-- **Comunicação Contínua**: Alinhamento assíncrono via repositório (Issues, Pull Requests) e reuniões de planejamento.
-- **Rastreabilidade**: Toda nova funcionalidade deve ser originada a partir de uma Issue vinculada a um Pull Request com revisão de código.
-- **Documentação como Código (Docs-as-Code)**: Atualização sincronizada das decisões de engenharia, arquitetura e dados nesta documentação do GitHub Pages.
+- **Comunicação Continua:** Alinhamento assincrono via GitHub Issues e Pull Requests com revisao por pares.
+- **Rastreabilidade Total:** Nenhuma alteracao em codigo ou arquitetura entra na `main` sem passar por pipeline automatizada.
+- **Docs-as-Code:** Atualizacao sincronizada da documentacao no GitHub Pages a cada avanco do projeto.

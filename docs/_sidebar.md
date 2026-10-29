@@ -12,6 +12,9 @@
   * [DevOps e MLOps](devops-mlops.md)
   * [Metodologia e Entregas](metodologia.md)
 
+* **Entregaveis**
+  * [Download do PDF da Semana](entregaveis-challenge-2-grupo-08.pdf)
+
 * **Links Uteis**
   * [Repositorio GitHub](https://github.com/ingrdsoares/RES-IA-Challenge-2)
   * [GitHub Pages](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
