@@ -22,6 +22,8 @@ Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Intelig�
 A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):
 
 - [`docs/README.md`](docs/README.md): Visão geral do projeto e apresentação do time.
+- [`docs/definicao-projeto.md`](docs/definicao-projeto.md): Pacote de definição do projeto (cenário, problema, personas, requisitos, riscos e métricas).
+- [`docs/guiding-questions.md`](docs/guiding-questions.md): Guiding questions, fundamentação de qualidade de vida e fluxo sem diagnóstico.
 - [`docs/desafio.md`](docs/desafio.md): Contexto do Challenge 2, pilares técnicos e marcos.
 - [`docs/equipe.md`](docs/equipe.md): Matriz detalhada de responsabilidades e atribuições.
 - [`docs/arquitetura.md`](docs/arquitetura.md): Diretrizes arquiteturais e frentes de dados/engenharia.

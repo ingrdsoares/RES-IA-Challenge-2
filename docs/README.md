@@ -53,13 +53,15 @@ flowchart LR
 
 ---
 
-## Navegação da Documentação
+## Navegacao da Documentacao
 
-- **[Visão Geral do Desafio](desafio.md)**: Contexto aprofundado, objetivos e critérios de sucesso.
-- **[Equipe e Atribuições](equipe.md)**: Detalhamento de cada papel e modelo de colaboração do time.
-- **[Arquitetura e Engenharia](arquitetura.md)**: Espaço para documentação técnica de dados e backend.
-- **[DevOps e MLOps](devops-mlops.md)**: Infraestrutura, esteiras de automação e governança.
-- **[Metodologia](metodologia.md)**: Ritos ágeis (Scrum adaptado) e quadro de entregas.
+- **[Pacote de Definicao do Projeto](definicao-projeto.md)**: Cenario, problema, personas, stakeholders, requisitos, riscos e metricas da solucao.
+- **[Guiding Questions e Conceito](guiding-questions.md)**: Fundamentacao conceitual de qualidade de vida, analise das questoes norteadoras e fluxo de triagem sem diagnostico.
+- **[Visao Geral do Desafio](desafio.md)**: Contexto aprofundado, objetivos e criterios de sucesso.
+- **[Equipe e Atribuicoes](equipe.md)**: Detalhamento de cada papel e modelo de colaboracao do time.
+- **[Arquitetura e Engenharia](arquitetura.md)**: Espaco para documentacao tecnica de dados e backend.
+- **[DevOps e MLOps](devops-mlops.md)**: Infraestrutura, esteiras de automacao e governanca.
+- **[Metodologia](metodologia.md)**: Ritos ageis (Scrum adaptado) e quadro de entregas.
 
 ---
 
