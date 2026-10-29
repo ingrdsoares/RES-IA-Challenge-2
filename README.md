@@ -4,7 +4,7 @@
 > Repositorio do **Grupo 08** para o **Challenge 2** da **Residencia em Inteligencia Artificial (RES-IA)**.
 
 **Documentacao Oficial (GitHub Pages):** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)  
-**Download do Entregavel da Semana (PDF):** [docs/entregaveis-challenge-2-grupo-08.pdf](docs/entregaveis-challenge-2-grupo-08.pdf)
+**Download do Entregavel da Semana (PDF V2):** [docs/entregaveis-challenge-2-grupo-08-v2.pdf](docs/entregaveis-challenge-2-grupo-08-v2.pdf)
 
 ---
 

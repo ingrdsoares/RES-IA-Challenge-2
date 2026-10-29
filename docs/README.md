@@ -7,7 +7,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=flat&logo=github)](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
 [![GitHub Repo](https://img.shields.io/badge/Repositório-ingrdsoares%2FRES--IA--Challenge--2-blue?style=flat&logo=github)](https://github.com/ingrdsoares/RES-IA-Challenge-2)
 [![Grupo](https://img.shields.io/badge/Grupo-08-orange?style=flat)](#divisao-da-equipe)
-[![Entregavel PDF](https://img.shields.io/badge/Entregável-PDF%20da%20Semana-red?style=flat)](entregaveis-challenge-2-grupo-08.pdf)
+[![Entregavel PDF](https://img.shields.io/badge/Entregável-PDF%20da%20Semana%20(V2)-red?style=flat)](entregaveis-challenge-2-grupo-08-v2.pdf)
 
 ---
 
@@ -57,7 +57,7 @@ flowchart LR
 - **[DevOps e MLOps](devops-mlops.md)**: Praticas de governanca, automacao de CI/CD e infraestrutura (Ingrid).
 - **[Equipe e Atribuicoes](equipe.md)**: Detalhamento de cada papel e modelo de colaboracao.
 - **[Metodologia e Entregas](metodologia.md)**: Scrum adaptado, git flow e criterios de aceitacao.
-- **[Baixar Entregavel em PDF](entregaveis-challenge-2-grupo-08.pdf)**: Documento consolidado da semana com o nome de todos os integrantes.
+- **[Baixar Entregavel em PDF (Versao 2)](entregaveis-challenge-2-grupo-08-v2.pdf)**: Documento consolidado da semana (4 paginas) com o nome de todos os integrantes.
 
 ---
 

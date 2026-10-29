@@ -1,126 +1,168 @@
-# Pacote de Definicao do Projeto - Challenge 2
+# Pacote de Definicao do Projeto - Challenge 2 (Versao 2)
 
 > **Residencia em Inteligencia Artificial (RES-IA) - Grupo 08**  
 > **Projeto:** Socio Digital: Copiloto de Gestao Fiscal para Pequenos Negocios  
 > **Subtitulo:** Desmistificando a contabilidade e a regularizacao de MEIs e MEs com IA  
 > **Integrantes:** Clara, Ingrid, Jhessica, Lucas, Nasser  
+> **Entregavel em PDF:** [Download do PDF da Semana (Versao 2)](entregaveis-challenge-2-grupo-08-v2.pdf)
 
 ---
 
-## 1. Tema e Cenario Escolhido
+## Resumo Executivo e Diferencial da Solucao
 
-### Tema
-Socio Digital: Copiloto de Gestao Fiscal para Pequenos Negocios (Desmistificacao contabil, orientacao de regularizacao e painel de monitoramento da empresa com LLM e RAG).
+O **Socio Digital** e um assistente inteligente voltado para microempreendedores individuais (MEIs) e pequenos empresarios (MEs e EPPs) para compreender obrigacoes contabeis e tributarias, organizar pendencias e acompanhar planos de acao.
 
-### Cenario
-No Brasil, aproximadamente 95% a 99% das empresas ativas pertencem a micro e pequenos negocios (MEIs, MEs e EPPs). A legislacao tributaria brasileira e reconhecida como uma das mais complexas do planeta, e nocoes basicas de contabilidade e tributacao nao sao ensinadas na educacao basica nem na maioria dos cursos superiores.
+O **diferencial central** do projeto e transformar uma duvida contabil em um **plano de acao estruturado, fundamentado e acompanhavel** — superando o formato de chat convencional descartavel. Diante de uma situacao relatada, o sistema identifica o contexto, recupera fontes oficiais por RAG, organiza etapas concretas de no maximo 3 passos, permite registrar documentos e acompanha a execucao informada no painel.
 
-Ao abrir um empreendimento, o micro ou pequeno empresario depara-se com uma barreira tecnica intransponivel e torna-se refem de uma "caixa preta contabil": depende integralmente do contador, desconhece a base de calculo dos impostos que paga, nao compreende siglas como CNAE, DAS, Fator R ou Anexos do Simples, e vive sob o medo constante de notificacoes da Receita Federal, cancelamento do CNPJ ou multas retroativas.
+*Delimitacao de Atuacao:* O sistema nao substitui a atuacao de profissionais habilitados (CRC) nem comprova regularidade fiscal sem consulta oficial autorizada.
 
-O projeto Socio Digital estabelece uma solucao inteligente que recebe informacoes da empresa (atividade, faturamento, regime tributario, intencao de abertura ou pendencias existentes), traduz a legislacao tributaria em linguagem acessivel, prescreve planos de acao praticos de regularizacao e mantem um painel centralizado para acompanhamento continuo da saude fiscal do negocio.
+---
+
+## 1. Cenario Escolhido
+
+O cenario e a gestao contabil e tributaria de microempreendedores individuais (MEIs), microempresas (MEs) e empresas de pequeno porte (EPPs) no Brasil.
+
+Segundo dados oficiais do Sebrae, os pequenos negocios somam mais de 24 milhoes de empresas ativas, representando aproximadamente 95% do total nacional [1]. Empreendedores frequentemente precisam compreender obrigacoes fiscais, documentos, regimes tributarios, prazos e procedimentos administrativos que exigem conhecimento especifico nao ensinado na educacao basica ou superior.
+
+A utilizacao de LLMs e RAG fundamenta orientacoes em fontes oficiais com base no contexto de cada empresa. O vinculo direto com a qualidade de vida esta na reducao substancial do tempo gasto em burocracia, da inseguranca financeira e da sobrecarga administrativa que gera estresse e insonia no empreendedor.
 
 ---
 
 ## 2. Definicao do Problema
 
-Microempreendedores e pequenos empresarios enfrentam quatro dores criticas que corroem sua qualidade de vida e ameacam a sobrevivencia do negocio:
+Microempreendedores e pequenos empresarios enfrentam serias dificuldades para compreender e acompanhar suas obrigacoes fiscais devido a complexidade normativa, a fragmentacao das informacoes e a falta de familiaridade com termos tecnicos:
 
-1. **Assimetria de Conhecimento e Dependencia Cega:** Todo o conhecimento contabil fica retido com o contador. O empresario assina guias sem saber o que esta pagando, por que esta pagando e se poderia estar enquadrado em uma aliquota menor legalmente (exemplo: migracao do Anexo V para o Anexo III do Simples Nacional via Fator R).
-2. **Terror Fiscal e Inseguranca Juridica:** A falta de compreensao sobre prazos e obrigacoes acessorias gera angustia continua e acumulo de passivos ocultos que so vem a tona quando o empreendedor tenta emitir uma Certidao Negativa de Debitos (CND) ou contratar um emprestimo bancario.
-3. **Dificuldade na Regularizacao e Abertura:** Falta de orientacao passo a passo sobre como parcelar dividas tributarias, como desenquadrar de MEI para ME ao atingir o teto de faturamento ou como escolher os CNAEs adequados para evitar bitributacao.
-4. **Impacto na Saude Mental e Qualidade de Vida:** O estresse financeiro decorrente do descontrole fiscal e um dos maiores catalisadores de insonia, ansiedade familiar e burnout de quem empreende no Brasil, contribuindo diretamente para o encerramento prematuro de mais de 60% dos pequenos negocios em ate 5 anos.
+1. **Dificuldade para identificar obrigacoes e procedimentos aplicaveis** ao seu porte, localizacao e CNAE.
+2. **Dependencia excessiva de terceiros** ate mesmo para compreender etapas administrativas simples ou orientacoes basicas.
+3. **Inseguranca cronica** quanto a situacao real da empresa, certidoes negativas (CND) e pendencias fiscais acumuladas.
+4. **Tempo excessivo gasto** pesquisando informacoes dispersas em multiplos portais municipais e federais.
+5. **Risco elevado de atrasos, multas e custos** decorrentes de enquadramentos incorretos ou perda de prazos do Simples Nacional.
+
+**Problema central:** Como reduzir a complexidade e a inseguranca enfrentadas por pequenos empreendedores na compreensao e no acompanhamento de suas obrigacoes contabeis e tributarias, promovendo maior autonomia e qualidade de vida?
 
 ---
 
 ## 3. Essential Question e Guiding Questions
 
 ### Essential Question (Pergunta Central da Equipe)
-> **Como podemos utilizar modelos de linguagem (LLM) integrados a recuperacao de informacao contextual (RAG) para desmistificar a legislacao contabil-tributaria brasileira, capacitando o micro e pequeno empreendedor a compreender, regularizar e monitorar a saude fiscal de sua empresa de forma autonoma e preventiva?**
+> **Como a inteligencia artificial generativa integrada a tecnicas de recuperacao factual (RAG) pode simplificar a gestao de obrigacoes contabeis e tributarias de pequenos empreendedores, promovendo maior autonomia e reduzindo a sobrecarga administrativa que afeta sua qualidade de vida?**
 
-### Guiding Questions Chave
-- **Como o projeto impacta a qualidade de vida?** Eliminando o medo do Fisco e a sobrecarga cognitiva do empreendedor, promovendo a estabilidade financeira familiar e garantindo a longevidade do pequeno negocio.
-- **Qual e a base de conhecimento do RAG?** Lei Complementar 123/2006 (Estatuto da Micro e Pequena Empresa), Resolucoes do Comite Gestor do Simples Nacional (CGSN), Tabela de CNAEs do IBGE, Manuais de Arrecadacao da Receita Federal e Guias Oficiais do Portal do Empreendedor.
-- **Qual e a fronteira etica e legal perante o Conselho Regional de Contabilidade (CRC)?** O Socio Digital posiciona-se estritamente como ferramenta de letramento fiscal, simulacao de cenarios e auditoria preventiva; o sistema nao assina balancos patrimoniais nem substitui a responsabilidade tecnica formal do contador.
-- **Como o sistema evita alucinacao em questoes tributarias criticas?** Atraves de uma arquitetura RAG com recuperacao estrita em bases oficiais consolidadas, combinada com extracao deterministica de regras para calculos matematicos de aliquotas.
+### Estrutura das Guiding Questions
+- **Compreensao do Problema:** Quais dificuldades contabeis sao mais frequentes? (CNAE, Fator R, desenquadramento de MEI, guias DAS). Como a falta de conhecimento afeta a qualidade de vida? Gerando estresse cronico, pavor de notificacoes fiscais e risco de fechamento do negocio.
+- **Desenvolvimento da Solucao:** Como LLMs traduzem normas tecnicas em linguagem simples? Como o RAG ancora respostas em documentos oficiais (LC 123/2006, CGSN, Receita Federal)? Como transformar duvidas em planos de acao de ate 3 passos com tarefas cadastradas no painel?
+- **Limites e Validacao:** Quais orientacoes sao informativas e quais procedimentos exigem profissional habilitado (CRC)? Como garantir que o sistema se abstenha proativamente diante de incertezas? Como medir a reducao de inseguranca e tempo economizado?
 
 ---
 
 ## 4. Mapa de Stakeholders
 
-| Stakeholder | Papel no Ecossistema | Interesses / Expectativas |
+| Parte Interessada | Papel no Ecossistema | Interesses e Expectativas Principais |
 | :--- | :--- | :--- |
-| **Microempreendedor Individual (MEI) e Pequeno Empresario (ME)** | Usuario final primario | Compreender seus impostos em linguagem clara, simular regimes tributarios, regularizar pendencias e acompanhar o status da empresa em um painel unico. |
-| **Pessoa em processo de abertura de empresa** | Usuario final secundario | Descobrir o melhor enquadramento (MEI vs ME), estimar impostos antes de abrir o CNPJ e evitar a escolha de CNAEs errados. |
-| **Contadores parceiros** | Intermediario profissional | Receber clientes mais conscientes, organizados e com dados pre-estruturados, reduzindo tempo gasto com duvidas basicas e retrabalho. |
-| **Fisco e Orgaos de Arrecadacao (Receita Federal / Fazendas Municipais)** | Ambiente regulatorio | Aumento da conformidade fiscal espontanea e diminuicao da inadimplencia de micro e pequenos contribuintes. |
-| **Equipe de Engenharia e MLOps** | Concepcao e sustentacao | RAG de alta fidelidade factual, extracao precisa de informacoes tributarias, pipeline seguro e monitoramento de desempenho. |
+| **Microempreendedores Individuais (MEIs)** | Usuario principal | Compreender obrigacoes, evitar desenquadramento involuntario, emitir guias e verificar regularidade. |
+| **Micro e Pequenas Empresas (MEs/EPPs)** | Usuario principal | Reduzir burocracia, organizar tarefas, entender calculos de tributos (ex.: Fator R) e acompanhar planos de acao. |
+| **Contadores** | Parceiro / Usuario secundario | Receber solicitacoes estruturadas e contextualizadas dos clientes, reduzindo tempo com duvidas repetitivas. |
+| **Escritorios Contabeis** | Parceiro potencial | Otimizar a comunicacao com a carteira de clientes e aumentar a eficiencia operacional das rotinas fiscais. |
+| **Receita Federal e Orgaos Fiscais** | Fonte oficial de informacao | Aumento do cumprimento espontaneo das regras tributarias e diminuicao da inadimplencia de pequenos negocios. |
+| **Entidades de Apoio (ex.: Sebrae)** | Apoiador institucional | Fomentar a educacao empreendedora, a autonomia contabil e a taxa de sobrevida das microempresas. |
+| **Equipe de Engenharia / MLOps** | Desenvolvimento e avaliacao | Garantir pipeline confiavel de RAG, respostas com zero alucinacao tributaria, seguranca e conformidade LGPD. |
 
 ---
 
 ## 5. Personas
 
-### Persona 1: Marcos, 34 anos (Microempreendedor de Servicos de Tecnologia)
-- **Perfil:** Desenvolvedor que abriu um CNPJ para prestar servicos a empresas. Fatura em media R$ 9.000 por mes.
-- **Dores:** Estourou o teto do MEI sem perceber; o contador solicitou guias que ele nao sabe onde emitir; nao entende o que e Fator R e se seu imposto sera de 6% ou de 15,5%.
-- **Necessidade no sistema:** Inserir sua atividade e faturamento e receber uma orientacao imediata: "Sua atividade se enquadra no CNAE X; com pro-labore de 28%, sua aliquota cai do Anexo V (15,5%) para o Anexo III (6%). O passo a passo para desenquadrar e parcelar pendencias e este...".
+### Persona 1: Carlos, 32 anos — Microempreendedor Individual (MEI)
+- **Perfil:** Administra um pequeno comercio e conhece pouco sobre regras tributarias.
+- **Dores:** Tem duvidas sobre documentos e prazos do MEI e medo de desenquadramento involuntario.
+- **Necessidade no Sistema:** Orientacoes claras, adequadas ao proprio negocio, sem depender de pesquisas dispersas.
 
-### Persona 2: Daiane, 42 anos (Dona de Pequena Confeitaria / ME)
-- **Perfil:** Comecou vendendo bolos em casa como MEI e hoje possui 2 funcionarias e uma pequena loja fisica.
-- **Dores:** Nao compreende quais impostos incidem sobre a folha de pagamento versus faturamento; teme estar acumulando juros na Prefeitura; sente vergonha de perguntar ao contador questoes que considera basicas.
-- **Necessidade no sistema:** Um painel de acompanhamento que exiba o status de sua empresa (verde para tributos federais regulares, amarelo para certidao municipal pendente) e um chat para esclarecer duvidas fiscais em linguagem simples.
+### Persona 2: Mariana, 41 anos — Proprietaria de Microempresa (ME)
+- **Perfil:** Possui empresa prestadora de servicos. Contrata contador, mas tem pouca visibilidade sobre a situacao fiscal real.
+- **Dores:** Nao compreende as recomendacoes tributarias recebidas (Anexo III vs V, Fator R) e teme estar acumulando juros.
+- **Necessidade no Sistema:** Painel organizado para compreender recomendacoes e acompanhar pendencias em formato de tarefas.
+
+### Persona 3: Rafael, 35 anos — Contador Parceiro
+- **Perfil:** Atende diversos pequenos empreendedores e gasta horas respondendo a duvidas operacionais recorrentes.
+- **Dores:** Sobrecarga com perguntas basicas e falta de contexto nos pedidos dos clientes.
+- **Necessidade no Sistema:** Receber solicitacoes pre-estruturadas e clientes com letramento fiscal basico para focar em consultoria estrategica.
+
+*Nota:* As personas sao hipoteses de design e serao verificadas por entrevistas com usuarios reais.
 
 ---
 
 ## 6. Requisitos do Sistema
 
-### Requisitos Funcionais (RF)
-- **RF-01 (Diagnostico de Enquadramento e Impostos):** Receber faturamento, atividade economica e localizacao e apresentar a tributacao estimada (Simples Nacional, MEI, Lucro Presumido).
-- **RF-02 (Roteiro de Regularizacao):** Identificar a situacao informada pelo usuario (ex.: debitos em divida ativa, desenquadramento de MEI, ausencia de declaracao anual) e gerar roteiro de acao em ate 3 etapas praticas.
-- **RF-03 (RAG Factual com Legislacao Tributaria):** Emitir respostas estritamente ancoradas nas resolucoes vigentes do Simples Nacional, Receita Federal e Portal do Empreendedor, com citacao expressa da norma.
-- **RF-04 (Painel de Monitoramento da Empresa):** Interface com status consolidado da empresa (situacao cadastral do CNPJ, limite de faturamento anual consumido, semaforo de conformidade e proximas datas de vencimento).
-- **RF-05 (Simulador de Cenarios para Abertura de Empresa):** Comparador de custos tributarios para novos empreendedores planejando abertura de negocio.
+### Requisitos Funcionais (RF01 a RF12)
 
-### Requisitos Nao Funcionais (RNF)
-- **RNF-01 (Fidelidade Tributaria Estrita - Zero Alucinacao):** O RAG deve possuir guarda de contencao (guardrail) para nunca inventar aliquotas, tabelas ou prazos legais inexistentes.
-- **RNF-02 (Disclaimer Legal e Contabil):** Exibicao clara e permanente de que o sistema atua como ferramenta de letramento e auxilio fiscal, nao substituindo a assinatura formal de demonstrativos por profissional contábil habilitado (CRC).
-- **RNF-03 (Seguranca de Dados e Privacidade - LGPD):** Nao exposicao de dados financeiros confidenciais ou informacoes protegidas por sigilo fiscal.
-- **RNF-04 (Linguagem Acessivel e Didatica):** Traducao automatica de termos tecnicos complexos (ex.: "substituicao tributaria", "fato gerador", "fator R") para analogias e explicacoes diretas.
+| ID | Requisito Funcional | Prioridade | Descricao e Escopo no MVP |
+| :--- | :--- | :---: | :--- |
+| **RF01** | Cadastro do Contexto Empresarial | Alta | Registro de porte (MEI/ME), CNAE, localizacao e regime tributario informado. |
+| **RF02** | Assistente Conversacional de Duvidas | Alta | Interface conversacional para interpretacao de duvidas contabeis em linguagem natural. |
+| **RF03** | Recuperacao de Fontes por RAG | Alta | Ancoragem de respostas em documentos oficiais consolidados (LC 123, CGSN, Receita). |
+| **RF04** | Respostas Personalizadas | Alta | Adequacao da explicacao ao porte da empresa e aos dados cadastrados pelo usuario. |
+| **RF05** | Registro Manual de Obrigacoes | Alta | Permissao para o usuario cadastrar suas pendencias fiscais e documentos de referencia. |
+| **RF06** | Painel de Tarefas e Acompanhamento | Alta | Dashboard com semaforo de status, historico de acoes e lista de tarefas pendentes. |
+| **RF07** | Planos de Acao Estruturados | Alta | Geracao de roteiros em ate 3 etapas claras com passos, documentos e fontes oficiais. |
+| **RF08** | Citacao de Fontes e Datas | Alta | Apresentacao explicita da base legal e da data de vigencia de cada orientacao dada. |
+| **RF09** | Atualizacao do Andamento | Media | O usuario marca etapas concluidas, atualizando o semaforo da empresa no painel. |
+| **RF10** | Lembretes de Prazos Cadastrados | Media | Alertas sobre datas de vencimento de guias (ex.: DAS no dia 20) e declaracoes anuais. |
+| **RF11** | Analise de Documentos Enviados | Media | Extracao e leitura de informacoes de guias ou notificacoes enviadas em PDF/imagem. |
+| **RF12** | Integracoes com Servicos Oficiais | Baixa | Consultas diretas a APIs governamentais (Portal e-CAC) sob autorizacao do usuario. |
 
----
+### Requisitos Nao Funcionais (RNF01 a RNF10)
 
-## 7. Riscos e Mitigacoes
+| ID | Requisito Nao Funcional | Descricao e Meta Arquitetural |
+| :--- | :--- | :--- |
+| **RNF01** | Autenticacao e Controle de Acesso | Isolamento estrito das sessoes e dados cadastrais por empresa (multi-tenant). |
+| **RNF02** | Conformidade com a LGPD | Tratamento minimo de dados pessoais, consentimento e ausencia de uso para treino de modelos. |
+| **RNF03** | Linguagem Simples e Acessivel | Traducao didatica de jargoes tributarios para analogias claras e textos objetivos. |
+| **RNF04** | Tratamento Explicito de Incertezas | Abstencao proativa e indicacao de profissional (CRC) quando nao houver fundamentacao oficial suficiente. |
+| **RNF05** | Referencias Verificaveis e Rastreaveis | Toda recomendacao contem link ou referencia oficial a norma tributaria vigente. |
+| **RNF06** | Historico de Orientacoes | Persistencia auditavel das orientacoes fornecidas para consulta futura pelo empreendedor. |
+| **RNF07** | Interface Responsiva | Disponibilidade adaptada para navegadores desktop e dispositivos moveis. |
+| **RNF08** | Latencia de Resposta | Tempo de resposta inferior a 3 segundos na API e inferior a 10 segundos em consultas RAG complexas. |
+| **RNF09** | Isolamento de Dados | Segregacao logica rigorosa impedindo que dados de uma empresa vazem para outra. |
+| **RNF10** | Versionamento da Base Normativa | Rastreamento de atualizacoes de legislacao fiscal com data de vigencia e DVC. |
 
-| Risco Identificado | Nivel de Severidade | Estrategia de Mitigacao |
-| :--- | :--- :--- |
-| **Alucinacao em aliquotas ou prazos fiscais** | Critico | Uso de RAG ancorado em tabelas estaticas oficiais homologadas (tabelas do Simples) com extracao deterministica para calculos matematicos. |
-| **Questionamento sobre exercicio ilegal da profissao contabil** | Alto | Delimitacao clara nos termos de uso como ferramenta de letramento e tecnologia educacional preventiva, atuando como ponte entre o cliente e seu contador. |
-| **Desatualizacao de normas e aliquotas municipais (ISS)** | Medio | Foco inicial nas normas federais do Simples Nacional e MEI, indicando claramente quando a regra depende do codigo tributario municipal especifico. |
-| **Incompreensao do usuario sobre calculos complexos** | Medio | Apresentacao visual com graficos comparativos simples e explicacoes em texto direto de impacto em Reais (R$). |
-
----
-
-## 8. Premissas e Limitacoes
-
-### O que o sistema faz
-- Traduz a legislacao tributaria e fiscal para a linguagem do pequeno empresario.
-- Avalia cenarios de enquadramento (MEI vs ME, Anexos do Simples).
-- Gera o plano de acao para resolver pendencias comuns (parcelamento, emissao de guias, CND).
-- Mantem o painel visual com o historico e a saude fiscal da empresa.
-
-### O que o sistema expressamente NAO faz
-- Nao realiza transmissao automatica de declaracoes fiscais sem aval do usuario/contador.
-- Nao emite laudos periciais contabeis assinados.
-- Nao gerencia contas bancarias nem executa pagamentos diretamente.
+*Nota de Escopo:* No MVP, o painel reflete dados fornecidos e confirmados pelo usuario. Nao apresenta autodeclaracao como comprovacao oficial de regularidade fiscal.
 
 ---
 
-## 9. Metricas de Sucesso
+## 7. Matriz de Riscos e Mitigacoes
 
-### Metricas Tecnicas de IA e MLOps
-- **Precisao na Recomendacao de CNAE/Anexo:** Taxa de acerto superior a 95% na classificacao de atividades dentro dos anexos oficiais do Simples Nacional.
-- **Faithfulness do RAG:** Minimo de 95% de fidelidade factual das respostas frente aos manuais da Receita Federal.
-- **Latencia de Resposta:** Tempo de inferencia e montagem do plano de acao em menos de 3 segundos.
+| Risco Identificado | Impacto | Estrategia de Mitigacao |
+| :--- | :--- | :--- |
+| **Alucinacoes do LLM** | Orientacao errada e prejuizos fiscais | RAG estrito, abstencao explicita e calculo matematico via motor deterministico. |
+| **Fontes Desatualizadas** | Instrucoes incompativeis com regras vigentes | Base de dados versionada com data de referencia e checagem periodica de normas. |
+| **Dados Incompletos** | Resposta inadequada ao contexto do negocio | Formulacao de perguntas complementares antes de emitir a recomendacao final. |
+| **Exposicao de Dados (LGPD)** | Violacao de sigilo e privacidade | Criptografia em repouso/transito, controle de acesso e minimizacao estrita de dados. |
+| **Confianca Excessiva** | Decisao precipitada sem aval profissional | Disclaimers claros e encaminhamento formal para validacao com o contador. |
+| **Integracoes Indisponiveis** | Limitacao de recursos da ferramenta | Escopo inicial de MVP baseado em dados declarados, sem dependencia de APIs governamentais. |
+| **Baixa Adesao do Usuario** | Produto subutilizado pelo publico | Foco em linguagem humanizada, resolucao de dores imediatas e testes de usabilidade. |
 
-### Metricas de Impacto em Qualidade de Vida e Negocio
-- **Reducao de Incerteza do Empreendedor:** Mais de 90% dos usuarios relatando que compreenderam exatamente o que devem pagar e qual o proximo passo para regularizacao.
-- **Economia Tributaria Legal Identificada:** Identificacao de oportunidades de reducao de aliquota (ex.: adocao correta de Fator R ou escolha de CNAE adequado).
+---
+
+## 8. Premissas e Delimitacao do MVP
+
+- **Premissas Centrais:** Parte substancial do publico-alvo enfrenta barreiras reais com informacoes contabeis; os usuarios aceitarao fornecer dados basicos de seu negocio para receber orientacoes contextualizadas; fontes oficiais publicas (LC 123/2006, CGSN, Receita Federal) sao suficientes para sustentar o RAG inicial.
+- **Fronteira Etica e Legal:** O assistente orienta e organiza tarefas, mas **nao substitui o contador**; o usuario confirma a execucao de acoes e a situacao de seu negocio; o MVP delimitara regimes (foco no Simples Nacional e MEI) para garantir viabilidade tecnica e acuracia absoluta.
+
+---
+
+## 9. Metricas de Sucesso e Verificacao
+
+| Indicador de Sucesso | Meta Inicial | Metodo de Verificacao | Impacto no Projeto |
+| :--- | :---: | :--- | :--- |
+| **Tempo de Tarefa Informacional** | Reducao de 30% | Comparacao de tempo em testes de usabilidade com/sem assistente. | Reducao da sobrecarga administrativa. |
+| **Corretude das Respostas** | >= 85% sem erros criticos | Avaliacao cega por especialistas contabeis e fiscais. | Confiabilidade e seguranca juridica. |
+| **Compreensao dos Passos** | >= 80% dos usuarios | Verificacao pos-orientacao se o usuario sabe o que fazer a seguir. | Clareza e reducao de inercia. |
+| **Inseguranca Percebida** | Reducao de 20% | Questionario padronizado pre e pos-uso da plataforma. | Melhoria direta da qualidade de vida. |
+| **Suporte das Fontes Oficiais** | >= 95% ancorado | Auditoria de citacoes com avaliacao de faithfulness (Ragas). | Zero alucinacao normativa. |
+
+---
+
+## 10. Referencias Oficiais
+
+[1] SEBRAE. Pequenos negocios somam 24 milhoes de empresas ativas. 2026. Disponivel em: https://agenciasebrae.com.br/dados/pequenos-negocios-somam-24-milhoes-de-empresas-ativas/  
+[2] RECEITA FEDERAL. Servicos disponiveis no Portal e-CAC. Disponivel em: https://solucoes.receita.fazenda.gov.br/Servicos/servicos-ecac/default.aspx  
+[3] RECEITA FEDERAL. Servicos para empresas e negocios. Disponivel em: https://www.gov.br/receitafederal/pt-br/assuntos/empresas-e-negocios/servicos  
+[4] AUTORIDADE NACIONAL DE PROTECAO DE DADOS (ANPD). Perguntas frequentes sobre a Lei Geral de Protecao de Dados (LGPD). 2026.

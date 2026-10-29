@@ -2,7 +2,7 @@
 
 * **Principal**
   * [Inicio](README.md)
-  * [Pacote de Definicao do Projeto](definicao-projeto.md)
+  * [Pacote de Definicao do Projeto (V2)](definicao-projeto.md)
   * [Guiding Questions e Conceito](guiding-questions.md)
   * [Visao Geral do Desafio](desafio.md)
   * [Equipe e Responsabilidades](equipe.md)
@@ -13,7 +13,7 @@
   * [Metodologia e Entregas](metodologia.md)
 
 * **Entregaveis**
-  * [Download do PDF da Semana](entregaveis-challenge-2-grupo-08.pdf)
+  * [Download do PDF da Semana (V2)](entregaveis-challenge-2-grupo-08-v2.pdf)
 
 * **Links Uteis**
   * [Repositorio GitHub](https://github.com/ingrdsoares/RES-IA-Challenge-2)
