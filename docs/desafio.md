@@ -4,7 +4,7 @@ A Residência em Inteligência Artificial (RES-IA) propõe o **Challenge 2** com
 
 ---
 
-## 📌 Contexto e Propósito
+## Contexto e Propósito
 
 Após a conclusão das fases preliminares, o **Challenge 2** eleva a complexidade técnica e a exigência de integração entre diferentes disciplinas da computação e da ciência de dados:
 
@@ -14,7 +14,7 @@ Após a conclusão das fases preliminares, o **Challenge 2** eleva a complexidad
 
 ---
 
-## 🎯 Pilares Técnicos
+## Pilares Técnicos
 
 ```mermaid
 graph TD
@@ -48,7 +48,7 @@ graph TD
 
 ---
 
-## 📅 Marcos e Entregas
+## Marcos e Entregas
 
 | Fase | Descrição | Principais Frentes Envolvidas |
 | :--- | :--- | :--- |

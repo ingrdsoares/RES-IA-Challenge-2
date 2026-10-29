@@ -4,7 +4,7 @@ Este documento descreve as práticas ágeis e a dinâmica operacional adotadas p
 
 ---
 
-## 🏃 Metodologia Ágil (Scrum Adaptado)
+## Metodologia Ágil (Scrum Adaptado)
 
 Para garantir iterações rápidas e entregas contínuas de valor, utilizamos uma adaptação leve do framework Scrum:
 
@@ -14,7 +14,7 @@ Para garantir iterações rápidas e entregas contínuas de valor, utilizamos um
 
 ---
 
-## 🌿 Fluxo de Versionamento (Git Flow Simplificado)
+## Fluxo de Versionamento (Git Flow Simplificado)
 
 Para manter a estabilidade do repositório principal:
 
@@ -28,7 +28,7 @@ Para manter a estabilidade do repositório principal:
 
 ---
 
-## 📋 Critérios de Aceitação (DoD - Definition of Done)
+## Critérios de Aceitação (DoD - Definition of Done)
 
 Para que uma tarefa seja considerada concluída:
 - [x] O código deve estar documentado e aderente aos padrões da equipe.

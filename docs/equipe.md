@@ -4,7 +4,7 @@ Este documento detalha os papéis, focos de atuação e atribuições dos integr
 
 ---
 
-## 👥 Matriz de Papéis
+## Matriz de Papéis
 
 | Integrante | Papel / Frente | Foco Principal | Status |
 | :--- | :--- | :--- | :---: |
@@ -15,7 +15,7 @@ Este documento detalha os papéis, focos de atuação e atribuições dos integr
 
 ---
 
-## 🔍 Detalhamento das Atribuições por Frente
+## Detalhamento das Atribuições por Frente
 
 ### 1. Engenharia de Dados e Desenvolvimento (Dev) — Lucas
 - **Ingestão e Processamento**: Implementar rotinas confiáveis de ingestão de dados brutos e estruturação de bases para modelagem.
@@ -39,7 +39,7 @@ Este documento detalha os papéis, focos de atuação e atribuições dos integr
 
 ---
 
-## 🤝 Modelo de Trabalho em Equipe
+## Modelo de Trabalho em Equipe
 
 - **Comunicação Contínua**: Alinhamento assíncrono via repositório (Issues, Pull Requests) e reuniões de planejamento.
 - **Rastreabilidade**: Toda nova funcionalidade deve ser originada a partir de uma Issue vinculada a um Pull Request com revisão de código.

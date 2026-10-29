@@ -9,7 +9,7 @@
 
 ---
 
-## 🎯 Sobre o Challenge 2
+## Sobre o Challenge 2
 
 O **Challenge 2** dá continuidade às atividades da **Residência Tecnológica em Inteligência Artificial (RES-IA)**. O foco deste desafio abrange a concepção, desenvolvimento, validação e implantação de uma solução orientada a IA, integrando governança de dados, engenharia de software de ponta a ponta e automação em nuvem (MLOps).
 
@@ -21,7 +21,7 @@ O **Challenge 2** dá continuidade às atividades da **Residência Tecnológica 
 
 ---
 
-## 👥 Divisão da Equipe (Grupo 08)
+## Divisão da Equipe (Grupo 08)
 
 A distribuição inicial das responsabilidades dos integrantes está estruturada abaixo:
 
@@ -34,7 +34,7 @@ A distribuição inicial das responsabilidades dos integrantes está estruturada
 
 ---
 
-## 🔄 Fluxo de Colaboração entre as Frentes
+## Fluxo de Colaboração entre as Frentes
 
 ```mermaid
 flowchart LR
@@ -53,17 +53,17 @@ flowchart LR
 
 ---
 
-## 🧭 Navegação da Documentação
+## Navegação da Documentação
 
-- 📄 **[Visão Geral do Desafio](desafio.md)**: Contexto aprofundado, objetivos e critérios de sucesso.
-- 👥 **[Equipe e Atribuições](equipe.md)**: Detalhamento de cada papel e modelo de colaboração do time.
-- 🏗️ **[Arquitetura e Engenharia](arquitetura.md)**: Espaço para documentação técnica de dados e backend.
-- ⚙️ **[DevOps e MLOps](devops-mlops.md)**: Infraestrutura, esteiras de automação e governança.
-- 📋 **[Metodologia](metodologia.md)**: Ritos ágeis (Scrum adaptado) e quadro de entregas.
+- **[Visão Geral do Desafio](desafio.md)**: Contexto aprofundado, objetivos e critérios de sucesso.
+- **[Equipe e Atribuições](equipe.md)**: Detalhamento de cada papel e modelo de colaboração do time.
+- **[Arquitetura e Engenharia](arquitetura.md)**: Espaço para documentação técnica de dados e backend.
+- **[DevOps e MLOps](devops-mlops.md)**: Infraestrutura, esteiras de automação e governança.
+- **[Metodologia](metodologia.md)**: Ritos ágeis (Scrum adaptado) e quadro de entregas.
 
 ---
 
-## 🔗 Links e Acessos Rápidos
+## Links e Acessos Rápidos
 
 - **Portal GitHub Pages:** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
 - **Repositório do Projeto:** [https://github.com/ingrdsoares/RES-IA-Challenge-2](https://github.com/ingrdsoares/RES-IA-Challenge-2)

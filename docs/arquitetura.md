@@ -5,7 +5,7 @@
 
 ---
 
-## 🏗️ Visão Arquitetural Preliminar
+## Visão Arquitetural Preliminar
 
 A arquitetura do sistema é desenhada para garantir desacoplamento, reprodutibilidade e escalabilidade:
 
@@ -29,7 +29,7 @@ flowchart TD
 
 ---
 
-## 💻 Atuação da Engenharia de Dados e Dev (Lucas)
+## Atuação da Engenharia de Dados e Dev (Lucas)
 
 1. **Ingestão de Dados:**
    - Criação de scripts e módulos Python para carga dos dados de treino e teste.
@@ -41,7 +41,7 @@ flowchart TD
 
 ---
 
-## 🏛️ Diretrizes de Arquitetura (A preencher)
+## Diretrizes de Arquitetura (A preencher)
 
 - **Padrões de Projeto:** Módulos independentes com interfaces abstratas para algoritmos de IA, facilitando a substituição e comparação de modelos.
 - **Segurança e Conformidade:** Não armazenamento de dados sensíveis não-anonimizados (LGPD).

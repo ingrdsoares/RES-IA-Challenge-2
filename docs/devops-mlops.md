@@ -5,7 +5,7 @@
 
 ---
 
-## 🛠️ Stack Tecnológica e Ferramentas
+## Stack Tecnológica e Ferramentas
 
 - **Controle de Versão de Código:** Git & GitHub (`ingrdsoares/RES-IA-Challenge-2`)
 - **Documentação e Portal:** Docsify hospedado no GitHub Pages ([ingrdsoares.github.io/RES-IA-Challenge-2](https://ingrdsoares.github.io/RES-IA-Challenge-2/))
@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 Esteira de GitHub Pages
+## Esteira de GitHub Pages
 
 A documentação do projeto está configurada com base no padrão Docs-as-Code via **Docsify**:
 
@@ -40,7 +40,7 @@ Em seguida, abra o navegador em `http://localhost:3000`.
 
 ---
 
-## 📦 Próximas Implementações de MLOps
+## Próximas Implementações de MLOps
 
 1. Configuração do pipeline de testes automatizados (`ci.yml`) para verificar novas contribuições via Pull Request.
 2. Estruturação do `dvc.yaml` para rastreamento de dados de treino e validação.

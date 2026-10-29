@@ -2,11 +2,11 @@
 
 Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Inteligência Artificial (RES-IA)**.
 
-🌐 **Documentação Oficial (GitHub Pages):** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
+**Documentação Oficial (GitHub Pages):** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
 
 ---
 
-## 👥 Divisão do Grupo
+## Divisão do Grupo
 
 | Papel / Frente | Integrante | Foco de Atuação |
 | :--- | :--- | :--- |
@@ -17,7 +17,7 @@ Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Intelig�
 
 ---
 
-## 🧭 Estrutura da Documentação
+## Estrutura da Documentação
 
 A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):
 
@@ -30,7 +30,7 @@ A documentação interativa é servida via **Docsify** e está localizada no dir
 
 ---
 
-## 💻 Como Visualizar Localmente a Documentação
+## Como Visualizar Localmente a Documentação
 
 Você pode executar o Docsify localmente com qualquer um dos métodos abaixo:
 
@@ -48,7 +48,7 @@ Acesse em: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🚀 Como Ativar o GitHub Pages no Repositório
+## Como Ativar o GitHub Pages no Repositório
 
 Para habilitar a publicação automática em `https://ingrdsoares.github.io/RES-IA-Challenge-2/`:
 
