@@ -12,6 +12,7 @@
   * [DevOps e MLOps](devops-mlops.md)
   * [Metodologia e Entregas](metodologia.md)
   * [Exploração de Dados](exploracao-dados.md)
+  * [Arquitetura do Crawler](crawler-arquitetura.md)
 
 * **Entregáveis**
   * [Download do PDF da Semana](entregaveis-challenge-2-grupo-08-final.pdf)
