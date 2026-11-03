@@ -9,10 +9,17 @@ Suporta:
 """
 
 import json
+import math
+import re
 import sqlite3
-import numpy as np
+import struct
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+
+try:
+    import numpy as np
+except Exception:  # pragma: no cover - fallback leve para ambientes sem numpy
+    np = None
 
 from .chunker import LegalChunk
 
@@ -33,12 +40,15 @@ class LegalVectorStore:
         self.model_name = model_name
         self.use_dense = use_dense
         self.model = None
+        self._fallback_to_python = np is None
+        self._fallback_vocab = None
+        self._fallback_idf = None
         self._init_model()
         self._init_db()
 
     def _init_model(self):
         """Inicializa o modelo de embedding com fallback gracioso se não houver rede."""
-        if self.use_dense:
+        if self.use_dense and not self._fallback_to_python:
             try:
                 from sentence_transformers import SentenceTransformer
                 self.model = SentenceTransformer(self.model_name)
@@ -48,9 +58,82 @@ class LegalVectorStore:
                 self.use_dense = False
 
         if not self.use_dense:
-            from sklearn.feature_extraction.text import TfidfVectorizer
-            self.tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
-            self.model = None
+            try:
+                from sklearn.feature_extraction.text import TfidfVectorizer
+                self.tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
+                self.model = None
+                print("[VectorStore] Uso de TF-IDF com sklearn habilitado.")
+            except Exception as e:
+                self.tfidf = None
+                self.model = None
+                self._fallback_to_python = True
+                print(f"[VectorStore] Aviso: usando fallback puro em Python devido a: {e}")
+
+    def _tokenize(self, text: str) -> List[str]:
+        return re.findall(r"[\wÀ-ÿ]+", text.lower())
+
+    def _encode_fallback(self, texts: List[str]) -> List[List[float]]:
+        if not texts:
+            return []
+
+        all_tokens = []
+        for text in texts:
+            all_tokens.extend(self._tokenize(text))
+
+        vocab = sorted(set(all_tokens))
+        self._fallback_vocab = {token: idx for idx, token in enumerate(vocab)}
+
+        doc_freq = {token: 0 for token in vocab}
+        for text in texts:
+            present = set()
+            for token in self._tokenize(text):
+                if token in self._fallback_vocab and token not in present:
+                    doc_freq[token] += 1
+                    present.add(token)
+
+        total_docs = max(len(texts), 1)
+        self._fallback_idf = []
+        for token in vocab:
+            idf = math.log((1 + total_docs) / (1 + doc_freq.get(token, 0))) + 1.0
+            self._fallback_idf.append(idf)
+
+        vectors = []
+        for text in texts:
+            counts = {}
+            for token in self._tokenize(text):
+                counts[token] = counts.get(token, 0) + 1
+
+            vec = [0.0] * len(vocab)
+            for token, count in counts.items():
+                if token in self._fallback_vocab:
+                    idx = self._fallback_vocab[token]
+                    vec[idx] = count * self._fallback_idf[idx]
+
+            norm = math.sqrt(sum(v * v for v in vec))
+            if norm > 0:
+                vec = [v / norm for v in vec]
+            vectors.append(vec)
+
+        return vectors
+
+    @staticmethod
+    def _serialize_embedding(emb):
+        if np is not None:
+            return np.asarray(emb, dtype=np.float32).tobytes()
+        return struct.pack(f"{len(emb)}f", *[float(x) for x in emb])
+
+    @staticmethod
+    def _deserialize_embedding(blob):
+        if np is not None:
+            return np.frombuffer(blob, dtype=np.float32)
+        num_floats = len(blob) // 4
+        return list(struct.unpack(f"{num_floats}f", blob))
+
+    @staticmethod
+    def _dot_product(a, b):
+        if np is not None:
+            return float(np.dot(a, b))
+        return sum(x * y for x, y in zip(a, b))
 
     def _init_db(self):
         """Cria as tabelas de armazenamento dos chunks e vetores."""
@@ -73,23 +156,27 @@ class LegalVectorStore:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_source ON legal_chunks(source_doc)")
             conn.commit()
 
-    def encode(self, texts: List[str]) -> np.ndarray:
+    def encode(self, texts: List[str]):
         """Gera vetores normalizados para os textos fornecidos."""
-        if self.use_dense and self.model is not None:
+        if self.use_dense and self.model is not None and np is not None:
             embeddings = self.model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
             return embeddings.astype(np.float32)
-        else:
-            # Fallback com TF-IDF normalizado
+
+        if self._fallback_to_python:
+            return self._encode_fallback(texts)
+
+        if self.tfidf is not None:
             if not hasattr(self, "tfidf_fitted") or not self.tfidf_fitted:
                 matrix = self.tfidf.fit_transform(texts)
                 self.tfidf_fitted = True
             else:
                 matrix = self.tfidf.transform(texts)
             arr = matrix.toarray().astype(np.float32)
-            # Normalização L2
             norms = np.linalg.norm(arr, axis=1, keepdims=True)
             norms[norms == 0] = 1.0
             return arr / norms
+
+        return self._encode_fallback(texts)
 
     def add_chunks(self, chunks: List[LegalChunk]):
         """Adiciona e indexa chunks na base vetorial."""
@@ -103,7 +190,7 @@ class LegalVectorStore:
             cursor = conn.cursor()
             for chunk, emb in zip(chunks, embeddings):
                 meta_json = json.dumps(chunk.metadata, ensure_ascii=False)
-                emb_blob = emb.tobytes()
+                emb_blob = self._serialize_embedding(emb)
 
                 cursor.execute("""
                     INSERT OR REPLACE INTO legal_chunks (
@@ -134,7 +221,6 @@ class LegalVectorStore:
         """
         Executa busca semântica por similaridade de cosseno com filtragem opcional.
         """
-        # Carrega os chunks do SQLite
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -146,7 +232,6 @@ class LegalVectorStore:
         if not rows:
             return []
 
-        # Vetoriza a consulta do usuário
         query_vec = self.encode([query])[0]
 
         results = []
@@ -154,26 +239,22 @@ class LegalVectorStore:
             chunk_id, source_doc, artigo, paragrafo, tema, content, raw_text, meta_json, emb_blob = row
             metadata = json.loads(meta_json) if meta_json else {}
 
-            # Filtro por tags se solicitado
             if filter_tags:
                 chunk_tags = set(metadata.get("tags", []))
                 if not any(tag.lower() in chunk_tags for tag in filter_tags):
                     continue
 
-            # Reconstrói vetor e calcula similaridade
-            vec = np.frombuffer(emb_blob, dtype=np.float32)
-            if len(vec) != len(query_vec):
-                continue
-
-            similarity = float(np.dot(query_vec, vec))
-
-            # Boost léxico para termos tributários e siglas normativas (ex: DASN-SIMEI, CPEN, Fator R)
             query_tokens = [w.lower().strip("?,.:;()\"'!") for w in query.split() if len(w) > 2]
             content_lower = content.lower()
             matches = sum(1 for token in query_tokens if token in content_lower)
             lexical_ratio = (matches / len(query_tokens)) if query_tokens else 0.0
 
-            # Score Híbrido: 70% semântico denso + 30% correspondência léxica exata
+            vec = self._deserialize_embedding(emb_blob)
+            if len(vec) == len(query_vec):
+                similarity = self._dot_product(query_vec, vec)
+            else:
+                similarity = lexical_ratio
+
             hybrid_score = round(0.70 * similarity + 0.30 * lexical_ratio, 4)
 
             results.append({
@@ -190,7 +271,6 @@ class LegalVectorStore:
                 "metadata": metadata,
             })
 
-        # Ordena por score decrescente
         results.sort(key=lambda x: x["score"], reverse=True)
         return results[:top_k]
 
