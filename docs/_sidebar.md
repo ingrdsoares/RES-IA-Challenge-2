@@ -16,6 +16,7 @@
 
 * **Entregáveis**
   * [Download do PDF da Semana](entregaveis-challenge-2-grupo-08-final.pdf)
+  * [Relatório Técnico: Projeto, RAG & MLOps (PDF)](relatorio-socio-digital-rag-mlops.pdf)
 
 * **Links Úteis**
   * [Repositório GitHub](https://github.com/ingrdsoares/RES-IA-Challenge-2)
