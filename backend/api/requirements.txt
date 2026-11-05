@@ -1,0 +1,8 @@
+fastapi==0.116.1
+starlette==0.47.3
+pydantic==2.14.3
+pydantic-settings==2.16.2
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+qdrant-client==1.15.1
+ollama==0.6.3
