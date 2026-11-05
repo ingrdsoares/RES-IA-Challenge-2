@@ -20,6 +20,8 @@ def planejar(selecionadas: set[str], refazer: set[str], resumos: dict, ultimas: 
             item = {'modulo': f.modulo, 'acao': 'pular' if pular else 'rodar',
                     'motivo': 'já tem dados' if pular else 'selecionada'}
         elif f.modulo in necessarias:
+            if (resumo or {}).get('itens'):
+                continue  # dependência com dados não precisa rodar
             item = {'modulo': f.modulo, 'acao': 'rodar', 'motivo': f'necessária para {necessarias[f.modulo]}'}
         else:
             continue
@@ -28,11 +30,7 @@ def planejar(selecionadas: set[str], refazer: set[str], resumos: dict, ultimas: 
                 if d not in selecionadas:
                     necessarias.setdefault(d, f.modulo)
         itens.append(item)
-    itens.reverse()
-    # dependência com dados não precisa rodar
-    por_pasta = {f.modulo: resumos.get(f.pasta) for f in frentes}
-    return [i for i in itens if i['motivo'] != f'necessária para {necessarias.get(i["modulo"])}'
-            or not (por_pasta[i['modulo']] or {}).get('itens')]
+    return itens[::-1]
 
 
 def classificar(saida: int | None, excecao: bool, interrompida: bool, situacao: str | None) -> str:
