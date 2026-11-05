@@ -199,6 +199,12 @@
       "descricao": "Coleta páginas Gov.br para Markdown com tabelas literais e rastreabilidade."
     },
     {
+      "modulo": "painel",
+      "arquivo": "painel/__main__.py",
+      "tipo": "coletor/comando",
+      "descricao": "Executor único das coletas com página local de acompanhamento."
+    },
+    {
       "modulo": "recuperar_anexos",
       "arquivo": "recuperar_anexos.py",
       "tipo": "coletor/comando",

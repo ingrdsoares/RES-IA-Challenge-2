@@ -39,6 +39,7 @@ Instale as dependências com `python -m pip install -r backend/crawler/requireme
 | [obrigacoes](obrigacoes.py) | coletor/comando | Coleta mensal da agenda tributária federal e orientações declaratórias. |
 | [obrigacoes_avancadas](obrigacoes_avancadas.py) | coletor/comando | Recorte oficial de DCTFWeb, eSocial e EFD-Reinf; não infere incidência por empresa. |
 | [paginas](paginas.py) | biblioteca | Coleta páginas Gov.br para Markdown com tabelas literais e rastreabilidade. |
+| [painel](painel/__main__.py) | coletor/comando | Executor único das coletas com página local de acompanhamento. |
 | [recuperar_anexos](recuperar_anexos.py) | coletor/comando | Recuperação local de anexos Word/OCR, sem alterar originais nem suas versões. |
 | [reforma](reforma.py) | coletor/comando | Coleta inicial das normas e do cronograma da reforma tributária. |
 | [reforma_historico](reforma_historico.py) | coletor/comando | Fotografia oficial da reforma CBS/IBS e do histórico normativo CGSN/MEI. |

@@ -41,6 +41,8 @@ python -m backend.crawler.cnae
 
 Veja [crawler/README.md](crawler/README.md) para a estrutura dos arquivos, validações e testes. A coleta inicial não exige banco de dados.
 
+Para rodar as coletas e acompanhar o progresso numa página local, veja [Painel de coleta](crawler/README.md#painel-de-coleta).
+
 Para coletar a LC 123/2006 e a CGSN 140/2018 em Markdown:
 
 ~~~bash
