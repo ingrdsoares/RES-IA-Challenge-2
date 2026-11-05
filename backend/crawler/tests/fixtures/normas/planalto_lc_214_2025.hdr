@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Date: Thu, 05 Nov 2026 23:09:42 GMT
+Last-Modified: Tue, 03 Nov 2026 20:23:07 GMT
+ETag: "526efc-65f6507d36575"
+Accept-Ranges: bytes
+Content-Length: 5403923
+Content-Type: text/html
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
