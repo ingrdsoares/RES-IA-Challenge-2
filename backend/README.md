@@ -1,0 +1,194 @@
+# Backend — Sócio Digital
+
+API FastAPI de consulta RAG com Qdrant persistente e Qwen servido pelo Ollama local.
+A coleção nasce vazia. A alimentação será feita posteriormente pelo responsável pelos dados;
+esta entrega não contém ingestão, seed ou endpoint de escrita de documentos.
+
+## Execução no Mac
+
+Pré-requisitos: Docker Desktop iniciado e Ollama instalado diretamente no macOS.
+O Ollama nativo usa a GPU Apple via Metal. A configuração inicial usa `qwen3:8b`
+quantizado e `qwen3-embedding:0.6b`, para demonstração em M4 com 24 GB.
+
+Baixe os modelos manualmente, uma única vez:
+
+```bash
+ollama pull qwen3:8b
+ollama pull qwen3-embedding:0.6b
+ollama list
+```
+
+O Ollama deve estar executando na porta 11434. Use o aplicativo Ollama ou
+`ollama serve` se ele ainda não estiver rodando. A API não baixa modelos.
+
+Na raiz do repositório:
+
+```bash
+cp backend/.env.example backend/.env
+docker compose -f backend/compose.yaml up -d --build
+docker compose -f backend/compose.yaml logs -f api
+```
+
+Serviços:
+
+| Serviço | Endereço |
+| --- | --- |
+| API / Swagger | http://localhost:8000/docs |
+| Qdrant / dashboard | http://localhost:6333/dashboard |
+| Ollama no host | http://localhost:11434 |
+
+Dentro do container a API acessa Ollama em `host.docker.internal:11434`.
+Se `/ready` retornar 503, confira os logs, `ollama list` e o acesso ao Ollama:
+
+```bash
+docker compose -f backend/compose.yaml exec api python -c "import urllib.request; print(urllib.request.urlopen('http://host.docker.internal:11434/api/tags', timeout=5).read().decode())"
+```
+
+Se o Docker Desktop não alcançar o Ollama restrito ao loopback, encerre a instância
+existente e execute `OLLAMA_HOST=0.0.0.0:11434 ollama serve`, ou execute a API no host,
+como abaixo. O bind em `0.0.0.0` também permite acesso pela rede local; use-o apenas
+em ambiente local controlado. A API e o Qdrant do Compose são publicados em localhost.
+
+Para parar, preservando a base:
+
+```bash
+docker compose -f backend/compose.yaml down
+```
+
+Os dados ficam no volume nomeado `socio-digital_qdrant_data`. Não remova esse volume
+nem use `down -v` se quiser manter os dados que inserir posteriormente.
+
+## API diretamente no host
+
+Python 3.12 ou superior. Na raiz do repositório:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/api/requirements-dev.txt
+docker compose -f backend/compose.yaml up -d qdrant
+cd backend/api
+../../.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Pare o serviço `api` do Compose antes, se já estiver usando a porta 8000.
+Sem variáveis de ambiente, a execução nativa usa Qdrant em `localhost:6333` e
+Ollama em `localhost:11434`. Para carregar um arquivo, passe `--env-file ../.env`
+ao Uvicorn e altere `OLLAMA_URL` desse arquivo para `http://localhost:11434`.
+O arquivo `.env` não é carregado implicitamente pelo código da aplicação.
+
+## Endpoints
+
+```bash
+curl http://localhost:8000/health
+curl -i http://localhost:8000/ready
+curl -X POST http://localhost:8000/rag/query \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"Quais documentos a base disponibiliza?"}'
+```
+
+`GET /health` retorna `{"status":"ok"}` e verifica apenas o processo.
+`GET /ready` retorna 200 quando Qdrant, coleção e os dois modelos estão disponíveis;
+caso contrário retorna 503. Coleção vazia não impede readiness.
+O healthcheck Docker usa `/health`, portanto um container saudável pode ter `/ready` em 503.
+
+`POST /rag/query` aceita somente `question`, texto de 1 a 2.000 caracteres após remover
+espaços externos. O backend usa embedding com instrução de recuperação, busca até cinco
+trechos e gera a resposta em português, sem thinking e sem histórico de conversa.
+
+Enquanto a coleção estiver vazia, retorna HTTP 200 sem chamar os modelos:
+
+```json
+{
+  "status": "empty_knowledge_base",
+  "answer": "A base de conhecimento está vazia. Adicione documentos para consultar o RAG.",
+  "sources": []
+}
+```
+
+Após alimentação, os outros estados são `insufficient_context`, quando nenhum trecho
+utilizável passa pelo limiar e orçamento, e `answered`, com `answer` e `sources`.
+As citações `[1]`, `[2]` correspondem à ordem de `sources`; cada referência inclui ID do
+ponto, texto efetivamente enviado ao modelo, origem, score e metadados disponíveis.
+As fontes mostram o contexto fornecido, sem verificação automática de cada afirmação.
+O prompt exige abstenção na falta de fundamento, mas não garante ausência de alucinações.
+
+| HTTP | Comportamento |
+| --- | --- |
+| 200 | Resposta gerada, base vazia ou contexto insuficiente, identificados por `status` |
+| 422 | Corpo inválido, pergunta vazia, longa demais ou campo inesperado |
+| 503 | Dependência/modelo indisponível, coleção incompatível ou consulta já em andamento |
+| 504 | Timeout de consulta ao Qdrant ou Ollama |
+
+Uma consulta por vez, por processo; execute com um único worker. Pedidos simultâneos
+recebem 503 imediatamente. Não há streaming nem retries automáticos. Se uma dependência
+falhar no startup, a API continua disponível e tenta novamente nas consultas/readiness.
+
+## Configuração
+
+No Compose, `backend/.env` fornece os valores interpolados. Na execução nativa, exporte
+as variáveis ou use `--env-file`. Nenhuma chave de API é necessária.
+
+| Variável | Padrão | Limites / uso |
+| --- | --- | --- |
+| `QDRANT_URL` | `http://localhost:6333` | HTTP(S); Compose fixa `http://qdrant:6333` |
+| `OLLAMA_URL` | `http://localhost:11434` | HTTP(S); Compose usa `http://host.docker.internal:11434` |
+| `EMBEDDING_MODEL` | `qwen3-embedding:0.6b` | Modelo exato instalado no Ollama |
+| `GENERATION_MODEL` | `qwen3:8b` | Modelo exato instalado no Ollama |
+| `COLLECTION_NAME` | `knowledge_base` | Nome da coleção, 1–255 caracteres |
+| `EMBEDDING_DIMENSIONS` | `1024` | 32–4096; exige 1024 para o modelo de embedding padrão |
+| `TOP_K` | `5` | 1–10; limite antes de descartar payloads inválidos |
+| `SCORE_THRESHOLD` | `0.5` | −1 a 1; valor inicial provisório, avaliar com o corpus real |
+| `QDRANT_TIMEOUT` | `5` | Segundos por chamada, maior que zero até 120 |
+| `OLLAMA_TIMEOUT` | `120` | Segundos por chamada, maior que zero até 600 |
+| `NUM_CTX` | `8192` | 8192–32768 tokens de contexto |
+| `NUM_PREDICT` | `1024` | 64–1024 tokens de saída |
+| `MAX_CONTEXT_CHARS` | `6000` | 1–6000 caracteres de texto recuperado no total |
+
+Além do limite de caracteres, o backend aplica orçamento conservador em bytes UTF-8
+ao prompt completo, reservando a saída e 256 tokens para o template. Os trechos são
+selecionados por score e podem ser truncados. Isso pode reduzir o contexto disponível;
+a latência e a qualidade precisam ser avaliadas quando houver documentos reais.
+
+## Contrato para alimentação posterior
+
+Coleção padrão `knowledge_base`, vetor denso **sem nome**, distância `Cosine`, dimensão
+`1024`. A aplicação cria a coleção vazia se estiver ausente. Coleção incompatível é
+rejeitada sem apagar ou recriar dados existentes.
+
+Cada ponto deve ter:
+
+- ID Qdrant válido: inteiro sem sinal ou UUID.
+- Vetor do texto do trecho gerado pelo **mesmo** `qwen3-embedding:0.6b`, com 1.024 dimensões.
+- Payload obrigatório: `text` e `source`, strings não vazias; `source` é URL ou referência
+  documental, até 2.048 caracteres.
+- Payload opcional: `title` (até 256 caracteres), `document_id`, `chunk_id` (strings),
+  `reference_date` e `effective_date` (datas `YYYY-MM-DD` quando conhecidas).
+
+Gere o embedding dos documentos usando somente o texto do trecho, sem instrução.
+Na consulta, a aplicação acrescenta a instrução recomendada para Qwen3 Embedding:
+
+```text
+Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query:<pergunta>
+```
+
+Use `truncate=False` também na futura ingestão para detectar trechos grandes demais.
+Trocar o modelo de embedding exige reindexar os documentos, mesmo se a dimensão for
+igual. Trocar apenas o gerador não exige reindexação. Payloads inválidos são descartados
+na busca, com aviso no log, e não chegam ao prompt.
+
+## Testes
+
+Na raiz, com o ambiente virtual instalado:
+
+```bash
+.venv/bin/python -m pytest backend/api/tests -m 'not integration' -q
+QDRANT_TEST_URL=http://localhost:6333 .venv/bin/python -m pytest backend/api/tests -m integration -q
+docker compose -f backend/compose.yaml config --quiet
+```
+
+Sem `QDRANT_TEST_URL`, o teste de integração é pulado. O teste cria e remove apenas
+uma coleção temporária `test_rag_<uuid>` com vetores sintéticos; não altera a coleção
+da aplicação. Os testes de Ollama usam o SDK real com transporte HTTP controlado.
+Sem modelos instalados e documentos, não é possível avaliar geração e recuperação
+semântica reais; a entrega valida os contratos, integrações e o estado de base vazia.

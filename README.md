@@ -29,6 +29,21 @@ Aproximadamente 95% a 99% das empresas ativas no Brasil são micro e pequenos ne
 
 ---
 
+## Backend inicial de RAG
+
+A API fica em [`backend/api/`](backend/api/). O backend usa FastAPI, Qdrant em Docker
+com persistência e Ollama no macOS para executar `qwen3:8b` e `qwen3-embedding:0.6b`.
+A base começa vazia e será alimentada posteriormente.
+
+Consulte [`backend/README.md`](backend/README.md) para configuração, execução e contrato
+dos documentos. Para iniciar os serviços com Docker Desktop e Ollama disponíveis:
+
+```bash
+docker compose -f backend/compose.yaml up -d --build
+```
+
+API: http://localhost:8000/docs. Qdrant: http://localhost:6333/dashboard.
+
 ## Estrutura da Documentação
 
 A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):

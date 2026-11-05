@@ -14,6 +14,8 @@ ignore = []
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-testpaths = ["api/tests"]
-pythonpath = ["api", "."]
+testpaths = ["backend/api/tests"]
+pythonpath = ["backend/api", "."]
 addopts = "-v --tb=short"
+
+markers = ["integration: requires QDRANT_TEST_URL and a real Qdrant instance"]
