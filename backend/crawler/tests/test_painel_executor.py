@@ -7,9 +7,10 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
-from backend.crawler.painel.executor import Executor, RodadaAtiva, comando_sonda, ultimas_execucoes
+from backend.crawler.painel.executor import Executor, RodadaAtiva, _encerrar_arvore, comando_sonda, ultimas_execucoes
 from backend.crawler.painel.frentes import Frente
 from backend.crawler.painel.sonda import SAIDA_EXCECAO
 
@@ -307,6 +308,30 @@ time.sleep(30)""")
         self.assertFalse(estado['rodando'])
         self.assertEqual(estado['finais'][0]['estado'], 'nao_iniciada')
         self.assertNotIn('estatisticas', self.ordem_rodada())
+
+    def test_forcar_nao_lanca_catalogo_nem_finais(self):
+        self.script('a', "espera(os.environ['PAINEL_PARAR'])")
+        self.script('estatisticas')
+        e = Executor(self.painel, self.data, frentes=FRENTES, comando=self.comando, tempo_limite=60, intervalo=0.02)
+        self.addCleanup(self._encerrar, e)
+        e.iniciar({'a'}, set(), {'estatisticas'})
+        self.esperar(self.ordem.exists)
+        e.forcar()
+        e.aguardar(10)
+        estado = e.estado()
+        self.assertEqual(self.ordem_rodada(), ['a'])
+        self.assertIsNone(estado['aviso'])
+        self.assertEqual(estado['finais'][0]['estado'], 'nao_iniciada')
+        self.assertEqual(self.linha(estado, 'a')['estado'], 'interrompida')
+
+    def test_encerrar_arvore_sobrevive_a_ctrl_c_no_taskkill(self):
+        alvo = 'subprocess.run' if os.name == 'nt' else 'os.killpg'
+        for efeitos in ([KeyboardInterrupt, None], [KeyboardInterrupt, KeyboardInterrupt]):
+            with self.subTest(efeitos=efeitos), mock.patch(alvo, side_effect=efeitos) as encerrar:
+                proc = mock.Mock(pid=1)
+                _encerrar_arvore(proc)
+                self.assertEqual(encerrar.call_count, 2)
+                proc.kill.assert_called_once_with()
 
     def test_forcar_sem_rodada_nao_faz_nada(self):
         e = self.executor()

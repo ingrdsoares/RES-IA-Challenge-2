@@ -266,6 +266,23 @@ class CtrlCTest(unittest.TestCase):
         _parar(ex)
         self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'], ['parar', 'aguardar', 'aguardar', 'forcar', 'aguardar'])
 
+    def test_ctrl_c_dentro_do_forcar_nao_escapa_e_repete(self):
+        class Teimoso(Falso):
+            def aguardar(self, timeout=None):
+                super().aguardar(timeout)
+                if len(self.de('aguardar')) == 1:
+                    raise KeyboardInterrupt
+
+            def forcar(self):
+                super().forcar()
+                if len(self.de('forcar')) == 1:
+                    raise KeyboardInterrupt
+
+        ex = Teimoso([{'rodando': True}])
+        _parar(ex)
+        self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'],
+                         ['parar', 'aguardar', 'forcar', 'forcar', 'aguardar'])
+
     def test_terceiro_ctrl_c_na_espera_final_nao_escapa(self):
         class Impaciente(Falso):
             def aguardar(self, timeout=None):

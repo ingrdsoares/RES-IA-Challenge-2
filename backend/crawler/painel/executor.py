@@ -69,14 +69,20 @@ def _dominio(url: str | None) -> str | None:
 
 def _encerrar_arvore(proc: subprocess.Popen) -> None:
     try:
-        if os.name == 'nt':
-            subprocess.run(['taskkill', '/PID', str(proc.pid), '/T', '/F'], stdin=subprocess.DEVNULL,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
-        else:
-            os.killpg(proc.pid, signal.SIGKILL)
-    except (OSError, subprocess.SubprocessError):
-        pass
-    proc.kill()  # se o encerramento da árvore falhou, ao menos o processo direto cai
+        for _ in range(2):  # um Ctrl+C durante o taskkill não pode deixar a árvore viva
+            try:
+                if os.name == 'nt':
+                    subprocess.run(['taskkill', '/PID', str(proc.pid), '/T', '/F'], stdin=subprocess.DEVNULL,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+                else:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                break
+            except KeyboardInterrupt:
+                continue
+            except (OSError, subprocess.SubprocessError):
+                break
+    finally:
+        proc.kill()  # se o encerramento da árvore falhou, ao menos o processo direto cai
 
 
 def _panorama(f, resumos: dict, ultimas: dict) -> dict:
@@ -316,7 +322,7 @@ class Executor:
                 executadas.append(modulo)
                 self._coletar(modulo)
             if executadas:
-                atualizado = self._atualizar_catalogo()
+                atualizado = not self._forcado and self._atualizar_catalogo()
                 self._classificar_executadas(executadas, atualizado)
             self._rodar_finais()  # depois de Parar, parar() já as tirou da fila
         except Exception as e:
@@ -368,9 +374,11 @@ class Executor:
                     'PAINEL_EVENTOS': str(self._eventos), 'PAINEL_PARAR': str(self._sinal)}
         with open(self._dir / f'{modulo}.log', 'ab') as log:
             try:
-                proc = subprocess.Popen(self.comando(modulo), cwd=RAIZ, env=ambiente, stdin=subprocess.DEVNULL,
-                                        stdout=log, stderr=subprocess.STDOUT, **_GRUPO)
-                with self._trava:
+                with self._trava:  # forcar() ou vê o coletor em _proc, ou vence a corrida e nada é lançado
+                    if self._forcado:
+                        return None, False
+                    proc = subprocess.Popen(self.comando(modulo), cwd=RAIZ, env=ambiente, stdin=subprocess.DEVNULL,
+                                            stdout=log, stderr=subprocess.STDOUT, **_GRUPO)
                     self._proc = proc
             except OSError as e:
                 log.write(f'Não foi possível iniciar o processo: {e}\n'.encode('utf-8'))
@@ -450,7 +458,7 @@ class Executor:
             self._etapa = 'catalogo'
         saida, _ = self._processo(MODULO_CATALOGO, forcavel=False)
         atualizado = saida == 0 and bool(self._resumos())
-        if not atualizado:
+        if not atualizado and not self._forcado:  # catálogo não lançado por causa de forcar() não é falha dele
             with self._trava:
                 self._aviso = _AVISO_CATALOGO
         return atualizado

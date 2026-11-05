@@ -78,7 +78,12 @@ def _parar(executor) -> None:
         while executor.estado()['rodando']:  # espera curta em laço: join sem prazo não é interrompível no Windows
             executor.aguardar(0.25)
     except KeyboardInterrupt:  # segundo Ctrl+C: mata o coletor e sai
-        executor.forcar()
+        for _ in range(5):  # novos Ctrl+C não podem impedir o encerramento do coletor
+            try:
+                executor.forcar()
+                break
+            except KeyboardInterrupt:
+                continue
         try:
             executor.aguardar(5)
         except KeyboardInterrupt:
