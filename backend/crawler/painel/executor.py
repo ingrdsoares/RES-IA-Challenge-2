@@ -124,6 +124,8 @@ class Executor:
         self._interrompidas: set[str] = set()
         self._parada = False
         self._limite = None
+        self._forcado = False
+        self._proc = None  # coletor em execução, para forcar()
 
     @staticmethod
     def _linha_final(modulo: str, estado: str) -> dict:
@@ -160,6 +162,17 @@ class Executor:
                     linha['estado'] = 'nao_iniciada'
                 elif linha['estado'] == 'coletando':
                     linha['estado'] = 'parando'
+
+    def forcar(self) -> None:
+        """Encerra já a árvore do coletor atual (inclusive o catálogo) e não inicia mais nada."""
+        self.parar()
+        with self._trava:
+            if not self._rodando:
+                return
+            self._forcado = True
+            proc = self._proc
+        if proc is not None and proc.poll() is None:
+            _encerrar_arvore(proc)
 
     def aguardar(self, timeout: float | None = None) -> None:
         if self._thread:
@@ -266,7 +279,7 @@ class Executor:
         self._casadas = {m: set() for m in self._rodar}
         self._relogio, self._duracoes = {}, {}
         self._interrompidas = set()
-        self._parada, self._limite = False, None
+        self._parada, self._limite, self._forcado = False, None, False
         self._etapa = 'coletando'
         self._inicio, self._fim, self._aviso = _agora(), None, None
 
@@ -357,6 +370,8 @@ class Executor:
             try:
                 proc = subprocess.Popen(self.comando(modulo), cwd=RAIZ, env=ambiente, stdin=subprocess.DEVNULL,
                                         stdout=log, stderr=subprocess.STDOUT, **_GRUPO)
+                with self._trava:
+                    self._proc = proc
             except OSError as e:
                 log.write(f'Não foi possível iniciar o processo: {e}\n'.encode('utf-8'))
                 return None, False
@@ -364,7 +379,7 @@ class Executor:
         try:
             while (saida := proc.poll()) is None:
                 passo()
-                if forcavel and not forcada and self._parada_vencida():
+                if not forcada and (self._forcado or (forcavel and self._parada_vencida())):
                     _encerrar_arvore(proc)
                     forcada = True
                 time.sleep(self.intervalo)
@@ -373,7 +388,10 @@ class Executor:
             _encerrar_arvore(proc)
             proc.wait()
             raise
-        return saida, forcada
+        finally:
+            with self._trava:
+                self._proc = None
+        return saida, forcada or self._forcado
 
     def _parada_vencida(self) -> bool:
         with self._trava:

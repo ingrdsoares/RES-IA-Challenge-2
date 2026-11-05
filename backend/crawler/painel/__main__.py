@@ -75,9 +75,14 @@ def _pagina(args, executor) -> int:
 def _parar(executor) -> None:
     try:
         executor.parar()
-        executor.aguardar()
-    except KeyboardInterrupt:
-        pass  # segundo Ctrl+C: sai sem esperar
+        while executor.estado()['rodando']:  # espera curta em laço: join sem prazo não é interrompível no Windows
+            executor.aguardar(0.25)
+    except KeyboardInterrupt:  # segundo Ctrl+C: mata o coletor e sai
+        executor.forcar()
+        try:
+            executor.aguardar(5)
+        except KeyboardInterrupt:
+            pass
 
 
 def _terminal(args, executor) -> int:

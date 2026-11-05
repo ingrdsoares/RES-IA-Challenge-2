@@ -8,7 +8,7 @@ import threading
 import unittest
 from pathlib import Path
 
-from backend.crawler.painel.__main__ import main
+from backend.crawler.painel.__main__ import _parar, main
 from backend.crawler.painel.executor import RodadaAtiva
 from backend.crawler.painel.servidor import criar_servidor
 
@@ -41,6 +41,9 @@ class Falso:
     def log(self, modulo):
         self.chamadas.append(('log', modulo))
         return f'log de {modulo} ç'
+
+    def forcar(self):
+        self.chamadas.append(('forcar',))
 
     def de(self, nome):
         return [c for c in self.chamadas if c[0] == nome]
@@ -150,6 +153,33 @@ class ServidorTest(unittest.TestCase):
         self.assertEqual(self.pedir('GET', '/estado')[0], 200)
         self.assertEqual(self.ex.de('parar'), [])
 
+    def contrabando(self, cabecalho_corpo):
+        """Envia uma requisição recusada cujo corpo é uma segunda requisição completa e válida."""
+        interno = (f'POST /iniciar HTTP/1.1\r\nHost: 127.0.0.1:{self.porta}\r\n'
+                   f'Origin: http://127.0.0.1:{self.porta}\r\nContent-Type: application/json\r\n'
+                   'Content-Length: 20\r\n\r\n{"frentes":["cnae"]}')
+        cabecalho, corpo = cabecalho_corpo(interno)
+        externo = (f'POST /x HTTP/1.1\r\nHost: 127.0.0.1:{self.porta}\r\nOrigin: https://evil.com\r\n'
+                   f'Content-Type: text/plain\r\n{cabecalho}\r\n\r\n{corpo}').encode()
+        with socket.create_connection(('127.0.0.1', self.porta), timeout=5) as s:
+            s.sendall(externo)
+            dados = b''
+            while parte := s.recv(4096):  # o servidor tem de fechar a conexão
+                dados += parte
+        return dados
+
+    def test_corpo_recusado_nao_vira_segunda_requisicao(self):
+        dados = self.contrabando(lambda interno: (f'Content-Length: {len(interno)}', interno))
+        self.assertIn(b' 403 ', dados.split(b'\r\n')[0])
+        self.assertEqual(dados.count(b'HTTP/1.'), 1)
+        self.assertEqual(self.ex.de('iniciar'), [])
+
+    def test_chunked_recusado_nao_vira_segunda_requisicao(self):
+        dados = self.contrabando(lambda interno: ('Transfer-Encoding: chunked', interno))
+        self.assertIn(b' 403 ', dados.split(b'\r\n')[0])
+        self.assertEqual(dados.count(b'HTTP/1.'), 1)
+        self.assertEqual(self.ex.de('iniciar'), [])
+
     def test_porta_ocupada(self):
         with socket.socket() as ocupada:
             ocupada.bind(('127.0.0.1', 0))
@@ -210,12 +240,41 @@ class CtrlCTest(unittest.TestCase):
     def test_ctrl_c_para_e_aguarda(self):
         class Interrompe(Falso):
             def estado(self):
-                raise KeyboardInterrupt
+                if not self.de('estado'):
+                    super().estado()
+                    raise KeyboardInterrupt
+                return super().estado()
 
         ex = Interrompe()
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(main(['--sem-pagina', '--frentes', 'cnae'], executor=ex), 1)
-        self.assertEqual([c[0] for c in ex.chamadas if c[0] in ('parar', 'aguardar')], ['parar', 'aguardar'])
+        self.assertEqual([c[0] for c in ex.chamadas if c[0] in ('parar', 'forcar')], ['parar'])
+
+    def test_parar_espera_em_laco_curto(self):
+        ex = Falso([{'rodando': True}, {'rodando': True}, {'rodando': False}])
+        _parar(ex)
+        self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'], ['parar', 'aguardar', 'aguardar'])
+
+    def test_segundo_ctrl_c_forca_antes_de_voltar(self):
+        class Teimoso(Falso):
+            def aguardar(self, timeout=None):
+                super().aguardar(timeout)
+                if len(self.de('aguardar')) == 2:
+                    raise KeyboardInterrupt  # segundo Ctrl+C durante a espera
+
+        ex = Teimoso([{'rodando': True}])
+        _parar(ex)
+        self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'], ['parar', 'aguardar', 'aguardar', 'forcar', 'aguardar'])
+
+    def test_terceiro_ctrl_c_na_espera_final_nao_escapa(self):
+        class Impaciente(Falso):
+            def aguardar(self, timeout=None):
+                super().aguardar(timeout)
+                raise KeyboardInterrupt
+
+        ex = Impaciente([{'rodando': True}])
+        _parar(ex)
+        self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'], ['parar', 'aguardar', 'forcar', 'aguardar'])
 
 
 if __name__ == '__main__':

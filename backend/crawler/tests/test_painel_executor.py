@@ -272,6 +272,47 @@ time.sleep(30)""")
         self.assertTrue(ultimas_execucoes(self.painel / 'historico.jsonl')['a']['forcada'])
         self.esperar(lambda: not vivo(pid))
 
+    def test_forcar_encerra_filho_e_neto_sem_esperar_o_prazo(self):
+        arquivo_pid = self.tmp / 'pid'
+        filho = "import os, pathlib, time; pathlib.Path(os.environ['ALVO']).write_text(str(os.getpid())); time.sleep(30)"
+        self.script('a', f"""
+os.environ['ALVO'] = {str(arquivo_pid)!r}
+subprocess.Popen([sys.executable, '-c', {filho!r}])
+time.sleep(30)""")
+        self.script('b')
+        e = Executor(self.painel, self.data, frentes=FRENTES, comando=self.comando, tempo_limite=60, intervalo=0.02)
+        self.addCleanup(self._encerrar, e)
+        e.iniciar({'a', 'b'}, set(), set())
+        self.esperar(lambda: arquivo_pid.exists() and arquivo_pid.read_text())
+        pid = int(arquivo_pid.read_text())
+        e.forcar()
+        e.aguardar(10)
+        self.assertFalse(e.estado()['rodando'])
+        linha = self.linha(e.estado(), 'a')
+        self.assertEqual((linha['estado'], linha['forcada']), ('interrompida', True))
+        self.assertEqual(self.linha(e.estado(), 'b')['estado'], 'nao_iniciada')
+        self.esperar(lambda: not vivo(pid))
+
+    def test_forcar_durante_catalogo_encerra_a_rodada(self):
+        self.script('a')
+        self.script('catalogo', f"espera({str(self.solta)!r})")
+        self.script('estatisticas')
+        e = Executor(self.painel, self.data, frentes=FRENTES, comando=self.comando, tempo_limite=60, intervalo=0.02)
+        self.addCleanup(self._encerrar, e)
+        e.iniciar({'a'}, set(), {'estatisticas'})
+        self.esperar(lambda: e.estado()['etapa'] == 'catalogo')
+        e.forcar()
+        e.aguardar(10)
+        estado = e.estado()
+        self.assertFalse(estado['rodando'])
+        self.assertEqual(estado['finais'][0]['estado'], 'nao_iniciada')
+        self.assertNotIn('estatisticas', self.ordem_rodada())
+
+    def test_forcar_sem_rodada_nao_faz_nada(self):
+        e = self.executor()
+        e.forcar()
+        self.assertFalse(e.estado()['rodando'])
+
     def test_parar_durante_catalogo_nao_o_encerra_e_cancela_finais(self):
         terminou = self.tmp / 'catalogo-terminou'
         self.script('a')

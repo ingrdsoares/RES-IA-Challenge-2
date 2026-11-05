@@ -23,7 +23,7 @@ class _Servidor(ThreadingHTTPServer):
 
 def criar_servidor(executor: Executor, porta: int, *, pagina: Path = PAGINA) -> ThreadingHTTPServer:
     class Handler(BaseHTTPRequestHandler):
-        protocol_version = 'HTTP/1.1'
+        # HTTP/1.0 (padrão): fecha após cada resposta; com keep-alive um corpo recusado viraria outra requisição
 
         def log_message(self, *args) -> None:
             pass
