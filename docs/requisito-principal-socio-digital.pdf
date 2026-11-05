@@ -1,0 +1,256 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 7 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+7 0 obj
+<< /Length 5757 >>
+stream
+q 0.06 0.12 0.28 rg 45 745 505.28 65 re f Q
+q 0.85 0.65 0.13 rg 45 807 505.28 3 re f Q
+BT /F2 15 Tf 1 1 1 rg 60 782 Td (SÓCIO DIGITAL: COPILOTO DE GESTÃO FISCAL) Tj ET
+BT /F1 9 Tf 0.85 0.90 0.98 rg 60 766 Td (RES-IA Challenge 2 — Grupo 08 | Clara, Ingrid, Jhessica, Lucas, Nasser) Tj ET
+BT /F2 8.5 Tf 0.95 0.75 0.25 rg 60 752 Td (ANÁLISE TÉCNICA: QUAL É O PRINCIPAL REQUISITO DO PROJETO?) Tj ET
+q 0.95 0.98 1.00 rg 0.60 0.75 0.95 RG 0.8 w 45 554 505.28 172 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 712 Td (A Pergunta Central do Avaliador / Stakeholder) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 699 Td ("Qual o principal requisito do meu projeto? Aquele que, se faltar, o projeto simplesmente não) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 687 Td (funcionaria?") Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 669 Td (Resposta Executiva:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O Sócio Digital não é apenas um assistente de conversação comum; é um) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 657 Td (copiloto de conformidade e tomada de decisão tributária. Seu funcionamento) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 645 Td (apoia-se em um TRINÔMIO DE REQUISITOS VITAIS:) Tj ET
+q 0.20 0.40 0.70 rg 58 635 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 633 Td (1. Entrada de Negócio \(RF01\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Contexto Empresarial \(CNAE / Faturamento / Folha\). Sem ele,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 621 Td (inexiste base matemática e legal.) Tj ET
+q 0.20 0.40 0.70 rg 58 611 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 609 Td (2. Núcleo Arquitetural \(RF03 / RNF05\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( RAG Factual + Motor Determinístico. Sem ele, a IA) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 597 Td (alucina e gera multas ao usuário.) Tj ET
+q 0.20 0.40 0.70 rg 58 587 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 585 Td (3. Entrega de Valor \(RF07\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Planos de Ação Estruturados em 3 Etapas. Sem ele, o sistema vira) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 573 Td (um chat descartável sem utilidade.) Tj ET
+q 0.10 0.28 0.65 rg 45 533 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 535 Td (1. O Requisito Vital de Entrada: Cadastro do Contexto Empresarial \(RF01\)) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 522 Td (Sem dados cadastrais e financeiros, a legislação tributária brasileira torna-se inaplicável.) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 504.2 Td (No sistema tributário nacional regido pela Lei Complementar nº 123/2006, é impossível emitir qualquer) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 492.2 Td (orientação ou apuração contábil no vácuo. Toda regra fiscal depende estritamente do cruzamento simultâneo de) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 480.2 Td (quatro variáveis cadastradas no perfil da empresa:) Tj ET
+q 0.15 0.35 0.70 rg 47 467.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 465.5 Td (CNAE \(Classificação Nacional de Atividades\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Determina de forma taxativa se o negócio pode ser MEI ou se) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 454.0 Td (obrigatoriamente deve migrar para o Simples Nacional. Além) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 442.5 Td (disso, vincula a atividade aos Anexos de I a V da LC 123/2006.) Tj ET
+q 0.15 0.35 0.70 rg 47 431.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 429.0 Td (Faturamento Bruto Acumulado \(RBT12\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( A apuração do Simples Nacional não usa alíquota fixa. Exige a fórmula) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 417.5 Td (oficial: Alíquota Efetiva = \(\(RBT12 * Alíquota Nominal\) - Parcela a) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 406.0 Td (Deduzir\) / RBT12. Sem o RBT12, a alíquota não existe.) Tj ET
+q 0.15 0.35 0.70 rg 47 394.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 392.5 Td (Folha de Pagamento e Pró-Labore \(Fator R\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Para empresas de serviços \(tecnologia, engenharia, saúde\), se a) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 381.0 Td (razão entre folha e faturamento for >= 28%, a empresa tributa no) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 369.5 Td (Anexo III \(6%\); se for menor, cai no Anexo V \(15,5%\).) Tj ET
+q 0.15 0.35 0.70 rg 47 358.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 356.0 Td (Localização Municipal e Estadual:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Define a incidência de ISS ou ICMS e a aplicação de sublimites fiscais) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 344.5 Td (estaduais.) Tj ET
+q 1.00 0.96 0.96 rg 0.95 0.70 0.70 RG 0.8 w 45 239.5 505.28 100 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 325.5 Td (O que acontece se faltar o Contexto Empresarial \(RF01\)?) Tj ET
+q 0.20 0.40 0.70 rg 58 314.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 312.5 Td (Impacto 1:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Qualquer orientação contábil torna-se puro palpite genérico e juridicamente) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 300.5 Td (perigoso.) Tj ET
+q 0.20 0.40 0.70 rg 58 290.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 288.5 Td (Impacto 2:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O usuário pode pagar 15,5% de imposto em vez de 6% por desconhecer a aplicação do) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 276.5 Td (Fator R.) Tj ET
+q 0.20 0.40 0.70 rg 58 266.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 264.5 Td (Impacto 3:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O empreendedor corre o risco de desenquadramento retroativo do MEI com multa de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 252.5 Td (20% e juros SELIC.) Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Análise de Requisitos Críticos | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 1 de 3) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 9 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+9 0 obj
+<< /Length 5475 >>
+stream
+q 0.08 0.16 0.32 rg 45 808 505.28 2 re f Q
+BT /F2 8 Tf 0.30 0.38 0.48 rg 45 814 Td (SÓCIO DIGITAL — PACOTE DE DEFINIÇÃO TÉCNICA) Tj ET
+BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2 — Grupo 08) Tj ET
+q 0.10 0.28 0.65 rg 45 775 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 777 Td (2. O Requisito Arquitetural Inegociável: RAG Factual + Motor Determinístico \(RF03 / RNF05\)) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 764 Td (A fronteira de segurança entre inteligência generativa e exatidão contábil \(Zero Alucinação\).) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 746.2 Td (O maior risco mapeado pelo Grupo 08 na concepção do Sócio Digital é a ALUCINAÇÃO DO LLM. Modelos fundacionais) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 734.2 Td (são motores probabilísticos de texto: eles tendem a inventar alíquotas plausíveis, errar contas com decimais e) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 722.2 Td (citar artigos revogados. Na contabilidade, um erro de R$ 0,01 invalida o Documento de Arrecadação do Simples) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 710.2 Td (Nacional \(DAS\).) Tj ET
+q 0.96 0.98 0.96 rg 0.70 0.88 0.70 RG 0.8 w 45 532 505.28 172 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 690 Td (A Solução Arquitetural de Clara, Nasser, Lucas e Jhessica) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 677 Td (1. Ingestão e Vector Store Factual \(src/rag/\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( A legislação oficial \(LC 123/2006, CGSN 140/2018\)) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 665 Td (é indexada por dispositivos jurídicos canônicos.) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 653 Td (Cada chunk preserva o artigo, parágrafo, órgão) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 641 Td (emissor e período de vigência.) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 629 Td (2. Motor Determinístico em Python \(src/fiscal/\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( As regras matemáticas de dedução, alíquotas) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 617 Td (efetivas e enquadramento do MEI são 100%) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 605 Td (determinísticas em código Python) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 593 Td (\(FiscalCalculator\). O LLM é expressamente) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 581 Td (proibido de calcular impostos.) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 569 Td (3. Papel do LLM na Solução:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O modelo generativo apenas recebe os números calculados pelo motor) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 557 Td (determinístico e o texto oficial resgatado pelo RAG para sintetizar) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 545 Td (uma explicação acolhedora, didática e livre de jargões técnicos.) Tj ET
+q 0.10 0.28 0.65 rg 45 511 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 513 Td (3. O Requisito de Entrega de Valor: Planos de Ação em até 3 Passos \(RF07\)) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 500 Td (A superação do modelo de chat comum: transformando ansiedade em passos executáveis.) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 482.2 Td (Pequenos empresários vivem sobrecarregados de tarefas operacionais e sob constante terror fiscal. Um chat) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 470.2 Td (tradicional que responde longas explicações teóricas gera paralisia por análise. O diferencial do projeto é o) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 458.2 Td (requisito RF07, que converte toda resposta em no máximo 3 etapas acionáveis:) Tj ET
+q 0.15 0.35 0.70 rg 47 445.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 443.5 Td (Passo 1 \(Diagnóstico\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Identificar a pendência exata na base oficial \(ex.: Notificação de Débito no Portal) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 432.0 Td (e-CAC\).) Tj ET
+q 0.15 0.35 0.70 rg 47 420.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 418.5 Td (Passo 2 \(Execução\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Instrução objetiva do que fazer \(ex.: Como aderir ao Programa de Parcelamento do Simples) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 407.0 Td (Nacional\).) Tj ET
+q 0.15 0.35 0.70 rg 47 395.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 393.5 Td (Passo 3 \(Comprovação\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Como obter a Certidão Positiva com Efeito de Negativa \(CPEN\) para manter o negócio) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 382.0 Td (apto a emitir notas.) Tj ET
+q 0.10 0.28 0.65 rg 45 364.0 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 366.0 Td (4. A Fronteira Regulatória e Ética: Não Exercício Ilegal da Contabilidade \(RNF04\)) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 353.0 Td (O assistente empodera o empreendedor sem violar prerrogativas exclusivas do CRC.) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 335.2 Td (O Decreto-Lei nº 9.295/1946 reserva privativamente a contadores registrados no CRC a emissão de balanços e) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 323.2 Td (pareceres fiscais. O Sócio Digital foi desenhado sob o requisito RNF04 \(Abstenção e Disclaimers\): atua no) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 311.2 Td (letramento e organização fiscal prévia, e se abstém proativamente, recomendando a validação presencial com o) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 299.2 Td (contador em operações societárias complexas.) Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Análise de Requisitos Críticos | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 2 de 3) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 11 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+11 0 obj
+<< /Length 6774 >>
+stream
+q 0.08 0.16 0.32 rg 45 808 505.28 2 re f Q
+BT /F2 8 Tf 0.30 0.38 0.48 rg 45 814 Td (SÓCIO DIGITAL — PACOTE DE DEFINIÇÃO TÉCNICA) Tj ET
+BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2 — Grupo 08) Tj ET
+q 0.10 0.28 0.65 rg 45 775 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 777 Td (5. Matriz Comparativa: O Impacto da Ausência de Cada Requisito) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 764 Td (Visão sintetizada de dependência funcional, tecnológica e de governança.) Tj ET
+q 0.10 0.18 0.35 rg 45 737 505.28 18 re f Q
+BT /F2 8 Tf 1 1 1 rg 50 742.5 Td (Requisito) Tj ET
+BT /F2 8 Tf 1 1 1 rg 130 742.5 Td (Tipo / Camada) Tj ET
+BT /F2 8 Tf 1 1 1 rg 225 742.5 Td (Objetivo no Projeto) Tj ET
+BT /F2 8 Tf 1 1 1 rg 400 742.5 Td (Impacto se Inexistir) Tj ET
+q 0.96 0.97 1.0 rg 45 711 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 711 m 550.28 711 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 727.5 Td (RF01: Contexto) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 727.5 Td (Funcional \(Entrada\)) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 727.5 Td (Capturar CNAE, RBT12, porte e folha) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 718.0 Td (salarial.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 727.5 Td (Cálculos impossíveis; respostas) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 718.0 Td (genéricas inválidas.) Tj ET
+q 1 1 1 rg 45 685 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 685 m 550.28 685 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 701.5 Td (RF03: RAG) Tj ET
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 692.0 Td (Factual) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 701.5 Td (Funcional) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 692.0 Td (\(IA/Dados\)) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 701.5 Td (Ancorar respostas em normas oficiais) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 692.0 Td (vigentes.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 701.5 Td (Alucinação jurídica com normas) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 692.0 Td (revogadas.) Tj ET
+q 0.96 0.97 1.0 rg 45 659 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 659 m 550.28 659 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 675.5 Td (RNF05: Motor) Tj ET
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 666.0 Td (Python) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 675.5 Td (Arquitetura /) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 666.0 Td (Regras) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 675.5 Td (Executar Fator R e alíquotas com) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 666.0 Td (exatidão matemática.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 675.5 Td (Erros de centavos que invalidam) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 666.0 Td (guias DAS oficiais.) Tj ET
+q 1 1 1 rg 45 633 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 633 m 550.28 633 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 649.5 Td (RF07: Planos 3) Tj ET
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 640.0 Td (Passos) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 649.5 Td (Funcional) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 640.0 Td (\(UX/Entrega\)) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 649.5 Td (Converter dúvidas em tarefas) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 640.0 Td (acionáveis e claras.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 649.5 Td (Usuário perdido em textos longos;) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 640.0 Td (abandono do app.) Tj ET
+q 0.96 0.97 1.0 rg 45 607 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 607 m 550.28 607 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 623.5 Td (RF06: Painel) Tj ET
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 614.0 Td (Semáforo) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 623.5 Td (Funcional \(Gestão\)) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 623.5 Td (Acompanhar conformidade e alertar) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 614.0 Td (vencimentos.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 623.5 Td (Usuário perde prazos e acumula) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 614.0 Td (multas moratórias.) Tj ET
+q 1 1 1 rg 45 581 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 581 m 550.28 581 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 597.5 Td (RNF04: Abstenção) Tj ET
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 588.0 Td (CRC) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 597.5 Td (Não-Funcional) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 130 588.0 Td (\(Ético\)) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 597.5 Td (Respeitar prerrogativas do) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 225 588.0 Td (profissional contábil.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 597.5 Td (Processos judiciais por exercício) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 400 588.0 Td (ilegal da profissão.) Tj ET
+q 0.70 0.76 0.88 RG 0.75 w 45 579 505.28 176 re S Q
+q 0.10 0.28 0.65 rg 45 556 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 558 Td (6. Conclusão e Resumo para Defesa Técnica) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 545 Td (Como sintetizar a resposta diante da banca avaliadora da Residência em IA.) Tj ET
+q 0.95 0.98 1.00 rg 0.10 0.28 0.65 RG 0.8 w 45 340 505.28 196 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 522 Td (Declaração de Encerramento e Defesa do Grupo 08) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 509 Td (Defesa:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( "Se fôssemos forçados a eleger um único requisito sem o qual o projeto sequer existiria,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 497 Td (a resposta é o) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 485 Td (NÚCLEO VITAL:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( DESACOPLAMENTO ENTRE O CONTEXTO EMPRESARIAL \(RF01\) E O MOTOR DETERMINÍSTICO) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 473 Td (ANCORADO EM RAG \(RF03/RNF05\).) Tj ET
+q 0.20 0.40 0.70 rg 58 457 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 455 Td (1. O modelo generativo isolado) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( destrói a confiança do empreendedor porque não sabe calcular) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 443 Td (tributos.) Tj ET
+q 0.20 0.40 0.70 rg 58 433 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 431 Td (2. A calculadora fria de impostos) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( sem IA não ajuda o leigo que tem pavor de guias e termos) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 419 Td (contábeis.) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 401 Td (A essência do Sócio Digital) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( é unir o rigor matemático da LC 123/2006 à capacidade do LLM de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 389 Td (traduzir a burocracia em um plano acolhedor de 3 passos, libertando) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 377 Td (o microempreendedor do terror fiscal e devolvendo sua qualidade de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 365 Td (vida.") Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Análise de Requisitos Críticos | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 3 de 3) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000134 00000 n 
+0000000231 00000 n 
+0000000333 00000 n 
+0000000438 00000 n 
+0000000590 00000 n 
+0000006399 00000 n 
+0000006551 00000 n 
+0000012078 00000 n 
+0000012232 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R >>
+startxref
+19059
+%%EOF

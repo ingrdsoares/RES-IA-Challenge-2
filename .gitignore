@@ -53,6 +53,6 @@ backend/evaluation/runs/
 backend/evaluation/cache/
 .venv-eval/
 
-# Data & Processed databases
+# Processed data, vector index & databases
 data/processed/*
 !data/processed/.gitkeep
