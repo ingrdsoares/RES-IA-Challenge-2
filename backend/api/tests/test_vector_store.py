@@ -83,3 +83,16 @@ def test_qdrant_timeout_is_translated(client, monkeypatch):
     monkeypatch.setattr(client, "collection_exists", timeout)
     with pytest.raises(DependencyTimeout):
         VectorStore(Settings(), client).ensure_collection()
+
+
+@pytest.mark.parametrize("field", ["reference_date", "effective_date"])
+@pytest.mark.parametrize("value", [0, "1735689600", "20261105", True, "2026-11-05T00:00:00"])
+def test_non_iso_date_payload_is_discarded_before_generation(client, field, value):
+    store = VectorStore(Settings(), client)
+    store.ensure_collection()
+    vector = [1.0] + [0.0] * 1023
+    client.upsert("knowledge_base", [models.PointStruct(
+        id=1, vector=vector,
+        payload={"text": "Trecho", "source": "Manual", field: value},
+    )])
+    assert store.search(vector) == []
