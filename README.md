@@ -85,3 +85,9 @@ Para habilitar a publicação automática em `https://ingrdsoares.github.io/RES-
 3. Em **Build and deployment** > **Source**, selecione:
    - **Deploy from a branch:** Selecione a branch `main` e a pasta `/docs`, depois clique em **Save**.
 4. O site estará disponível em instantes em: [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
+
+## Avaliação do RAG
+
+O pipeline de avaliação em [`backend/api/evaluation/`](backend/api/evaluation/) permite
+coleta retomável, ROUGE-L/BERTScore, bootstrap, comparação pareada e exportação Excel.
+Instalação, formato do dataset e comandos: [`backend/evaluation/README.md`](backend/evaluation/README.md).

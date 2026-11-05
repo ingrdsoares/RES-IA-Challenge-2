@@ -192,3 +192,13 @@ uma coleção temporária `test_rag_<uuid>` com vetores sintéticos; não altera
 da aplicação. Os testes de Ollama usam o SDK real com transporte HTTP controlado.
 Sem modelos instalados e documentos, não é possível avaliar geração e recuperação
 semântica reais; a entrega valida os contratos, integrações e o estado de base vazia.
+
+## Avaliação automatizada
+
+A CLI separada de avaliação, ROUGE-L, BERTScore, bootstrap e Excel está documentada em
+[evaluation/README.md](evaluation/README.md). Não altera o fluxo de produção e recebe
+o dataset real posteriormente. Para gerar modelos de planilha vazios, execute em api/:
+
+```bash
+python -m evaluation template --output ../evaluation/runs/template
+```
