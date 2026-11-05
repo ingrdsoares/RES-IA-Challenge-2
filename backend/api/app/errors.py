@@ -8,6 +8,10 @@ class DependencyTimeout(DependencyUnavailable):
 
 class CollectionIncompatible(DependencyUnavailable):
     """Existing collection cannot be queried using this configuration."""
+
+
+class QueryBusy(DependencyUnavailable):
+    """The single local generation slot is already occupied."""
 from contextlib import contextmanager
 
 import httpx
