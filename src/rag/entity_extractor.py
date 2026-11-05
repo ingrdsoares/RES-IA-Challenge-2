@@ -280,14 +280,19 @@ class TaxEntityExtractor:
                 expansions.append(desc)
 
         # Injeta termos conceituais legais conforme o foco
-        if tag_foco == "fator_r" or parametros.get("sujeito_fator_r"):
+        t_lower = text.lower()
+        if "exclus" in t_lower or "pendênc" in t_lower or "termo" in t_lower:
+            expansions.append("termo de exclusão pendências regularização débitos Art. 2º Art. 3º e-CAC")
+        elif tag_foco == "fator_r" or parametros.get("sujeito_fator_r") or "fator r" in t_lower:
             expansions.append("Fator R folha de salários 28% Anexo III Anexo V Art. 18")
-        elif tag_foco == "desenquadramento":
+        elif tag_foco == "desenquadramento" or "desenquadr" in t_lower or "ultrapass" in t_lower:
             expansions.append("desenquadramento MEI excesso de receita 20% Art. 18-A")
-        elif tag_foco == "obrigacoes_acessorias":
+        elif tag_foco == "obrigacoes_acessorias" or "dasn" in t_lower:
             expansions.append("DASN-SIMEI declaração anual 31 de maio prazo Art. 106")
-        elif tag_foco == "certidoes":
-            expansions.append("Certidão Negativa CND CPEN regularidade fiscal Art. 1º")
+        elif tag_foco == "certidoes" or "cpen" in t_lower or "cnd" in t_lower:
+            expansions.append("Certidão Negativa CND CPEN regularidade fiscal parcelamento Art. 1º")
+        elif intencao == "calculo_simples" or tag_foco == "simples_nacional" or "anexo" in t_lower or "aliquota" in t_lower or "alíquota" in t_lower:
+            expansions.append("alíquota efetiva Simples Nacional RBT12 Anexo I cálculo DAS Art. 18")
 
         return " ".join(expansions)
 

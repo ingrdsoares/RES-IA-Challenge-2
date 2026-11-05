@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from src.fiscal.calculator import FiscalCalculator
 from src.fiscal.repository import FiscalRepository
+from src.rag.entity_extractor import TaxEntityExtractor
 from src.rag.prompts import (
     DISCLAIMER_CRC_PADRAO,
     PROMPT_ABSTENCAO_MOTIVO,
@@ -57,6 +58,7 @@ class RAGService:
         self,
         vector_store: Optional[LegalVectorStore] = None,
         calculator: Optional[FiscalCalculator] = None,
+        extractor: Optional[TaxEntityExtractor] = None,
         base_dir: Optional[Path] = None,
     ):
         if base_dir is None:
@@ -82,6 +84,9 @@ class RAGService:
             else:
                 self.calculator = None
 
+        # 3. Inicializa Extrator de Entidades Fiscais
+        self.extractor = extractor or TaxEntityExtractor()
+
     def _verificar_gatilho_abstencao(self, pergunta: str) -> Optional[str]:
         """Detecta se a pergunta fere as diretrizes éticas ou ultrapassa o escopo do Simples Nacional."""
         p_lower = pergunta.lower()
@@ -100,9 +105,10 @@ class RAGService:
         """
         Ponto de entrada do Copiloto Fiscal:
         1. Avalia guardrails e abstenção proativa.
-        2. Recupera dispositivos legais canônicos no Vector Store.
-        3. Aciona cálculo determinístico se houver contexto fiscal.
-        4. Sintetiza o diagnóstico e o Plano de Ação em 3 Passos.
+        2. Extrai entidades e expande a busca vetorial.
+        3. Recupera dispositivos legais canônicos no Vector Store.
+        4. Aciona cálculo determinístico se houver contexto fiscal.
+        5. Sintetiza o diagnóstico e o Plano de Ação em 3 Passos.
         """
         # 1. Guardrail de Abstenção
         motivo_abstencao = self._verificar_gatilho_abstencao(pergunta)
@@ -125,8 +131,18 @@ class RAGService:
                 score_confianca=1.0,
             )
 
-        # 2. Recuperação Factual no Vector Store (RAG)
-        retrieved_chunks = self.vector_store.search(pergunta, top_k=3)
+        # 2. Extração Factual de Entidades e Expansão da Consulta
+        extracted = self.extractor.extract(pergunta)
+        if cnae is None and extracted.cnaes:
+            cnae = extracted.cnaes[0]["codigo"]
+        if faturamento_anual is None and "rbt12" in extracted.parametros_calculo:
+            faturamento_anual = extracted.parametros_calculo["rbt12"]
+        if folha_anual is None and "folha_12m" in extracted.parametros_calculo:
+            folha_anual = extracted.parametros_calculo["folha_12m"]
+
+        # 3. Recuperação Factual no Vector Store (RAG)
+        search_query = extracted.query_expandida if extracted.query_expandida else pergunta
+        retrieved_chunks = self.vector_store.search(search_query, top_k=3)
         score_maximo = retrieved_chunks[0]["score"] if retrieved_chunks else 0.0
 
         # Se a busca vetorial tiver relevância quase nula e a pergunta não tiver contexto
@@ -278,6 +294,25 @@ class RAGService:
                 "Passo 1 (Consulta de Pendências): Acessar o Portal e-CAC da Receita Federal com certificado digital ou conta Gov.br (Prata/Ouro) e emitir a 'Situação Fiscal'.",
                 "Passo 2 (Negociação e Parcelamento): Optar pelo Programa de Parcelamento Ordinário do Simples Nacional ou Transação Tributária na PGFN (Regularize), efetuando o pagamento da primeira parcela.",
                 "Passo 3 (Emissão da CPEN): Aguardar a compensação bancária (24 a 48h) e emitir a Certidão Positiva com Efeitos de Negativa no site da Receita Federal."
+            ]
+            return diag, plano
+
+        # CENÁRIO C2: Cálculo Geral do Simples Nacional (Comércio, Indústria e Serviços sem Fator R)
+        if calc and "anexo_aplicado" in calc:
+            anexo = calc["anexo_aplicado"]
+            aliq = calc["aliquota_efetiva"] * 100
+            das = calc["das_mensal"]
+            cnae_desc = calc.get("cnae_descricao") or "Atividade econômica informada"
+            cnae_cod = calc.get("cnae") or ""
+            diag = (
+                f"Para a atividade de {cnae_desc} (CNAE {cnae_cod}) com faturamento anual informado, a tributação ocorre pelo "
+                f"Anexo {anexo} do Simples Nacional. A alíquota efetiva apurada conforme o {top_artigo} da LC 123/2006 "
+                f"é de {aliq:.2f}%, resultando em uma guia DAS mensal estimada de R$ {das:,.2f}."
+            )
+            plano = [
+                f"Passo 1 (Apuração da Receita): Segregar as receitas brutas da competência corrente correspondentes ao Anexo {anexo} a partir das notas fiscais emitidas.",
+                f"Passo 2 (Emissão do DAS no PGDAS-D): Acessar o Portal do Simples Nacional até o dia 20 do mês subsequente, preenchendo a apuração para emissão da guia única com alíquota de {aliq:.2f}%.",
+                "Passo 3 (Conciliação Contábil): Acompanhar o acumulado dos 12 meses anteriores (RBT12) para monitorar eventuais mudanças de faixa de tributação e arquivar o extrato oficial."
             ]
             return diag, plano
 

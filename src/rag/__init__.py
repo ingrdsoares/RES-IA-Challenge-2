@@ -9,6 +9,7 @@ from .vector_store import LegalVectorStore
 from .ingest import IngestionPipeline
 from .entity_extractor import TaxEntityExtractor, TaxEntity, FiscalExtractionResult
 from .service import RAGService, RespostaCopiloto
+from .evaluator import RAGEvaluator, BenchmarkSummary, EvaluationResult
 
 __all__ = [
     "LegalHierarchicalChunker",
@@ -20,4 +21,7 @@ __all__ = [
     "FiscalExtractionResult",
     "RAGService",
     "RespostaCopiloto",
+    "RAGEvaluator",
+    "BenchmarkSummary",
+    "EvaluationResult",
 ]
