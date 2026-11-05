@@ -48,7 +48,11 @@ htmlcov/
 .env.local
 .env.*.local
 
+# Evaluation artifacts and caches
+backend/evaluation/runs/
+backend/evaluation/cache/
+.venv-eval/
+
 # Processed data, vector index & databases
 data/processed/*
 !data/processed/.gitkeep
-
