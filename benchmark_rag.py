@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.rag.evaluator import RAGEvaluator, BenchmarkSummary
+from src.rag.evaluator import BenchmarkSummary, RAGEvaluator
 
 
 def format_table_row(cols, widths, alignments=None):
@@ -27,7 +27,7 @@ def format_table_row(cols, widths, alignments=None):
     for val, w, align in zip(cols, widths, alignments):
         s = str(val)
         if len(s) > w:
-            s = s[:w - 1] + "…"
+            s = s[: w - 1] + "…"
         if align == ">":
             out.append(s.rjust(w))
         elif align == "^":
@@ -58,7 +58,17 @@ def main():
     # Tabela detalhada de cenários
     widths = [26, 18, 8, 8, 8, 6, 6, 9, 8]
     aligns = ["<", "<", ">", ">", ">", "^", "^", ">", "^"]
-    headers = ["Cenário ID", "Categoria", "Recall", "Precis", "Faith", "3Step", "CRC", "Tempo", "Status"]
+    headers = [
+        "Cenário ID",
+        "Categoria",
+        "Recall",
+        "Precis",
+        "Faith",
+        "3Step",
+        "CRC",
+        "Tempo",
+        "Status",
+    ]
 
     print("-" * 88)
     print(format_table_row(headers, widths, aligns))
@@ -99,15 +109,25 @@ def main():
     print_metric("Guardrail Robustness (Abstenção)", summary.guardrail_robustness, 1.00)
     print_metric("Taxa de Conformidade RF07 (3 Passos)", summary.conformidade_3_passos, 1.00)
     print_metric("Taxa de Presença Disclaimer CRC", summary.conformidade_crc, 1.00)
-    print(f"  • {'Tempo Médio por Consulta'.ljust(35)}: {f'{summary.tempo_medio_ms:.2f}ms'.rjust(8)}  (Benchmark Latência)")
-    print(f"  • {'Tempo Total de Execução'.ljust(35)}: {f'{summary.tempo_total_ms:.2f}ms'.rjust(8)}  ({summary.total_cenarios} cenários)")
-    print(f"  • {'Taxa Global de Aprovação'.ljust(35)}: {f'{summary.taxa_aprovacao_global * 100:.1f}%'.rjust(8)}  ({summary.total_aprovados}/{summary.total_cenarios} cenários)")
+    print(
+        f"  • {'Tempo Médio por Consulta'.ljust(35)}: {f'{summary.tempo_medio_ms:.2f}ms'.rjust(8)}  (Benchmark Latência)"
+    )
+    print(
+        f"  • {'Tempo Total de Execução'.ljust(35)}: {f'{summary.tempo_total_ms:.2f}ms'.rjust(8)}  ({summary.total_cenarios} cenários)"
+    )
+    print(
+        f"  • {'Taxa Global de Aprovação'.ljust(35)}: {f'{summary.taxa_aprovacao_global * 100:.1f}%'.rjust(8)}  ({summary.total_aprovados}/{summary.total_cenarios} cenários)"
+    )
 
     print("=" * 88)
 
     if summary.todos_aprovados:
-        print("\n>>> RESULTADO FINAL: TODOS OS CRITÉRIOS DE ACEITAÇÃO FORAM ATINGIDOS COM SUCESSO! <<<")
-        print(">>> Artefato de governança pronto para ingestão no MLflow e esteira CI/CD da Ingrid. <<<\n")
+        print(
+            "\n>>> RESULTADO FINAL: TODOS OS CRITÉRIOS DE ACEITAÇÃO FORAM ATINGIDOS COM SUCESSO! <<<"
+        )
+        print(
+            ">>> Artefato de governança pronto para ingestão no MLflow e esteira CI/CD da Ingrid. <<<\n"
+        )
         sys.exit(0)
     else:
         print("\n[ERRO] Um ou mais cenários falharam nos critérios de aceitação.\n")

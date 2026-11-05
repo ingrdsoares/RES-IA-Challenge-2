@@ -31,7 +31,9 @@ class TaxEntity:
 @dataclass
 class FiscalExtractionResult:
     texto_original: str
-    intencao_primaria: str  # calculo_simples, fator_r, enquadramento_mei, desenquadramento_mei, etc.
+    intencao_primaria: (
+        str  # calculo_simples, fator_r, enquadramento_mei, desenquadramento_mei, etc.
+    )
     confianca_intencao: float
     cnaes: List[Dict[str, Any]] = field(default_factory=list)
     cnpjs: List[str] = field(default_factory=list)
@@ -111,7 +113,13 @@ class TaxEntityExtractor:
 
     # 6. Dicionários de Obrigações, Certidões e Documentos Fiscais
     OBRIGACOES_MAP = {
-        "dasn_simei": ["dasn-simei", "dasn simei", "dasn", "declaração anual do mei", "declaracao anual"],
+        "dasn_simei": [
+            "dasn-simei",
+            "dasn simei",
+            "dasn",
+            "declaração anual do mei",
+            "declaracao anual",
+        ],
         "das": ["guia das", "das avulso", "das mei", "das-mei", "documento de arrecadação"],
         "defis": ["defis", "declaração de informações socioeconômicas"],
         "pgdas_d": ["pgdas-d", "pgdas"],
@@ -120,13 +128,27 @@ class TaxEntityExtractor:
 
     CERTIDOES_MAP = {
         "cnd": ["cnd", "certidão negativa de débitos", "certidão negativa"],
-        "cpen": ["cpen", "certidão positiva com efeitos de negativa", "positiva com efeito de negativa"],
+        "cpen": [
+            "cpen",
+            "certidão positiva com efeitos de negativa",
+            "positiva com efeito de negativa",
+        ],
         "divida_ativa": ["dívida ativa", "divida ativa", "pgfn", "procuradoria-geral"],
-        "termo_exclusao": ["termo de exclusão", "notificação de exclusão", "aviso de exclusão", "dte-sn"],
+        "termo_exclusao": [
+            "termo de exclusão",
+            "notificação de exclusão",
+            "aviso de exclusão",
+            "dte-sn",
+        ],
     }
 
     LEIS_MAP = {
-        "lc_123_2006": ["lc 123", "lc 123/2006", "lei complementar 123", "estatuto da microempresa"],
+        "lc_123_2006": [
+            "lc 123",
+            "lc 123/2006",
+            "lei complementar 123",
+            "estatuto da microempresa",
+        ],
         "res_cgsn_140": ["resolução cgsn 140", "cgsn 140", "resolucao 140"],
         "art_18_a": ["art. 18-a", "artigo 18-a", "art 18a"],
         "art_18": ["art. 18", "artigo 18"],
@@ -282,7 +304,9 @@ class TaxEntityExtractor:
         # Injeta termos conceituais legais conforme o foco
         t_lower = text.lower()
         if "exclus" in t_lower or "pendênc" in t_lower or "termo" in t_lower:
-            expansions.append("termo de exclusão pendências regularização débitos Art. 2º Art. 3º e-CAC")
+            expansions.append(
+                "termo de exclusão pendências regularização débitos Art. 2º Art. 3º e-CAC"
+            )
         elif tag_foco == "fator_r" or parametros.get("sujeito_fator_r") or "fator r" in t_lower:
             expansions.append("Fator R folha de salários 28% Anexo III Anexo V Art. 18")
         elif tag_foco == "desenquadramento" or "desenquadr" in t_lower or "ultrapass" in t_lower:
@@ -291,7 +315,13 @@ class TaxEntityExtractor:
             expansions.append("DASN-SIMEI declaração anual 31 de maio prazo Art. 106")
         elif tag_foco == "certidoes" or "cpen" in t_lower or "cnd" in t_lower:
             expansions.append("Certidão Negativa CND CPEN regularidade fiscal parcelamento Art. 1º")
-        elif intencao == "calculo_simples" or tag_foco == "simples_nacional" or "anexo" in t_lower or "aliquota" in t_lower or "alíquota" in t_lower:
+        elif (
+            intencao == "calculo_simples"
+            or tag_foco == "simples_nacional"
+            or "anexo" in t_lower
+            or "aliquota" in t_lower
+            or "alíquota" in t_lower
+        ):
             expansions.append("alíquota efetiva Simples Nacional RBT12 Anexo I cálculo DAS Art. 18")
 
         return " ".join(expansions)
@@ -305,27 +335,33 @@ class TaxEntityExtractor:
         for match in self.CNPJ_FORMATADO_REGEX.finditer(text):
             cnpj = match.group(1)
             found.append(cnpj)
-            entities.append(TaxEntity(
-                tipo="cnpj",
-                valor=cnpj,
-                texto_original=match.group(0),
-                inicio=match.start(),
-                fim=match.end(),
-                confianca=1.0,
-            ))
-        for match in self.CNPJ_DIGITOS_REGEX.finditer(text):
-            cnpj_raw = match.group(1)
-            cnpj_fmt = f"{cnpj_raw[:2]}.{cnpj_raw[2:5]}.{cnpj_raw[5:8]}/{cnpj_raw[8:12]}-{cnpj_raw[12:]}"
-            if cnpj_fmt not in found:
-                found.append(cnpj_fmt)
-                entities.append(TaxEntity(
+            entities.append(
+                TaxEntity(
                     tipo="cnpj",
-                    valor=cnpj_fmt,
+                    valor=cnpj,
                     texto_original=match.group(0),
                     inicio=match.start(),
                     fim=match.end(),
-                    confianca=0.95,
-                ))
+                    confianca=1.0,
+                )
+            )
+        for match in self.CNPJ_DIGITOS_REGEX.finditer(text):
+            cnpj_raw = match.group(1)
+            cnpj_fmt = (
+                f"{cnpj_raw[:2]}.{cnpj_raw[2:5]}.{cnpj_raw[5:8]}/{cnpj_raw[8:12]}-{cnpj_raw[12:]}"
+            )
+            if cnpj_fmt not in found:
+                found.append(cnpj_fmt)
+                entities.append(
+                    TaxEntity(
+                        tipo="cnpj",
+                        valor=cnpj_fmt,
+                        texto_original=match.group(0),
+                        inicio=match.start(),
+                        fim=match.end(),
+                        confianca=0.95,
+                    )
+                )
         return found
 
     def _extract_cnaes(self, text: str, entities: List[TaxEntity]) -> List[Dict[str, Any]]:
@@ -339,15 +375,17 @@ class TaxEntityExtractor:
             item = {"codigo": codigo, "codigo_limpo": "".join(filter(str.isdigit, codigo))}
             self._enrich_cnae_item(item)
             cnaes.append(item)
-            entities.append(TaxEntity(
-                tipo="cnae",
-                valor=item,
-                texto_original=match.group(0),
-                inicio=match.start(),
-                fim=match.end(),
-                confianca=1.0,
-                metadados=item,
-            ))
+            entities.append(
+                TaxEntity(
+                    tipo="cnae",
+                    valor=item,
+                    texto_original=match.group(0),
+                    inicio=match.start(),
+                    fim=match.end(),
+                    confianca=1.0,
+                    metadados=item,
+                )
+            )
 
         # CNAEs de 7 dígitos precedidos de identificador
         for match in self.CNAE_DIGITOS_REGEX.finditer(text):
@@ -358,20 +396,30 @@ class TaxEntityExtractor:
                 item = {"codigo": codigo_fmt, "codigo_limpo": digs}
                 self._enrich_cnae_item(item)
                 cnaes.append(item)
-                entities.append(TaxEntity(
-                    tipo="cnae",
-                    valor=item,
-                    texto_original=match.group(0),
-                    inicio=match.start(),
-                    fim=match.end(),
-                    confianca=0.9,
-                    metadados=item,
-                ))
+                entities.append(
+                    TaxEntity(
+                        tipo="cnae",
+                        valor=item,
+                        texto_original=match.group(0),
+                        inicio=match.start(),
+                        fim=match.end(),
+                        confianca=0.9,
+                        metadados=item,
+                    )
+                )
 
         # Se houver repositório, tenta busca semântica por descrição de atividade se nenhum CNAE foi achado
         if not cnaes and self.fiscal_repo is not None:
             norm_text = self._normalize_text(text)
-            keywords = ["software", "programador", "salao de beleza", "cabeleireiro", "eletricista", "comercio", "restaurante"]
+            keywords = [
+                "software",
+                "programador",
+                "salao de beleza",
+                "cabeleireiro",
+                "eletricista",
+                "comercio",
+                "restaurante",
+            ]
             for kw in keywords:
                 if kw in norm_text:
                     results = self.fiscal_repo.search_cnaes(kw, limit=1)
@@ -410,19 +458,26 @@ class TaxEntityExtractor:
         for match in self.ANEXO_REGEX.finditer(text):
             raw_val = match.group(1).upper()
             anexo_normalizado = map_romanos.get(raw_val, raw_val)
-            if anexo_normalizado in ["I", "II", "III", "IV", "V"] and anexo_normalizado not in anexos:
+            if (
+                anexo_normalizado in ["I", "II", "III", "IV", "V"]
+                and anexo_normalizado not in anexos
+            ):
                 anexos.append(anexo_normalizado)
-                entities.append(TaxEntity(
-                    tipo="anexo",
-                    valor=anexo_normalizado,
-                    texto_original=match.group(0),
-                    inicio=match.start(),
-                    fim=match.end(),
-                    confianca=1.0,
-                ))
+                entities.append(
+                    TaxEntity(
+                        tipo="anexo",
+                        valor=anexo_normalizado,
+                        texto_original=match.group(0),
+                        inicio=match.start(),
+                        fim=match.end(),
+                        confianca=1.0,
+                    )
+                )
         return anexos
 
-    def _extract_regimes_e_portes(self, text: str, entities: List[TaxEntity]) -> tuple[List[str], List[str]]:
+    def _extract_regimes_e_portes(
+        self, text: str, entities: List[TaxEntity]
+    ) -> tuple[List[str], List[str]]:
         norm_text = f" {self._normalize_text(text)} "
         regimes = []
         portes = []
@@ -433,14 +488,16 @@ class TaxEntityExtractor:
                 if re.search(pattern, norm_text):
                     if reg_id not in regimes:
                         regimes.append(reg_id)
-                    entities.append(TaxEntity(
-                        tipo="regime",
-                        valor=reg_id,
-                        texto_original=syn,
-                        inicio=0,
-                        fim=0,
-                        confianca=0.95,
-                    ))
+                    entities.append(
+                        TaxEntity(
+                            tipo="regime",
+                            valor=reg_id,
+                            texto_original=syn,
+                            inicio=0,
+                            fim=0,
+                            confianca=0.95,
+                        )
+                    )
                     break
 
         for porte_id, synonyms in self.PORTES_MAP.items():
@@ -469,18 +526,22 @@ class TaxEntityExtractor:
                 if match:
                     if term_id not in found:
                         found.append(term_id)
-                    entities.append(TaxEntity(
-                        tipo=entity_type,
-                        valor=term_id,
-                        texto_original=syn,
-                        inicio=match.start(),
-                        fim=match.end(),
-                        confianca=0.9,
-                    ))
+                    entities.append(
+                        TaxEntity(
+                            tipo=entity_type,
+                            valor=term_id,
+                            texto_original=syn,
+                            inicio=match.start(),
+                            fim=match.end(),
+                            confianca=0.9,
+                        )
+                    )
                     break
         return found
 
-    def _extract_currency_values(self, text: str, entities: List[TaxEntity]) -> List[Dict[str, Any]]:
+    def _extract_currency_values(
+        self, text: str, entities: List[TaxEntity]
+    ) -> List[Dict[str, Any]]:
         """Extrai valores monetários inferindo se são faturamento anual, mensal, folha ou débito."""
         valores = []
 
@@ -518,10 +579,10 @@ class TaxEntityExtractor:
                     val *= 1_000.0
 
             full_span = match.group(0).strip()
-            tem_cifrao = "R$" in text[max(0, m_start - 4):m_end]
+            tem_cifrao = "R$" in text[max(0, m_start - 4) : m_end]
 
             # Ignora números se seguidos por unidades não monetárias (ex: "60 parcelas", "30 dias", "12 meses")
-            next_text = text[m_end:min(len(text), m_end + 15)].lower()
+            next_text = text[m_end : min(len(text), m_end + 15)].lower()
             if not tem_cifrao and not multiplicador:
                 if re.match(r"\s*(?:parcelas?|dias?|meses|mês|anos?|artigos?|art\.?)\b", next_text):
                     continue
@@ -530,30 +591,73 @@ class TaxEntityExtractor:
                     continue
 
             # Contexto textual direcionado (à esquerda define a natureza do valor; à direita define o período)
-            left_context = self._normalize_text(text[max(0, m_start - 55):m_start])
-            right_context = self._normalize_text(text[m_end:min(len(text), m_end + 30)])
+            left_context = self._normalize_text(text[max(0, m_start - 55) : m_start])
+            right_context = self._normalize_text(text[m_end : min(len(text), m_end + 30)])
 
             # Classificação semântica
             categoria_inferida = "geral"
 
             # 1. Folha de pagamento / Salários / Pró-labore (verificado prioritariamente no contexto à esquerda)
-            if any(k in left_context for k in ["folha", "salario", "salarios", "pro-labore", "pro labore", "equipe", "funcionarios"]):
+            if any(
+                k in left_context
+                for k in [
+                    "folha",
+                    "salario",
+                    "salarios",
+                    "pro-labore",
+                    "pro labore",
+                    "equipe",
+                    "funcionarios",
+                ]
+            ):
                 categoria_inferida = "folha_pagamento"
             # 2. Débitos e dívidas
-            elif any(k in left_context for k in ["divida", "debito", "debitos", "pendencia", "atraso", "devendo", "multa"]):
+            elif any(
+                k in left_context
+                for k in ["divida", "debito", "debitos", "pendencia", "atraso", "devendo", "multa"]
+            ):
                 categoria_inferida = "debito"
             # 3. Faturamento / Receita com indicativo anual ou mensal
-            elif any(k in left_context for k in ["fatur", "receita", "ganh", "venda", "teto", "limite", "rbt12", "acumulad"]):
-                if any(k in left_context or k in right_context for k in ["ano", "anual", "acumulad", "12 mes", "rbt12"]):
+            elif any(
+                k in left_context
+                for k in [
+                    "fatur",
+                    "receita",
+                    "ganh",
+                    "venda",
+                    "teto",
+                    "limite",
+                    "rbt12",
+                    "acumulad",
+                ]
+            ):
+                if any(
+                    k in left_context or k in right_context
+                    for k in ["ano", "anual", "acumulad", "12 mes", "rbt12"]
+                ):
                     categoria_inferida = "faturamento_anual"
-                elif any(k in left_context or k in right_context for k in ["mes", "mensal", "por mes"]):
+                elif any(
+                    k in left_context or k in right_context for k in ["mes", "mensal", "por mes"]
+                ):
                     categoria_inferida = "faturamento_mensal"
                 else:
-                    categoria_inferida = "faturamento_anual" if val >= 50_000.0 else "faturamento_mensal"
+                    categoria_inferida = (
+                        "faturamento_anual" if val >= 50_000.0 else "faturamento_mensal"
+                    )
             # 4. Contexto temporal direto
-            elif any(k in left_context or right_context.startswith(f" {k}") or right_context.startswith(k) for k in ["no ano", "ao ano", "por ano", "anual", "acumulado"]):
+            elif any(
+                k in left_context
+                or right_context.startswith(f" {k}")
+                or right_context.startswith(k)
+                for k in ["no ano", "ao ano", "por ano", "anual", "acumulado"]
+            ):
                 categoria_inferida = "faturamento_anual"
-            elif any(k in left_context or right_context.startswith(f" {k}") or right_context.startswith(k) for k in ["no mes", "ao mes", "por mes", "mensal"]):
+            elif any(
+                k in left_context
+                or right_context.startswith(f" {k}")
+                or right_context.startswith(k)
+                for k in ["no mes", "ao mes", "por mes", "mensal"]
+            ):
                 categoria_inferida = "faturamento_mensal"
 
             item = {
@@ -563,15 +667,17 @@ class TaxEntityExtractor:
                 "posicao": (m_start, m_end),
             }
             valores.append(item)
-            entities.append(TaxEntity(
-                tipo="valor_monetario",
-                valor=item["valor"],
-                texto_original=full_span,
-                inicio=m_start,
-                fim=m_end,
-                confianca=0.9,
-                metadados={"categoria": categoria_inferida},
-            ))
+            entities.append(
+                TaxEntity(
+                    tipo="valor_monetario",
+                    valor=item["valor"],
+                    texto_original=full_span,
+                    inicio=m_start,
+                    fim=m_end,
+                    confianca=0.9,
+                    metadados={"categoria": categoria_inferida},
+                )
+            )
 
         return valores
 
@@ -603,15 +709,17 @@ class TaxEntityExtractor:
                 "texto_original": match.group(0),
             }
             percentuais.append(item)
-            entities.append(TaxEntity(
-                tipo="percentual",
-                valor=val,
-                texto_original=match.group(0),
-                inicio=match.start(),
-                fim=match.end(),
-                confianca=0.95,
-                metadados={"tipo": tipo_perc},
-            ))
+            entities.append(
+                TaxEntity(
+                    tipo="percentual",
+                    valor=val,
+                    texto_original=match.group(0),
+                    inicio=match.start(),
+                    fim=match.end(),
+                    confianca=0.95,
+                    metadados={"tipo": tipo_perc},
+                )
+            )
 
         return percentuais
 
@@ -633,27 +741,52 @@ class TaxEntityExtractor:
         norm = self._normalize_text(text)
 
         # 1. Regra Fator R
-        if "fator r" in norm or (anexos and "V" in anexos and "III" in anexos) or any(p["tipo"] == "fator_r" for p in percentuais):
+        if (
+            "fator r" in norm
+            or (anexos and "V" in anexos and "III" in anexos)
+            or any(p["tipo"] == "fator_r" for p in percentuais)
+        ):
             return "fator_r", 0.95
 
         # 2. Desenquadramento MEI
-        if "mei" in regimes and any(k in norm for k in ["desenquadr", "estourou", "passou do limite", "ultrapassou", "excesso"]):
+        if "mei" in regimes and any(
+            k in norm
+            for k in ["desenquadr", "estourou", "passou do limite", "ultrapassou", "excesso"]
+        ):
             return "desenquadramento_mei", 0.95
 
         # 3. Regularização, Débitos e Certidões
-        if certidoes or any(k in norm for k in ["regulariz", "divida", "pendencia", "cnd", "cpen", "parcelar", "exclusao"]):
+        if certidoes or any(
+            k in norm
+            for k in ["regulariz", "divida", "pendencia", "cnd", "cpen", "parcelar", "exclusao"]
+        ):
             return "regularizacao_pendencias", 0.90
 
         # 4. Obrigações Acessórias e Prazos (DASN, DAS, Prazos)
-        if obrigacoes or any(k in norm for k in ["prazo", "vencimento", "declaracao anual", "quando pagar", "dia 20", "31 de maio"]):
+        if obrigacoes or any(
+            k in norm
+            for k in [
+                "prazo",
+                "vencimento",
+                "declaracao anual",
+                "quando pagar",
+                "dia 20",
+                "31 de maio",
+            ]
+        ):
             return "obrigacoes_acessorias", 0.90
 
         # 5. Cálculo / Simulação do Simples Nacional
-        if (cnaes or anexos or valores) and any(k in norm for k in ["quanto vou pagar", "aliquota", "calcular", "simular", "imposto", "das"]):
+        if (cnaes or anexos or valores) and any(
+            k in norm
+            for k in ["quanto vou pagar", "aliquota", "calcular", "simular", "imposto", "das"]
+        ):
             return "calculo_simples", 0.85
 
         # 6. Enquadramento de MEI Geral
-        if "mei" in regimes or any(k in norm for k in ["posso ser mei", "limite mei", "81 mil", "abrir mei"]):
+        if "mei" in regimes or any(
+            k in norm for k in ["posso ser mei", "limite mei", "81 mil", "abrir mei"]
+        ):
             return "enquadramento_mei", 0.85
 
         return "consulta_geral", 0.60

@@ -37,5 +37,5 @@ DISCLAIMER_CRC_PADRAO = (
 PROMPT_ABSTENCAO_MOTIVO = {
     "fora_de_escopo": "A questão aborda matéria fora do escopo de MEI e Simples Nacional ou envolve planejamento elisivo controvertido.",
     "sem_base_oficial": "Não foi localizada fundamentação oficial suficiente na base legal indexada para assegurar uma resposta com 100% de precisão.",
-    "litigio_judicial": "A situação relatada envolve execução fiscal contenciosa ou litígio judicial, demandando assistência de advogado tributarista e contador perito."
+    "litigio_judicial": "A situação relatada envolve execução fiscal contenciosa ou litígio judicial, demandando assistência de advogado tributarista e contador perito.",
 }

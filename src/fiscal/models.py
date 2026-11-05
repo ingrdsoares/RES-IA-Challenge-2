@@ -77,4 +77,3 @@ class SimulacaoComparativaResultado:
     recomendacao_regime: str
     economia_mensal_mei: Optional[float]
     alertas: List[str] = field(default_factory=list)
-

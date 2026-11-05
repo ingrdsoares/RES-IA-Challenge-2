@@ -4,12 +4,12 @@ Extração de Entidades Fiscais e RAGService.
 Frente de Ciência de Dados (Jhessica).
 """
 
-from .chunker import LegalHierarchicalChunker, LegalChunk
-from .vector_store import LegalVectorStore
+from .chunker import LegalChunk, LegalHierarchicalChunker
+from .entity_extractor import FiscalExtractionResult, TaxEntity, TaxEntityExtractor
+from .evaluator import BenchmarkSummary, EvaluationResult, RAGEvaluator
 from .ingest import IngestionPipeline
-from .entity_extractor import TaxEntityExtractor, TaxEntity, FiscalExtractionResult
 from .service import RAGService, RespostaCopiloto
-from .evaluator import RAGEvaluator, BenchmarkSummary, EvaluationResult
+from .vector_store import LegalVectorStore
 
 __all__ = [
     "LegalHierarchicalChunker",

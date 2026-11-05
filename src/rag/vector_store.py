@@ -14,7 +14,7 @@ import re
 import sqlite3
 import struct
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 try:
     import numpy as np
@@ -51,6 +51,7 @@ class LegalVectorStore:
         if self.use_dense and not self._fallback_to_python:
             try:
                 from sentence_transformers import SentenceTransformer
+
                 self.model = SentenceTransformer(self.model_name)
                 print(f"[VectorStore] Modelo de embeddings denso carregado: {self.model_name}")
             except Exception as e:
@@ -60,6 +61,7 @@ class LegalVectorStore:
         if not self.use_dense:
             try:
                 from sklearn.feature_extraction.text import TfidfVectorizer
+
                 self.tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
                 self.model = None
                 print("[VectorStore] Uso de TF-IDF com sklearn habilitado.")
@@ -192,22 +194,25 @@ class LegalVectorStore:
                 meta_json = json.dumps(chunk.metadata, ensure_ascii=False)
                 emb_blob = self._serialize_embedding(emb)
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO legal_chunks (
                         chunk_id, source_doc, artigo, paragrafo, tema,
                         content, raw_text, metadata_json, embedding
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    chunk.chunk_id,
-                    chunk.source_doc,
-                    chunk.artigo,
-                    chunk.paragrafo,
-                    chunk.tema,
-                    chunk.content,
-                    chunk.raw_text,
-                    meta_json,
-                    emb_blob,
-                ))
+                """,
+                    (
+                        chunk.chunk_id,
+                        chunk.source_doc,
+                        chunk.artigo,
+                        chunk.paragrafo,
+                        chunk.tema,
+                        chunk.content,
+                        chunk.raw_text,
+                        meta_json,
+                        emb_blob,
+                    ),
+                )
             conn.commit()
 
         print(f"[VectorStore] {len(chunks)} chunks indexados com sucesso em {self.db_path}.")
@@ -236,7 +241,17 @@ class LegalVectorStore:
 
         results = []
         for row in rows:
-            chunk_id, source_doc, artigo, paragrafo, tema, content, raw_text, meta_json, emb_blob = row
+            (
+                chunk_id,
+                source_doc,
+                artigo,
+                paragrafo,
+                tema,
+                content,
+                raw_text,
+                meta_json,
+                emb_blob,
+            ) = row
             metadata = json.loads(meta_json) if meta_json else {}
 
             if filter_tags:
@@ -257,19 +272,21 @@ class LegalVectorStore:
 
             hybrid_score = round(0.70 * similarity + 0.30 * lexical_ratio, 4)
 
-            results.append({
-                "chunk_id": chunk_id,
-                "score": hybrid_score,
-                "dense_score": round(similarity, 4),
-                "lexical_score": round(lexical_ratio, 4),
-                "source_doc": source_doc,
-                "artigo": artigo,
-                "paragrafo": paragrafo,
-                "tema": tema,
-                "content": content,
-                "raw_text": raw_text,
-                "metadata": metadata,
-            })
+            results.append(
+                {
+                    "chunk_id": chunk_id,
+                    "score": hybrid_score,
+                    "dense_score": round(similarity, 4),
+                    "lexical_score": round(lexical_ratio, 4),
+                    "source_doc": source_doc,
+                    "artigo": artigo,
+                    "paragrafo": paragrafo,
+                    "tema": tema,
+                    "content": content,
+                    "raw_text": raw_text,
+                    "metadata": metadata,
+                }
+            )
 
         results.sort(key=lambda x: x["score"], reverse=True)
         return results[:top_k]
@@ -278,7 +295,9 @@ class LegalVectorStore:
         """Estatísticas do índice vetorial."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*), COUNT(DISTINCT artigo), COUNT(DISTINCT source_doc) FROM legal_chunks")
+            cursor.execute(
+                "SELECT COUNT(*), COUNT(DISTINCT artigo), COUNT(DISTINCT source_doc) FROM legal_chunks"
+            )
             total_chunks, total_artigos, total_docs = cursor.fetchone()
 
             cursor.execute("SELECT metadata_json FROM legal_chunks")

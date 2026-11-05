@@ -5,9 +5,9 @@ Sócio Digital — RES-IA Challenge 2 (Ciência de Dados - Jhessica).
 
 import json
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List
 
-from .chunker import LegalHierarchicalChunker, LegalChunk
+from .chunker import LegalChunk, LegalHierarchicalChunker
 from .vector_store import LegalVectorStore
 
 
@@ -65,13 +65,15 @@ class IngestionPipeline:
             chunks = self.chunker.chunk_document(raw_text, source_doc=doc_name)
             all_chunks.extend(chunks)
 
-            doc_summaries.append({
-                "file": fpath.name,
-                "source_doc": doc_name,
-                "size_bytes": len(raw_text.encode("utf-8")),
-                "total_chunks": len(chunks),
-                "articles": sorted(list(set(c.artigo for c in chunks))),
-            })
+            doc_summaries.append(
+                {
+                    "file": fpath.name,
+                    "source_doc": doc_name,
+                    "size_bytes": len(raw_text.encode("utf-8")),
+                    "total_chunks": len(chunks),
+                    "articles": sorted(list(set(c.artigo for c in chunks))),
+                }
+            )
             print(f" -> {fpath.name}: {len(chunks)} chunks gerados.")
 
         # Armazena e indexa vetores
@@ -93,7 +95,9 @@ class IngestionPipeline:
         with open(self.manifest_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2, ensure_ascii=False)
 
-        print(f"[IngestionPipeline] Ingestão concluída com sucesso! Manifesto gerado em: {self.manifest_path}")
+        print(
+            f"[IngestionPipeline] Ingestão concluída com sucesso! Manifesto gerado em: {self.manifest_path}"
+        )
         return manifest
 
 

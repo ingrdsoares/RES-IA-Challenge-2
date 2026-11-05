@@ -6,8 +6,8 @@ Responsável: Engenharia de Dados & Dev (Lucas).
 from src.fiscal.calculator import FiscalCalculator
 from src.fiscal.ingest import FiscalIngestionPipeline
 from src.fiscal.models import (
-    CNAEItem,
     CalculoSimplesResultado,
+    CNAEItem,
     FaixaSimples,
     SimulacaoComparativaResultado,
 )
@@ -22,4 +22,3 @@ __all__ = [
     "FiscalRepository",
     "FiscalCalculator",
 ]
-

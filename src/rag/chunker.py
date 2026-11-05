@@ -11,7 +11,7 @@ Evita o "chunking ingênuo" por quantidade cega de caracteres, preservando:
 
 import re
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -149,12 +149,14 @@ class LegalHierarchicalChunker:
             chap_match = self.CHAPTER_REGEX.search(line)
             if chap_match:
                 if current_lines and current_artigo != "Preâmbulo / Introdução":
-                    articles.append({
-                        "artigo": current_artigo,
-                        "capitulo": current_capitulo,
-                        "tema": current_tema,
-                        "content": "\n".join(current_lines),
-                    })
+                    articles.append(
+                        {
+                            "artigo": current_artigo,
+                            "capitulo": current_capitulo,
+                            "tema": current_tema,
+                            "content": "\n".join(current_lines),
+                        }
+                    )
                     current_lines = []
                     current_artigo = "Preâmbulo / Introdução"
                     current_tema = "Abertura"
@@ -164,12 +166,14 @@ class LegalHierarchicalChunker:
             art_match = self.ARTICLE_REGEX.search(line)
             if art_match:
                 if current_lines:
-                    articles.append({
-                        "artigo": current_artigo,
-                        "capitulo": current_capitulo,
-                        "tema": current_tema,
-                        "content": "\n".join(current_lines),
-                    })
+                    articles.append(
+                        {
+                            "artigo": current_artigo,
+                            "capitulo": current_capitulo,
+                            "tema": current_tema,
+                            "content": "\n".join(current_lines),
+                        }
+                    )
                     current_lines = []
 
                 matched_raw = art_match.group(1).strip()
@@ -189,12 +193,14 @@ class LegalHierarchicalChunker:
                 current_lines.append(line)
 
         if current_lines:
-            articles.append({
-                "artigo": current_artigo,
-                "capitulo": current_capitulo,
-                "tema": current_tema,
-                "content": "\n".join(current_lines),
-            })
+            articles.append(
+                {
+                    "artigo": current_artigo,
+                    "capitulo": current_capitulo,
+                    "tema": current_tema,
+                    "content": "\n".join(current_lines),
+                }
+            )
 
         return articles
 
@@ -220,7 +226,7 @@ class LegalHierarchicalChunker:
                 continue
 
             p_match = self.PARAGRAPH_REGEX.search(p_clean)
-            paragrafo_label = p_match.group(1) if p_match else f"Trecho {idx+1}"
+            paragrafo_label = p_match.group(1) if p_match else f"Trecho {idx + 1}"
 
             # Injeta o cabeçalho contextual completo
             context_header = (
@@ -230,7 +236,9 @@ class LegalHierarchicalChunker:
             )
 
             full_chunk_text = context_header + p_clean
-            chunk_id = f"{self._sanitize_id(source_doc)}_{self._sanitize_id(artigo_label)}_p{idx+1}"
+            chunk_id = (
+                f"{self._sanitize_id(source_doc)}_{self._sanitize_id(artigo_label)}_p{idx + 1}"
+            )
             tags = self.extract_tax_tags(full_chunk_text)
 
             sub_chunks.append(
