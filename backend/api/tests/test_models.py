@@ -3,7 +3,6 @@ import json
 import httpx
 import ollama
 import pytest
-
 from app.config import Settings
 from app.errors import DependencyTimeout, DependencyUnavailable
 from app.models import LocalModels, prepare_sources
@@ -24,7 +23,10 @@ def test_embedding_uses_retrieval_instruction_and_correct_dimension():
         body = json.loads(request.content)
         assert request.url.path == "/api/embed"
         assert body["model"] == "qwen3-embedding:0.6b"
-        assert body["input"] == "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:Como funciona?"
+        assert body["input"] == (
+            "Instruct: Given a web search query, retrieve relevant passages "
+            "that answer the query\nQuery:Como funciona?"
+        )
         assert body["truncate"] is False
         return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
 
@@ -55,9 +57,17 @@ def test_missing_model_is_not_downloaded():
 
 
 def test_both_installed_models_are_ready():
-    models = make_models(lambda request: httpx.Response(200, json={"models": [
-        {"model": "qwen3:8b"}, {"model": "qwen3-embedding:0.6b"},
-    ]}))
+    models = make_models(
+        lambda request: httpx.Response(
+            200,
+            json={
+                "models": [
+                    {"model": "qwen3:8b"},
+                    {"model": "qwen3-embedding:0.6b"},
+                ]
+            },
+        )
+    )
     models.check_models()
     models.close()
 
@@ -73,7 +83,9 @@ def test_generation_is_grounded_and_thinking_is_disabled():
         assert "instruções" in body["messages"][0]["content"]
         assert "Trecho para responder." in body["messages"][1]["content"]
         assert "[1]" in body["messages"][1]["content"]
-        return httpx.Response(200, json={"message": {"role": "assistant", "content": "Resposta [1]"}})
+        return httpx.Response(
+            200, json={"message": {"role": "assistant", "content": "Resposta [1]"}}
+        )
 
     models = make_models(handler)
     assert models.answer("Pergunta", [source()]) == "Resposta [1]"
@@ -136,8 +148,11 @@ def test_unicode_context_is_trimmed_to_fit_prompt_budget():
     assert len(selected) == 1
     assert 0 < len(selected[0].text) < 2000
 
-    models = make_models(lambda request: httpx.Response(
-        200, json={"message": {"role": "assistant", "content": "Resposta [1]"}},
-    ))
+    models = make_models(
+        lambda request: httpx.Response(
+            200,
+            json={"message": {"role": "assistant", "content": "Resposta [1]"}},
+        )
+    )
     assert models.answer("Pergunta", selected) == "Resposta [1]"
     models.close()

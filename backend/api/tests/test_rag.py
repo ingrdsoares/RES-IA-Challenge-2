@@ -2,16 +2,21 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 
 import pytest
-from qdrant_client import models
-
 from app.errors import DependencyUnavailable, QueryBusy
+from qdrant_client import models
 
 
 def add_document(service, text="Texto de teste", vector=None):
-    service.store.client.upsert("knowledge_base", [models.PointStruct(
-        id=1, vector=vector or [1.0] + [0.0] * 1023,
-        payload={"text": text, "source": "Manual de teste"},
-    )])
+    service.store.client.upsert(
+        "knowledge_base",
+        [
+            models.PointStruct(
+                id=1,
+                vector=vector or [1.0] + [0.0] * 1023,
+                payload={"text": text, "source": "Manual de teste"},
+            )
+        ],
+    )
 
 
 def test_empty_collection_does_not_use_models(service, monkeypatch):

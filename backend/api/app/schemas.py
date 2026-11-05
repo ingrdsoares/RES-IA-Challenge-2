@@ -1,5 +1,5 @@
-from datetime import date
 import re
+from datetime import date
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
@@ -9,7 +9,9 @@ NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)
 
 class QueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    question: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
+    question: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)
+    ]
 
 
 class Source(BaseModel):

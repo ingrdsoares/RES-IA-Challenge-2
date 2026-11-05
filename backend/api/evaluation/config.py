@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+
 from evaluation.schemas import EvalConfig
 
 
@@ -18,9 +19,9 @@ def resolve_config(file: Path | None, overrides: dict) -> EvalConfig:
     defaults = EvalConfig().model_dump()
     for section, fields in defaults.items():
         for key in fields:
-            if key == 'selection':
+            if key == "selection":
                 continue
-            value = os.getenv('EVAL_' + key.upper())
+            value = os.getenv("EVAL_" + key.upper())
             if value is not None:
                 env.setdefault(section, {})[key] = value
     config = merge(env, json.loads(file.read_text()) if file else {})

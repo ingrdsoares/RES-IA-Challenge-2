@@ -52,3 +52,7 @@ htmlcov/
 backend/evaluation/runs/
 backend/evaluation/cache/
 .venv-eval/
+
+# Data & Processed databases
+data/processed/*
+!data/processed/.gitkeep

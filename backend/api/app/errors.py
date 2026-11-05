@@ -1,3 +1,10 @@
+from contextlib import contextmanager
+
+import httpx
+import ollama
+from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
+
+
 class DependencyUnavailable(Exception):
     """A required service cannot complete the operation."""
 
@@ -12,13 +19,6 @@ class CollectionIncompatible(DependencyUnavailable):
 
 class QueryBusy(DependencyUnavailable):
     """The single local generation slot is already occupied."""
-from contextlib import contextmanager
-
-import httpx
-import ollama
-from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
-
-
 
 
 @contextmanager
@@ -31,5 +31,11 @@ def dependency_errors(service: str):
         if isinstance(exc.source, httpx.TimeoutException):
             raise DependencyTimeout(f"Tempo de espera excedido: {service}.") from exc
         raise DependencyUnavailable(f"Serviço indisponível: {service}.") from exc
-    except (httpx.HTTPError, UnexpectedResponse, ollama.ResponseError, ConnectionError, ValueError) as exc:
+    except (
+        httpx.HTTPError,
+        UnexpectedResponse,
+        ollama.ResponseError,
+        ConnectionError,
+        ValueError,
+    ) as exc:
         raise DependencyUnavailable(f"Não foi possível consultar {service}.") from exc

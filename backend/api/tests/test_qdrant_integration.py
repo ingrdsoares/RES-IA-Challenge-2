@@ -2,10 +2,9 @@ import os
 from uuid import uuid4
 
 import pytest
-from qdrant_client import QdrantClient, models
-
 from app.config import Settings
 from app.vector_store import VectorStore
+from qdrant_client import QdrantClient, models
 
 
 @pytest.mark.integration
@@ -22,10 +21,20 @@ def test_real_qdrant_search_survives_client_reconnect():
         store.ensure_collection()
         created = True
         vector = [1.0] + [0.0] * 1023
-        client.upsert(name, [models.PointStruct(
-            id=1, vector=vector,
-            payload={"text": "Documento sintético de teste", "source": "Teste de integração"},
-        )], wait=True)
+        client.upsert(
+            name,
+            [
+                models.PointStruct(
+                    id=1,
+                    vector=vector,
+                    payload={
+                        "text": "Documento sintético de teste",
+                        "source": "Teste de integração",
+                    },
+                )
+            ],
+            wait=True,
+        )
         assert store.search(vector)[0].text == "Documento sintético de teste"
         store.close()
         client = QdrantClient(url=url, timeout=5)
