@@ -1,0 +1,274 @@
+{
+  "ferramentas": [
+    {
+      "modulo": "anexos",
+      "arquivo": "anexos.py",
+      "tipo": "coletor/comando",
+      "descricao": "Baixa e extrai os PDFs dos anexos da CGSN 140 para Markdown."
+    },
+    {
+      "modulo": "calendario_df",
+      "arquivo": "calendario_df.py",
+      "tipo": "coletor/comando",
+      "descricao": "Agenda federal publicada de 2026 e calendário administrativo federal/DF documentado."
+    },
+    {
+      "modulo": "casos_oficiais",
+      "arquivo": "casos_oficiais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Índice de trechos candidatos a exemplos, extraídos literalmente de manuais oficiais."
+    },
+    {
+      "modulo": "catalogo",
+      "arquivo": "catalogo.py",
+      "tipo": "coletor/comando",
+      "descricao": "Catálogo local e auditoria de integridade; não valida conteúdo fiscal."
+    },
+    {
+      "modulo": "cnae",
+      "arquivo": "cnae.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta manual de subclasses CNAE do IBGE para Markdown rastreável."
+    },
+    {
+      "modulo": "cnpj",
+      "arquivo": "cnpj.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte inicial de Empresas e tabelas auxiliares dos dados abertos CNPJ."
+    },
+    {
+      "modulo": "cnpj_ampliado",
+      "arquivo": "cnpj_ampliado.py",
+      "tipo": "coletor/comando",
+      "descricao": "Amostra cruzada dos arquivos públicos CNPJ, sem carregar os CSVs em memória."
+    },
+    {
+      "modulo": "cnpj_df",
+      "arquivo": "cnpj_df.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte reproduzível de empresas ativas de pequeno porte com estabelecimento no DF."
+    },
+    {
+      "modulo": "cnpj_df_censo",
+      "arquivo": "cnpj_df_censo.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte DF ativo de portes 01/03, com todos os lotes da competência."
+    },
+    {
+      "modulo": "complemento_contabil",
+      "arquivo": "complemento_contabil.py",
+      "tipo": "coletor/comando",
+      "descricao": "Preserva CTG 1000 e recorta os artigos 1.179 a 1.195 do Código Civil oficial."
+    },
+    {
+      "modulo": "consultas_df_amplas",
+      "arquivo": "consultas_df_amplas.py",
+      "tipo": "coletor/comando",
+      "descricao": "Bounded public Receita DF annual consultations and paginated TARF decisions."
+    },
+    {
+      "modulo": "consultas_rfb",
+      "arquivo": "consultas_rfb.py",
+      "tipo": "coletor/comando",
+      "descricao": "Acervo temático oficial SC/SD: originais, ementas e integrais disponíveis."
+    },
+    {
+      "modulo": "contabilidade",
+      "arquivo": "contabilidade.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta normas contábeis simplificadas oficiais do CFC para Markdown."
+    },
+    {
+      "modulo": "distrital_df",
+      "arquivo": "distrital_df.py",
+      "tipo": "coletor/comando",
+      "descricao": "Fontes oficiais do Distrito Federal: ISS, retenções e NFS-e."
+    },
+    {
+      "modulo": "documentos_fiscais",
+      "arquivo": "documentos_fiscais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta inicial da documentação técnica e dos schemas NF-e/NFS-e."
+    },
+    {
+      "modulo": "documentos_jurisprudencia",
+      "arquivo": "documentos_jurisprudencia.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte oficial adicional: eventos/rejeições de DF-e e jurisprudência MEI/Simples."
+    },
+    {
+      "modulo": "economia",
+      "arquivo": "economia.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta séries SGS de contexto econômico em JSON e Markdown."
+    },
+    {
+      "modulo": "esquemas",
+      "arquivo": "esquemas.py",
+      "tipo": "biblioteca",
+      "descricao": "Inventário de declarações XSD em pacotes ZIP oficiais, sem compilar schemas."
+    },
+    {
+      "modulo": "estatisticas",
+      "arquivo": "estatisticas.py",
+      "tipo": "coletor/comando",
+      "descricao": "Estimativa reproduzível do acervo, sem somar unidades diferentes."
+    },
+    {
+      "modulo": "fontes_recuperadas",
+      "arquivo": "fontes_recuperadas.py",
+      "tipo": "coletor/comando",
+      "descricao": "Retentativas públicas limitadas; resultados históricos permanecem intactos."
+    },
+    {
+      "modulo": "historico_competencias",
+      "arquivo": "historico_competencias.py",
+      "tipo": "coletor/comando",
+      "descricao": "Agendas federais históricas por competência e disponibilidade mensal CNPJ."
+    },
+    {
+      "modulo": "ibge_indicadores",
+      "arquivo": "ibge_indicadores.py",
+      "tipo": "coletor/comando",
+      "descricao": "Indicadores anuais oficiais do IBGE/SIDRA, com recortes explícitos."
+    },
+    {
+      "modulo": "icms_consultas_df",
+      "arquivo": "icms_consultas_df.py",
+      "tipo": "coletor/comando",
+      "descricao": "Corpus ICMS DF: grafo oficial limitado e páginas públicas de consultas no DODF."
+    },
+    {
+      "modulo": "indicadores_empresariais",
+      "arquivo": "indicadores_empresariais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Indicadores empresariais públicos: Observatório Sebrae e boletins Mapa de Empresas."
+    },
+    {
+      "modulo": "legislacao",
+      "arquivo": "legislacao.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta legislação oficial em Markdown, sem inferir vigência."
+    },
+    {
+      "modulo": "legislacao_complementar",
+      "arquivo": "legislacao_complementar.py",
+      "tipo": "coletor/comando",
+      "descricao": "Textos oficiais complementares; coleta não comprova vigência."
+    },
+    {
+      "modulo": "manuais",
+      "arquivo": "manuais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta manuais e perguntas e respostas oficiais do Simples Nacional/MEI."
+    },
+    {
+      "modulo": "mei",
+      "arquivo": "mei.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta orientações oficiais do Portal do Empreendedor em Markdown."
+    },
+    {
+      "modulo": "notas_cnae",
+      "arquivo": "notas_cnae.py",
+      "tipo": "coletor/comando",
+      "descricao": "Notas explicativas integrais da CNAE-Subclasses 2.3, publicação IBGE 2020."
+    },
+    {
+      "modulo": "notas_tecnicas_fiscais",
+      "arquivo": "notas_tecnicas_fiscais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte versionado de NT RTC e classificações oficiais NF-e/NFS-e/NBS."
+    },
+    {
+      "modulo": "obrigacoes",
+      "arquivo": "obrigacoes.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta mensal da agenda tributária federal e orientações declaratórias."
+    },
+    {
+      "modulo": "obrigacoes_avancadas",
+      "arquivo": "obrigacoes_avancadas.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte oficial de DCTFWeb, eSocial e EFD-Reinf; não infere incidência por empresa."
+    },
+    {
+      "modulo": "paginas",
+      "arquivo": "paginas.py",
+      "tipo": "biblioteca",
+      "descricao": "Coleta páginas Gov.br para Markdown com tabelas literais e rastreabilidade."
+    },
+    {
+      "modulo": "recuperar_anexos",
+      "arquivo": "recuperar_anexos.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recuperação local de anexos Word/OCR, sem alterar originais nem suas versões."
+    },
+    {
+      "modulo": "reforma",
+      "arquivo": "reforma.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta inicial das normas e do cronograma da reforma tributária."
+    },
+    {
+      "modulo": "reforma_historico",
+      "arquivo": "reforma_historico.py",
+      "tipo": "coletor/comando",
+      "descricao": "Fotografia oficial da reforma CBS/IBS e do histórico normativo CGSN/MEI."
+    },
+    {
+      "modulo": "regularizacao_fiscal",
+      "arquivo": "regularizacao_fiscal.py",
+      "tipo": "coletor/comando",
+      "descricao": "Orientações públicas RFB/PGFN para regularização, sem consultar contribuintes."
+    },
+    {
+      "modulo": "retencoes_defesa_setores",
+      "arquivo": "retencoes_defesa_setores.py",
+      "tipo": "coletor/comando",
+      "descricao": "Buscas oficiais delimitadas: retenções, defesa, restituição e atividades econômicas."
+    },
+    {
+      "modulo": "sebrae",
+      "arquivo": "sebrae.py",
+      "tipo": "coletor/comando",
+      "descricao": "Estudos públicos Sebrae: originais PDF e extração Markdown auditável."
+    },
+    {
+      "modulo": "sped_complementar",
+      "arquivo": "sped_complementar.py",
+      "tipo": "coletor/comando",
+      "descricao": "Recorte documental SPED: ECD, ECF, EFD-Contribuições e EFD-ICMS/IPI."
+    },
+    {
+      "modulo": "sumarizacao",
+      "arquivo": "sumarizacao.py",
+      "tipo": "coletor/comando",
+      "descricao": "Sumarização descritiva e referências exaustivas dos snapshots e recibos locais."
+    },
+    {
+      "modulo": "sumulas_classificacao",
+      "arquivo": "sumulas_classificacao.py",
+      "tipo": "coletor/comando",
+      "descricao": "Bounded official CARF and merchandise-classification documentary collection."
+    },
+    {
+      "modulo": "tabelas_fiscais",
+      "arquivo": "tabelas_fiscais.py",
+      "tipo": "coletor/comando",
+      "descricao": "Snapshots oficiais de tabelas fiscais; não determina aplicação tributária."
+    },
+    {
+      "modulo": "tributacao_lucro",
+      "arquivo": "tributacao_lucro.py",
+      "tipo": "coletor/comando",
+      "descricao": "Núcleo oficial IRPJ/CSLL e RIR, com a visão publicada preservada."
+    },
+    {
+      "modulo": "xmls_exemplo",
+      "arquivo": "xmls_exemplo.py",
+      "tipo": "coletor/comando",
+      "descricao": "Inventário seguro de XMLs publicados explicitamente como exemplos oficiais."
+    }
+  ]
+}
