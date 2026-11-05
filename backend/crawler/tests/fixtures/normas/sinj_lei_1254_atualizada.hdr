@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 05 Nov 2026 22:58:40 GMT
+Content-Type: text/html
+Content-Length: 435160
+Connection: keep-alive
+X-AspNet-Version: 4.0.30319
+Expires: -1
+Pragma: no-cache
+Cache-Control: no-cache, no-store
+Vary: Accept-Encoding
+X-Powered-By: Mono
+Content-Security-Policy: upgrade-insecure-requests
+

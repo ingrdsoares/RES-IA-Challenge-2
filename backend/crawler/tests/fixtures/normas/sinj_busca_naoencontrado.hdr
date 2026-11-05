@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 05 Nov 2026 22:58:38 GMT
+Content-Type: application/json
+Content-Length: 411
+Connection: keep-alive
+X-AspNet-Version: 4.0.30319
+Cache-Control: private
+Vary: Accept-Encoding
+X-Powered-By: Mono
+Content-Security-Policy: upgrade-insecure-requests
+

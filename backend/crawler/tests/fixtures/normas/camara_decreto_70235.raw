@@ -1,0 +1,814 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="apple-itunes-app" content="app-id=1049343067" />
+    <meta name="google-play-app" content="app-id=br.leg.camara.infolegmovel" />
+    <script>
+      (function () {
+        let initialized = false;
+        let loading = false;
+
+        function ensureBody(callback) {
+          if (document.body) {
+            callback();
+          } else {
+            setTimeout(() => ensureBody(callback), 50);
+          }
+        }
+
+        function loadScript() {
+          if (loading || window.VLibras) return;
+          loading = true;
+
+          ensureBody(() => {
+            const s = document.createElement("script");
+            s.src = "https://vlibras.gov.br/app/vlibras-plugin.js";
+            s.onload = initVLibras;
+            document.body.appendChild(s);
+          });
+        }
+
+        function initVLibras() {
+          if (initialized || !window.VLibras) return;
+
+          ensureBody(() => {
+            if (!document.querySelector("[vw]")) {
+              const container = document.createElement("div");
+              container.innerHTML = `
+              <div vw class="enabled">
+                <div vw-access-button class="active"></div>
+                <div vw-plugin-wrapper>
+                  <div class="vw-plugin-top-wrapper"></div>
+                </div>
+              </div>
+            `;
+              document.body.appendChild(container);
+            }
+
+            (new window.VLibras.Widget(
+              "https://vlibras.gov.br/app",
+              "https://vlibras.gov.br/config/camara.json",
+            ),
+              $("body").append(
+                '<aside><div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div></aside>',
+              ));
+            initialized = true;
+
+            injectCSS();
+            if (!window.location.pathname.includes("/comissoes")) {
+              bindButton();
+            }
+          });
+        }
+
+        function injectCSS() {
+          if (document.getElementById("vlibras-style")) return;
+          const style = document.createElement("style");
+          style.id = "vlibras-style";
+          style.innerHTML = `
+          [vw-access-button] { display: none !important; }
+          div[vw] { z-index: 999999 !important; }
+        `;
+          document.head.appendChild(style);
+        }
+
+        function bindButton() {
+          const btn = document.getElementById("meu-botao-vlibras");
+          if (!btn) {
+            setTimeout(bindButton, 300);
+            return;
+          }
+
+          btn.onclick = function (e) {
+            e.preventDefault();
+            const original = document.querySelector("[vw-access-button]");
+            if (original) original.click();
+          };
+        }
+
+        // OBSERVA MUTA&#199;&#213;ES DO DOM (ESSENCIAL NO PLONE)
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector("[vw]") && !initialized) {
+            loadScript();
+          }
+        });
+
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+        });
+
+        window.addEventListener("load", loadScript);
+      })();
+    </script>
+
+    <title>Portal da Câmara dos Deputados</title>
+  <style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/member-cachekey-46bb2e0fc9968a457e63f356c0ff3900.css);</style><style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/portlets-cachekey-8a45f49b338591ae0c9c8a91f261dc78.css);</style><style type="text/css" media="screen">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/deprecated-cachekey-32595b622b36f2eee9478f07796d4f67.css);</style><style type="text/css" media="screen">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/resourceplone.app.discussion.stylesheetsdiscussion-cachekey-5b23f388acd88bdb65020b51a5a278fb.css);</style><style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/elements-cachekey-57e40a70bd8192a6f63782abff5c2748.css);</style><style type="text/css" media="all">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/ploneCustom-cachekey-7fb44e17264e070fccf4e31d9f2ada1c.css);</style><link rel="stylesheet" type="text/css" href="https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/themecamara.leg.viradadigitalcsslibsbootstrap-datetimepicker.min-cachekey-ab2d257c1b49d2d194633e2ecb4564a2.css" /><link rel="stylesheet" type="text/css" href="https://www.camara.leg.br/tema/global/camara-custom.css" /><link rel="stylesheet" type="text/css" href="https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/++theme++camara.leg.viradadigital/css/all.min.css" /><link rel="apple-touch-icon" sizes="180x180" href="https://www.camara.leg.br/tema/apple-touch-icon.png" /><link rel="icon" type="image/png" sizes="32x32" href="https://www.camara.leg.br/tema/favicon-32x32.png" /><link rel="icon" type="image/png" sizes="16x16" href="https://www.camara.leg.br/tema/favicon-16x16.png" /><link rel="manifest" href="https://www.camara.leg.br/tema/site.webmanifest" /><link rel="mask-icon" href="https://www.camara.leg.br/tema/safari-pinned-tab.svg" color="#009e49" /><link rel="search" href="http://www2.camara.leg.br/busca-geral" title="Buscar neste site" /><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/resourceplone.app.jquery-cachekey-3fa72abea58e1799bd3b0bc237335d45.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/styleswitcher-cachekey-9178d2d1bc80488214ac8d40a46c7bdf.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/impressaoIframes-cachekey-7de901cf3c737563606c12fa53b7a321.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/GoogleAnalyticsTracker.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/kss-bbb-cachekey-df10a37e7aa4176c3b122c2e3b0ee128.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/inline_validation-cachekey-35d4d75a94cdb17b403a636871dd92cb.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljsbootstrap.min-cachekey-c15df71e2ec454087fe4c4eab0ce9d3e.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsmoment.min-cachekey-860514b918ea422f7e82fa48125015c4.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsmoment-pt-br-cachekey-0aafba4fb000126f1ed0f6701186de00.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsbootstrap-datetimepicker.min-cachekey-fac2884b384d9c99236b26d0746facc4.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsjquery.maskedinput.min-cachekey-e2f8b2523378532cc132594675b6dc6f.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljsacoes-tema-cachekey-a0084cf69f1785571a18f6a58a4986ac.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljscorrecoes-bootstrap-tema-cachekey-bd4c19550531506aa59d8b0aa7e8d6c5.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitalvendorjquery.mmenu.all-cachekey-f0e297313e30d6b2b2c2588ef23b5ef2.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsvd_correcoes-cachekey-52a3614631388ad9e07bf35264bc73d5.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsmmenu-correcoes-cachekey-8e45cc1e451978774afbfe2f5f1e95cf.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsselecao-idioma-cachekey-998dbb210e1353a5d7f94011740ee16c.js"></script><meta name="msapplication-TileColor" content="#00a300" /><meta name="msapplication-TileImage" content="https://www.camara.leg.br/tema/mstile-144x144.png" /><meta name="theme-color" content="#009e49" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="canonical" href="" /><script type="text/javascript">
+          $("link[rel='canonical']").attr("href", window.location.href);
+        </script>
+
+
+
+
+
+
+
+<title> DECRETO Nº 70.235, DE 6 DE MARÇO DE 1972 - Dados da Norma - Portal Câmara dos Deputados</title>
+
+<meta name="description" content="Dispõe sobre o processo administrativo fiscal e dá outras providências." />
+
+<!-- Coloque aqui sua referência ao CSS local -->
+<link rel="stylesheet" type="text/css" href="../../../_css/legislacao-v1.css" />
+
+<!-- Coloque aqui seu javascript -->
+<!-- script type="text/javascript" src="caminho-e-nome-do-arquivo.js"></script -->
+<script type="text/javascript" src="../../../js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cd.gruporetratil.js"></script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function($) {
+
+        $('.grupoRetratil').grupoRetratil();
+    });
+
+</script>
+
+</head>
+<body>
+    <header class="l-cabecalho-portal" role="banner" id="portal-header">
+        <ul aria-label="Acesso direto" class="acesso-direto">
+          <!-- Links para saltar diretamente para &#225;reas importantes da p&#225;gina accesskey 2 = conte&#250;do e 3 = navega&#231;&#227;o -->
+          <li>
+            <a class="acesso-direto__link" href="#main-content" accesskey="2">Ir ao conteúdo</a>
+          </li>
+          <li>
+            <a class="acesso-direto__link" href="#main-nav" accesskey="3">Ir à navegação principal</a>
+          </li>
+        </ul>
+
+        <!--[if lte IE 9]>
+          <p class="browserupgrade">
+            Voc&#234; est&#225; usando um navegador <strong>defasado</strong>. Por favor,
+            <a href="https://browsehappy.com/">atualize seu navegador</a> para
+            melhorar sua experi&#234;ncia e sua seguran&#231;a.
+          </p>
+        <![endif]-->
+
+        <div class="nav-top">
+          <div class="container nav-top--container">
+            <a href="https://www2.camara.leg.br" class="logo-camara" accesskey="1"><span class="sr-only">Página inicial</span></a>
+
+            <div class="nav-top__palacio"></div>
+
+            <div class="nav-top__menu-superior">
+              <ul aria-label="Ferramentas de apoio" class="links-apoio">
+                <li class="links-apoio__item links-apoio__item--vlibras">
+                  <a id="meu-botao-vlibras" href="javascript:void(0);">
+                    <span>
+                      <img src="https://www.camara.leg.br/tema/assets/images/ico-vlibras-branco.png" alt="Ativar VLibras" width="28px" height="30px" />
+                    </span>
+                  </a>
+                </li>
+                <li class="links-apoio__item links-apoio__item--acessibilidade">
+                  <a href="https://www2.camara.leg.br/acessibilidade/recursos-de-acessibilidade" accesskey="0">Acessibilidade</a>
+                </li>
+                <li class="links-apoio__item links-apoio__item--faleconosco">
+                  <a href="https://www.camara.leg.br/fale-conosco" accesskey="9">Fale Conosco</a>
+                </li>
+              </ul>
+
+              <ul class="orgaos-parceiros" aria-label="Órgãos parceiros">
+                <li class="orgaos-parceiros__item orgaos-parceiros__item--congresso">
+                  <a href="http://www.congressonacional.leg.br"><span>Congresso</span></a>
+                </li>
+                <li class="orgaos-parceiros__item orgaos-parceiros__item--senado">
+                  <a href="http://www.senado.leg.br"><span>Senado</span></a>
+                </li>
+              </ul>
+
+              <div class="lista-idiomas">
+                <button class="botao-idioma-topo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="4,0">
+                  <span class="botao-idioma-topo__sigla">PT</span>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-right l-lista-idiomas" aria-label="Idioma">
+                  <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/english" class="idioma-topo">
+                      <span class="idioma-topo__bandeira idioma-topo__bandeira--ingles" aria-hidden="true"></span>
+                      <span class="idioma-topo__nome">English</span>
+                      <span class="idioma-topo__sigla">EN</span>
+                    </a>
+                  </li>
+                  <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/espanol" class="idioma-topo">
+                      <span class="idioma-topo__bandeira idioma-topo__bandeira--espanhol" aria-hidden="true"></span>
+                      <span class="idioma-topo__nome">Español</span>
+                      <span class="idioma-topo__sigla">ES</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="home-camara-menu">
+    <nav class="menu-global navbar navbar-expand-lg" role="navigation" aria-label="Navegação principal" id="menuglobal">
+      <div class="container menu-global--container">
+      
+
+        <a href="https://www.camara.leg.br" class="logo-camara" accesskey="1">
+          <span class="sr-only">Página inicial</span>
+        </a>
+
+      
+        
+        <!-- icone menu -->
+        <button class="menu-global--btnmenu navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarportal" aria-controls="navbarportal" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="menu-global--icon"></span>
+        </button>
+
+        <!-- icone busca -->
+        <button class="menu-global--btnsearch" type="button" data-toggle="collapse" data-target="#buscaportal" aria-controls="buscaportal" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="fa fa-search"></span>
+        </button>
+
+        <div class="navbar-collapse hidden-sm hidden-md hidden-xs" id="navbarportal">
+          <ul title="Navegação Principal" id="main-nav" class="navbar-nav">
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-temas nav-link dropdown-toggle" id="temas">Assuntos</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="temas">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/agropecuaria">Agropecuária</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/cidades-e-transportes">Cidades e transportes</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/ciencia-tecnologia-e-comunicacoes">Ciência, tecnologia e comunicações</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/consumidor">Consumidor</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/direitos-humanos">Direitos humanos</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/economia">Economia</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/educacao-cultura-e-esportes">Educação, cultura e esportes</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/meio-ambiente-e-energia">Meio ambiente e energia</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/politica-e-administracao-publica">Política e administração pública</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/relacoes-exteriores">Relações exteriores</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/saude">Saúde</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/seguranca">Segurança</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/trabalho-previdencia-e-assistencia">Trabalho, previdência e assistência</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-institucional nav-link dropdown-toggle" id="institucional">Institucional</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="institucional">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/agenda">Agenda</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/transparencia/servicos-ao-cidadao">Serviços</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/a-camara/estruturaadm/mesa/presidencia">Presidência</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/biblioteca-e-publicacoes/">Biblioteca e publicações</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/escola-da-camara/">Escola da Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/papel-e-estrutura/">Papel e estrutura</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/historia-e-arquivo/">História e arquivo</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/a-camara/visiteacamara">Visite</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-deputados nav-link dropdown-toggle" id="deputados">Deputados</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="deputados">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/deputados/quem-sao">Quem são</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/deputados/liderancas-e-bancadas-partidarias">Lideranças e bancadas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/deputados/frentes-e-grupos-parlamentares">Frentes e grupos parlamentares</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-atvlegislativa nav-link dropdown-toggle" id="atvlegislativa">Atividade Legislativa</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="atvlegislativa">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/busca-portal/proposicoes/pesquisa-simplificada">Propostas legislativas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/plenario">Plenário</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/comissoes">Comissões</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/sessoesereunioes">Sessões e reuniões</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/estudos-e-notas-tecnicas">Estudos legislativos</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/orcamento-da-uniao">Orçamento da União</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/legislacao">Legislação</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/entenda-o-processo-legislativo/">Entenda o processo legislativo</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/participe">Participe</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-comunicacao nav-link dropdown-toggle" id="comunicacao">Comunicação</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="comunicacao">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/noticias">Agência Câmara de Notícias</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/radio">Rádio Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/tv">TV Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/banco-imagens">Banco de Imagens</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assessoria-de-imprensa">Assessoria de Imprensa</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/comprove">Comprove uma notícia</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-transprestcontas nav-link dropdown-toggle" id="transprestcontas">Transparência e prestação de contas</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="transprestcontas">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/transparencia/">Transparência</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/transparencia/prestacao-de-contas">Prestação de contas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://dadosabertos.camara.leg.br/">Dados abertos</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+          </ul>
+          <div class="outras-opcoes-menu-usuario hidden-md hidden-lg">
+            <ul aria-label="Ferramentas de apoio" class="links-apoio links-apoio--menu-mobile">
+              <li class="links-apoio__item links-apoio__item--acessibilidade">
+                <a href="https://www2.camara.leg.br/acessibilidade/recursos-de-acessibilidade" accesskey="0">Acessibilidade</a>
+              </li>
+              <li class="links-apoio__item links-apoio__item--faleconosco">
+                <a href="https://www.camara.leg.br/fale-conosco" accesskey="9">Fale Conosco</a>
+              </li>
+            </ul>
+          </div>
+          <div class="lista-idiomas hidden-md hidden-lg">
+            <button id="botao-idioma-topo" class="botao-idioma-topo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="4,0">
+                <span class="botao-idioma-topo__sigla">PT</span>
+            </button>
+        
+            <ul class="dropdown-menu-right l-lista-idiomas " aria-label="Idioma">
+                <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/english" class="idioma-topo">
+                        <span class="idioma-topo__bandeira idioma-topo__bandeira--ingles" aria-hidden="true"></span>
+                        <span class="idioma-topo__nome">English</span>
+                        <span class="idioma-topo__sigla">EN</span>
+                    </a>
+                </li>
+                <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/espanol" class="idioma-topo">
+                        <span class="idioma-topo__bandeira idioma-topo__bandeira--espanhol" aria-hidden="true"></span>
+                        <span class="idioma-topo__nome">Español</span>
+                        <span class="idioma-topo__sigla">ES</span>            
+                    </a>
+                </li>
+            </ul>
+        </div>
+        </div>
+
+
+        <div class="collapse box-search" id="buscaportal">
+          <form role="search" accesskey="4" class="box-search__busca form-inline" action="https://www.camara.leg.br/busca-geral">
+            <label for="termo" class="sr-only box-search__label">Pesquise no Portal da Câmara</label>
+            <input class="form-control box-search__campo" type="search" name="termo" id="termo" placeholder="Buscar" aria-label="Search" />
+          </form>
+        </div>
+      </div>
+    </nav>
+  </div>
+      </header>
+
+    <div class="breadcrumbs-marcacao">
+        <div class="container">
+            <nav aria-label="Onde estou">
+                <ol class="breadcrumb portal-breadcrumbs">
+                    <li class="breadcrumb-item"><a href="//www.camara.leg.br">Início</a></li>
+                    
+	<li class='breadcrumb-item'><a href='http://www2.camara.gov.br/atividade-legislativa'>Atividade Legislativa</a></li>
+    <li class='breadcrumb-item'><a href='http://www2.camara.gov.br/atividade-legislativa/legislacao'>Legislação</a></li>
+
+                    <li class="breadcrumb-item active" aria-current="page">Esta página</li>
+                </ol>
+            </nav>
+        </div>
+        
+        <div class="container-fluid p-0">
+            <div id="menu-secoes-internas" class="menu-secoes-internass">
+                <div id="portal-mainsection">
+                    <div class="l-identificacao-landing">
+                        <div class="container">
+                            <h1 class="titulo-landing">Legislação</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="marcacao-conteudo-portal" class="conteudo-portal container nopadding-right nopadding-left">
+        <div class="coluna-centro col-md-12">
+
+
+<div id="portal-column-content">
+	<div id="portal-content-wrapper">
+		<div class="documentContent">
+			<div id="content">
+	
+				<h2 class="documentFirstHeading">Legislação Informatizada - Dados da Norma</h2>
+				<div class="dadosNorma">
+					<h1>DECRETO Nº 70.235, DE 6 DE MARÇO DE 1972</h1>
+						<p class="sessao ementa">
+				    		<span class="rotulo">EMENTA:</span> Dispõe sobre o processo administrativo fiscal e dá outras providências.
+				    	</p>
+			    
+				    	<div class="textoAtualizadoDownload">
+                                            <p>
+
+                                                    
+                                                    <a href="decreto-70235-6-marco-1972-418562-normaatualizada-pe.html" target="_blank">Texto Atualizado (HTML)</a>
+                                                    &nbsp;&nbsp;&nbsp;                                                
+                                                
+                                                    <a href="decreto-70235-6-marco-1972-418562-normaatualizada-pe.docx">Formato docx <img src="../../../_imagens/icone-docx.png" /></a>
+                                                    &nbsp;&nbsp;&nbsp;
+                                                
+                                                        <a href="decreto-70235-6-marco-1972-418562-normaatualizada-pe.pdf">
+                                                            Formato pdf <img src="../../../_imagens/icone-pdf.png" />
+                                                        </a>
+                                                
+
+                                            </p>
+                                        </div>
+				    
+                                        <div class="sessao">
+                                                    <a style="text-transform:uppercase;" href="decreto-70235-6-marco-1972-418562-publicacaooriginal-1-pe.html">
+                                                        <strong>
+                                                                Texto - Publicação Original
+                                                         </strong>
+                                                    </a>
+                                                    <ul class="listaMarcada">
+                                                        <li>
+                                                            
+
+                                                            <!-- -->
+
+                                                            Diário Oficial da União - Seção 1
+                                                            	- 7/3/1972, Página 1923       
+                                                            
+                                                            (Publicação Original)
+
+                                                            <!---->
+
+                                                            
+                                                        </li>
+                                                        <li>
+                                                            
+
+                                                            <!-- -->
+
+                                                            Coleção de Leis do Brasil
+                                                             - 1972, Página 711 
+                                                            Vol. 2          
+                                                            (Publicação Original)
+
+                                                            <!---->
+
+                                                            
+                                                        </li>
+                                                </ul>
+                                                    <a style="text-transform:uppercase;" href="decreto-70235-6-marco-1972-418562-retificacao-26496-pe.html">
+                                                        <strong>
+                                                                Texto - Retificação
+                                                         </strong>
+                                                    </a>
+                                                    <ul class="listaMarcada">
+                                                        <li>
+                                                            
+
+                                                            <!-- -->
+
+                                                            Diário Oficial da União - Seção 1
+                                                            	- 9/3/1972, Página 2019 
+                                                            
+                                                            (Retificação)
+
+                                                            <!---->
+
+                                                            
+                                                        </li>
+                                                </ul>
+                                        </div>
+				    
+				    
+				    
+				    	<div class="sessao">
+				    		<span class=""rotulo""><strong>Observação: </strong></span>
+				    		<span>Vide ADIN n° 1976-7</span>
+				    	</div>
+				    	<br/>
+				    
+				    	<div class="sessao">
+				    		<span class=""rotulo""><strong>Origem: </strong></span>
+				    		<span>Poder Executivo</span>
+				    	</div>
+				    	<br/>
+
+				    	<div class="sessao">
+				    		<span class=""rotulo""><strong>Situação: </strong></span>
+				    		<span>Não consta revogação expressa</span>
+				    	</div>
+				    	<br/>
+				    
+				        
+					    <div class="sessao">
+					    	<span class="rotulo">
+					    		<strong>Vide Norma(s):</strong>
+					    	</span>
+					    	<ul class="listaMarcada">
+					    			<li>
+					    				<a href="../../../fed/leicom/2026/leicomplementar-227-13-janeiro-2026-798657-norma-pl.html">Lei Complementar nº 227 de 13 de Janeiro de 2026 (Poder Legislativo) - (Alteração).
+					    				 Art. 5º, "caput", incisos I, II ; Art. 5º-A, "caput", parágrafo único ; Art. 5º-B ; Art. 7º, "caput", § 2º ; Art. 10, "caput", inciso V ; Art. 15, "caput" ; Art. 27, "caput", § 2º ; Art. 33, "caput" ; Art. 37, "caput", § 5º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2023/lei-14689-20-setembro-2023-794729-norma-pl.html">Lei Ordinária nº 14689 de 20 de Setembro de 2023 (Poder Legislativo) - (Alteração).
+					    				 Art. 25, "caput", §§ 9º-A, 12, 13 ; Art. 25-A, "caput", §§ 1º a 4ª, incisos I, II, §§ 5º a 8º, incisos I, II, §§ 9º, 10 .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2015/lei-13140-26-junho-2015-781100-norma-pl.html">Lei Ordinária nº 13140 de 26 de Junho de 2015 (Poder Legislativo) - (Acréscimo de Artigo).
+					    				 Art. 14-A .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2015/lei-13097-19-janeiro-2015-780071-norma-pl.html">Lei Ordinária nº 13097 de 19 de Janeiro de 2015 (Poder Legislativo) - (Acréscimo de Parágrafo).
+					    				 Art. 64-B, § 3° .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2013/lei-12865-9-outubro-2013-777235-norma-pl.html">Lei Ordinária nº 12865 de 9 de Outubro de 2013 (Poder Legislativo) - (Alteração).
+					    				 Art. 2º, Parágrafo único ; Art. 64-A ; Art. 64-B, §§ 1º, 2º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2013/lei-12844-19-julho-2013-776582-norma-pl.html">Lei Ordinária nº 12844 de 19 de Julho de 2013 (Poder Legislativo) - (Alteração).
+					    				 Art. 23, § 2º, inciso III, alíneas "a", "b", "c" .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/decret/2011/decreto-7574-29-setembro-2011-611525-norma-pe.html">Decreto nº 7574 de 29 de Setembro de 2011 (Poder Executivo) - (Regulamentação).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2009/lei-12096-24-novembro-2009-593791-norma-pl.html">Lei Ordinária nº 12096 de 24 de Novembro de 2009 (Poder Legislativo) - (Revogação Parcial).
+					    				 Art. 33, § 1º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2009/medidaprovisoria-465-29-junho-2009-589124-norma-pe.html">Medida Provisória nº 465 de 29 de Junho de 2009 (Poder Executivo) - (Revogação Parcial).
+					    				 Art. 33, § 1º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2009/lei-11941-27-maio-2009-588492-norma-pl.html">Lei Ordinária nº 11941 de 27 de Maio de 2009 (Poder Legislativo) - (Alteração).
+					    				 Art. 9º, §§ 4º, 5º, 6º ; Art. 23, § 1º ; Art. 24, Parágrafo único ; Art. 25, inciso II e §§ 1º a 5º e 7º a 11 ; Art. 26-A, § 6º, incisos I, II, alíneas "a", "b", "c" ; Art. 37, § 2º, inciso II .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2009/lei-11941-27-maio-2009-588492-norma-pl.html">Lei Ordinária nº 11941 de 27 de Maio de 2009 (Poder Legislativo) - (Revogação Parcial).
+					    				 Art. 15, Parágrafo único .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2008/medidaprovisoria-449-3-dezembro-2008-584686-norma-pe.html">Medida Provisória nº 449 de 3 de Dezembro de 2008 (Poder Executivo) - (Alteração).
+					    				 Art. 9º, §§ 4º, 5º, 6º, 7º ; Art. 23, §§ 1º, 2º, inciso III, alíneas "a", "b", "c" ; Art. 24, Parágrafo único ; Art. 25, inciso II, §§ 1º a 11 ; Art. 26, Parágrafo único ; Art. 26-A, Parágrafo único, incisos I, II, alíneas "a", "b", "c" ; Art. 37, § 2º, incisos I e II e §§ 3º e 4º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2008/medidaprovisoria-449-3-dezembro-2008-584686-norma-pe.html">Medida Provisória nº 449 de 3 de Dezembro de 2008 (Poder Executivo) - (Revogação Parcial).
+					    				 Art. 15, Parágrafo único .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/decret/2007/decreto-6103-30-abril-2007-553538-norma-pe.html">Decreto nº 6103 de 30 de Abril de 2007 (Poder Executivo) - (Alteração de Prazo).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2007/lei-11457-16-marco-2007-552186-norma-pl.html">Lei Ordinária nº 11457 de 16 de Março de 2007 (Poder Legislativo) - (Acréscimo de Parágrafo).
+					    				 Art. 23, §§ 7º, 8º, 9º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2007/lei-11457-16-marco-2007-552186-norma-pl.html">Lei Ordinária nº 11457 de 16 de Março de 2007 (Poder Legislativo) - (Norma Complementar).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2006/medidaprovisoria-303-29-junho-2006-544085-norma-pe.html">Medida Provisória nº 303 de 29 de Junho de 2006 (Poder Executivo) - (Norma Complementar).
+					    				 Art. 23 .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2005/lei-11196-21-novembro-2005-539221-norma-pl.html">Lei Ordinária nº 11196 de 21 de Novembro de 2005 (Poder Legislativo) - (Acréscimo de Artigo).
+					    				 Art. 26-A .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2005/lei-11196-21-novembro-2005-539221-norma-pl.html">Lei Ordinária nº 11196 de 21 de Novembro de 2005 (Poder Legislativo) - (Alteração).
+					    				 Art. 2º, Parágrafo único ; Art. 9º, § 1º ; Art. 16, inciso V ; Art. 23, inciso III alíneas "a" e "b" § 1º incisos I, II § 2º, III alíneas "a" e "b", IV §§ 3º e 4º , incisos I e II, § 5º, § 6º .</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2005/medidaprovisoria-258-21-julho-2005-537884-norma-pe.html">Medida Provisória nº 258 de 21 de Julho de 2005 (Poder Executivo) - (Aplicação).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2005/medidaprovisoria-243-31-marco-2005-536258-norma-pe.html">Medida Provisória nº 243 de 31 de Março de 2005 (Poder Executivo) - (Aplicação).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2004/medidaprovisoria-232-30-dezembro-2004-535313-norma-pe.html">Medida Provisória nº 232 de 30 de Dezembro de 2004 (Poder Executivo) - (Alteração).
+					    				 Art. 2º, Parágrafo único; Art. 9º, § 1º; Art. 15, Parágrafo único; Art. 16, inciso V; Art. 23, inciso III § 1º incisos I, II e III, § 2º inciso III alíneas "a " e "b" inciso IV, § 3º, § 4º incisos I e II; Art. 25, inciso I alíneas "a" e "b", inciso II; Art. 62, Parágrafo único.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2002/medidaprovisoria-75-24-outubro-2002-470397-norma-pe.html">Medida Provisória nº 75 de 24 de Outubro de 2002 (Poder Executivo) - (Alteração sem Eficácia).
+					    				 Art. 9º; Art. 15; Art. 16; Art. 17; Art. 62.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/decret/2002/decreto-4395-27-setembro-2002-466856-norma-pe.html">Decreto nº 4395 de 27 de Setembro de 2002 (Poder Executivo) - (Aplicação).
+					    				</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/lei/2002/lei-10522-19-julho-2002-471180-norma-pl.html">Lei Ordinária nº 10522 de 19 de Julho de 2002 (Poder Legislativo) - (Alteração).
+					    				 Art. 33.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2158-35-24-agosto-2001-390566-norma-pe.html">Medida Provisória nº 2158-35 de 24 de Agosto de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2176-79-23-agosto-2001-389643-norma-pe.html">Medida Provisória nº 2176-79 de 23 de Agosto de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2158-34-27-julho-2001-381964-norma-pe.html">Medida Provisória nº 2158-34 de 27 de Julho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2176-78-26-julho-2001-381636-norma-pe.html">Medida Provisória nº 2176-78 de 26 de Julho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2176-77-28-junho-2001-335157-norma-pe.html">Medida Provisória nº 2176-77 de 28 de Junho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2158-33-28-junho-2001-335615-norma-pe.html">Medida Provisória nº 2158-33 de 28 de Junho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2113-32-21-junho-2001-326145-norma-pe.html">Medida Provisória nº 2113-32 de 21 de Junho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-76-13-junho-2001-325655-norma-pe.html">Medida Provisória nº 2095-76 de 13 de Junho de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2113-31-24-maio-2001-341095-norma-pe.html">Medida Provisória nº 2113-31 de 24 de Maio de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-75-17-maio-2001-339836-norma-pe.html">Medida Provisória nº 2095-75 de 17 de Maio de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2113-30-26-abril-2001-351986-norma-pe.html">Medida Provisória nº 2113-30 de 26 de Abril de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 25.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-74-19-abril-2001-355781-norma-pe.html">Medida Provisória nº 2095-74 de 19 de Abril de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-73-22-marco-2001-351176-norma-pe.html">Medida Provisória nº 2095-73 de 22 de Março de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-72-22-fevereiro-2001-363204-norma-pe.html">Medida Provisória nº 2095-72 de 22 de Fevereiro de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2001/medidaprovisoria-2095-71-25-janeiro-2001-357172-norma-pe.html">Medida Provisória nº 2095-71 de 25 de Janeiro de 2001 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2000/medidaprovisoria-2095-70-27-dezembro-2000-377824-norma-pe.html">Medida Provisória nº 2095-70 de 27 de Dezembro de 2000 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2000/medidaprovisoria-1973-69-21-dezembro-2000-353356-norma-pe.html">Medida Provisória nº 1973-69 de 21 de Dezembro de 2000 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2000/medidaprovisoria-1973-68-23-novembro-2000-361905-norma-pe.html">Medida Provisória nº 1973-68 de 23 de Novembro de 2000 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2000/medidaprovisoria-1973-67-26-outubro-2000-376505-norma-pe.html">Medida Provisória nº 1973-67 de 26 de Outubro de 2000 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+					    				<a href="../../../fed/medpro/2000/medidaprovisoria-1973-66-27-setembro-2000-375996-norma-pe.html">Medida Provisória nº 1973-66 de 27 de Setembro de 2000 (Poder Executivo) - (Alteração).
+					    				 Art. 33, §§ 1º a 5º; Art. 43, § 3º, alíneas "a" e "b" e § 4º.</a>
+					    			</li>
+					    			<li>
+<!-- FIXTURE TRUNCADO: original 73037 bytes; mantidos primeiros 49901 bytes -->
