@@ -1,6 +1,6 @@
 # Pipeline de avaliação do RAG — desenho
 
-Status: proposta para aprovação. Branch: `feat/rag-evaluation`, derivada da implementação atual do backend.
+Status: aprovado pelo usuário em 2026-11-05. Branch: `feat/rag-evaluation`, derivada da implementação atual do backend.
 
 ## Objetivo e limites
 
