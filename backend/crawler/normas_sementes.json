@@ -1,0 +1,9 @@
+[
+  {"tipo": "constituicao", "numero": 0, "ano": 1988, "jurisdicao": "federal", "titulo_regex": "constituicao (da republica|federal)"},
+  {"tipo": "decreto", "numero": 7212, "ano": 2010, "jurisdicao": "federal"},
+  {"tipo": "lodf", "numero": 0, "ano": 1993, "jurisdicao": "df", "titulo_regex": "lei organica do distrito federal"},
+  {"tipo": "assunto", "numero": 0, "ano": null, "jurisdicao": "df", "assunto": "IPTU"},
+  {"tipo": "assunto", "numero": 0, "ano": null, "jurisdicao": "df", "assunto": "ITBI"},
+  {"tipo": "assunto", "numero": 0, "ano": null, "jurisdicao": "df", "assunto": "IPVA"},
+  {"tipo": "assunto", "numero": 0, "ano": null, "jurisdicao": "df", "assunto": "ITCD"}
+]
