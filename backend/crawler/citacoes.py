@@ -1,0 +1,39 @@
+"""Extracao de citacoes normativas em texto livre."""
+from dataclasses import dataclass
+
+from backend.crawler.normas_id import _RX, NormaId, _sem_acento, norma_do_match
+
+
+@dataclass(frozen=True)
+class Citacao:
+    norma: NormaId
+    trecho: str
+    candidatas_jurisdicao: tuple[str, ...]
+
+
+def extrair_citacoes(texto: str, jurisdicao_origem: str) -> list[Citacao]:
+    """Uma Citacao por norma (primeira ocorrencia). Trecho vem do texto sem acento/minusculo."""
+    t = _sem_acento(texto)
+    vistas: set[str] = set()
+    saida = []
+    for m in _RX.finditer(t):
+        jur = m.group('jur')
+        if jur in ('df', 'distrital', 'gdf'):
+            cands = ('df',)
+        elif jur == 'federal':
+            cands = ('federal',)
+        elif jurisdicao_origem == 'df':
+            cands = ('df', 'federal')
+        else:
+            cands = ('federal',)
+        n = norma_do_match(m, cands[0])
+        # sem ano, so numeros com milhar (>=1000) sao citacao; "lei 12" e ruido
+        if n.ano is None and n.numero < 1000:
+            continue
+        if n.jurisdicao == 'confaz':
+            cands = ('confaz',)
+        if n.chave in vistas:
+            continue
+        vistas.add(n.chave)
+        saida.append(Citacao(n, t[max(0, m.start() - 40):m.end() + 40].strip(), cands))
+    return saida
