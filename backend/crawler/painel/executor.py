@@ -60,6 +60,13 @@ def _agora() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _dominio(url: str | None) -> str | None:
+    try:
+        return urlsplit(url or '').hostname
+    except ValueError:
+        return None
+
+
 def _encerrar_arvore(proc: subprocess.Popen) -> None:
     try:
         if os.name == 'nt':
@@ -193,7 +200,7 @@ class Executor:
         for f in frentes:
             if f['estado'] not in ('na_fila', 'coletando'):
                 continue
-            anterior = self._ultimas.get(f['modulo'], {}).get('duracao_s')
+            anterior = self._execucao_completa(f['modulo']).get('duracao_s')
             decorrido = time.monotonic() - self._relogio[f['modulo']] if f['estado'] == 'coletando' else None
             f['restante_s'] = estimar(anterior, decorrido, f['fracao'], s_por_item, f['itens'])
             if f['restante_s'] is None:
@@ -298,7 +305,7 @@ class Executor:
             if executadas:
                 atualizado = self._atualizar_catalogo()
                 self._classificar_executadas(executadas, atualizado)
-                self._rodar_finais()
+            self._rodar_finais()  # depois de Parar, parar() já as tirou da fila
         except Exception as e:
             traceback.print_exc()
             with self._trava:
@@ -326,6 +333,18 @@ class Executor:
             else:
                 estado = 'erro' if self._com_excecao(saida) else 'verificando'
             self._linhas[modulo].update(estado=estado, fim=fim, saida=saida, forcada=forcada)
+            registro = self._registro_fim(modulo, self._resultado(modulo, None))
+        self._registrar(registro)  # uma queda antes do catálogo não invalida a frente que já terminou
+
+    def _resultado(self, modulo: str, situacao: str | None) -> str:
+        saida = self._linhas[modulo]['saida']
+        return classificar(saida, self._com_excecao(saida), modulo in self._interrompidas, situacao)
+
+    def _registro_fim(self, modulo: str, resultado: str) -> dict:
+        linha = self._linhas[modulo]
+        return {'evento': 'fim', 'modulo': modulo, 'inicio': linha['inicio'], 'fim': linha['fim'],
+                'resultado': resultado, 'requisicoes': linha['requisicoes'], 'bytes': linha['bytes'],
+                'duracao_s': self._duracoes[modulo], 'forcada': linha['forcada']}
 
     @staticmethod
     def _com_excecao(saida: int | None) -> bool:
@@ -342,13 +361,18 @@ class Executor:
                 log.write(f'Não foi possível iniciar o processo: {e}\n'.encode('utf-8'))
                 return None, False
         forcada = False
-        while (saida := proc.poll()) is None:
+        try:
+            while (saida := proc.poll()) is None:
+                passo()
+                if forcavel and not forcada and self._parada_vencida():
+                    _encerrar_arvore(proc)
+                    forcada = True
+                time.sleep(self.intervalo)
             passo()
-            if forcavel and not forcada and self._parada_vencida():
-                _encerrar_arvore(proc)
-                forcada = True
-            time.sleep(self.intervalo)
-        passo()
+        except BaseException:  # a rodada não pode terminar nem soltar a trava com o coletor ainda rodando
+            _encerrar_arvore(proc)
+            proc.wait()
+            raise
         return saida, forcada
 
     def _parada_vencida(self) -> bool:
@@ -375,17 +399,29 @@ class Executor:
             for ev in eventos:
                 if not isinstance(ev, dict) or ev.get('modulo') != modulo or ev.get('tipo') not in ('pedido', 'resposta'):
                     continue
-                linha.update(item_atual=ev.get('url'), fonte=urlsplit(ev.get('url') or '').hostname)
-                if ev['tipo'] == 'resposta':
-                    linha['requisicoes'] += 1
-                    linha['bytes'] += ev.get('bytes') or 0
-                    linha['bytes_item'] = ev.get('bytes')
-                    self._casadas[modulo] |= {ev.get('url'), ev.get('url_final')} & self._origens[modulo]
+                try:
+                    self._aplicar_evento(modulo, linha, ev)
+                except (AttributeError, TypeError, ValueError):
+                    continue  # evento malformado não pode derrubar a rodada
             self._atualizar_barra(modulo)
+
+    def _aplicar_evento(self, modulo: str, linha: dict, ev: dict) -> None:
+        linha.update(item_atual=ev.get('url'), fonte=_dominio(ev.get('url')))
+        if ev['tipo'] == 'resposta':
+            tamanho = ev.get('bytes') or 0
+            casadas = {ev.get('url'), ev.get('url_final')} & self._origens[modulo]
+            linha['bytes'] += tamanho  # primeiro o que pode falhar: evento ruim não entra pela metade
+            linha['requisicoes'] += 1
+            linha['bytes_item'] = tamanho
+            self._casadas[modulo] |= casadas
+
+    def _execucao_completa(self, modulo: str) -> dict:
+        ultima = self._ultimas.get(modulo, {})  # execução interrompida ou com erro é truncada: não mede o total
+        return ultima if ultima.get('resultado') in ('concluida', 'parcial') else {}
 
     def _atualizar_barra(self, modulo: str) -> None:
         linha = self._linhas[modulo]
-        anterior = self._ultimas.get(modulo, {}).get('requisicoes') or None  # execução sem requisições não é base 1
+        anterior = self._execucao_completa(modulo).get('requisicoes') or None  # execução sem requisições não é base 1
         casadas, origens = len(self._casadas[modulo]), len(self._origens[modulo])
         fracao, base = barra(linha['requisicoes'], casadas, anterior, origens)
         linha.update(fracao=fracao, base=base, feitos=linha['requisicoes'] if base == 1 else casadas,
@@ -408,16 +444,15 @@ class Executor:
             r = resumos.get(por_modulo[modulo].pasta) or {}
             with self._trava:
                 linha = self._linhas[modulo]
-                resultado = classificar(linha['saida'], self._com_excecao(linha['saida']),
-                                        modulo in self._interrompidas, r.get('situacao'))
+                resultado = self._resultado(modulo, r.get('situacao'))
+                mudou = resultado != self._resultado(modulo, None)
                 linha['estado'] = resultado
                 if r:
                     linha.update(itens=r['itens'], ultima_coleta=r['ultima_coleta'], pendencias=r['pendencias'],
                                  fonte=r['fonte'] or linha['fonte'])
-                registro = {'evento': 'fim', 'modulo': modulo, 'inicio': linha['inicio'], 'fim': linha['fim'],
-                            'resultado': resultado, 'requisicoes': linha['requisicoes'], 'bytes': linha['bytes'],
-                            'duracao_s': self._duracoes[modulo], 'forcada': linha['forcada']}
-            self._registrar(registro)
+                registro = self._registro_fim(modulo, resultado)
+            if mudou:  # em ultimas_execucoes, a última linha vale
+                self._registrar(registro)
 
     def _registrar(self, registro: dict) -> None:
         with open(self.historico, 'a', encoding='utf-8') as f:

@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -204,7 +206,7 @@ espera({str(self.solta)!r})""")
 
     def test_estimativa_soma_e_conta_frentes_sem_base(self):
         self.gravar_catalogo({'cobertura_frentes': [{'pasta': 'pasta-b', 'snapshots': 2}]})
-        self.gravar_historico(json.dumps({'evento': 'fim', 'modulo': 'a', 'resultado': 'erro', 'duracao_s': 500.0}) + '\n')
+        self.gravar_historico(json.dumps({'evento': 'fim', 'modulo': 'a', 'resultado': 'concluida', 'duracao_s': 500.0}) + '\n')
         self.script('a', f'espera({str(self.solta)!r})')
         self.script('b')
         self.script('c')
@@ -397,3 +399,113 @@ time.sleep(30)""")
         self.assertEqual(self.linha(estado, 'nao_existe_xyz')['saida'], SAIDA_EXCECAO)
         self.assertEqual(self.linha(estado, 'nao_existe_xyz')['estado'], 'erro')
         self.assertIn('nao_existe_xyz', e.log('nao_existe_xyz'))
+
+    def test_url_invalida_em_evento_nao_derruba_a_rodada(self):
+        self.script('a', f"""
+ev('pedido', 'http://[bad')
+ev('resposta', 'http://[bad', url_final='http://[bad', status=200, bytes=3, ms=1)
+ev('resposta', 'https://y.gov.br/1', url_final=['nao', 'hashavel'], status=200, bytes='x', ms=1)
+ev('resposta', 'https://y.gov.br/2', url_final='https://y.gov.br/2', status=200, bytes=4, ms=1)
+espera({str(self.solta)!r})""")
+        e = self.executor()
+        e.iniciar({'a'}, set(), set())
+        self.esperar(lambda: self.linha(e.estado(), 'a')['fonte'] == 'y.gov.br')
+        self.assertTrue(e.estado()['rodando'])
+        self.assertEqual(self.linha(e.estado(), 'a')['estado'], 'coletando')
+        self.solta.touch()
+        e.aguardar(30)
+        estado = e.estado()
+        self.assertIsNone(estado['aviso'])
+        self.assertEqual(self.linha(estado, 'a')['estado'], 'concluida')
+        self.assertEqual(self.linha(estado, 'a')['bytes'], 7)
+
+    def test_falha_interna_nao_deixa_processo_vivo(self):
+        arquivo_pid = self.tmp / 'pid'
+        self.script('a', f"""
+pathlib.Path({str(arquivo_pid)!r}).write_text(str(os.getpid()))
+time.sleep(30)""")
+        self.script('b')
+        e = self.executor()
+
+        def falha(_modulo):
+            if arquivo_pid.exists() and arquivo_pid.read_text():
+                raise RuntimeError('quebrou')
+        e._ler_eventos = falha
+        with contextlib.redirect_stderr(io.StringIO()):  # a falha interna imprime o traceback de propósito
+            e.iniciar({'a', 'b'}, set(), set())
+            e.aguardar(30)
+        estado = e.estado()
+        self.assertFalse(estado['rodando'])
+        self.assertIn('quebrou', estado['aviso'])
+        self.assertFalse(vivo(int(arquivo_pid.read_text())))
+        self.assertEqual(self.linha(estado, 'a')['estado'], 'interrompida')
+        self.assertEqual(self.linha(estado, 'b')['estado'], 'nao_iniciada')
+
+    def test_execucao_truncada_nao_serve_de_base_nem_estimativa(self):
+        for resultado in ('interrompida', 'erro'):
+            with self.subTest(resultado=resultado):
+                self.solta.unlink(missing_ok=True)
+                self.ordem.unlink(missing_ok=True)
+                self.gravar_historico(json.dumps({'evento': 'fim', 'modulo': 'a', 'resultado': resultado,
+                                                  'requisicoes': 2, 'duracao_s': 3.0}) + '\n')
+                self.script('a', f"""
+ev('resposta', 'https://y.gov.br/1', url_final='https://y.gov.br/1', status=200, bytes=1, ms=1)
+ev('resposta', 'https://y.gov.br/2', url_final='https://y.gov.br/2', status=200, bytes=1, ms=1)
+espera({str(self.solta)!r})""")
+                e = self.executor()
+                e.iniciar({'a'}, set(), set())
+                self.esperar(lambda: self.linha(e.estado(), 'a')['requisicoes'] == 2)
+                estado = e.estado()
+                linha = self.linha(estado, 'a')
+                self.assertEqual((linha['fracao'], linha['base'], linha['total']), (None, None, None))
+                self.assertIsNone(linha['restante_s'])
+                self.assertEqual(estado['sem_estimativa'], 1)
+                self.solta.touch()
+                e.aguardar(30)
+
+    def test_execucao_parcial_serve_de_base(self):
+        self.gravar_historico(json.dumps({'evento': 'fim', 'modulo': 'a', 'resultado': 'parcial',
+                                          'requisicoes': 4, 'duracao_s': 100.0}) + '\n')
+        self.script('a', f'espera({str(self.solta)!r})')
+        e = self.executor()
+        e.iniciar({'a'}, set(), set())
+        self.esperar(self.ordem.exists)
+        linha = self.linha(e.estado(), 'a')
+        self.assertEqual((linha['total'], linha['base']), (4, 1))
+        self.assertGreater(linha['restante_s'], 0)
+
+    def test_queda_depois_da_primeira_frente_preserva_o_resultado_dela(self):
+        self.gravar_catalogo(catalogo('pasta-a', 'pasta-b'))
+        self.script('a')
+        self.script('b', f'espera({str(self.solta)!r})')
+        e = self.executor()
+        e.iniciar({'a', 'b'}, {'a', 'b'}, set())
+        self.esperar(lambda: self.linha(e.estado(), 'b')['estado'] == 'coletando')
+        # o histórico neste instante é o que sobraria de uma queda da máquina
+        ultimas = ultimas_execucoes(self.painel / 'historico.jsonl')
+        self.assertEqual(ultimas['a']['resultado'], 'concluida')
+        self.assertEqual(ultimas['b'], {'resultado': 'interrompida'})
+        self.assertEqual(e.previa({'a'}, set())[0]['acao'], 'pular')
+
+    def fins_no_historico(self, modulo):
+        linhas = (json.loads(b) for b in (self.painel / 'historico.jsonl').read_text(encoding='utf-8').splitlines())
+        return [x['resultado'] for x in linhas if x['evento'] == 'fim' and x['modulo'] == modulo]
+
+    def test_catalogo_corrige_resultado_do_processo_no_historico(self):
+        self.catalogo_final = catalogo('pasta-a', situacao='coletada_com_pendencias', pendencias=3)
+        self.script('a', saida=1)
+        self.rodada(self.executor(), ['a'])
+        self.assertEqual(self.fins_no_historico('a'), ['erro', 'parcial'])
+        self.assertEqual(ultimas_execucoes(self.painel / 'historico.jsonl')['a']['resultado'], 'parcial')
+
+    def test_resultado_igual_nao_repete_linha_no_historico(self):
+        self.script('a')
+        self.rodada(self.executor(), ['a'])
+        self.assertEqual(self.fins_no_historico('a'), ['concluida'])
+
+    def test_etapa_final_roda_sem_frente_executada_e_sem_catalogo(self):
+        self.script('estatisticas')
+        estado = self.rodada(self.executor(), (), finais=['estatisticas'])
+        self.assertEqual(self.ordem_rodada(), ['estatisticas'])
+        self.assertEqual(estado['finais'][0]['estado'], 'concluida')
+        self.assertEqual(estado['finais'][1]['estado'], 'nao_iniciada')
