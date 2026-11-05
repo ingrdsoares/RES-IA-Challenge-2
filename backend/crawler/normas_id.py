@@ -17,13 +17,13 @@ _TIPOS = [
     ('convenio_icms', r'convenio\s+icms'),
     ('ajuste_sinief', r'ajuste\s+sinief'),
 ]
-_ORGAOS = r'rfb|srf|pgfn|sefaz|cosit|coana|conjunta'
+_ORG = r'(?:rfb|srf|pgfn|sefaz|cosit|coana)'
 _RX = re.compile(
     r'\b(?:' + '|'.join(f'(?P<{k}>{p})' for k, p in _TIPOS) + r')'
     r'(?:\s+(?:df|distrital|federal|gdf))?'
-    rf'(?:\s+(?P<orgao>{_ORGAOS}))?'
+    rf'(?:\s+conjunta)?(?:\s+(?P<orgao>{_ORG}(?:/{_ORG})*))?'
     r'\s*(?:n[o°º.]*)?\s*(?P<num>\d{1,3}(?:\.\d{3})+|\d{1,6})'
-    r'(?:\s*/\s*(?P<a1>\d{4}|\d{2})\b|,?\s+de\s+\d{1,2}[o°º]?\s+de\s+[a-z]+\s+de\s+(?P<a2>\d{4}))?'
+    r'(?:\s*/\s*(?P<a1>\d{4}|\d{2})\b|,?\s+de\s+(?:\d{1,2}[o°º]?\s+de\s+[a-z]+\s+de\s+)?(?P<a2>\d{4}))?'
 )
 _CONFAZ = {'convenio_icms', 'ajuste_sinief'}
 
@@ -47,7 +47,7 @@ def _sem_acento(t: str) -> str:
 
 def identidade_titulo(titulo: str, jurisdicao: str = 'indefinida') -> NormaId | None:
     t = _sem_acento(titulo)
-    m = _RX.search(t)
+    m = _RX.match(t.strip())
     if not m:
         return None
     tipo = next(k for k, _ in _TIPOS if m.group(k))
