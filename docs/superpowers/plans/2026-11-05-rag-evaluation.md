@@ -180,3 +180,41 @@ Criar `__init__.py` nos subpacotes. Testes em `backend/api/tests/evaluation/`. R
 Cobertura: tarefa 1 define datasets/configuração e independência dos splits; tarefa 2 preserva integração e retomada; tarefa 3 métricas oficiais/português/versões/falhas; tarefa 4 estatística, repetição e dimensionamento; tarefa 5 comparação e abstenção adjudicada; tarefa 6 todos os formatos e gráficos; tarefa 7 operação completa, comandos e verificações locais. Todos os itens de Review Focus têm testes na tarefa responsável.
 
 Método de execução proposto: o próprio agente nesta sessão, preservando a preferência usada no backend, com uma revisão independente ao final. As interfaces são compartilhadas entre as sete tarefas e uma execução sequencial evita duplicar decisões sobre schema e checkpoints.
+
+
+## Resultado da implementação — 2026-11-05
+
+Pipeline implementado em `backend/api/evaluation/`, com CLI, coleta SQLite retomável,
+métricas, estatística, comparação, adjudicação e exportação Excel/JSON/CSV/Markdown/PNG.
+Testes foram agrupados em `tests/evaluation/test_dataset.py`, `test_eval_config.py`,
+`test_pipeline.py`, `test_metrics.py`, `test_bert_real_library.py`, `test_reports.py`,
+`test_workflow.py` e `test_cli.py`, em vez de um arquivo por nome proposto no plano.
+
+Evidência final: suíte completa no ambiente Docker Python 3.12 com dependências de
+avaliação instaladas: **90 passed, 1 skipped, 1 warning**, em 3,61 s. O skip é o teste
+opcional de Qdrant que exige QDRANT_TEST_URL; aviso de depreciação de Starlette/AnyIO.
+ROUGE foi executado com a biblioteca real; a compatibilidade BERTScore/Transformers/
+PyTorch em CPU foi verificada com um encoder minúsculo de pesos aleatórios criado
+localmente apenas para teste de software. Não é resultado científico do produto.
+Nenhum peso de modelo foi baixado e nenhuma bateria real do RAG foi executada.
+
+Artefatos concretos gerados e reabertos com openpyxl:
+`backend/evaluation/runs/template/dataset.xlsx` e `report.xlsx`, ambos vazios de casos
+ou pontuações, além de `report.md`. Relatórios completos e gráficos foram gerados
+apenas em diretórios temporários dos testes, identificados como fixtures.
+
+Revisão independente identificou planejamento SQLite não atômico e cache de métricas
+obsoleto após alteração da tentativa. Ambos foram reproduzidos por regressões RED e
+corrigidos: transação única de planejamento e validação da tentativa inteira ao ler
+cache. Também corrigidos denominadores de disponibilidade por recorte, identidade de
+relatórios incluindo respostas/revisões/piloto, e comparação BERT não resolvida nos
+recortes. Nenhum achado menor foi deixado pendente.
+
+Decisões de execução:
+- Consolidação dos testes em oito arquivos e da implementação num commit funcional;
+  mantém o escopo, mas produz um diff maior para leitura.
+- Ambiente Docker opcional exclusivo de avaliação, pois o host usa Python 3.14;
+  não altera Dockerfile, requirements nem código app/ de produção.
+- A validação real de qualidade fiscal e do BERTimbau aguarda corpus e referências
+  reais e preparação explícita do encoder. A biblioteca foi validada, não sua
+  calibração nesse domínio.

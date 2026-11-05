@@ -47,3 +47,8 @@ htmlcov/
 .env
 .env.local
 .env.*.local
+
+# Evaluation artifacts and caches
+backend/evaluation/runs/
+backend/evaluation/cache/
+.venv-eval/
