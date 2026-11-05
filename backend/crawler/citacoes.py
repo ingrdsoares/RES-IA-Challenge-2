@@ -31,6 +31,9 @@ def extrair_citacoes(texto: str, jurisdicao_origem: str) -> list[Citacao]:
         generico = n.tipo in ('lei', 'decreto') or (n.tipo == 'portaria' and n.orgao is None)
         if n.ano is None and n.numero < 1000 and generico and not m.group('marc'):
             continue
+        # sigla 'EC 08 de Taguatinga' em texto do DF e escola classe, nao emenda constitucional
+        if n.tipo == 'ec' and n.ano is None and jurisdicao_origem == 'df' and m.group('ec') == 'ec':
+            continue
         if n.jurisdicao == 'confaz':
             cands = ('confaz',)
         if n.chave in vistas:

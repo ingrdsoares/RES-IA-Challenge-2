@@ -105,3 +105,44 @@ def test_citacao_do_df_com_duas_candidatas(run):
     assert r['federal:lei:-:4567:2011']['situacao'] == 'ja_existia'
     a, b = r['df:lei:-:7000:2015'], r['federal:lei:-:7000:2015']
     assert a['situacao'] == b['situacao'] == 'pendente' and a['ligacao'] == b['ligacao'] == 'ambigua'
+
+
+def _docs(run, texto, n, prefixo, **kw):
+    for i in range(n):
+        run.add(f'{prefixo}{i}', 'x', texto=texto, **kw)
+
+
+def test_ano_dominante_em_numeracao_continua(run):
+    _docs(run, 'Lei nº 10.833, de 2003', 453, 'a')
+    _docs(run, 'Lei nº 10.833', 51, 'b')
+    _docs(run, 'Lei nº 10.833, de 2002', 10, 'c')
+    r = rodar(run)
+    assert r['federal:lei:-:10833:2003']['citado_em'] == 504 and r['federal:lei:-:10833:2003']['situacao'] == 'pendente'
+    assert 'federal:lei:-:10833:?' not in r
+    assert r['federal:lei:-:10833:2002']['situacao'] == 'ambigua'
+    assert 'dominante 2003' in r['federal:lei:-:10833:2002']['motivo'] and r['federal:lei:-:10833:2002']['citado_em'] == 10
+
+
+def test_portaria_nao_usa_ano_dominante(run):
+    _docs(run, 'Portaria RFB nº 100, de 2020', 100, 'a')
+    _docs(run, 'Portaria RFB nº 100, de 2021', 5, 'b')
+    r = rodar(run)
+    assert r['federal:portaria:rfb:100:2020']['situacao'] == r['federal:portaria:rfb:100:2021']['situacao'] == 'pendente'
+
+
+def test_gemea_dobra_na_linha_certa(run):
+    run.add('d1', 'x', texto='Decreto Distrital nº 33.269, de 2011', frente='distrital-df')
+    run.add('d2', 'x', texto='Decreto nº 33.269, de 2011', frente='distrital-df')
+    run.add('d3', 'x', texto='Decreto nº 33.269, de 2011 e Decreto nº 40.000, de 2015', frente='distrital-df')
+    r = rodar(run)
+    assert 'federal:decreto:-:33269:2011' not in r and r['df:decreto:-:33269:2011']['citado_em'] == 3
+    assert r['df:decreto:-:40000:2015']['candidata_ordem'] == 0 and r['federal:decreto:-:40000:2015']['candidata_ordem'] == 1
+
+
+def test_citada_sem_ano_nao_casa_coletada_com_ano_fora_do_conjunto(run):
+    run.add('d1', 'Portaria 27/2022')
+    run.add('d2', 'Lei 9.430/1996')
+    run.add('d3', 'x', texto='Portaria RFB nº 27 e Lei nº 9.430')
+    r = rodar(run)
+    assert r['federal:portaria:rfb:27:?']['situacao'] == 'pendente'
+    assert r['federal:lei:-:9430:1996']['situacao'] == 'ja_existia'

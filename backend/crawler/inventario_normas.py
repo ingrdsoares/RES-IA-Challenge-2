@@ -31,10 +31,15 @@ def _extrair(arg):
             for c in extrair_citacoes(texto, jur)]
 
 
+def _continua(tipo: str, numero: int) -> bool:
+    """Numeracao continua entre anos: o numero identifica a norma mesmo sem ano."""
+    return tipo in ('lei', 'lc', 'ec', 'dl') or (tipo == 'decreto' and numero >= 1000)
+
+
 def _casa(coletada: NormaId, n: NormaId, jurs) -> bool:
-    """ano e orgao None sao curingas nos dois sentidos; jurisdicao precisa estar entre as candidatas."""
+    """Coletada sem ano/orgao e curinga; citada sem ano so em numeracao continua; orgao None da citada e curinga."""
     return (coletada.tipo == n.tipo and coletada.numero == n.numero and coletada.jurisdicao in jurs
-            and (coletada.ano is None or n.ano is None or coletada.ano == n.ano)
+            and (coletada.ano is None or coletada.ano == n.ano or (n.ano is None and _continua(n.tipo, n.numero)))
             and (coletada.orgao is None or n.orgao is None or coletada.orgao == n.orgao))
 
 
@@ -42,8 +47,8 @@ def _chave(n: NormaId, assunto: str | None = None) -> str:
     return n.chave + (f'#{assunto.lower()}' if assunto else '')
 
 
-def _linha(n, docs, exemplos, origem, ligacao, assunto=None):
-    return {'chave': _chave(n, assunto), 'norma': asdict(n), 'docs': set(docs), 'exemplos': list(exemplos),
+def _linha(n, docs, exemplos, origem, ligacao, assunto=None, ordem=None):
+    return {**({'candidata_ordem': ordem} if ordem is not None else {}), 'chave': _chave(n, assunto), 'norma': asdict(n), 'docs': set(docs), 'exemplos': list(exemplos),
             'situacao': 'pendente', 'motivo': None, 'origem': origem, 'ligacao': ligacao,
             **({'assunto': assunto} if assunto else {})}
 
@@ -53,8 +58,46 @@ def _somar(a, b):
     a['exemplos'] = (a['exemplos'] + [e for e in b['exemplos'] if e not in a['exemplos']])[:_EXEMPLOS]
     if b['ligacao'] == 'certa':
         a['ligacao'] = 'certa'
+        a.pop('candidata_ordem', None)
     if b['origem'] == 'semente':
         a['origem'] = 'semente'
+
+
+def _ano_dominante(linhas: dict):
+    """Numeracao continua: ano com 3x as citacoes de cada outro (ou unico) domina; minoritarios viram ambigua."""
+    grupos: dict = {}
+    for l in linhas.values():
+        n = l['norma']
+        if l['origem'] == 'citacao' and n['ano'] is not None and _continua(n['tipo'], n['numero']):
+            grupos.setdefault((n['tipo'], n['numero'], n['jurisdicao'], n['orgao']), []).append(l)
+    for g in grupos.values():
+        top = max(g, key=lambda x: len(x['docs']))
+        if any(len(o['docs']) * 3 > len(top['docs']) for o in g if o is not top):
+            continue
+        n = top['norma']
+        for o in g:
+            if o is not top and o['situacao'] == 'pendente':
+                o['situacao'] = 'ambigua'
+                o['motivo'] = f"ano divergente do dominante {n['ano']}"
+        for k, l in list(linhas.items()):
+            m = l['norma']
+            if (l['origem'] == 'citacao' and l['situacao'] == 'pendente' and m['ano'] is None
+                    and (m['tipo'], m['numero'], m['jurisdicao'], m['orgao']) == (n['tipo'], n['numero'], n['jurisdicao'], n['orgao'])):
+                _somar(top, l)
+                del linhas[k]
+
+
+def _dobrar_gemeas(linhas: dict):
+    """Linha de dois candidatos com irma 'certa' na outra jurisdicao (mesmo tipo/numero/ano/orgao) some nela."""
+    for k, l in list(linhas.items()):
+        if l['ligacao'] != 'ambigua' or l['origem'] != 'citacao':
+            continue
+        n = l['norma']
+        outra = [i for i in linhas.values() if i['ligacao'] == 'certa' and i['norma']['jurisdicao'] != n['jurisdicao']
+                 and all(i['norma'][f] == n[f] for f in ('tipo', 'numero', 'ano', 'orgao'))]
+        if outra:
+            _somar(outra[0], l)
+            del linhas[k]
 
 
 def _juntar_irmas(linhas: dict, campo: str):
@@ -129,7 +172,8 @@ def inventariar(run_dir: Path, sementes: Path = SEMENTES_PADRAO, destino: Path =
             continue
         lig = 'certa' if len(cands) == 1 else 'ambigua'
         for j in cands:
-            entra(_linha(replace(base, jurisdicao=j), g['docs'], g['exemplos'], 'citacao', lig))
+            entra(_linha(replace(base, jurisdicao=j), g['docs'], g['exemplos'], 'citacao', lig,
+                         ordem=cands.index(j) if lig == 'ambigua' else None))
 
     for s in json.loads(Path(sementes).read_text(encoding='utf-8')):
         n = NormaId(s['tipo'], s['numero'], s.get('ano'), s['jurisdicao'], s.get('orgao'))
@@ -140,7 +184,9 @@ def inventariar(run_dir: Path, sementes: Path = SEMENTES_PADRAO, destino: Path =
         entra(l)
 
     # so pendentes participam da fusao de irmas
+    _dobrar_gemeas(linhas)
     _juntar_irmas(linhas, 'orgao')
+    _ano_dominante(linhas)
     _juntar_irmas(linhas, 'ano')
 
     saida = []

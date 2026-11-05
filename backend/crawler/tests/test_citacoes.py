@@ -71,3 +71,9 @@ def test_decreto_com_marcador_sem_ano():
 
 def test_decreto_sem_marcador_sem_ano_e_ruido():
     assert _chave('Decreto 435') == []
+
+
+def test_ec_sigla_sem_ano_em_texto_df_e_ruido_escolar():
+    assert extrair_citacoes('EC 08 de Taguatinga', 'df') == []
+    assert [c.norma.numero for c in extrair_citacoes('Emenda Constitucional nº 132', 'df')] == [132]
+    assert [c.norma.numero for c in extrair_citacoes('EC 132', 'federal')] == [132]
