@@ -63,7 +63,7 @@ button { font: inherit; color: inherit; }
 .frentes h2 { margin: 8px 0 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
 .linha { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--linha); }
 .linha[data-estado="coletando"], .linha[data-estado="verificando"], .linha[data-estado="parando"] { border-left-color: var(--em-curso); }
-.linha[data-estado="concluida"], .linha[data-estado="ja_coletada"] { border-left-color: var(--ok); }
+.linha[data-estado="concluida"], .linha[data-estado="ja_coletada"], .linha[data-estado="pulada"] { border-left-color: var(--ok); }
 .linha[data-estado="parcial"] { border-left-color: var(--atencao); }
 .linha[data-estado="erro"] { border-left-color: var(--falha); }
 .cabeca, .par { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
@@ -71,7 +71,7 @@ button { font: inherit; color: inherit; }
 .selo { font-size: 12px; padding: 1px 9px; border-radius: 10px; border: 1px solid currentColor; color: var(--suave); white-space: nowrap; }
 .selo[data-estado="coletando"], .selo[data-estado="verificando"], .selo[data-estado="parando"] { color: var(--em-curso); }
 .selo[data-estado="coletando"]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: currentColor; animation: pulsa 1.2s ease-in-out infinite; }
-.selo[data-estado="concluida"], .selo[data-estado="ja_coletada"] { color: var(--ok); }
+.selo[data-estado="concluida"], .selo[data-estado="ja_coletada"], .selo[data-estado="pulada"] { color: var(--ok); }
 .selo[data-estado="parcial"], .selo[data-estado="interrompida"] { color: var(--atencao); }
 .selo[data-estado="erro"] { color: var(--falha); }
 .barra { height: 8px; border-radius: 4px; background: var(--trilho); overflow: hidden; position: relative; }
@@ -148,7 +148,7 @@ dialog .botoes { display: flex; justify-content: flex-end; gap: 8px; margin-top:
 const ROTULOS = {
   sem_dados: 'sem dados', ja_coletada: 'já coletada', parcial: 'parcial', na_fila: 'na fila',
   coletando: 'coletando', parando: 'parando…', verificando: 'verificando', concluida: 'concluída',
-  pulada: 'pulada', erro: 'erro', interrompida: 'interrompida', nao_iniciada: 'não iniciada',
+  pulada: 'já coletada · pulada', erro: 'erro', interrompida: 'interrompida', nao_iniciada: 'não iniciada',
 };
 const ATIVOS = ['coletando', 'parando', 'verificando'];
 const NOMES_FINAIS = { estatisticas: 'Estatísticas', sumarizacao: 'Sumarização' };
@@ -281,17 +281,17 @@ function textoRestante(f) {
 }
 function textoHoras(f) {
   const partes = [];
-  if (f.inicio) partes.push(`início ${fmtHora(f.inicio)}`);
-  if (f.fim) partes.push(`fim ${fmtHora(f.fim)}`);
-  if (!partes.length && f.ultima_coleta) partes.push(`última coleta ${fmtHora(f.ultima_coleta)}`);
+  if (f.ultima_coleta && ['pulada', 'ja_coletada', 'parcial', 'concluida'].includes(f.estado)) partes.push(`última coleta ${fmtHora(f.ultima_coleta)}`);
+  if (f.estado !== 'pulada' && f.inicio) partes.push(`início ${fmtHora(f.inicio)}`);
+  if (f.estado !== 'pulada' && f.fim) partes.push(`fim ${fmtHora(f.fim)}`);
   return partes.join(' · ');
 }
 function atualizarBarra(p, f, ativa) {
-  const cheia = ['concluida', 'parcial', 'ja_coletada'].includes(f.estado); // `fracao` para em 0,99
+  const cheia = ['concluida', 'parcial', 'ja_coletada', 'pulada'].includes(f.estado); // `fracao` para em 0,99
   const indeterminada = ativa && f.fracao == null;
   const pct = cheia ? 100 : f.fracao == null ? 0 : Math.round(f.fracao * 100);
   p.barra.className = 'barra' + (indeterminada ? ' indeterminada' : '') + (cheia ? (f.estado === 'parcial' ? ' parcial' : ' feita') : '')
-    + (['erro', 'interrompida', 'pulada'].includes(f.estado) ? ' parada' : '');
+    + (['erro', 'interrompida'].includes(f.estado) ? ' parada' : '');
   p.barra.firstChild.style.width = indeterminada ? '' : pct + '%';
   if (indeterminada) p.barra.removeAttribute('aria-valuenow');
   else ligar(p.barra, 'aria-valuenow', String(pct));
