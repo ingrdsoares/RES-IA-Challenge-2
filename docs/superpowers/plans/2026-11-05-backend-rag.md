@@ -139,3 +139,20 @@ Decisões e limites registrados durante a execução:
 5. Entregar para demonstração local, conforme escopo; autenticação e publicação não estão implementadas.
 
 Nenhuma carga na base da aplicação, ingestão ou download de modelos foi realizado.
+
+## Validação adicional dos modelos — 2026-11-05
+
+Após solicitação explícita do usuário para baixar e habilitar os modelos, foram
+instalados `qwen3:8b` e `qwen3-embedding:0.6b` no Ollama local. Os limites de validação
+da seção anterior descrevem o estado antes dessa autorização adicional.
+
+- Embedding real pelo adapter da API: vetor válido de 1.024 dimensões, cerca de 1,55 s
+  nesta execução, incluindo o carregamento inicial.
+- Geração real pelo adapter da API: resposta correta com citação `[1]` para uma pergunta
+  técnica sobre o endpoint `/health`, usando contexto fornecido em memória. Cerca de
+  7,01 s nesta execução, incluindo o carregamento inicial do gerador.
+- `/ready`: HTTP 200 com os dois modelos disponíveis.
+- A coleção da aplicação permanece vazia, com zero pontos. Não houve ingestão.
+
+Essas medições são verificações pontuais; qualidade com documentos fiscais e latência
+sob carga continuam dependendo de avaliação posterior com o corpus da aplicação.
