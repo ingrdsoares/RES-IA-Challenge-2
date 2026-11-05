@@ -38,3 +38,36 @@ def test_uma_citacao_por_norma():
 
 def test_ano_com_digito_extra_nao_vira_ano():
     assert identidade_titulo('Lei 9718, de 19981').ano is None
+
+
+def _chave(texto):
+    r = extrair_citacoes(texto, 'federal')
+    return [x.norma.chave for x in r]
+
+
+def test_lc_com_marcador_sem_ano():
+    assert _chave('Lei Complementar nº 123') == ['federal:lc:-:123:?']
+
+
+def test_lc_sigla_sem_ano():
+    assert _chave('conforme LC 116') == ['federal:lc:-:116:?']
+
+
+def test_in_rfb_sem_ano():
+    assert _chave('Instrução Normativa RFB nº 971') == ['federal:in:rfb:971:?']
+
+
+def test_ec_sem_ano():
+    assert _chave('a EC 132') == ['federal:ec:-:132:?']
+
+
+def test_ajuste_sinief_sem_ano():
+    assert _chave('Ajuste SINIEF 7') == ['confaz:ajuste_sinief:-:7:?']
+
+
+def test_decreto_com_marcador_sem_ano():
+    assert _chave('Decreto nº 435') == ['federal:decreto:-:435:?']
+
+
+def test_decreto_sem_marcador_sem_ano_e_ruido():
+    assert _chave('Decreto 435') == []

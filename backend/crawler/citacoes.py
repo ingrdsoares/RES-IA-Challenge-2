@@ -27,8 +27,9 @@ def extrair_citacoes(texto: str, jurisdicao_origem: str) -> list[Citacao]:
         else:
             cands = ('federal',)
         n = norma_do_match(m, cands[0])
-        # sem ano, so numeros com milhar (>=1000) sao citacao; "lei 12" e ruido
-        if n.ano is None and n.numero < 1000:
+        # sem ano e sem marcador (nº, n.), numero pequeno de tipo generico e ruido ("lei 12")
+        generico = n.tipo in ('lei', 'decreto') or (n.tipo == 'portaria' and n.orgao is None)
+        if n.ano is None and n.numero < 1000 and generico and not m.group('marc'):
             continue
         if n.jurisdicao == 'confaz':
             cands = ('confaz',)

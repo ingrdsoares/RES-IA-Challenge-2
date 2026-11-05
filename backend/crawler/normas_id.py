@@ -22,7 +22,7 @@ _RX = re.compile(
     r'\b(?:' + '|'.join(f'(?P<{k}>{p})' for k, p in _TIPOS) + r')'
     r'(?:\s+(?P<jur>df|distrital|federal|gdf))?'
     rf'(?:\s+conjunta)?(?:\s+(?P<orgao>{_ORG}(?:/{_ORG})*))?'
-    r'\s*(?:n[o°º.]*)?\s*(?P<num>\d{1,3}(?:\.\d{3})+|\d{1,6})'
+    r'\s*(?P<marc>n[o°º.]*)?\s*(?P<num>\d{1,3}(?:\.\d{3})+|\d{1,6})'
     r'(?:\s*/\s*(?P<a1>\d{4}|\d{2})\b|,?\s+de\s+(?:\d{1,2}[o°º]?\s+de\s+[a-z]+\s+de\s+)?(?P<a2>\d{4})\b)?'
 )
 _CONFAZ = {'convenio_icms', 'ajuste_sinief'}
