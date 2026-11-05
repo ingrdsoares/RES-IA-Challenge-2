@@ -12,6 +12,8 @@ from backend.crawler.painel.__main__ import _parar, main
 from backend.crawler.painel.executor import RodadaAtiva
 from backend.crawler.painel.servidor import criar_servidor
 
+PAINEL = Path(__file__).parents[1] / 'painel'
+
 
 class Falso:
     def __init__(self, estados=None):
@@ -89,6 +91,14 @@ class ServidorTest(unittest.TestCase):
         self.assertEqual(self.pedir('GET', '/nada')[0], 404)
         self.pagina.unlink()
         self.assertEqual(self.pedir('GET', '/')[0], 500)
+
+    def test_pagina_sem_recursos_externos_e_com_rotas(self):
+        html = (PAINEL / 'pagina.html').read_text('utf8')
+        self.assertNotRegex(html, r'(src|href)="https?://')
+        for rota in ('/eventos', '/previa', '/iniciar', '/parar', '/log'):
+            self.assertIn(rota, html)
+        self.assertIn('total desconhecido', html)
+        self.assertIn('sem estimativa', html)
 
     def test_host_externo_recusado(self):
         self.assertEqual(self.pedir('GET', '/estado', cabecalhos={'Host': 'evil.com'})[0], 403)
