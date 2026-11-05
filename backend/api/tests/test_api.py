@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+from qdrant_client import models
 
 from app.errors import CollectionIncompatible, DependencyTimeout, DependencyUnavailable, QueryBusy
 from app.main import app, create_app
@@ -69,3 +70,19 @@ def test_readiness_requires_models_even_with_empty_collection(service, monkeypat
     monkeypatch.setattr(service.models, "check_models", fail)
     with TestClient(create_app(service=service)) as client:
         assert client.get("/ready").status_code == 503
+
+
+def test_http_response_includes_generated_answer_and_context_references(service):
+    service.store.client.upsert("knowledge_base", [models.PointStruct(
+        id=7, vector=[1.0] + [0.0] * 1023,
+        payload={"text": "Documento técnico de teste", "source": "Manual", "effective_date": "2026-11-05"},
+    )])
+    with TestClient(create_app(service=service)) as client:
+        response = client.post("/rag/query", json={"question": "Pergunta"})
+        assert response.status_code == 200
+        body = response.json()
+        assert body["status"] == "answered"
+        assert body["answer"] == "Orientação [1]"
+        assert body["sources"][0]["id"] == 7
+        assert body["sources"][0]["source"] == "Manual"
+        assert body["sources"][0]["effective_date"] == "2026-11-05"
