@@ -1,9 +1,8 @@
 import pytest
-from fastapi.testclient import TestClient
-from qdrant_client import models
-
 from app.errors import CollectionIncompatible, DependencyTimeout, DependencyUnavailable, QueryBusy
 from app.main import app, create_app
+from fastapi.testclient import TestClient
+from qdrant_client import models
 
 client = TestClient(app)
 
@@ -29,13 +28,18 @@ def test_empty_base_is_a_valid_response(service):
         assert response.json()["sources"] == []
 
 
-@pytest.mark.parametrize("error, status", [
-    (DependencyUnavailable("private-host"), 503),
-    (DependencyTimeout("private-host"), 504),
-    (CollectionIncompatible("private-host"), 503),
-    (QueryBusy(), 503),
-])
-def test_dependency_errors_are_explicit_and_do_not_leak_details(service, monkeypatch, error, status):
+@pytest.mark.parametrize(
+    "error, status",
+    [
+        (DependencyUnavailable("private-host"), 503),
+        (DependencyTimeout("private-host"), 504),
+        (CollectionIncompatible("private-host"), 503),
+        (QueryBusy(), 503),
+    ],
+)
+def test_dependency_errors_are_explicit_and_do_not_leak_details(
+    service, monkeypatch, error, status
+):
     def fail(question):
         raise error
 
@@ -62,7 +66,9 @@ def test_startup_failure_keeps_health_and_allows_recovery(service, monkeypatch):
         assert client.post("/rag/query", json={"question": "Pergunta"}).status_code == 200
 
 
-@pytest.mark.parametrize("error", [DependencyUnavailable("missing model"), DependencyTimeout("timeout")])
+@pytest.mark.parametrize(
+    "error", [DependencyUnavailable("missing model"), DependencyTimeout("timeout")]
+)
 def test_readiness_requires_models_even_with_empty_collection(service, monkeypatch, error):
     def fail():
         raise error
@@ -73,10 +79,20 @@ def test_readiness_requires_models_even_with_empty_collection(service, monkeypat
 
 
 def test_http_response_includes_generated_answer_and_context_references(service):
-    service.store.client.upsert("knowledge_base", [models.PointStruct(
-        id=7, vector=[1.0] + [0.0] * 1023,
-        payload={"text": "Documento técnico de teste", "source": "Manual", "effective_date": "2026-11-05"},
-    )])
+    service.store.client.upsert(
+        "knowledge_base",
+        [
+            models.PointStruct(
+                id=7,
+                vector=[1.0] + [0.0] * 1023,
+                payload={
+                    "text": "Documento técnico de teste",
+                    "source": "Manual",
+                    "effective_date": "2026-11-05",
+                },
+            )
+        ],
+    )
     with TestClient(create_app(service=service)) as client:
         response = client.post("/rag/query", json={"question": "Pergunta"})
         assert response.status_code == 200

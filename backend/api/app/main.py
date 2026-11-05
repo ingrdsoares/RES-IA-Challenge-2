@@ -1,5 +1,5 @@
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -19,7 +19,11 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         config = settings if settings is not None else Settings()
-        rag = service if service is not None else RagService(config, VectorStore(config), LocalModels(config))
+        rag = (
+            service
+            if service is not None
+            else RagService(config, VectorStore(config), LocalModels(config))
+        )
         app.state.rag = rag
         try:
             try:
@@ -31,13 +35,23 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             await run_in_threadpool(rag.close)
 
     app = FastAPI(
-        title="Sócio Digital — RAG", description="Consulta de documentos com Qwen e Qdrant.",
+        title="Sócio Digital - Copiloto de Gestão Fiscal",
+        description=(
+            "Aproximadamente 95% a 99% das empresas ativas no Brasil são micro e pequenos "
+            "negócios. A falta de formação contábil gera dependência cega do contador e "
+            "terror fiscal nos empreendedores. O Sócio Digital é uma aplicação inteligente "
+            "de copiloto fiscal. Consulta de documentos com Qwen e Qdrant."
+        ),
+        version="0.1.0",
         lifespan=lifespan,
     )
 
     @app.exception_handler(DependencyUnavailable)
     async def dependency_error(request: Request, exc: DependencyUnavailable):
-        status, detail = 503, "Um serviço necessário ao RAG está indisponível. Consulte /ready e os logs."
+        status, detail = (
+            503,
+            "Um serviço necessário ao RAG está indisponível. Consulte /ready e os logs.",
+        )
         if isinstance(exc, DependencyTimeout):
             status, detail = 504, "Tempo de espera excedido ao consultar um serviço do RAG."
         elif isinstance(exc, CollectionIncompatible):
@@ -56,7 +70,9 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
         try:
             request.app.state.rag.ready()
         except DependencyUnavailable:
-            raise HTTPException(503, "Qdrant, coleção ou modelos Ollama não estão prontos.") from None
+            raise HTTPException(
+                503, "Qdrant, coleção ou modelos Ollama não estão prontos."
+            ) from None
         return {"status": "ready"}
 
     @app.post("/rag/query", response_model=QueryResponse)

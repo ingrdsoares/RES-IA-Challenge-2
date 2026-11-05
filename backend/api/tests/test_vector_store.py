@@ -1,11 +1,10 @@
 import httpx
 import pytest
-from qdrant_client import QdrantClient, models
-from qdrant_client.http.exceptions import UnexpectedResponse
-
 from app.config import Settings
 from app.errors import CollectionIncompatible, DependencyTimeout
 from app.vector_store import VectorStore
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.exceptions import UnexpectedResponse
 
 
 @pytest.fixture
@@ -21,19 +20,28 @@ def test_collection_is_created_empty_and_preserved(client):
     store = VectorStore(Settings(), client)
     store.ensure_collection()
     assert store.count() == 0
-    client.upsert("knowledge_base", [models.PointStruct(
-        id=1, vector=[1.0] + [0.0] * 1023,
-        payload={"text": "Documento de teste", "source": "Manual de teste"},
-    )])
+    client.upsert(
+        "knowledge_base",
+        [
+            models.PointStruct(
+                id=1,
+                vector=[1.0] + [0.0] * 1023,
+                payload={"text": "Documento de teste", "source": "Manual de teste"},
+            )
+        ],
+    )
     store.ensure_collection()
     assert store.count() == 1
 
 
-@pytest.mark.parametrize("vectors", [
-    models.VectorParams(size=512, distance=models.Distance.COSINE),
-    models.VectorParams(size=1024, distance=models.Distance.DOT),
-    {"named": models.VectorParams(size=1024, distance=models.Distance.COSINE)},
-])
+@pytest.mark.parametrize(
+    "vectors",
+    [
+        models.VectorParams(size=512, distance=models.Distance.COSINE),
+        models.VectorParams(size=1024, distance=models.Distance.DOT),
+        {"named": models.VectorParams(size=1024, distance=models.Distance.COSINE)},
+    ],
+)
 def test_incompatible_collection_is_not_recreated(client, vectors):
     client.create_collection("knowledge_base", vectors_config=vectors)
     before = client.get_collection("knowledge_base").config.params.vectors
@@ -65,10 +73,17 @@ def test_search_discards_bad_payloads_and_applies_threshold_and_limit(client):
         {"text": "Data inválida", "source": "Manual", "effective_date": "ontem"},
         {"text": "Irrelevante", "source": "Manual"},
     ]
-    client.upsert("knowledge_base", [models.PointStruct(
-        id=i + 1, vector=([1.0] + [0.0] * 1023 if i < 4 else [0.0, 1.0] + [0.0] * 1022),
-        payload=payload,
-    ) for i, payload in enumerate(payloads)])
+    client.upsert(
+        "knowledge_base",
+        [
+            models.PointStruct(
+                id=i + 1,
+                vector=([1.0] + [0.0] * 1023 if i < 4 else [0.0, 1.0] + [0.0] * 1022),
+                payload=payload,
+            )
+            for i, payload in enumerate(payloads)
+        ],
+    )
     sources = store.search([1.0] + [0.0] * 1023)
     assert len(sources) == 1
     assert sources[0].id == 1
@@ -91,8 +106,14 @@ def test_non_iso_date_payload_is_discarded_before_generation(client, field, valu
     store = VectorStore(Settings(), client)
     store.ensure_collection()
     vector = [1.0] + [0.0] * 1023
-    client.upsert("knowledge_base", [models.PointStruct(
-        id=1, vector=vector,
-        payload={"text": "Trecho", "source": "Manual", field: value},
-    )])
+    client.upsert(
+        "knowledge_base",
+        [
+            models.PointStruct(
+                id=1,
+                vector=vector,
+                payload={"text": "Trecho", "source": "Manual", field: value},
+            )
+        ],
+    )
     assert store.search(vector) == []

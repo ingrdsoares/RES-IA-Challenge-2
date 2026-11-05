@@ -22,22 +22,33 @@ class RagService:
             if self.store.count() == 0:
                 return QueryResponse(
                     status="empty_knowledge_base",
-                    answer="A base de conhecimento está vazia. Adicione documentos para consultar o RAG.",
+                    answer=(
+                        "A base de conhecimento está vazia. "
+                        "Adicione documentos para consultar o RAG."
+                    ),
                     sources=[],
                 )
             vector = self.models.embed_question(question)
             sources = prepare_sources(
-                self.store.search(vector), self.settings.max_context_chars,
-                question=question, num_ctx=self.settings.num_ctx, num_predict=self.settings.num_predict,
+                self.store.search(vector),
+                self.settings.max_context_chars,
+                question=question,
+                num_ctx=self.settings.num_ctx,
+                num_predict=self.settings.num_predict,
             )
             if not sources:
                 return QueryResponse(
                     status="insufficient_context",
-                    answer="Não há contexto suficiente na base para fundamentar uma resposta à pergunta.",
+                    answer=(
+                        "Não há contexto suficiente na base "
+                        "para fundamentar uma resposta à pergunta."
+                    ),
                     sources=[],
                 )
             return QueryResponse(
-                status="answered", answer=self.models.answer(question, sources), sources=sources,
+                status="answered",
+                answer=self.models.answer(question, sources),
+                sources=sources,
             )
         finally:
             self._query_lock.release()
