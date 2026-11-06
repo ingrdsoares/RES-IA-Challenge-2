@@ -24,10 +24,11 @@ def test_normalization_preserves_legal_content():
 
 def make_input(root,items):
     snapshots=[]
-    for name,url,text,front in items:
+    for name,url,text,front,*extra in items:
         folder=root/front/name;folder.mkdir(parents=True)
         md=folder/'documento.md';md.write_text(text,encoding='utf8')
         raw=b'same raw primary';meta=dict(source_url=url,source_id=name,titulo='Documento',sha256=hashlib.sha256(raw).hexdigest(),coletado_em='2026-11-05',tipo='legislacao',status='extraido',markdown_arquivo='documento.md',markdown_sha256=hashlib.sha256(md.read_bytes()).hexdigest())
+        if extra:meta.update(extra[0])
         mp=folder/'metadados.json';mp.write_text(json.dumps(meta),encoding='utf8')
         snapshots.append(dict(diretorio=folder.relative_to(root).as_posix(),metadados=mp.relative_to(root).as_posix(),origem=url,problemas=[]))
     catalog=root/'catalogo.json';catalog.write_text(json.dumps(dict(snapshots=snapshots,executado_em='2026-11-05')),encoding='utf8');return catalog
@@ -109,3 +110,74 @@ def test_changed_catalog_audit_cannot_reuse_stale_core(tmp_path):
     meta=json.loads((new/'manifesto.json').read_bytes());meta['politica_sha256']='0'*64
     (new/'manifesto.json').write_text(json.dumps(meta),encoding='utf8')
     with pytest.raises(ValueError,match='incompatível'):run(root,catalog,tmp_path/'refined')
+
+
+LEI='Lei nº 8.212, de 24 de julho de 1991'
+RFB='https://normasinternet2.receita.fazenda.gov.br/api/consulta-externa/ato/%s/visao/multivigente'
+
+
+def refine(tmp_path,items):
+    root=tmp_path/'raw';catalog=make_input(root,items)
+    report=run(root,catalog,tmp_path/'refined');return tmp_path/'refined'/report['run_id'],report
+
+
+def test_mesma_lei_camara_e_planalto_vira_um_documento(tmp_path):
+    leg=dict(natureza_documental='legislacao',titulo=LEI)
+    folder,report=refine(tmp_path,[('c','https://www2.camara.leg.br/legin/fed/lei-8212','# Lei\nArt. 1 A.','legislacao',leg),('p','https://www.planalto.gov.br/ccivil_03/leis/l8212.htm','# Lei\nArt. 1 B.','legislacao',leg)])
+    docs=read_rows(folder,'documentos.jsonl')
+    assert report['documentos_logicos']==1 and docs[0]['chave_origem']=='norma:federal:lei:-:8212:1991'
+
+
+def test_lei_federal_e_df_mesmo_numero_continuam_separadas(tmp_path):
+    leg=dict(natureza_documental='legislacao',titulo='Lei nº 123, de 14 de dezembro de 2006')
+    folder,report=refine(tmp_path,[('f','https://www.planalto.gov.br/l123.htm','# Lei\nFederal.','legislacao',leg),('d','https://www.sinj.df.gov.br/sinj/Norma/123','# Lei\nDistrital.','legislacao',leg)])
+    keys={d['chave_origem'] for d in read_rows(folder,'documentos.jsonl')}
+    assert keys=={'norma:federal:lei:-:123:2006','norma:df:lei:-:123:2006'}
+
+
+def test_atos_com_texto_quase_igual_continuam_separados(tmp_path):
+    body='# Ineficácia\n'+'\n'.join('Linha %d do texto.'%i for i in range(50))
+    folder,report=refine(tmp_path,[('a',RFB%'1',body+'\nfim 19','consultas-rfb',dict(titulo='Solução de Ineficácia nº 19/2019')),('b',RFB%'2',body+'\nfim 20','consultas-rfb',dict(titulo='Solução de Ineficácia nº 20/2019'))])
+    assert report['documentos_logicos']==2 and len(read_rows(folder,'indice_nucleo.jsonl'))==2
+
+
+def test_consulta_rfb_mantem_identidade_por_ato(tmp_path):
+    meta=dict(natureza_documental='legislacao',titulo='Instrução Normativa RFB nº 1.500, de 29 de outubro de 2014')
+    folder,_=refine(tmp_path,[('a',RFB%'111','# IN\nTexto.','legislacao',meta)])
+    assert read_rows(folder,'documentos.jsonl')[0]['chave_origem']=='rfb:ato:111'
+
+
+def citada(name,visao,text):
+    return (name,'https://x.gov.br/'+name,text,'normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte=visao,natureza_documental='legislacao',titulo='Lei nº 9/2000'))
+
+
+def versions_by_visao(folder):return {v['visao']:v for v in read_rows(folder,'versoes.jsonl')}
+
+
+def test_compilada_e_preferida_e_original_fica_fora_do_indice(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(20))
+    folder,_=refine(tmp_path,[citada('o','original',base+'\nArt. 99 Só no original.\n'+'x'*500),citada('c','multivigente',base)])
+    vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert set(vs)=={'compilada','original'}
+    assert row['versoes']==[vs['compilada']['id']] and row['representacao_preferida']==vs['compilada']['id']
+    assert read_rows(folder,'documentos.jsonl')[0]['chave_origem']=='norma:federal:lei:-:9:2000'
+
+
+def test_sem_compilada_original_e_indexada(tmp_path):
+    folder,_=refine(tmp_path,[citada('o','original','# Lei\nArt. 1.')])
+    vs=versions_by_visao(folder)
+    assert read_rows(folder,'indice_nucleo.jsonl')[0]['versoes']==[vs['original']['id']]
+
+
+def test_extracao_com_visao_extra_nao_perde_conteudo(tmp_path):
+    comp='# Ato\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',comp),citada('u','unica',comp+'\nAnexo I\nTabela A\nTabela B'),citada('o','original',comp+'\nRedação original\nOutra'),citada('p','exclusiva',comp+'\nUma linha a mais')])
+    vs={v['id']:v for v in read_rows(folder,'versoes.jsonl')}
+    row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert len(vs)==4
+    assert sorted(vs[i]['visao'] for i in row['versoes'])==['compilada','unica']
+    assert vs[row['representacao_preferida']]['visao']=='compilada'
+
+
+def test_familia_normas_citadas_entra_no_nucleo():
+    assert 'normas-citadas' in load_policy()['familias_nucleo']

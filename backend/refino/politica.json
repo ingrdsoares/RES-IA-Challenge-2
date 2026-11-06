@@ -22,8 +22,10 @@
     "legislacao",
     "mei",
     "manuais",
-    "anexos-cgsn140"
+    "anexos-cgsn140",
+    "normas-citadas"
   ],
+  "limiar_linhas_ausentes_versao_extra": 0.05,
   "familias_dados": [
     "cnpj",
     "cnpj-ampliado",

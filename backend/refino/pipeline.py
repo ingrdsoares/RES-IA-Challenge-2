@@ -9,8 +9,10 @@ from pathlib import Path
 import re
 import tempfile
 import unicodedata
+from dataclasses import replace
 from urllib.parse import urlsplit,urlunsplit,unquote_plus,parse_qs
 from backend.crawler.catalogo import frontmatter
+from backend.crawler.normas_id import identidade_titulo
 
 BASE=Path(__file__).resolve().parent
 DATA=BASE.parent/'crawler'/'data'
@@ -53,6 +55,23 @@ def identity(url):
         match=re.fullmatch(r'/consulta/externa/(\d+)/visao/[^/]+',p.fragment)
         if match:return 'rfb:ato:'+match[1]
     return 'url:'+canonical_url(url)
+
+
+_JURISDICAO_HOST={'planalto.gov.br':'federal','camara.leg.br':'federal','senado.leg.br':'federal','receita.fazenda.gov.br':'federal','sinj.df.gov.br':'df','confaz.fazenda.gov.br':'confaz'}
+_VISAO={'multivigente':'compilada','compilada':'compilada','original':'original'}
+_VISAO_ORDEM={'compilada':0,'unica':1,'original':2}
+
+
+def chave_documento(meta,source,title):
+    """norma:<chave> só quando verificável; senão a identidade por URL/ato."""
+    if meta.get('norma_chave'):return 'norma:'+meta['norma_chave']
+    key=identity(source)
+    if key.startswith('rfb:') or str(meta.get('natureza_documental') or meta.get('tipo'))!='legislacao' or not title:return key
+    norma=identidade_titulo(str(title))
+    host=(urlsplit(source).hostname or '').lower()
+    jur=next((j for h,j in _JURISDICAO_HOST.items() if host==h or host.endswith('.'+h)),None)
+    if not norma or not jur or norma.ano is None or norma.jurisdicao not in ('indefinida',jur):return key
+    return 'norma:'+replace(norma,jurisdicao=jur).chave
 
 
 def normalize_text(text):
@@ -123,7 +142,8 @@ def load_occurrence(snapshot,root,policy):
     meta_raw=mp.read_bytes()
     meta=json.loads(meta_raw) if mp.suffix=='.json' else frontmatter(meta_raw.decode('utf-8-sig'))
     source=meta.get('source_url') or meta.get('url') or snapshot.get('origem')
-    key=identity(source);did=sha(key.encode());front=mp.relative_to(root).parts[0]
+    front=mp.relative_to(root).parts[0]
+    key=chave_documento(meta,source,meta.get('titulo') or meta.get('title'));did=sha(key.encode())
     category,reasons=classify(meta,front,None,policy)
     errors=list(snapshot.get('problemas',[]));text='';md=None;md_sha=None;quality=[]
     if category not in ('dados_estruturados','evidencia'):
@@ -150,9 +170,10 @@ def load_occurrence(snapshot,root,policy):
         first=re.search(r'^#\s+(.+)$',text,re.M);title=first[1] if first else None
     title=str(title or meta.get('source_id') or key)
     views=meta.get('visoes_fonte') or ([{'visao':meta.get('visao_fonte')}] if meta.get('visao_fonte') else [])
+    visao=_VISAO.get(str(meta.get('visao_fonte') or ''),'unica')
     occurrence=dict(id=oid,documento_id=did,versao_id=version_id,chave_origem=key,titulo=title,frente=front,
         metadados_ref=snapshot['metadados'],hash_metadados=sha(meta_raw),markdown_ref=md.relative_to(root).as_posix() if md else None,
-        hash_markdown=md_sha,source_url=source,originais=originals,coletado_em=meta.get('coletado_em'),
+        visao=visao,hash_markdown=md_sha,source_url=source,originais=originals,coletado_em=meta.get('coletado_em'),
         natureza=str(meta.get('natureza_documental') or meta.get('tipo') or 'nao_informada'),visoes=views,
         vigencia=meta.get('vigencia','nao_verificada'),classificacao=category,motivos=reasons,qualidade=quality,erros=errors,
         conteudo_id=content_id,bytes_texto=len(text.encode()) if content_id else 0,hashes_originais=raw_set,revisao_semantica='pendente')
@@ -200,7 +221,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         if cid and cid not in contents:
             contents[cid]=dict(id=cid,arquivo='conteudos/'+cid+'.md',bytes=row['bytes_texto'],normalizacao='NFC+finais_de_linha+frontmatter_de_coleta')
             (stage/contents[cid]['arquivo']).write_bytes(text.encode())
-        version=versions.setdefault(row['versao_id'],dict(id=row['versao_id'],documento_id=row['documento_id'],conteudo_id=cid,ocorrencias=[],categorias=set(),hashes_originais=set(),qualidade=set(),revisao_semantica='pendente'))
+        version=versions.setdefault(row['versao_id'],dict(id=row['versao_id'],visao=row['visao'],documento_id=row['documento_id'],conteudo_id=cid,ocorrencias=[],categorias=set(),hashes_originais=set(),qualidade=set(),revisao_semantica='pendente'))
         version['ocorrencias'].append(row['id']);version['categorias'].add(row['classificacao']);version['hashes_originais'].update(row['hashes_originais']);version['qualidade'].update(row['qualidade'])
         doc=docs.setdefault(row['documento_id'],dict(id=row['documento_id'],chave_origem=row['chave_origem'],titulos=set(),naturezas=set(),versoes=set(),ocorrencias=[],categorias=set()))
         doc['titulos'].add(row['titulo']);doc['naturezas'].add(row['natureza']);doc['versoes'].add(row['versao_id']);doc['ocorrencias'].append(row['id']);doc['categorias'].add(row['classificacao'])
@@ -208,17 +229,23 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         for key in ('categorias','hashes_originais','qualidade'):v[key]=sorted(v[key])
         v['classificacao']=min(v['categorias'],key=priority.get)
         v['indexavel_nucleo']=v['conteudo_id'] is not None and v['classificacao']=='nucleo'
+    def lines(vid):return {l.strip() for l in (stage/contents[versions[vid]['conteudo_id']]['arquivo']).read_text(encoding='utf8').splitlines() if l.strip()}
     rowmap={r['id']:r for r in occurrences};indexes={k:[] for k in ('nucleo','complementar','historico','revisao')};relations=[]
     for doc in docs.values():
         for key in ('titulos','naturezas','versoes','categorias'):doc[key]=sorted(doc[key])
         def rank(vid):
             v=versions[vid];candidates=[rowmap[oid] for oid in v['ocorrencias']]
-            return (priority[v['classificacao']],min(len(r['erros']) for r in candidates),len(v['qualidade']),-len(v['hashes_originais']),-max(r['bytes_texto'] for r in candidates),vid)
+            return (priority[v['classificacao']],_VISAO_ORDEM[v['visao']],min(len(r['erros']) for r in candidates),len(v['qualidade']),-len(v['hashes_originais']),-max(r['bytes_texto'] for r in candidates),vid)
         doc['representacao_preferida']=min(doc['versoes'],key=rank)
         doc['criterio_representacao']='Preferência técnica de extração; não significa versão vigente. Todas as versões permanecem disponíveis.'
         for category in indexes:
             vids=[vid for vid in doc['versoes'] if versions[vid]['classificacao']==category and (category=='revisao' or versions[vid]['conteudo_id'])]
-            if vids:indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],versoes=vids,representacao_preferida=min(vids,key=rank),revisao_semantica='pendente'))
+            if not vids:continue
+            best=min(vids,key=rank);shown=vids
+            if category!='revisao':
+                # Original fica fora do índice; outra extração entra se trouxer conteúdo ausente na preferida.
+                ref=lines(best);shown=[best]+[v for v in sorted(vids) if v!=best and versions[v]['visao']!='original' and (lambda l:l and len(l-ref)/len(l)>policy['limiar_linhas_ausentes_versao_extra'])(lines(v))]
+            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],versoes=shown,representacao_preferida=best,revisao_semantica='pendente'))
         if doc['chave_origem'].startswith('rfb:anexo:'):
             parent=sha(('rfb:ato:'+doc['chave_origem'].split(':')[2]).encode())
             if parent in docs:relations.append(dict(documento_id=doc['id'],relacionado_id=parent,tipo='anexo_de',evidencia='identificadores_explicitos_na_url_rfb'))
