@@ -43,12 +43,15 @@ Este módulo implementa o pipeline de ingestão, chunking hierárquico legal, ve
 src/rag/
 ├── __init__.py           # Exportação das classes e modelos principais
 ├── chunker.py            # LegalHierarchicalChunker e LegalChunk (2.000 chars, 200 overlap)
-├── vector_store.py       # LegalVectorStore (suporte a qwen3-embedding 1024d e Qdrant)
-├── ingest.py             # IngestionPipeline (orquestrador de data/raw para Qdrant e SQLite)
+├── csv_para_qdrant.py    # Ponte do recorte CSV (recorte_csv) para coleção Qdrant
 ├── entity_extractor.py   # TaxEntityExtractor, TaxEntity e FiscalExtractionResult
 ├── evaluator.py          # RAGEvaluator e métricas de qualidade factual
+├── ingest.py             # IngestionPipeline (orquestrador de data/raw para Qdrant e SQLite)
 ├── prompts.py            # Prompts especializados para fundamentação normativa
+├── recorte_csv.py        # Extração e filtragem do recorte público em CSV
+├── revisao_manual.json   # Regras e revisões manuais do acervo
 ├── service.py            # RagService para consultas fiscais integradas
+├── vector_store.py       # LegalVectorStore (suporte a qwen3-embedding 1024d e Qdrant)
 └── README.md             # Esta documentação técnica
 ```
 
@@ -81,10 +84,26 @@ Valida:
 3. Detecção de prazos e multas da obrigação acessória DASN-SIMEI.
 4. Extração de valores de débito, termo de exclusão e certidão CPEN.
 5. Extração de CNPJ e CNAE com cálculo do Simples Nacional.
-6. **Integração Tripla:** Pergunta do usuário $\to$ Extração de Entidades $\to$ Cálculo Determinístico no Motor Fiscal $\to$ Recuperação do Artigo Legal exato.
+6. **Integração Tripla:** Pergunta do usuário $\to$ Extração de Entidades $\to$ Cálculo Determinístico no Motor Fiscal $\to$ Recuperação do Artigo Legal exato via RAG vetorial.
 
 ### 3.4 Suíte de Benchmark Quantitativo (MLOps):
 ```bash
 python benchmark_rag.py
 ```
 - Avalia Context Recall, Context Precision, Faithfulness e conformidade com guardrails.
+
+---
+
+## 4. Recorte RAG v1 (CSV e ponte para Qdrant)
+
+```bash
+# CSV do índice núcleo do refino (versão preferida por documento; entrada de pipeline, não planilha)
+python -m src.rag.recorte_csv --run <dir do refino> --saida <arquivo.csv>
+
+# Confere o que subiria (sem modelo, sem Qdrant); depois sobe de verdade
+python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --dry-run
+python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --colecao <nome> [--limite N]
+```
+A gravação exige `--colecao` (sem padrão); o Ollama vem de `backend/api/app/config.py` (`Settings`).
+Antes de subir um documento, seus pontos antigos saem pelo `document_id`. Texto com `~~riscado~~` ou marcado como tachado na fonte não é embeddado; o original fica em `texto_com_rasuras`.
+Os pontos têm id estável (versão + índice do chunk), então reexecutar não duplica.
