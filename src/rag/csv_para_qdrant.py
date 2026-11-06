@@ -17,6 +17,7 @@ Uso:
 
 import argparse
 import csv
+import gzip
 import itertools
 import re
 import sys
@@ -72,7 +73,11 @@ def estatisticas_novas() -> dict[str, int]:
 
 def ler_csv(caminho: Path) -> Iterator[dict]:
     csv.field_size_limit(2**31 - 1)
-    with open(caminho, encoding="utf-8", newline="") as f:
+    if str(caminho).endswith(".gz"):
+        f = gzip.open(caminho, "rt", encoding="utf-8", newline="")
+    else:
+        f = open(caminho, encoding="utf-8", newline="")
+    with f:
         yield from csv.DictReader(f)
 
 
