@@ -75,9 +75,16 @@
     "apoio"
   ],
   "apoio": {
-    "frentes": ["calendario-df"],
-    "tipos_prefixo": ["agenda"],
-    "titulos_restritos": ["Conteúdo Restrito"]
+    "naturezas": [
+      "agenda_diaria",
+      "agenda_mes",
+      "agenda_indice"
+    ],
+    "restrito_marcadores": [
+      "necessario autenticar para visualizar essa pagina",
+      "administracao do site",
+      "ir para a pagina inicial"
+    ]
   },
   "ruido": {
     "minimo_textos_sugestao": 50

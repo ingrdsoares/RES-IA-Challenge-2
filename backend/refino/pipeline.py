@@ -91,6 +91,13 @@ def searchable(text):
     return ''.join(c for c in unicodedata.normalize('NFD',text).lower() if not unicodedata.combining(c))
 
 
+def _conteudo_restrito(text,marcadores):
+    """Stub de acesso restrito: o corpo, sem títulos, Fonte e citações, é só o aviso de autenticação."""
+    linhas=[searchable(l.strip()) for l in text.split('\n')]
+    corpo=[l for l in linhas if l and not l.startswith(('#','fonte:','>','info'))]
+    return bool(corpo) and all(any(m in l for m in marcadores) for l in corpo) and any(marcadores[0] in l for l in corpo)
+
+
 def classify(meta,front,text,policy):
     kind=str(meta.get('natureza_documental') or meta.get('tipo') or meta.get('kind') or '')
     if meta.get('status') in ('erro','falha','error'):return 'revisao',['coleta_com_falha']
@@ -98,8 +105,7 @@ def classify(meta,front,text,policy):
     original=str(meta.get('original','')).lower()
     if original.endswith(('.csv','.xlsx','.xsd')):return 'dados_estruturados',['tabela_ou_schema_primario']
     apoio=policy['apoio']
-    first=re.search(r'^#\s+(.+)$',text,re.M) if text else None
-    if (front in apoio['frentes'] or (kind.startswith(tuple(apoio['tipos_prefixo'])) and 'hist' not in kind)) or (first and searchable(first[1].strip()) in {searchable(t) for t in apoio['titulos_restritos']}):return 'apoio',['agenda_ou_calendario_de_apoio_ou_conteudo_restrito']
+    if kind in apoio['naturezas'] or (text and _conteudo_restrito(text,apoio['restrito_marcadores'])):return 'apoio',['agenda_ou_conteudo_restrito_de_apoio']
     if kind in policy['tipos_evidencia']:return 'evidencia',['indice_catalogo_ou_comparacao']
     if front=='casos-oficiais':return 'evidencia',['trecho_derivado_ja_rastreado_no_documento_fonte']
     if front=='historico-competencias' or 'historica' in kind or 'historico' in kind and 'agenda' in kind:return 'historico',['competencia_historica_explicita']

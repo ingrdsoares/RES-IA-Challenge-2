@@ -8,6 +8,17 @@ from backend.refino.ruido import carregar_regras, limpar, sugerir
 REGRAS = carregar_regras()
 ASSINATURA = 'AUDITOR-FISCAL DA RECEITA FEDERAL DO BRASIL'
 BANNER = '> Revisão humana pendente. Vigência e aplicabilidade não verificadas. TARF: ementa e decisão disponibilizadas pelo catálogo; não equivale ao inteiro teor do voto.'
+STUB = (
+    '# Conteúdo Restrito\n\n'
+    'Fonte: https://www.gov.br/carf/x.pdf\n\n'
+    '> Súmulas, precedentes e atos normativos. Vigência exige revisão.\n\n'
+    'Info\n\n'
+    '# Conteúdo Restrito\n\n'
+    'É necessário autenticar para visualizar essa página. Se você acredita que está recebendo essa mensagem incorretamente, por favor contate a\n'
+    '[administração do site](https://www.gov.br/carf/canais).\n\n'
+    '[Ir para a página inicial](https://www.gov.br/carf)\n'
+)
+CARF_COM_TEXTO = '# Súmula CARF 1\n\nO conteúdo deste acórdão não fica restrito ao contribuinte; o texto integral está disponível.\nArt. 2º Valor de R$ 10,00 em 01/02/2020.\n'
 
 
 def make_input(root, items):
@@ -82,11 +93,26 @@ def test_conteudo_original_nao_muda(tmp_path):
 def test_agenda_e_conteudo_restrito_viram_apoio():
     policy = load_policy()
     assert classify({'natureza_documental': 'agenda_diaria'}, 'calendario-df', '# Agenda\nDia 10', policy)[0] == 'apoio'
-    assert classify({'natureza_documental': 'orientacao_declaracao'}, 'calendario-df', '# Prazo\nTexto', policy)[0] == 'apoio'
+    assert classify({'natureza_documental': 'agenda_mes'}, 'obrigacoes', '# Agenda do mês\nDia 10', policy)[0] == 'apoio'
     assert classify({'natureza_documental': 'agenda_indice'}, 'obrigacoes', '# Agenda\nÍndice', policy)[0] == 'apoio'
-    assert classify({'natureza_documental': 'ato_normativo_administrativo'}, 'sumulas-classificacao', '# Conteúdo Restrito\n\nÉ necessário autenticar para visualizar essa página.', policy)[0] == 'apoio'
+    assert classify({'natureza_documental': 'ato_normativo_administrativo'}, 'sumulas-classificacao', STUB, policy)[0] == 'apoio'
+    assert classify({'natureza_documental': 'ato_normativo_administrativo'}, 'legislacao', STUB, policy)[0] == 'apoio'
     assert classify({'tipo': 'agenda_diaria_historica', 'periodo': '2020-01'}, 'historico-competencias', 'Simples Nacional', policy)[0] == 'historico'
     assert classify({'natureza_documental': 'legislacao'}, 'legislacao', '# Lei\nArt. 1º Texto.', policy)[0] == 'nucleo'
+    corpo_so_aviso = 'É necessário autenticar para visualizar essa página. Por favor contate a\n[administração do site](https://www.gov.br/carf/canais).\n\n[Ir para a página inicial](https://www.gov.br/carf)\n'
+    assert classify({'natureza_documental': 'ato_normativo_administrativo'}, 'legislacao', corpo_so_aviso, policy)[0] == 'apoio'
+
+
+def test_pagina_oficial_e_orientacao_do_calendario_nao_viram_apoio():
+    policy = load_policy()
+    lei = '# Lei 963\n\nArt. 1º Fica instituído o programa; R$ 100,00.\n'
+    assert classify({'natureza_documental': 'pagina_oficial'}, 'calendario-df', lei, policy)[0] == 'nucleo'
+    assert classify({'natureza_documental': 'orientacao_declaracao'}, 'calendario-df', '# DASN-SIMEI\n\nPrazo 31 de maio.\n', policy)[0] == 'nucleo'
+
+
+def test_documento_com_texto_e_palavra_restrito_no_corpo_nao_vira_apoio():
+    policy = load_policy()
+    assert classify({'natureza_documental': 'ato_normativo_administrativo'}, 'sumulas-classificacao', CARF_COM_TEXTO, policy)[0] != 'apoio'
 
 
 def test_apoio_fica_fora_do_nucleo_e_acessivel(tmp_path):

@@ -8,6 +8,7 @@ import zipfile
 
 REPO=Path(__file__).resolve().parents[2]
 FORBIDDEN={'.git','.venv','venv','__pycache__','.pytest_cache'}
+PACOTE_EXCLUI_RUN=('busca/',)  # texto limpo repete conteudos/ e dobraria o pacote
 
 def digest(raw):return hashlib.sha256(raw).hexdigest()
 
@@ -43,7 +44,7 @@ def package(repo,output,state_path):
     if not run.resolve().is_relative_to(repo/'backend/refino/data'):raise ValueError('Execução fora da pasta de refino')
     if not (run/'manifesto.json').is_file():raise ValueError('Execução autoritativa não encontrada')
     for path in run.rglob('*'):
-        if path.suffix in ('.json','.jsonl','.md'):add(path)
+        if path.suffix in ('.json','.jsonl','.md') and not path.relative_to(run).as_posix().startswith(PACOTE_EXCLUI_RUN):add(path)
     payloads={str(p).replace('\\','/'):(repo/p).read_bytes() for p in sorted(files)}
     manifest=dict(formato='handoff-refino-v1',criado_em=datetime.now(timezone.utc).isoformat(),run_id=state['run_id'],
         entrada='handoff/refino/CONTINUAR.md',dados_brutos_incluidos=False,textos_refinados_incluidos=True,
@@ -52,6 +53,7 @@ def package(repo,output,state_path):
     run_manifest=json.loads(payloads[run.relative_to(repo).as_posix()+'/manifesto.json'])
     if run_manifest.get('run_id')!=state['run_id'] or not isinstance(run_manifest.get('artefatos_sha256'),dict):raise ValueError('Manifesto refinado incompatível/incompleto')
     for name,checksum in run_manifest['artefatos_sha256'].items():
+        if name.startswith(PACOTE_EXCLUI_RUN):continue  # derivado de conteudos/: fora do pacote e da verificação
         path=run/name
         if not path.resolve().is_relative_to(run.resolve()):raise ValueError('Artefato fora da execução')
         member=path.relative_to(repo).as_posix()
