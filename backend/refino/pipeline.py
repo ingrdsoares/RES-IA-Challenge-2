@@ -203,7 +203,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
     root=Path(root).resolve();output=Path(output).resolve();catalog_path=Path(catalog_path or root/'catalogo'/'catalogo.json')
     if output.is_relative_to(root):raise ValueError('Saída deve ficar fora da camada de coleta')
     if not 1<=workers<=16:raise ValueError('Concorrência local deve estar entre 1 e 16')
-    catalog_raw=catalog_path.read_bytes();inventory=json.loads(catalog_raw);policy=load_policy(policy_path,profile)
+    catalog_raw=catalog_path.read_bytes();inventory=json.loads(catalog_raw);policy=load_policy(policy_path,profile);similar_params=policy['similaridade']
     snapshots=inventory['snapshots']
     with ThreadPoolExecutor(max_workers=workers) as pool:loaded=list(pool.map(lambda s:load_occurrence(s,root,policy),snapshots))
     loaded.sort(key=lambda r:r[0]['id']);fingerprint=sha(encoded([r[0]['id'] for r in loaded]));policy_sha=sha(encoded(policy))
@@ -221,7 +221,8 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         occurrences.append(row)
         if dataset:datasets.append(dataset)
         cid=row['conteudo_id']
-        if cid:doc_por_conteudo[cid].add(row['documento_id'])
+        comparavel=row['frente'] not in policy['familias_dados'] and row['natureza'] not in policy['tipos_dados']  # dados saem da similaridade mesmo com status de erro
+        if cid and comparavel:doc_por_conteudo[cid].add(row['documento_id'])
         if cid and cid not in contents:
             contents[cid]=dict(id=cid,arquivo='conteudos/'+cid+'.md',bytes=row['bytes_texto'],normalizacao='NFC+finais_de_linha+frontmatter_de_coleta')
             (stage/contents[cid]['arquivo']).write_bytes(text.encode())
@@ -270,7 +271,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         write_jsonl(stage/(name+'.jsonl'),sorted(rows,key=lambda r:r.get('id') or encoded(r).decode()))
     for category,rows in indexes.items():write_jsonl(stage/('indice_'+category+'.jsonl' if category!='revisao' else 'fila_revisao.jsonl'),sorted(rows,key=lambda r:r['documento_id']))
     # Similaridade é relatório: lê só os textos já escritos e não altera índice nem documentos. CNPJ/dados não têm texto aqui.
-    pares=similaridade.comparar({cid:stage/meta['arquivo'] for cid,meta in contents.items()},workers=workers,documentos=doc_por_conteudo,params=policy.get('similaridade'))
+    pares=similaridade.comparar({cid:stage/contents[cid]['arquivo'] for cid in doc_por_conteudo},workers=workers,documentos=doc_por_conteudo,params=similar_params)
     write_jsonl(stage/'similaridade.jsonl',[asdict(par) for par in pares]);write_jsonl(stage/'suspeitos.jsonl',[asdict(par) for par in similaridade.suspeitos(pares)])
     (stage/'politica.json').write_bytes(encoded(policy)+b'\n')
     counts=Counter(r['classificacao'] for r in occurrences);text_count=sum(r['conteudo_id'] is not None for r in occurrences)

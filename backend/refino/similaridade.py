@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from functools import lru_cache
 from itertools import combinations
 from pathlib import Path
-import json
 import re
 import unicodedata
 import zlib
@@ -16,7 +15,7 @@ import zlib
 import numpy as np
 
 SUSPEITAS = ('so_formatacao', 'reordenado', 'so_numeros', 'poucas_palavras')
-PARAMS = json.loads((Path(__file__).resolve().parent / 'politica.json').read_bytes())['similaridade']
+TEXTOS_EM_CACHE = 512  # ponytail: tokens de até 512 textos em memória; teto ~ 512 x maior texto. Upgrade: cache por bytes ou Counter por texto
 BUCKET_MAX = 50  # ponytail: bucket maior que isso vira estrela + vizinhos; pode perder pares dentro dele, upgrade: bucket por sub-hash
 _TOKEN = re.compile(r'\d+(?:[.,/\-]\d+)*|[a-z]+')
 _COMBINANTE = re.compile(r'[̀-ͯ]')
@@ -97,9 +96,8 @@ def _classificar(ta, tb):
     return ('poucas_palavras' if pequena else 'texto_diferente'), len(diff), amostra
 
 
-def comparar(textos, workers=8, documentos=None, params=None):
+def comparar(textos, workers=8, documentos=None, *, params):
     """textos: conteudo_id -> arquivo. documentos: conteudo_id -> ids de documento que o contêm (sem isso, tudo é documentos_diferentes)."""
-    params = params or PARAMS
     if not 1 <= workers <= 16:
         raise ValueError('Concorrência local deve estar entre 1 e 16')
     jobs = [(cid, str(textos[cid]), params) for cid in sorted(textos)]
@@ -112,7 +110,7 @@ def comparar(textos, workers=8, documentos=None, params=None):
     sigs = {cid: sg for cid, _, sg in extraidos if sg is not None}
     limiar = params['limiar_jaccard']
 
-    @lru_cache(maxsize=256)
+    @lru_cache(maxsize=TEXTOS_EM_CACHE)
     def toks(cid):
         return tokens(Path(textos[cid]).read_text('utf-8', 'replace'))
 
