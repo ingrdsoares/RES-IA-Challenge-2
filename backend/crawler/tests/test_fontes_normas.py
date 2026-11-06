@@ -218,16 +218,16 @@ def test_429_recua_e_depois_bloqueia():
 
 
 def test_limite_por_host():
-    http, _, rel = montar({}, atraso=1.0, atrasos={'www.camara.leg.br': 6.0})
+    http, _, rel = montar({}, atraso=1.0, atrasos={'www.camara.leg.br': 6.0, 'www2.camara.leg.br': 40.0})
     http.get('https://a.test/1')  # robots.txt + pedido: o segundo espera 1 s
     assert rel.pausas == [1.0]
     rel.pausas.clear()
     http.get('https://a.test/2')
     assert rel.pausas == [1.0]
     rel.pausas.clear()
-    http.get('https://www2.camara.leg.br/x')  # outro host: robots sem espera; www2 e www dividem relogio
+    http.get('https://www2.camara.leg.br/x')  # paginas: limite proprio medido em 2026-11-06, separado da busca
     http.get('https://www.camara.leg.br/y')
-    assert rel.pausas == [6.0, 6.0, 6.0]  # www2 e www dividem o mesmo relogio de host
+    assert rel.pausas == [40.0, 6.0]
 
 
 def _http_fn(h, atraso=0.0):

@@ -183,7 +183,7 @@ def _baixar(cand, norma, http, raiz: Path, rodada: int, frente: Path) -> dict:
                                                'fonte': cand.fonte, 'visao': cand.visao, 'url': cand.url}}
 
 
-def _por_fonte(fonte, norma, http, raiz, rodada, frente) -> dict:
+def _por_fonte(fonte, norma, http, raiz, rodada, frente, uma_versao: bool = False) -> dict:
     try:
         cands = fonte.localizar(norma, http)
     except Ambigua as e:
@@ -196,7 +196,13 @@ def _por_fonte(fonte, norma, http, raiz, rodada, frente) -> dict:
         return {'resultado': 'indisponivel', 'detalhe': str(e), 'candidatos': []}
     except Exception as e:  # noqa: BLE001
         return {'resultado': 'indisponivel', 'detalhe': f'erro inesperado: {type(e).__name__}: {e}', 'candidatos': []}
-    tentativas = [_baixar(c, norma, http, raiz, rodada, frente) for c in cands]
+    if uma_versao:  # compilada primeiro; para na primeira que entregar, sem gastar pagina (Camara: 2 por ~70 s)
+        cands = sorted(cands, key=lambda c: c.visao != 'compilada')
+    tentativas = []
+    for c in cands:
+        tentativas.append(_baixar(c, norma, http, raiz, rodada, frente))
+        if uma_versao and 'doc' in tentativas[-1]:
+            break
     docs = [t.pop('doc') for t in tentativas if 'doc' in t]
     res = {'candidatos': tentativas}
     if docs:
@@ -240,11 +246,11 @@ def _sugestao(fontes: dict) -> str | None:
 
 
 def _tentar(norma: NormaId, aplicaveis: list, http, raiz: Path, rodada: int, frente: Path, anterior: int,
-            so_primaria: bool = False) -> dict:
+            so_primaria: bool = False, uma_versao: bool = False) -> dict:
     """Roda as fontes em ordem ate uma entregar. Executa em thread; nao toca no checkpoint."""
     fontes, docs = {}, []
     for f in aplicaveis[:1] if so_primaria else aplicaveis:
-        fontes[f.nome] = r = _por_fonte(f, norma, http, raiz, rodada, frente)
+        fontes[f.nome] = r = _por_fonte(f, norma, http, raiz, rodada, frente, uma_versao)
         if r['resultado'] == 'ok':
             docs = r.pop('documentos')
             break
@@ -410,7 +416,7 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
             workers: int = 4, relogio=time.monotonic, dormir=time.sleep, falhas_host: int = FALHAS_SEGUIDAS,
             pausa_host: float = PAUSA_HOST, a_cada: int = 50, saida=print, atrasos: dict | None = None,
             inventario_rodada1: Path | None = None, reprocessar: list[str] = (),
-            so_primaria: bool = False, simultaneas: dict | None = None) -> dict:
+            so_primaria: bool = False, simultaneas: dict | None = None, uma_versao: bool = False) -> dict:
     if rodada not in (1, 2):
         raise ValueError(f'rodada {rodada} invalida: sao no maximo duas')
     inv = json.loads(Path(inventario).read_text(encoding='utf-8'))
@@ -500,7 +506,7 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
             k = min(livres)[1]
             _, l, norma, aplicaveis = filas[k].popleft()
             ant = por_chave.get(l['chave'], {}).get('tentativas', 0)
-            ativos[ex.submit(_tentar, norma, aplicaveis, obs, raiz, rodada, frente, ant, so_primaria)] = (l, k)
+            ativos[ex.submit(_tentar, norma, aplicaveis, obs, raiz, rodada, frente, ant, so_primaria, uma_versao)] = (l, k)
             ocupadas[k] += 1
             tentadas += 1
 
@@ -592,6 +598,7 @@ def main(argv=None) -> int:
                     help='retenta nesta execucao as entradas do diario com essa situacao (e trecho no motivo); repetivel')
     ap.add_argument('--so-primaria', action='store_true',
                     help='so a primeira fonte de cada norma; quem nao resolver fica para a proxima execucao, com reservas')
+    ap.add_argument('--uma-versao', action='store_true', help='compilada primeiro; so busca outra versao se ela falhar')
     ap.add_argument('--status', action='store_true', help='mostra as contagens do checkpoint, sem rede')
     a = ap.parse_args(argv)
     try:
@@ -608,7 +615,7 @@ def main(argv=None) -> int:
         inv = inv1 if a.rodada == 1 else garantir_rodada_2(a.destino, inv1)
     fontes = FONTES_FEDERAIS + FONTES_DF + FONTES_CONFAZ + FONTES_RFB
     r = coletar(inv, a.destino, a.rodada, fontes, limite=a.limite, workers=a.workers, inventario_rodada1=inv1,
-                reprocessar=a.reprocessar, so_primaria=a.so_primaria, simultaneas=SIMULTANEAS)
+                reprocessar=a.reprocessar, so_primaria=a.so_primaria, simultaneas=SIMULTANEAS, uma_versao=a.uma_versao)
     print(('INTERROMPIDO; ' if r['interrompido'] else '') + f"{_fmt(Counter(r['contagem']))} | restantes={r['restantes']} "
           f"a_repetir={r['a_repetir']}")
     return 0
