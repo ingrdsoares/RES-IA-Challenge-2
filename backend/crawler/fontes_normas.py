@@ -331,10 +331,12 @@ class Camara:
                 achadas.append(u)
         if norma.ano is None:  # so uma norma, e so se a pagina de resultados for a lista inteira
             pag = self._PAGINA.search(html)
+            if pag is None:
+                raise Ambigua('busca da Camara sem contagem de resultados; unicidade nao verificavel')
+            if int(pag[2]) > int(pag[1]):  # nunca nao_encontrada a partir de uma pagina truncada
+                raise Ambigua(f'busca da Camara com {pag[2]} resultados e so {pag[1]} na pagina; unicidade nao verificavel')
             if len(achadas) > 1:
                 raise Ambigua(f'{len(achadas)} normas da Camara com tipo {norma.tipo} e numero {norma.numero} (ano nao citado)')
-            if achadas and pag and int(pag[2]) > int(pag[1]):
-                raise Ambigua(f'busca da Camara com {pag[2]} resultados e so {pag[1]} na pagina; unicidade nao verificavel')
         saida = []
         for u in achadas:
             resp = exigir(http.get(u), 200, 404)
@@ -378,7 +380,9 @@ class Sinj:
         q = urlencode({**campos, 'bbusca': 'sinj_norma', 'iDisplayStart': 0,
                        'iDisplayLength': 200 if lodf else 100 if completa else 10, 'sEcho': 1})
         dados = json.loads(exigir(http.get(self._BUSCA + q), 200).content)
-        if completa and dados.get('iTotalDisplayRecords', 0) > len(dados['aaData']):
+        if completa and 'iTotalDisplayRecords' not in dados:  # ausente nao e zero
+            raise Indisponivel('resposta do SINJ sem iTotalDisplayRecords')
+        if completa and dados['iTotalDisplayRecords'] > len(dados['aaData']):
             raise Ambigua(f"busca do SINJ com {dados['iTotalDisplayRecords']} registros e so {len(dados['aaData'])} "
                           'na pagina: mais resultados que a pagina; unicidade nao verificavel')
         achados = []

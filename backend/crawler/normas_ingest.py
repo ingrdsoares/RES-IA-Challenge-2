@@ -99,9 +99,30 @@ def _orgao_no_cabecalho(orgao: str, cab: str) -> bool:
     return True
 
 
+_ANO_TITULO = {'constituicao': 1988, 'lodf': 1993}
+_ABRE_EPIGRAFE = re.compile(r'(?:emenda|lei|decreto|portaria|medida|instrucao|resolucao|ato|convenio|ajuste)\b')
+
+
+def _titulo_valido(norma: NormaId, texto: str) -> bool:
+    """Numero 0: o titulo e uma linha inteira do cabecalho (opcionalmente 'de <ano>'), a primeira com cara de epigrafe."""
+    ano_ok = _ANO_TITULO[norma.tipo]
+    if norma.ano is not None and norma.ano != ano_ok:
+        return False
+    titulo = re.compile(rf'{_TITULOS[norma.tipo]}(?:\s+de\s+(?:\d{{1,2}}/\d{{1,2}}/)?(\d{{4}}))?\.?', re.I)
+    curto = re.compile(r'lei organica de (?:\d{1,2}/\d{1,2}/)?(\d{4})', re.I) if norma.tipo == 'lodf' else None  # cabecalho do SINJ
+    for linha in _cabecalho(texto).splitlines():
+        l = linha.strip()
+        m = titulo.fullmatch(l) or (curto and curto.fullmatch(l))
+        if m:
+            return m[1] is None or int(m[1]) == ano_ok
+        if _ABRE_EPIGRAFE.match(l.lower()):  # epigrafe de outro ato (EC, lei, emenda a LODF...) vem antes do titulo
+            return False
+    return False
+
+
 def validar_identidade(norma: NormaId, texto: str) -> bool:
-    if norma.tipo in _TITULOS:  # titulo citado no meio de um texto nao e o titulo do texto
-        return any(l.strip().lower().startswith(_TITULOS[norma.tipo]) for l in _cabecalho(texto).splitlines())
+    if norma.tipo in _TITULOS:
+        return _titulo_valido(norma, texto)
     achada = identificar_cabecalho(texto)
     if achada is None:
         return False
@@ -144,10 +165,39 @@ class ErroConversao(Exception):
     """O documento foi baixado mas nao deu para converte-lo (bug ou formato inesperado): termina `manual`, sem repetir."""
 
 
+_VAZIAS = {'br', 'hr', 'img', 'meta', 'link', 'input', 'col', 'area', 'base', 'wbr', 'param', 'source'}
+_TAG = re.compile(r'<(/?)([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(/?)>')
+
+
+def _fechar_p_abertos(marcacao: str) -> str:
+    """Insere </p> antes de um <p> cujo ancestral aberto mais proximo e outro <p>; nada mais muda.
+
+    Rastreia as tags abertas: <s>, <table> etc. que atravessam paragrafos abertos continuam inteiros.
+    """
+    pilha: list[str] = []
+
+    def passo(m: re.Match) -> str:
+        fecha, nome, auto = m[1], m[2].lower(), m[3]
+        if fecha:
+            if nome in pilha:  # fecha tambem o que ficou aberto dentro dele
+                del pilha[len(pilha) - 1 - pilha[::-1].index(nome):]
+            return m[0]
+        if nome in _VAZIAS or auto:
+            return m[0]
+        antes = ''
+        if nome == 'p' and pilha and pilha[-1] == 'p':
+            pilha.pop()
+            antes = '</p>'
+        pilha.append(nome)
+        return antes + m[0]
+
+    return _TAG.sub(passo, marcacao)
+
+
 def _html(candidato: Candidato, raw: bytes) -> tuple[str, str]:
     marcacao = decodificar(raw, _charset(raw))
     if candidato.fonte == 'sinj':  # o SINJ omite </p> em centenas de blocos; sem isto o parser aninha e estoura a pilha
-        marcacao = re.sub(r'(?i)(<p(?:\s[^>]*|)>)', r'</p>\1', marcacao)
+        marcacao = _fechar_p_abertos(marcacao)
     soup = BeautifulSoup(marcacao, 'html.parser')
     for no in soup(['script', 'style']):
         no.decompose()
@@ -216,9 +266,7 @@ def ingerir(norma: NormaId, candidato: Candidato, raw: bytes, destino: Path, *, 
         return alvo
     try:
         extensao, validar, markdown = _lido(candidato, raw)
-    except ValueError:
-        raise
-    except Exception as e:  # noqa: BLE001 - nao e identidade divergente nem fonte fora do ar
+    except Exception as e:  # noqa: BLE001 - leitura/conversao; so a identidade (abaixo) segue como ValueError
         raise ErroConversao(f'{type(e).__name__}: {e}') from e
     achada = None
     if markdown is not None:

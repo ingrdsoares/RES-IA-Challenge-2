@@ -449,16 +449,18 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
         processadas += 1
         if not entrada['repetir']:
             for dep in esperando.pop(chave, []):
-                liberar(dep, entrada['situacao'])
+                liberar(dep, entrada['situacao'], bool(entrada['fontes']))
         if progresso and processadas % a_cada == 0:
             saida(f'{processadas} normas nesta execucao | {_fmt(_contagem(por_chave))} | '
                   f'{int(relogio() - inicio)} s')
 
-    def liberar(l, situacao_irma):
+    def liberar(l, situacao_irma, tentou_rede=True):
         if situacao_irma in ('coletada', 'ja_existia'):  # so uma ordem 0 com texto resolve a ambiguidade
             registrar(l['chave'], _entrada_local('ambigua', 'resolvida pela candidata de ordem 0'))
+        elif situacao_irma == 'nao_encontrada' or (situacao_irma == 'manual' and not tentou_rede):
+            enfileirar(l)  # a ordem 0 nao existe ou nem foi pedida: a ordem 1 e a unica chance
         else:
-            enfileirar(l)
+            registrar(l['chave'], _entrada_local('ambigua', f'ordem 0 não resolvida: {situacao_irma}'))
 
     def enfileirar(l):
         norma = NormaId(**l['norma'])
@@ -506,7 +508,7 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
                 if irma is None or irma == l['chave']:
                     enfileirar(l)
                 elif final(irma):
-                    liberar(l, por_chave[irma]['situacao'])
+                    liberar(l, por_chave[irma]['situacao'], bool(por_chave[irma]['fontes']))
                 elif irma in pendentes:
                     esperando.setdefault(irma, []).append(l)
                 else:  # irma que ja estava resolvida na entrada (ja_existia, ambigua)

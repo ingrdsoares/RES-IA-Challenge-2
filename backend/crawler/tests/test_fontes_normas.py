@@ -714,3 +714,25 @@ def test_receita_varios_idato_mesmo_orgao_devolve_todos_os_candidatos():
     assert len(cands) == 6
     http, _, _ = montar(rotas_rfb('receita_busca_in971_revogada.raw'))
     assert len(Receita().localizar(NormaId('in', 971, 2009, 'federal', 'rfb'), http)) == 4
+
+
+def test_camara_sem_ano_pagina_truncada_e_ambigua_mesmo_sem_acerto_e_sem_contagem():
+    n = NormaId('lei', 99999, None, 'federal')
+    b = fx('camara_busca_naoencontrado.raw').decode('utf-8')
+    url = CAM_BUSCA + 'lei+99999'
+    http, _, _ = montar({url: (200, b.replace('de 0 a 0 de 0', 'de 1 a 20 de 300').encode(), 'text/html; charset=utf-8')})
+    with pytest.raises(Ambigua):  # nenhum acerto na pagina 1, mas ha mais paginas: nunca nao_encontrada
+        Camara().localizar(n, http)
+    http, _, _ = montar({url: (200, b.replace('Exibindo resultados', 'Mostrando').encode(), 'text/html; charset=utf-8')})
+    with pytest.raises(Ambigua):  # sem contagem de resultados nao ha como provar unicidade
+        Camara().localizar(n, http)
+    http, _, _ = montar({url: (200, b.encode(), 'text/html; charset=utf-8')})
+    assert Camara().localizar(n, http) == []  # 0 de 0 e ausencia verdadeira
+
+
+def test_sinj_sem_ano_sem_total_de_registros_e_indisponivel():
+    d = json.loads(fx('sinj_busca_lei1254_sem_ano.raw'))
+    del d['iTotalDisplayRecords']
+    http, _, _ = montar({SINJ_SEM_ANO.format(t='Lei', n=1254): (200, json.dumps(d).encode(), JSON_CT)})
+    with pytest.raises(Indisponivel):
+        Sinj().localizar(NormaId('lei', 1254, None, 'df'), http)

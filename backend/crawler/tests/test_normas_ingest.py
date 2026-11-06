@@ -143,10 +143,11 @@ def test_soft_404_e_redirecionamento_nao_coletam(tmp_path, fonte, fixture, norma
 
 
 def test_pdf_ou_json_invalidos_nao_coletam(tmp_path):
-    with pytest.raises(ValueError):
+    from backend.crawler.normas_ingest import ErroConversao  # leitura impossivel = erro de conversao (termina manual)
+    with pytest.raises(ErroConversao):
         ingerir(LEI, Candidato('https://x/a.pdf', 'planalto', 'unica'), b'%PDF-1.4 lixo', tmp_path)
     rec = Candidato('https://normasinternet2.receita.fazenda.gov.br/api/consulta-externa/ato/1/visao/multivigente', 'receita', 'compilada')
-    with pytest.raises(ValueError):
+    with pytest.raises(ErroConversao):
         ingerir(NormaId('portaria', 1750, 2018, 'federal'), rec, b'<html>erro</html>', tmp_path)
     assert not (tmp_path / 'normas-citadas').exists()
 
@@ -440,6 +441,22 @@ def test_titulo_citado_no_meio_do_texto_nao_vale():
     assert not validar_identidade(CF, 'LEI Nº 1, DE 1º DE JANEIRO DE 2000\nEmenta. Segundo a Constituição da República '
                                       'Federativa do Brasil de 1988, fica. Art. 1º Texto.')
     assert validar_identidade(CF, 'Presidência da República\nCONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1988\nArt. 1º X')
+    assert validar_identidade(CF, 'CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL\nArt. 1º X')
+    assert validar_identidade(LODF, 'LEI ORGÂNICA DO DISTRITO FEDERAL\nPREÂMBULO Art. 1º X')
+
+
+@pytest.mark.parametrize('norma, texto', [
+    (CF, 'EMENDA CONSTITUCIONAL Nº 132, DE 20 DE DEZEMBRO DE 2023\nCONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1988\nArt. 1º X'),
+    (CF, 'CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1967\nArt. 1º X'),
+    (CF, 'CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL: comentada\nArt. 1º X'),
+    (CF, 'CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1988 comentada\nArt. 1º X'),
+    (LODF, 'LEI Nº 5, DE 1º DE JANEIRO DE 2000\nLei Orgânica do Distrito Federal, altera.\nLei Orgânica do Distrito Federal\nArt. 1º X'),
+    (LODF, 'EMENDA À LEI ORGÂNICA Nº 100, DE 2018\nLEI ORGÂNICA DO DISTRITO FEDERAL\nArt. 1º X'),
+    (LODF, 'LEI ORGÂNICA DO DISTRITO FEDERAL DE 1990\nArt. 1º X'),
+    (NormaId('constituicao', 0, 1967, 'federal'), 'CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1988\nArt. 1º X'),
+])
+def test_titulo_de_numero_zero_exige_linha_inteira_e_primeira_epigrafe(norma, texto):
+    assert not validar_identidade(norma, texto)
 
 
 def test_emenda_constitucional_valida_numero_e_rejeita_a_errada(tmp_path):
@@ -448,3 +465,42 @@ def test_emenda_constitucional_valida_numero_e_rejeita_a_errada(tmp_path):
     assert ingerir(ec132, cand, fx('planalto_emc_132.raw'), tmp_path).is_dir()
     with pytest.raises(ValueError, match='identidade'):  # a pagina da EC 103 sob a EC 132
         ingerir(ec132, cand, fx('planalto_emc_103.raw'), tmp_path)
+
+
+# ---- Fix round 1 ----
+
+def _sinj_md(corpo, tmp_path, titulo='Lei 5 de 01/01/2020'):
+    raw = f'<html><body><div id="div_texto"><h1>{titulo}</h1>{corpo}</div></body></html>'.encode()
+    pasta = ingerir(NormaId('lei', 5, 2020, 'df'), Candidato('https://x/s.html', 'sinj', 'compilada'), raw, tmp_path)
+    return (pasta / 'documento.md').read_text(encoding='utf-8')
+
+
+def test_sinj_rasura_que_atravessa_paragrafos_abertos_nao_perde_o_segundo_trecho(tmp_path):
+    md = _sinj_md('<p><s>riscado um<p>riscado dois</s><p>normal', tmp_path)
+    import re
+    assert re.search(r'~~[^~]*riscado um[^~]*~~', md) and re.search(r'~~[^~]*riscado dois[^~]*~~', md)
+    assert not re.search(r'~~[^~]*normal[^~]*~~', md) and md.index('riscado dois') < md.index('normal')
+
+
+def test_sinj_tabela_dentro_de_paragrafo_aberto_nao_e_partida(tmp_path):
+    md = _sinj_md('<p>intro<table><tr><td><p>AA</td><td><p>BB</td></tr><tr><td><p>CC</td><td><p>DD</td></tr></table>'
+                  '<p>depois', tmp_path)
+    linhas = [l for l in md.splitlines() if '|' in l]
+    assert any('AA' in l and 'BB' in l for l in linhas) and any('CC' in l and 'DD' in l for l in linhas)
+    assert md.index('intro') < md.index('AA') < md.index('depois')
+    solto = _sinj_md('<p>intro<table><tr><td><p>AA<td><p>BB<tr><td><p>CC<td><p>DD</table><p>depois', tmp_path / 'b')
+    assert all(t in solto for t in ('AA', 'BB', 'CC', 'DD')) and solto.index('intro') < solto.index('AA') < solto.index('depois')
+
+
+def test_valueerror_da_conversao_vira_erroconversao_mas_identidade_continua_valueerror(tmp_path, monkeypatch):
+    from backend.crawler import normas_ingest as ni
+    monkeypatch.setattr(ni, '_convert', lambda *a: b'\xff'.decode('utf-8'))  # UnicodeDecodeError e subclasse de ValueError
+    with pytest.raises(ni.ErroConversao, match='UnicodeDecodeError'):
+        ingerir(LEI, PLAN, lei_html(), tmp_path)
+    monkeypatch.undo()
+    with pytest.raises(ValueError, match='identidade') as e:
+        ingerir(NormaId('lei', 1, 2003, 'federal'), PLAN, lei_html(), tmp_path)
+    assert not isinstance(e.value, ni.ErroConversao)
+    with pytest.raises(ni.ErroConversao):  # JSON da Receita malformado: falha de leitura, nao identidade
+        ingerir(NormaId('portaria', 1, 2018, 'federal', 'rfb'),
+                Candidato('https://x/ato/1/visao/original', 'receita', 'original'), b'{nao e json', tmp_path)

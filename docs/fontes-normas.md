@@ -267,14 +267,14 @@ Fixtures: `confaz_convenio_52_17.raw` e `confaz_convenio_100_97.raw` (cabeçalho
 | Citação (tipo do projeto) | 1ª | 2ª | 3ª | Notas |
 |---|---|---|---|---|
 | Lei, LC, decreto-lei, decreto federais | Planalto (URL por regra) | LexML | Câmara (`-normaatualizada-`, `-publicacaooriginal-`) | texto original limpo só na Câmara. **Sem ano:** só a Câmara (busca por tipo e número), aceita se vier exatamente uma norma e a página de resultados for a lista inteira; várias = `ambigua`; o ano sai do cabeçalho validado |
-| Constituição Federal (`constituicao`, número 0) | Planalto `constituicao/constituicao.htm` | Câmara (busca "constituição federal 1988", pasta `consti/1988/constituicao-1988-`) | | identidade pelo título "CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL" no início de uma linha do cabeçalho |
+| Constituição Federal (`constituicao`, número 0) | Planalto `constituicao/constituicao.htm` | Câmara, **reserva não verificada em página real**: a busca "constituição federal 1988" foi lida (pasta `consti/1988/constituicao-1988-`), mas a página `-norma-` e o texto atualizado da Constituição nunca foram baixados | | identidade pelo título "CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL" (opcionalmente "DE 1988") como linha inteira do cabeçalho, a primeira com cara de epígrafe (nenhuma EC/lei/emenda antes dele) |
 | Emenda constitucional federal (ano 1992 em diante) | Planalto `emendas/emc/emc{NN}.htm` | Câmara (pasta `emecon`, busca "emenda constitucional N") | | identidade pelo cabeçalho "EMENDA CONSTITUCIONAL Nº N, DE ..."; EC anterior a 1992 ou sem ano: `manual` |
 | Portaria, IN, ADE, resolução CGSN sem ano | nenhuma | | | `manual`, motivo "ano não citado; numeração recomeça a cada ano" |
 | MP federal | Planalto só se ano a partir de 2001 sem reedição, ou se a citação traz a reedição | LexML | Câmara | `manual` se nenhum entregar |
 | Portaria, IN, ADE, Resolução CGSN (federais) | Receita | | | LexML e Planalto não trazem |
 | Convênio ICMS, ajuste SINIEF | CONFAZ (índice anual) | | | |
 | Lei, LC, decreto, portaria, IN, ADE do DF | SINJ-DF (compilado) | | | sem ano: só lei, LC e decreto, registro único |
-| Lei Orgânica do DF (`lodf`, número 0) | SINJ-DF (tipo `Lei Orgânica`, número 0, ano 1993) | | | identidade pelo título "LEI ORGÂNICA DO DISTRITO FEDERAL" |
+| Lei Orgânica do DF (`lodf`, número 0) | SINJ-DF (tipo `Lei Orgânica`, número 0, ano 1993) | | | identidade pelo título "LEI ORGÂNICA DO DISTRITO FEDERAL" como linha inteira (o SINJ ainda antepõe "Lei Orgânica de 08/06/1993"), sem epígrafe de outro ato antes dele |
 | Emenda constitucional do DF, decreto legislativo/decreto-lei do DF, MP do DF, "assunto" | sem regra de localização verificada | | | `manual` |
 
 O Senado (API e páginas `/norma/`) está excluído até aval do usuário e não aparece na ordem.
@@ -318,5 +318,5 @@ A estimativa pode errar em 30% ou mais, principalmente na taxa de queda do Plana
 - Planalto, LexML, SINJ e CONFAZ: nenhum termo publicado encontrado.
 - Planalto: sem robots; cp1252; URL varia por era; a URL "pura" já é anotada.
 - Respostas com status 200 que significam "não encontrado": LexML (página de ~1 KB), SINJ (busca com `aaData: []` e texto com `ch_norma` inválido), Receita (`quantidadeTotal: 0`) e Câmara (busca com "de 0 a 0 de 0"); Senado (XML vazio) fica fora do pipeline. Erro 404 real: Planalto, Câmara (página da norma), CONFAZ.
-- Task 8a: a página `-norma-` da Constituição na Câmara não foi baixada (só a busca); o teste da reserva usa a busca real e uma página `-norma-` sintética com os links relativos. Câmara sem ano compara só a primeira página de resultados (20), por isso aceita só quando "de 1 a N de N" cobre tudo.
+- Task 8a: a reserva da Câmara para a Constituição **não está verificada em página real**: só a busca foi lida; o teste usa a busca real e uma página `-norma-` sintética com os links relativos. Câmara sem ano compara só a primeira página de resultados: sem a linha "Exibindo resultados" ou com "de 1 a N de M", M > N, é sempre `ambigua` (nunca `nao_encontrada`), com ou sem acerto na página; "de 0 a 0 de 0" é ausência verdadeira. SINJ sem `iTotalDisplayRecords` na busca sem ano/LODF é `Indisponivel`, não zero.
 - Não verificado: SRU do LexML, Planalto antes de 1964, emenda constitucional e demais tipos sem regra.

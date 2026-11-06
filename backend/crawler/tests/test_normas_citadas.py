@@ -522,20 +522,60 @@ def test_erro_de_conversao_termina_manual_com_motivo_e_nao_repete(tmp_path, monk
     assert rede2.pedidos == []
 
 
+def _par():
+    return linha('lei', 5, 2000, 'df', ordem=0), linha('lei', 5, 2000, 'federal', ordem=1)
+
+
 def test_ordem_1_e_tentada_quando_a_ordem_0_nao_tem_regra(tmp_path):
     # DF sem fonte que a aceite: manual local, sem rede; a federal (ordem 1) tem de ser tentada
-    df, fed = linha('lei', 5, 2000, 'df', ordem=0), linha('lei', 5, 2000, 'federal', ordem=1)
+    df, fed = _par()
     _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('planalto'), 'federal')])
     e = estado(tmp_path)
-    assert e['df:lei:-:5:2000']['situacao'] == 'manual' and e['df:lei:-:5:2000']['tentativas'] == 0
+    assert e['df:lei:-:5:2000']['situacao'] == 'manual' and e['df:lei:-:5:2000']['fontes'] == {}
     assert e['federal:lei:-:5:2000']['situacao'] == 'coletada' and len(rede.pedidos) == 1
 
 
-def test_ordem_1_fica_ambigua_se_a_ordem_0_ja_existia(tmp_path):
-    df, fed = linha('lei', 5, 2000, 'df', ordem=0, situacao='ja_existia'), linha('lei', 5, 2000, 'federal', ordem=1)
-    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('planalto'), 'federal')])
-    e = estado(tmp_path)['federal:lei:-:5:2000']
-    assert (e['situacao'], e['motivo']) == ('ambigua', 'resolvida pela candidata de ordem 0') and rede.pedidos == []
+def test_ordem_1_e_tentada_quando_a_ordem_0_nao_foi_encontrada(tmp_path):
+    df, fed = _par()
+    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('sinj', ato=lambda n, h: []), 'df'), so_jur(Stub('planalto'), 'federal')])
+    assert estado(tmp_path)['federal:lei:-:5:2000']['situacao'] == 'coletada'
+
+
+@pytest.mark.parametrize('desfecho', ['ambigua', 'bloqueada', 'manual_com_rede'])
+def test_ordem_1_nao_e_tentada_se_a_ordem_0_terminou_de_outro_modo(tmp_path, desfecho):
+    def ato(n, h):
+        if desfecho == 'ambigua':
+            raise Ambigua('dois')
+        if desfecho == 'bloqueada':
+            raise Bloqueada('403')
+        raise SemTextoAutomatico('sem texto')
+    df, fed = _par()
+    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('sinj', ato=ato), 'df'), so_jur(Stub('planalto'), 'federal')])
+    e = estado(tmp_path)
+    sit0 = e['df:lei:-:5:2000']['situacao']
+    assert sit0 == {'ambigua': 'ambigua', 'bloqueada': 'bloqueada', 'manual_com_rede': 'manual'}[desfecho]
+    f = e['federal:lei:-:5:2000']
+    assert (f['situacao'], f['motivo']) == ('ambigua', f'ordem 0 não resolvida: {sit0}') and rede.pedidos == []
+
+
+def test_ordem_1_espera_a_ordem_0_que_ainda_sera_repetida(tmp_path):
+    df, fed = _par()
+    def cai(n, h):
+        raise Indisponivel('5xx')
+    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('sinj', ato=cai), 'df'), so_jur(Stub('planalto'), 'federal')])
+    e = estado(tmp_path)
+    assert e['df:lei:-:5:2000']['repetir'] and 'federal:lei:-:5:2000' not in e and rede.pedidos == []
+
+
+def test_ordem_1_com_ordem_0_estatica_ja_existia_ou_ambigua(tmp_path):
+    df, fed = linha('lei', 5, 2000, 'df', ordem=0, situacao='ja_existia'), _par()[1]
+    rodar(tmp_path, [df, fed], [so_jur(Stub('planalto'), 'federal')])
+    f = estado(tmp_path)['federal:lei:-:5:2000']
+    assert (f['situacao'], f['motivo']) == ('ambigua', 'resolvida pela candidata de ordem 0')
+    df, fed = linha('lei', 5, 2000, 'df', ordem=0, situacao='ambigua'), _par()[1]
+    rodar(tmp_path / 'b', [df, fed], [so_jur(Stub('planalto'), 'federal')])
+    f = estado(tmp_path / 'b')['federal:lei:-:5:2000']
+    assert (f['situacao'], f['motivo']) == ('ambigua', 'ordem 0 não resolvida: ambigua')
 
 
 def test_sem_ano_de_numeracao_anual_e_manual_com_motivo_sem_rede(tmp_path):
