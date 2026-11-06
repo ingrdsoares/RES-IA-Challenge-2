@@ -634,3 +634,14 @@ def test_so_fonte_primaria_nao_libera_candidata_de_ordem_1(tmp_path):
     ls = [linha('lei', 1, 2000, ordem=0), linha('lei', 1, 2000, 'df', ordem=1)]
     rodar(tmp_path, ls, [Stub('planalto', ato=lambda n, h: []), Stub('lexml')], so_primaria=True)
     assert 'df:lei:-:1:2000' not in estado(tmp_path)
+
+
+def test_simultaneas_permite_mais_de_uma_norma_por_fonte(tmp_path):
+    barreira = threading.Barrier(2, timeout=5)
+
+    def ato(n, h):
+        barreira.wait()  # so passa se duas normas da mesma fonte rodarem ao mesmo tempo
+        return []
+    ls = [linha('lei', 1, 2000), linha('lei', 2, 2000)]
+    rodar(tmp_path, ls, [Stub('planalto', ato=ato)], simultaneas={'planalto': 2}, workers=2)
+    assert set(e['situacao'] for e in estado(tmp_path).values()) == {'nao_encontrada'}
