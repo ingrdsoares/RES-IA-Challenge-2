@@ -47,6 +47,13 @@ _NOMES_ORGAO = {'rfb': 'receita federal', 'srf': 'secretaria da receita federal'
                 'pgfn': 'procuradoria-geral da fazenda nacional', 'cgsn': 'comite gestor do simples nacional'}
 _DISPOSITIVO = re.compile(r'\bart\.?\s*1\s*[º°o]?(?!\d)|\bclausula\s+primeira')
 _LIMITE_CABECALHO = 5000
+# documento de outro tipo que so cita normas: a identidade dele nunca e a da norma citada
+_OUTRO_DOCUMENTO = re.compile(
+    r'[#*\s]*(?:solucao\s+de\s+(?:consulta|divergencia)|declaracao\s+de\s+(?:ineficacia|inadmissibilidade)'
+    r'|acordao|parecer|sumula|tarf\b|sc\s+\d)', re.I)
+# medido: 135 documentos passavam por citacao em caixa mista, todos a mais de 200 caracteres do inicio;
+# reexecutar a validacao sobre o original das 4.070 versoes coletadas nao reprova nenhuma por este limite
+_LIMITE_CAIXA_MISTA = 200
 _BLOCOS = ['title', 'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'tr', 'td', 'th', 'br', 'table', 'center',
            'blockquote', 'dir']
 
@@ -71,6 +78,8 @@ def identificar_cabecalho(texto: str) -> tuple[str, int, int, str | None] | None
     em caixa mista, so se comecar a linha. Qualquer outra ("Altera a Lei nº 9.718, de ...") e citacao.
     """
     cab = _cabecalho(texto)
+    if _OUTRO_DOCUMENTO.match(cab):
+        return None
     todas = list(_EPIGRAFE.finditer(cab))
     escolhida = None
     for m in todas:
@@ -78,7 +87,8 @@ def identificar_cabecalho(texto: str) -> tuple[str, int, int, str | None] | None
         if m.group(k).isupper() and (m.group('orgao') or 'A').isupper():
             escolhida = m
             break
-    if escolhida is None and todas and cab[:todas[0].start()].split('\n')[-1].strip() == '':
+    if (escolhida is None and todas and todas[0].start() <= _LIMITE_CAIXA_MISTA
+            and cab[:todas[0].start()].split('\n')[-1].strip() == ''):
         escolhida = todas[0]
     if escolhida is None:
         return None
