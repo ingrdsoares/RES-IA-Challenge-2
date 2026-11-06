@@ -27,6 +27,10 @@
   ],
   "limiar_linhas_ausentes_versao_extra": 0.05,
   "limiar_bytes_preferida": 0.2,
+  "auditoria_extracao": {
+    "razao_texto_minima": 0.5,
+    "bytes_apos_body_precoce": 2000
+  },
   "similaridade": {
     "shingles": 5,
     "permutacoes": 120,
