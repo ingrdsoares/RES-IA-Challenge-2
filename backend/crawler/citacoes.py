@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from backend.crawler.normas_id import _RX, NormaId, _sem_acento, norma_do_match
 
+_ORGAOS_FEDERAIS = {'rfb', 'srf', 'cosit', 'pgfn', 'cgsn'}
+
 
 @dataclass(frozen=True)
 class Citacao:
@@ -25,6 +27,9 @@ def extrair_citacoes(texto: str, jurisdicao_origem: str) -> list[Citacao]:
         elif jurisdicao_origem == 'df':
             cands = ('df', 'federal')
         else:
+            cands = ('federal',)
+        # CGSN e orgaos da Receita/PGFN sao federais, mesmo citados em texto do DF
+        if m.group('resol_cgsn') or _ORGAOS_FEDERAIS & set((m.group('orgao') or '').split('/')):
             cands = ('federal',)
         n = norma_do_match(m, cands[0])
         # sem ano e sem marcador (nº, n.), numero pequeno de tipo generico e ruido ("lei 12")

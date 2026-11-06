@@ -77,3 +77,22 @@ def test_ec_sigla_sem_ano_em_texto_df_e_ruido_escolar():
     assert extrair_citacoes('EC 08 de Taguatinga', 'df') == []
     assert [c.norma.numero for c in extrair_citacoes('Emenda Constitucional nº 132', 'df')] == [132]
     assert [c.norma.numero for c in extrair_citacoes('EC 132', 'federal')] == [132]
+
+
+def test_orgao_federal_forca_candidata_federal_mesmo_no_df():
+    for t in ('Resolução CGSN nº 140/2018', 'Portaria RFB nº 12/2020', 'Instrução Normativa RFB nº 1.700/2017',
+              'Ato Declaratório Executivo Cosit nº 3/2021', 'Portaria PGFN nº 5/2020', 'Portaria SRF nº 7/2001'):
+        c = extrair_citacoes(t, 'df')[0]
+        assert c.candidatas_jurisdicao == ('federal',), t
+        assert c.norma.jurisdicao == 'federal', t
+
+
+def test_resol_cgsn_e_sempre_federal_mesmo_sem_orgao():
+    c = extrair_citacoes('Resolução nº 140/2018', 'df')[0]
+    assert c.norma.tipo == 'resol_cgsn' and c.candidatas_jurisdicao == ('federal',)
+    assert c.norma.jurisdicao == 'federal'
+
+
+def test_sefaz_continua_df_ou_federal():
+    c = extrair_citacoes('Portaria Sefaz nº 12/2020', 'df')[0]
+    assert set(c.candidatas_jurisdicao) == {'df', 'federal'}
