@@ -97,3 +97,4 @@ Na execução oficial sobre os 46 documentos centrais da demonstração:
 - **Tamanho Médio de Chunk:** 680 caracteres
 - **Maior Chunk:** 1.840 caracteres (dentro do limite estrito de 2.000 caracteres)
 - **Taxa de Integridade:** 100% dos chunks com `document_id`, `source`, `chunk_id` e tags fiscais mapeadas.
+

@@ -96,3 +96,4 @@ O dataset oficial com 25 perguntas e referências documentais auditadas está di
 - Arquivo JSONL: `backend/evaluation/data/ground_truth_avaliacao.jsonl`
 
 Ambos são 100% aderentes ao contrato formal `backend/evaluation/dataset.schema.json`.
+

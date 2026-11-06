@@ -114,3 +114,4 @@ flowchart TD
 ```
 
 Essa arquitetura garante estabilidade total: os testes unitários (`pytest`), o linter (`Ruff`) e os testes de integração sempre rodam em qualquer ambiente, enquanto a inferência de produção se beneficia do modelo `qwen3-embedding:0.6b` de 1024 dimensões.
+

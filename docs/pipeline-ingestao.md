@@ -103,3 +103,4 @@ python scripts/ingest_qdrant.py --dry-run
 python scripts/avaliar_recuperacao_qdrant.py
 ```
 - Executa as 20 rodadas de calibração de `top_k` e `score_threshold` contra o benchmark de 25 perguntas fiscais.
+
