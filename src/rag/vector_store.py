@@ -2,10 +2,11 @@
 Gerenciamento de Vector Store e Embeddings para o Sócio Digital.
 Frente de Ciência de Dados (Jhessica).
 
-Suporta:
-- Embeddings multilíngues densos via SentenceTransformers (ou fallback TF-IDF/sklearn).
-- Persistência em banco relacional/vetorial local (SQLite + vetores serializados).
-- Filtragem por metadados fiscais (ex.: tags={'mei'}, tipo='lei_complementar').
+Alinhamento Arquitetural (Plano de Entrega):
+- Modelo Oficial de Produção: qwen3-embedding:0.6b (1024 dimensões, distância Cosseno).
+- Banco Vetorial Oficial de Produção: Qdrant (coleção 'knowledge_base').
+- Banco Vetorial Local de Desenvolvimento/Testes: SQLite com vetores serializados e busca híbrida (semântica + léxica).
+- Fallback Gracioso: Fallback determinístico em Python puro / TF-IDF para ambientes sem GPU/Ollama.
 """
 
 import json
@@ -18,7 +19,7 @@ from typing import Any, Dict, List, Optional
 
 try:
     import numpy as np
-except Exception:  # pragma: no cover - fallback leve para ambientes sem numpy
+except Exception:  # pragma: no cover
     np = None
 
 from .chunker import LegalChunk
@@ -26,19 +27,24 @@ from .chunker import LegalChunk
 
 class LegalVectorStore:
     """
-    Armazenamento vetorial leve, determinístico e autônomo com persistência SQLite.
+    Armazenamento vetorial leve, determinístico e autônomo.
+    Compatível com o contrato do Qdrant e modelo qwen3-embedding:0.6b (1024 dimensões).
     """
 
     def __init__(
         self,
         db_path: str = "data/processed/vector_index.db",
-        model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        model_name: str = "qwen3-embedding:0.6b",
+        embedding_dimensions: int = 1024,
         use_dense: bool = True,
+        ollama_url: Optional[str] = None,
     ):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.model_name = model_name
+        self.embedding_dimensions = embedding_dimensions
         self.use_dense = use_dense
+        self.ollama_url = ollama_url or "http://localhost:11434"
         self.model = None
         self._fallback_to_python = np is None
         self._fallback_vocab = None
@@ -47,13 +53,29 @@ class LegalVectorStore:
         self._init_db()
 
     def _init_model(self):
-        """Inicializa o modelo de embedding com fallback gracioso se não houver rede."""
+        """Inicializa o modelo de embedding com fallback gracioso se não houver Ollama/rede."""
+        if self.use_dense:
+            try:
+                import httpx
+
+                resp = httpx.get(f"{self.ollama_url}/api/tags", timeout=0.8)
+                if resp.status_code == 200:
+                    self.ollama_active = True
+                    print(
+                        f"[VectorStore] Conectado ao Ollama: modelo oficial {self.model_name} (1024 dimensões)"
+                    )
+                    return
+            except Exception:
+                self.ollama_active = False
+
         if self.use_dense and not self._fallback_to_python:
             try:
                 from sentence_transformers import SentenceTransformer
 
-                self.model = SentenceTransformer(self.model_name)
-                print(f"[VectorStore] Modelo de embeddings denso carregado: {self.model_name}")
+                self.model = SentenceTransformer(
+                    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                )
+                print("[VectorStore] Fallback local: modelo SentenceTransformer carregado.")
             except Exception as e:
                 print(f"[VectorStore] Aviso: fallback para embedding TF-IDF/Count devido a: {e}")
                 self.use_dense = False
@@ -138,12 +160,13 @@ class LegalVectorStore:
         return sum(x * y for x, y in zip(a, b))
 
     def _init_db(self):
-        """Cria as tabelas de armazenamento dos chunks e vetores."""
+        """Cria as tabelas de armazenamento dos chunks e vetores com migração automática."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS legal_chunks (
                     chunk_id TEXT PRIMARY KEY,
+                    document_id TEXT,
                     source_doc TEXT,
                     artigo TEXT,
                     paragrafo TEXT,
@@ -154,12 +177,43 @@ class LegalVectorStore:
                     embedding BLOB
                 )
             """)
+            cursor.execute("PRAGMA table_info(legal_chunks)")
+            cols = [row[1] for row in cursor.fetchall()]
+            if cols and "document_id" not in cols:
+                cursor.execute("ALTER TABLE legal_chunks ADD COLUMN document_id TEXT")
+
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_artigo ON legal_chunks(artigo)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_source ON legal_chunks(source_doc)")
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_document_id ON legal_chunks(document_id)"
+            )
             conn.commit()
 
-    def encode(self, texts: List[str]):
+    def encode(self, texts: List[str]) -> Any:
         """Gera vetores normalizados para os textos fornecidos."""
+        if getattr(self, "ollama_active", False):
+            try:
+                import httpx
+
+                vectors = []
+                for t in texts:
+                    res = httpx.post(
+                        f"{self.ollama_url}/api/embeddings",
+                        json={"model": self.model_name, "prompt": t},
+                        timeout=30.0,
+                    )
+                    if res.status_code == 200:
+                        v = res.json().get("embedding", [])
+                        norm = math.sqrt(sum(x * x for x in v)) or 1.0
+                        vectors.append([x / norm for x in v])
+                    else:
+                        raise ValueError(f"Ollama error: {res.text}")
+                if np is not None:
+                    return np.array(vectors, dtype=np.float32)
+                return vectors
+            except Exception:
+                pass
+
         if self.use_dense and self.model is not None and np is not None:
             embeddings = self.model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
             return embeddings.astype(np.float32)
@@ -167,7 +221,7 @@ class LegalVectorStore:
         if self._fallback_to_python:
             return self._encode_fallback(texts)
 
-        if self.tfidf is not None:
+        if getattr(self, "tfidf", None) is not None:
             if not hasattr(self, "tfidf_fitted") or not self.tfidf_fitted:
                 matrix = self.tfidf.fit_transform(texts)
                 self.tfidf_fitted = True
@@ -197,12 +251,13 @@ class LegalVectorStore:
                 cursor.execute(
                     """
                     INSERT OR REPLACE INTO legal_chunks (
-                        chunk_id, source_doc, artigo, paragrafo, tema,
+                        chunk_id, document_id, source_doc, artigo, paragrafo, tema,
                         content, raw_text, metadata_json, embedding
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
                         chunk.chunk_id,
+                        chunk.document_id,
                         chunk.source_doc,
                         chunk.artigo,
                         chunk.paragrafo,
@@ -222,14 +277,15 @@ class LegalVectorStore:
         query: str,
         top_k: int = 3,
         filter_tags: Optional[List[str]] = None,
+        filter_doc_id: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
-        Executa busca semântica por similaridade de cosseno com filtragem opcional.
+        Executa busca híbrida (70% semântica vetorial + 30% correspondência léxica).
         """
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT chunk_id, source_doc, artigo, paragrafo, tema, content, raw_text, metadata_json, embedding
+                SELECT chunk_id, document_id, source_doc, artigo, paragrafo, tema, content, raw_text, metadata_json, embedding
                 FROM legal_chunks
             """)
             rows = cursor.fetchall()
@@ -238,11 +294,12 @@ class LegalVectorStore:
             return []
 
         query_vec = self.encode([query])[0]
-
         results = []
+
         for row in rows:
             (
                 chunk_id,
+                doc_id,
                 source_doc,
                 artigo,
                 paragrafo,
@@ -254,16 +311,21 @@ class LegalVectorStore:
             ) = row
             metadata = json.loads(meta_json) if meta_json else {}
 
+            if filter_doc_id and doc_id != filter_doc_id:
+                continue
+
             if filter_tags:
                 chunk_tags = set(metadata.get("tags", []))
                 if not any(tag.lower() in chunk_tags for tag in filter_tags):
                     continue
 
+            # Cálculo léxico de precisão
             query_tokens = [w.lower().strip("?,.:;()\"'!") for w in query.split() if len(w) > 2]
             content_lower = content.lower()
             matches = sum(1 for token in query_tokens if token in content_lower)
             lexical_ratio = (matches / len(query_tokens)) if query_tokens else 0.0
 
+            # Similaridade de cosseno
             vec = self._deserialize_embedding(emb_blob)
             if len(vec) == len(query_vec):
                 similarity = self._dot_product(query_vec, vec)
@@ -275,6 +337,7 @@ class LegalVectorStore:
             results.append(
                 {
                     "chunk_id": chunk_id,
+                    "document_id": doc_id or metadata.get("document_id", ""),
                     "score": hybrid_score,
                     "dense_score": round(similarity, 4),
                     "lexical_score": round(lexical_ratio, 4),
@@ -310,7 +373,8 @@ class LegalVectorStore:
         return {
             "total_chunks": total_chunks,
             "total_artigos": total_artigos,
-            "total_docs": total_docs,
+            "total_documentos": total_docs,
             "available_tags": sorted(list(all_tags)),
-            "db_path": str(self.db_path),
+            "model_name": self.model_name,
+            "dimensions": self.embedding_dimensions,
         }
