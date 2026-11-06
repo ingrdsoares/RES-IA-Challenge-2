@@ -616,3 +616,21 @@ def test_cli_reprocessar_repetivel_e_valida_a_situacao():
     assert nc.parse_reprocessar(['manual:sem regra', 'ambigua']) == [('manual', 'sem regra'), ('ambigua', None)]
     with pytest.raises(argparse.ArgumentTypeError):
         nc.parse_reprocessar(['pendente'])
+
+
+def test_so_fonte_primaria_adia_reservas_para_a_proxima_execucao(tmp_path):
+    ls = [linha('lei', 1, 2000)]
+    reserva = Stub('lexml')
+    fontes = [Stub('planalto', ato=lambda n, h: []), reserva]
+    rodar(tmp_path, ls, fontes, so_primaria=True)
+    e = estado(tmp_path)['federal:lei:-:1:2000']
+    assert list(e['fontes']) == ['planalto'] and e['repetir'] is True and e['situacao'] == 'nao_encontrada'
+    rodar(tmp_path, ls, fontes)
+    e = estado(tmp_path)['federal:lei:-:1:2000']
+    assert e['situacao'] == 'coletada' and e['repetir'] is False and list(e['fontes']) == ['planalto', 'lexml']
+
+
+def test_so_fonte_primaria_nao_libera_candidata_de_ordem_1(tmp_path):
+    ls = [linha('lei', 1, 2000, ordem=0), linha('lei', 1, 2000, 'df', ordem=1)]
+    rodar(tmp_path, ls, [Stub('planalto', ato=lambda n, h: []), Stub('lexml')], so_primaria=True)
+    assert 'df:lei:-:1:2000' not in estado(tmp_path)

@@ -239,10 +239,11 @@ def _sugestao(fontes: dict) -> str | None:
     return None
 
 
-def _tentar(norma: NormaId, aplicaveis: list, http, raiz: Path, rodada: int, frente: Path, anterior: int) -> dict:
+def _tentar(norma: NormaId, aplicaveis: list, http, raiz: Path, rodada: int, frente: Path, anterior: int,
+            so_primaria: bool = False) -> dict:
     """Roda as fontes em ordem ate uma entregar. Executa em thread; nao toca no checkpoint."""
     fontes, docs = {}, []
-    for f in aplicaveis:
+    for f in aplicaveis[:1] if so_primaria else aplicaveis:
         fontes[f.nome] = r = _por_fonte(f, norma, http, raiz, rodada, frente)
         if r['resultado'] == 'ok':
             docs = r.pop('documentos')
@@ -254,6 +255,7 @@ def _tentar(norma: NormaId, aplicaveis: list, http, raiz: Path, rodada: int, fre
         queda = any(v['resultado'] == 'indisponivel' or any(c['resultado'] == 'indisponivel' for c in v['candidatos'])
                     for v in fontes.values())
         repetir = repetir or queda  # resultado misto com queda de fonte nao e terminal
+        repetir = repetir or (so_primaria and len(aplicaveis) > 1)  # reservas ficam para a proxima execucao
     return {'situacao': situacao, 'motivo': motivo, 'repetir': repetir, 'fontes': fontes, 'documentos': docs,
             'sugestao': None if docs else _sugestao(fontes), 'tentativas': anterior + 1,
             'atualizado_em': datetime.now(timezone.utc).isoformat()}
@@ -404,7 +406,8 @@ def _fmt(cont: Counter) -> str:
 def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=None, limite: int | None = None, *,
             workers: int = 4, relogio=time.monotonic, dormir=time.sleep, falhas_host: int = FALHAS_SEGUIDAS,
             pausa_host: float = PAUSA_HOST, a_cada: int = 50, saida=print, atrasos: dict | None = None,
-            inventario_rodada1: Path | None = None, reprocessar: list[str] = ()) -> dict:
+            inventario_rodada1: Path | None = None, reprocessar: list[str] = (),
+            so_primaria: bool = False) -> dict:
     if rodada not in (1, 2):
         raise ValueError(f'rodada {rodada} invalida: sao no maximo duas')
     inv = json.loads(Path(inventario).read_text(encoding='utf-8'))
@@ -493,7 +496,7 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
             k = min(livres)[1]
             _, l, norma, aplicaveis = filas[k].popleft()
             ant = por_chave.get(l['chave'], {}).get('tentativas', 0)
-            ativos[ex.submit(_tentar, norma, aplicaveis, obs, raiz, rodada, frente, ant)] = (l, k)
+            ativos[ex.submit(_tentar, norma, aplicaveis, obs, raiz, rodada, frente, ant, so_primaria)] = (l, k)
             ocupadas.add(k)
             tentadas += 1
 
@@ -583,6 +586,8 @@ def main(argv=None) -> int:
     ap.add_argument('--inventario-rodada1', type=Path, help='padrao: <frente>/inventario/inventario.json')
     ap.add_argument('--reprocessar', action='append', default=[], metavar='SITUACAO[:TRECHO]',
                     help='retenta nesta execucao as entradas do diario com essa situacao (e trecho no motivo); repetivel')
+    ap.add_argument('--so-primaria', action='store_true',
+                    help='so a primeira fonte de cada norma; quem nao resolver fica para a proxima execucao, com reservas')
     ap.add_argument('--status', action='store_true', help='mostra as contagens do checkpoint, sem rede')
     a = ap.parse_args(argv)
     try:
@@ -599,7 +604,7 @@ def main(argv=None) -> int:
         inv = inv1 if a.rodada == 1 else garantir_rodada_2(a.destino, inv1)
     fontes = FONTES_FEDERAIS + FONTES_DF + FONTES_CONFAZ + FONTES_RFB
     r = coletar(inv, a.destino, a.rodada, fontes, limite=a.limite, workers=a.workers, inventario_rodada1=inv1,
-                reprocessar=a.reprocessar)
+                reprocessar=a.reprocessar, so_primaria=a.so_primaria)
     print(('INTERROMPIDO; ' if r['interrompido'] else '') + f"{_fmt(Counter(r['contagem']))} | restantes={r['restantes']} "
           f"a_repetir={r['a_repetir']}")
     return 0
