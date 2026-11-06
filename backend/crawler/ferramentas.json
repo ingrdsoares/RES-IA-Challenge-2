@@ -169,6 +169,12 @@
       "descricao": "Coleta orientações oficiais do Portal do Empreendedor em Markdown."
     },
     {
+      "modulo": "normas_citadas",
+      "arquivo": "normas_citadas.py",
+      "tipo": "coletor/comando",
+      "descricao": "Coleta em até duas rodadas das normas citadas no acervo, com checkpoint, retomada e lista manual."
+    },
+    {
       "modulo": "notas_cnae",
       "arquivo": "notas_cnae.py",
       "tipo": "coletor/comando",

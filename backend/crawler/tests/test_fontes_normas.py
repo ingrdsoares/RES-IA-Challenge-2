@@ -576,3 +576,34 @@ def test_sinj_registro_sem_texto_compilado_levanta_sem_texto_automatico():
     with pytest.raises(SemTextoAutomatico) as e:
         Sinj().localizar(NormaId('lei', 1254, 1996, 'df'), http)
     assert e.value.motivo
+
+
+def test_atraso_por_host_vale_entre_threads():
+    """Duas threads no mesmo host nunca pedem juntas; o atraso minimo separa as requisicoes."""
+    import threading
+    relogio = threading.Lock()
+    estado = {'t': 1000.0}
+    chegadas, barreira = [], threading.Barrier(2)
+
+    def agora():
+        return estado['t']
+
+    def dormir(s):
+        with relogio:
+            estado['t'] += s
+
+    def handler(req):
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        chegadas.append(agora())
+        try:
+            barreira.wait(timeout=0.5)  # sem trava por host as duas threads chegam aqui juntas
+        except threading.BrokenBarrierError:
+            pass
+        return httpx.Response(200, content=b'ok')
+
+    http = Http(httpx.Client(transport=httpx.MockTransport(handler)), atraso=2.0, relogio=agora, dormir=dormir)
+    ts = [threading.Thread(target=http.get, args=(f'https://a.gov.br/{i}',)) for i in range(2)]
+    [t.start() for t in ts]
+    [t.join() for t in ts]
+    assert len(chegadas) == 2 and abs(chegadas[1] - chegadas[0]) >= 2.0

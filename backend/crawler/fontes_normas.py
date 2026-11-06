@@ -1,6 +1,7 @@
 """Localizacao de normas federais: cliente HTTP educado e estrategias por fonte (sem rede nos testes)."""
 import json
 import re
+import threading
 import time
 from dataclasses import dataclass
 from typing import Callable, Protocol
@@ -67,10 +68,20 @@ class Http:
         self.atrasos = {**ATRASOS, **(atrasos or {})}
         self._ultimo: dict[str, float] = {}
         self._robots: dict[str, RobotFileParser | Bloqueada] = {}
+        self._travas: dict[str, threading.Lock] = {}
+        self._travas_mestre = threading.Lock()
+
+    def _trava(self, chave: str) -> threading.Lock:
+        with self._travas_mestre:
+            return self._travas.setdefault(chave, threading.Lock())
 
     def _pedir(self, url: str, corpo: dict | None = None) -> httpx.Response:
         """Um salto, sem seguir redirecionamento. 429: recua e tenta de novo; 5xx/rede: tenta de novo."""
         host = _chave_host(urlsplit(url).netloc)
+        with self._trava(host):  # atraso por host vale entre threads; hosts diferentes seguem em paralelo
+            return self._pedir_travado(url, corpo, host)
+
+    def _pedir_travado(self, url: str, corpo: dict | None, host: str) -> httpx.Response:
         for tentativa in (1, 2):
             espera = self._ultimo.get(host, -1e9) + self.atrasos.get(host, self.atraso) - self.relogio()
             if espera > 0:
@@ -113,17 +124,18 @@ class Http:
     def _permitido(self, url: str) -> bool:
         p = urlsplit(url)
         base = f'{p.scheme}://{p.netloc}'
-        if base not in self._robots:
-            try:
-                resp = self._seguir(base + '/robots.txt', checar_robots=False)
-            except Bloqueada as e:  # 401/403: guardado, sem nova requisicao
-                self._robots[base] = e
-                raise
-            # Indisponivel (5xx/rede) propaga sem cache: nega agora, tenta de novo depois
-            rp = RobotFileParser()
-            # 404/outros 4xx ou SPA devolvendo HTML: sem politica publicada, sem regras
-            rp.parse(texto(resp).splitlines() if resp.status_code == 200 else [])
-            self._robots[base] = rp
+        with self._trava('robots:' + base):
+            if base not in self._robots:
+                try:
+                    resp = self._seguir(base + '/robots.txt', checar_robots=False)
+                except Bloqueada as e:  # 401/403: guardado, sem nova requisicao
+                    self._robots[base] = e
+                    raise
+                # Indisponivel (5xx/rede) propaga sem cache: nega agora, tenta de novo depois
+                rp = RobotFileParser()
+                # 404/outros 4xx ou SPA devolvendo HTML: sem politica publicada, sem regras
+                rp.parse(texto(resp).splitlines() if resp.status_code == 200 else [])
+                self._robots[base] = rp
         rp = self._robots[base]
         if isinstance(rp, Bloqueada):
             raise rp
