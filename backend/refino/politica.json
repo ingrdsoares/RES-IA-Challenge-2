@@ -122,12 +122,13 @@
         "\\bnfs-?e\\b",
         "\\bsped\\b",
         "\\bdctf\\b"
-      ]
+      ],
+      "limite_termos_corpo": 5,
+      "janela_corpo": 20000
     },
     "revogada": {
-      "campo": "situacao_fonte",
       "padrao": "\\brevogad[oa]\\b",
-      "negacao": "\\bnao\\b[^.;]{0,30}revogad"
+      "negacao": "\\bnao\\b[^.;,:]{0,30}revogad"
     }
   }
 }

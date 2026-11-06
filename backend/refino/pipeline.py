@@ -91,12 +91,26 @@ def searchable(text):
     return ''.join(c for c in unicodedata.normalize('NFD',text).lower() if not unicodedata.combining(c))
 
 
+_SEM_EMENTA=('(autoria','(vide','(mensagem','presidencia da republica','subchefia')  # rodapés de autoria e cabeçalhos do Planalto
+
+
 def ementa(text):
-    # ponytail: aproximação da ementa = primeiro parágrafo que não é título, citação ou fonte; upgrade: campo ementa da fonte.
+    """Ementa: primeira célula (ou linha) com texto visível fora de títulos, citações, links e cabeçalhos.
+    ponytail: heurística sobre o Markdown coletado; sem campo ementa da fonte. Upgrade: ler a ementa do original."""
     for linha in text.split('\n'):
-        s=linha.strip()
-        if s and not s.startswith(('#','>','[','---')):return s[:1000]
+        s=re.sub(r'\]\([^)]*\)',']',linha.strip())
+        if not s or s.startswith(('#','>','---')):continue
+        celulas=[c.strip() for c in s.strip('|').split('|')] if s.startswith('|') else [s]
+        for c in celulas:
+            visivel=re.sub(r'\[[^\]]*\]','',c).replace('*','').strip()
+            if len(re.findall(r'[^\W\d_]',visivel))<10 or searchable(c.lstrip('*[ ')).startswith(_SEM_EMENTA):continue
+            return c[:1000]
     return ''
+
+
+def termos_no_corpo(text,padroes,janela):
+    s=searchable(text[:janela])
+    return sum(len(re.findall(p,s)) for p in padroes)
 
 
 def termo_tributario(texto,padroes):
@@ -110,11 +124,18 @@ def revogada(situacao,cfg):
     return bool(re.search(cfg['padrao'],s)) and not re.search(cfg['negacao'],s)
 
 
-def etiquetas_documento(rows,policy):
-    """Etiquetas só acrescentam informação; nenhuma tira o documento do índice."""
+def revogada_versao(rows,cfg):
+    """Versão revogada só se todas as ocorrências que informam situação dizem revogada; conflito não é resolvido, aparece em situacao_por_ocorrencia."""
+    flags=[revogada(r.get('situacao_fonte'),cfg) for r in rows if r.get('situacao_fonte')]
+    return bool(flags) and all(flags)
+
+
+def etiquetas_documento(rows,policy,preferida):
+    """Etiquetas só acrescentam informação; nenhuma tira o documento do índice. revogada vem da versão preferida."""
     cfg=policy['etiquetas'];out=[]
-    if any(r['frente'] in cfg['relacionada']['frentes'] for r in rows) and not any(r['termo_tributario'] for r in rows):out.append('relacionada')
-    if any(revogada(r.get('situacao_fonte'),cfg['revogada']) for r in rows):out.append('revogada')
+    tributaria=any(r['termo_tributario'] or r['termos_no_corpo']>=cfg['relacionada']['limite_termos_corpo'] for r in rows)
+    if any(r['frente'] in cfg['relacionada']['frentes'] for r in rows) and not tributaria:out.append('relacionada')
+    if revogada_versao(preferida,cfg['revogada']):out.append('revogada')
     return out
 
 
@@ -209,14 +230,15 @@ def load_occurrence(snapshot,root,policy):
     if not title and text:
         first=re.search(r'^#\s+(.+)$',text,re.M);title=first[1] if first else None
     title=str(title or meta.get('source_id') or key)
-    tributaria=termo_tributario(title+' '+ementa(text),policy['etiquetas']['relacionada']['termos_tributarios'])
+    padroes=policy['etiquetas']['relacionada']['termos_tributarios'];texto_ementa=ementa(text)
+    tributaria=termo_tributario(title+' '+texto_ementa,padroes);hits=termos_no_corpo(text,padroes,policy['etiquetas']['relacionada']['janela_corpo'])
     views=meta.get('visoes_fonte') or ([{'visao':meta.get('visao_fonte')}] if meta.get('visao_fonte') else [])
     visao=_VISAO.get(str(meta.get('visao_fonte') or ''),'unica')
     occurrence=dict(id=oid,documento_id=did,versao_id=version_id,chave_origem=key,titulo=title,frente=front,
         metadados_ref=snapshot['metadados'],hash_metadados=sha(meta_raw),markdown_ref=md.relative_to(root).as_posix() if md else None,
         visao=visao,hash_markdown=md_sha,source_url=source,originais=originals,coletado_em=meta.get('coletado_em'),
         natureza=str(meta.get('natureza_documental') or meta.get('tipo') or 'nao_informada'),visoes=views,
-        vigencia=meta.get('vigencia','nao_verificada'),situacao_fonte=meta.get('situacao_fonte'),termo_tributario=tributaria,classificacao=category,motivos=reasons,qualidade=quality,erros=errors,
+        vigencia=meta.get('vigencia','nao_verificada'),situacao_fonte=meta.get('situacao_fonte'),ementa=texto_ementa,termo_tributario=tributaria,termos_no_corpo=hits,classificacao=category,motivos=reasons,qualidade=quality,erros=errors,
         conteudo_id=content_id,bytes_texto=len(text.encode()) if content_id else 0,hashes_originais=raw_set,revisao_semantica='pendente')
     dataset=None
     if category=='dados_estruturados':
@@ -281,6 +303,10 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         v['indexavel_nucleo']=v['conteudo_id'] is not None and v['classificacao']=='nucleo'
     def lines(vid):return {l.strip() for l in (stage/contents[versions[vid]['conteudo_id']]['arquivo']).read_text(encoding='utf8').splitlines() if l.strip()}
     rowmap={r['id']:r for r in occurrences};indexes={k:[] for k in ('nucleo','complementar','historico','revisao','apoio')};relations=[]
+    for v in versions.values():
+        rows_v=[rowmap[oid] for oid in v['ocorrencias']]
+        v['situacao_por_ocorrencia']={r['id']:r.get('situacao_fonte') for r in rows_v}
+        v['etiquetas']=['revogada'] if revogada_versao(rows_v,policy['etiquetas']['revogada']) else []
     for doc in docs.values():
         for key in ('titulos','naturezas','versoes','categorias'):doc[key]=sorted(doc[key])
         def rank(vid):
@@ -294,7 +320,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
             return (min(pool,key=rank),False) if pool else (min(vids,key=lambda v:(-size(v),rank(v))),True)
         doc['representacao_preferida']=pick(doc['versoes'])[0]
         doc['fora_do_indice']=[dict(versao=v,motivo=_motivo_fora(versions[v])) for v in doc['versoes'] if versions[v]['classificacao'] in ('revisao','evidencia','dados_estruturados') or not versions[v]['conteudo_id']]
-        doc['etiquetas']=etiquetas_documento([rowmap[oid] for oid in doc['ocorrencias']],policy)
+        doc['etiquetas']=etiquetas_documento([rowmap[oid] for oid in doc['ocorrencias']],policy,[rowmap[oid] for oid in versions[doc['representacao_preferida']]['ocorrencias']])
         doc['criterio_representacao']='Preferência técnica de extração; não significa versão vigente. Todas as versões permanecem em versoes.jsonl e ocorrencias.jsonl; o índice lista a preferida e as extras com conteúdo novo, e fora_do_indice registra o motivo das demais.'
         for category in indexes:
             vids=[vid for vid in doc['versoes'] if versions[vid]['classificacao']==category and (category=='revisao' or versions[vid]['conteudo_id'])]
@@ -309,7 +335,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
                     mine=lines(v);new={l for l in mine-ref if not _OMISSAO.fullmatch(l)}
                     if new and (len(new)/len(mine)>policy['limiar_linhas_ausentes_versao_extra'] or any(c.isdigit() for l in new for c in l)):shown.append(v)
                     else:out.append(dict(versao=v,motivo='versao_sem_conteudo_novo'))
-            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],etiquetas=doc['etiquetas'],versoes=shown,fora_do_indice=out,apenas_versao_parcial=partial,representacao_preferida=best,revisao_semantica='pendente'))
+            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],etiquetas=doc['etiquetas'],situacao_por_versao={vid:versions[vid]['situacao_por_ocorrencia'] for vid in doc['versoes']},versoes=shown,fora_do_indice=out,apenas_versao_parcial=partial,representacao_preferida=best,revisao_semantica='pendente'))
         if doc['chave_origem'].startswith('rfb:anexo:'):
             parent=sha(('rfb:ato:'+doc['chave_origem'].split(':')[2]).encode())
             if parent in docs:relations.append(dict(documento_id=doc['id'],relacionado_id=parent,tipo='anexo_de',evidencia='identificadores_explicitos_na_url_rfb'))
@@ -356,7 +382,7 @@ def _resumo_execucao(folder,normas):
     for arquivo in sorted(folder.glob('indice_*.jsonl')):
         for linha in arquivo.read_text(encoding='utf8').splitlines():
             row=json.loads(linha);indexados.add(row['documento_id'])
-            if row['apenas_versao_parcial']:parciais.append(row['documento_id'])
+            if row['apenas_versao_parcial']:parciais.append(row['documento_id'])  # conta documentos únicos, não linhas
     auditoria=[json.loads(l) for l in (folder/'auditoria_extracao.jsonl').read_text(encoding='utf8').splitlines() if l.strip()]
     if normas is None:situacoes=None
     else:
@@ -364,7 +390,7 @@ def _resumo_execucao(folder,normas):
     return dict(run_id=manifesto['run_id'],documentos_no_indice=len(indexados),indices_documentos=manifesto['indices_documentos'],
         bytes_textuais_entrada=manifesto['bytes_textuais_entrada'],bytes_conteudos_unicos=manifesto['bytes_conteudos_unicos'],bytes_busca=manifesto['bytes_busca'],
         extracao_curta=sum('extracao_curta' in r['problemas'] for r in auditoria),
-        apenas_versao_parcial=dict(count=len(parciais),documentos=sorted(parciais)),
+        apenas_versao_parcial=dict(count=len(set(parciais)),documentos=sorted(set(parciais))),
         normas=None if situacoes is None else dict(ausentes=situacoes.get('nao_encontrada',0),bloqueadas_ou_manuais=situacoes.get('bloqueada',0)+situacoes.get('manual',0),situacoes=situacoes))
 
 

@@ -33,7 +33,7 @@ Deduplicação textual compartilha conteúdo; não une autoridades ou jurisdiç�
 
 O perfil padrão é `tributario_df`. Fontes tributárias federais e distritais são candidatas ao núcleo, cobrindo Simples, MEI e demais regimes. Modelos, editoriais e atos administrativos operacionais ficam complementares; tipos explícitos de pessoal não são promovidos por mencionar Simples. Outras jurisdições explicitamente identificadas ficam fora do núcleo local. Dúvidas permanecem para revisão.
 
-Etiquetas em `documentos.jsonl` e em cada linha de índice: `relacionada` (norma citada sem termo tributário no título nem na ementa) e `revogada` (só quando `situacao_fonte` da fonte diz revogada). Etiqueta nunca remove documento do índice.
+Etiquetas em `documentos.jsonl` e em cada linha de índice: `relacionada` (norma citada sem termo tributário no título nem na ementa, e menos de 5 termos no corpo nos primeiros 20.000 caracteres) e `revogada` (só quando a `situacao_fonte` da versão preferida diz revogada). `situacao_por_versao` mostra a situação de cada ocorrência; conflitos não são resolvidos. Etiqueta nunca remove documento do índice.
 
 Alternativas: `--perfil mei_simples_df` e `--perfil tributario_nacional`. Regras e motivos são versionados em `politica.json`. A classificação inicial é candidata: Portarias genéricas ainda podem requerer revisão de ementa para separar procedimento fiscal de organização interna. Não há exclusão física por palavras-chave.
 

@@ -378,3 +378,77 @@ def test_antes_depois_compara_indice_bytes_normas_e_parcial(tmp_path):
     assert saida['atual']['normas']=={'ausentes':1,'bloqueadas_ou_manuais':2,'situacoes':{'nao_encontrada':1,'bloqueada':1,'manual':1,'coletada':1}}
     assert saida['base']['normas'] is None
     assert saida['atual']['extracao_curta']==sum('extracao_curta' in r['problemas'] for r in read_rows(atual_folder,'auditoria_extracao.jsonl'))
+
+
+def planalto(ementa,corpo=''):
+    """Forma real do Planalto coletado: frontmatter, título, citação, cabeçalho, links e ementa numa célula."""
+    return ('---\nsource_url: https://www.planalto.gov.br/ccivil_03/leis/l8212compilado.htm\nsha256: abc\ncoletado_em: 2026-11-06\nvigencia: nao_verificada\n---\n\n'
+        '# Lei nº 8212/1991\n\n[Arquivo original](original.html)\n\n'
+        '> Coletado para pesquisa. A data de coleta não comprova vigência; a situação declarada pela fonte consta em metadados.json.\n\n'
+        '|  |  |\n| --- | --- |\n|  | **Presidência da República   Casa Civil   Subchefia para Assuntos Jurídicos** |\n\n'
+        '**[LEI Nº 8.212, DE 24 DE JULHO DE 1991](https://legislacao.planalto.gov.br/x?OpenDocument)**\n\n'
+        '|  |  |\n| --- | --- |\n'
+        '| [Texto compilado](https://www.planalto.gov.br/L.htm) [Mensagem de veto](https://x) [Vide Lei n° 15.371, de 2026](https://x) [Vigência](https://x) | '+ementa+' |\n\n'
+        'O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta e eu sanciono a seguinte Lei:\n\n'+corpo)
+
+
+def test_ementa_vem_da_celula_da_tabela_e_ignora_linhas_vazias_e_autoria():
+    from backend.refino.pipeline import ementa, normalize_text
+    assert ementa(normalize_text(planalto('Dispõe sobre a organização da Seguridade Social, institui Plano de Custeio.')))=='Dispõe sobre a organização da Seguridade Social, institui Plano de Custeio.'
+    assert ementa('|  |  |\n| --- | --- |\n|  |  |\n(Autoria do Projeto: Poder Executivo)\n\nReestrutura a Carreira de Auditoria Tributária do DF.')=='Reestrutura a Carreira de Auditoria Tributária do DF.'
+
+
+def test_lei_8212_com_muitos_termos_no_corpo_nao_e_relacionada(tmp_path):
+    corpo='\n'.join('A contribuição social do empregador, art. %d.'%i for i in range(10))
+    folder,_=refine(tmp_path,[('8212','https://www.planalto.gov.br/ccivil_03/leis/l8212compilado.htm',planalto('Dispõe sobre a organização da Seguridade Social, institui Plano de Custeio.',corpo),'normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 8212/1991'))])
+    oc=read_rows(folder,'ocorrencias.jsonl')[0]
+    assert oc['ementa'].startswith('Dispõe sobre a organização') and oc['termos_no_corpo']>=5
+    assert read_rows(folder,'indice_nucleo.jsonl')[0]['etiquetas']==[]
+
+
+def test_leis_10833_e_9718_com_ementa_tributaria_nao_sao_relacionadas(tmp_path):
+    folder,_=refine(tmp_path,[
+        ('10833','https://www.planalto.gov.br/ccivil_03/leis/2003/L10833.htm',planalto('Altera a Legislação Tributária Federal e dá outras providências.'),'normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 10833/2003')),
+        ('9718','https://www.planalto.gov.br/ccivil_03/leis/L9718.htm',planalto('Altera a Legislação Tributária Federal.'),'normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 9718/1998'))])
+    assert [r['etiquetas'] for r in read_rows(folder,'indice_nucleo.jsonl')]==[[],[]]
+
+
+def test_codigo_civil_com_poucos_termos_e_relacionada_e_continua_no_indice(tmp_path):
+    folder,_=refine(tmp_path,[('cc','https://www.planalto.gov.br/ccivil_03/leis/2002/L10406.htm',planalto('Institui o Código Civil.','Art. 1 Texto. Contribuição, uma vez.'),'normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 10406/2002'))])
+    row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['etiquetas']==['relacionada'] and row['versoes']
+
+
+def test_situacao_conflitante_entre_versoes_nao_e_resolvida_e_etiqueta_segue_preferida(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',base,situacao_fonte='Vigente'),citada('o','original',base+'\nRedação original',situacao_fonte='Revogado')])
+    vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['representacao_preferida']==vs['compilada']['id'] and 'revogada' not in row['etiquetas']
+    assert row['situacao_por_versao'][vs['compilada']['id']]==dict(zip(vs['compilada']['ocorrencias'],['Vigente']))
+    assert row['situacao_por_versao'][vs['original']['id']]==dict(zip(vs['original']['ocorrencias'],['Revogado']))
+    assert vs['original']['etiquetas']==['revogada'] and vs['compilada']['etiquetas']==[]
+
+
+def test_revogada_da_versao_preferida_entra_na_etiqueta_do_indice(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',base,situacao_fonte='Revogado'),citada('o','original',base+'\nRedação original',situacao_fonte='Vigente')])
+    assert read_rows(folder,'indice_nucleo.jsonl')[0]['etiquetas']==['relacionada','revogada']
+
+
+def test_negacao_so_vale_ate_pontuacao():
+    from backend.refino.pipeline import revogada, load_policy
+    cfg=load_policy()['etiquetas']['revogada']
+    assert revogada('Não consta revogação, mas foi revogada pela Lei X',cfg)
+    assert revogada('Revogada',cfg) and not revogada('Não revogada',cfg)
+    assert not revogada('Não consta revogação expressa',cfg)
+
+
+def test_apenas_versao_parcial_conta_documento_unico(tmp_path):
+    from backend.refino.pipeline import antes_depois
+    pasta=tmp_path/'run';pasta.mkdir()
+    (pasta/'manifesto.json').write_text(json.dumps(dict(run_id='r',indices_documentos={},bytes_textuais_entrada=0,bytes_conteudos_unicos=0,bytes_busca=0)),encoding='utf8')
+    (pasta/'auditoria_extracao.jsonl').write_text('',encoding='utf8')
+    linhas=[dict(documento_id='d1',apenas_versao_parcial=True),dict(documento_id='d1',apenas_versao_parcial=True),dict(documento_id='d2',apenas_versao_parcial=False)]
+    (pasta/'indice_nucleo.jsonl').write_text('\n'.join(json.dumps(l) for l in linhas)+'\n',encoding='utf8')
+    out=antes_depois(pasta,pasta)
+    assert out['atual']['apenas_versao_parcial']['count']==1 and out['atual']['apenas_versao_parcial']['documentos']==['d1']

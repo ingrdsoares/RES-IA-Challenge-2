@@ -73,6 +73,16 @@ As saídas são publicadas em diretório próprio somente após geração comple
 
 O [contrato SQL](../backend/refino/schema.sql) prepara PostgreSQL com integridade entre documento, versão, ocorrência e dataset. Ele não foi aplicado a um servidor nesta etapa. O [README do refino](../backend/refino/README.md) descreve os JSONL e a reprodução.
 
+## Etiquetas, exclusões e auditoria
+
+- **Etiquetas** (`etiquetas` em `documentos.jsonl` e em cada linha de índice). `relacionada`: norma citada sem termo tributário no título nem na ementa, e com menos de 5 termos tributários nos primeiros 20.000 caracteres do corpo. A ementa é a célula de texto do cabeçalho do Planalto ou do SINJ, sem linhas de autoria, "Vide" ou cabeçalho da Presidência. `revogada`: só quando a situação informada pela fonte diz revogado; a etiqueta vale para a versão preferida do documento. Etiqueta nunca remove documento do índice.
+- **Situação por versão** (`situacao_por_versao` nas linhas de índice e `etiquetas` em `versoes.jsonl`). Cada ocorrência mostra a situação que a própria fonte declarou. Versões com situações conflitantes não recebem `revogada` e o conflito fica visível; o refino não resolve conflito. "Não vigente" não é tratado como revogada, porque a fonte não diz revogada.
+- **Fora do índice** (`fora_do_indice`). Toda versão que não entra no índice tem motivo: `em_revisao`, `sem_texto_extraido`, `categoria_sem_indice` (evidência ou dado estruturado), `original_com_compilada` ou `versao_sem_conteudo_novo`.
+- **`apenas_versao_parcial`**. A categoria do documento só tem versão menor que 20% do maior texto do documento, então a linha do índice pode não representar o texto completo. O relatório `antes_depois.json` conta documentos únicos com esse estado.
+- **Auditoria de extração** (`auditoria_extracao.jsonl`, `duplicatas_fisicas.jsonl`). Relata problemas e nunca retira ocorrência do índice. `extracao_curta` aparece só no relatório; os demais problemas entram em `fila_revisao.jsonl`.
+- **Similaridade** (`similaridade.jsonl`, `suspeitos.jsonl`). Relatório de pares de conteúdo. Não funde documentos nem os tira da busca. CNPJ e dados estruturados ficam fora da comparação.
+- **Comparação entre execuções** (`antes_depois.json`, com `--comparar-com`). Mostra documentos no índice, bytes, `extracao_curta`, `apenas_versao_parcial` e, se informados, normas ausentes, bloqueadas e manuais.
+
 ## Etapas seguintes
 
 1. Revisar a fila e os casos administrativos ambíguos.
