@@ -32,6 +32,16 @@ flowchart TD
 
 ---
 
+## Arquitetura-alvo
+
+> Este diagrama mostra a solução planejada, não apenas o que já foi implementado. Frontend, PostgreSQL, autenticação multi-tenant, orquestrador, busca híbrida e integrações fiscais ainda não existem na API.
+
+![Arquitetura-alvo do Sócio Digital: fontes e ingestão, produto e processamento, integrações e status fiscal](diagramas/socio_digital_arquitetura.png)
+
+Arquivo editável: [socio_digital_arquitetura.excalidraw](diagramas/socio_digital_arquitetura.excalidraw), para abrir em [excalidraw.com](https://excalidraw.com).
+
+---
+
 ## Atuação da Engenharia de Dados e Dev (Lucas)
 
 1. **Ingestão e Estruturação de Dados Fiscais:**
