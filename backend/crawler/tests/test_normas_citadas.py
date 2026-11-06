@@ -89,7 +89,11 @@ def frente(tmp):
 
 
 def estado(tmp, rodada=1):
-    return json.loads((frente(tmp) / f'estado-rodada-{rodada}.json').read_text('utf-8'))['normas']
+    out = {}
+    for l in (frente(tmp) / f'estado-rodada-{rodada}.jsonl').read_text('utf-8').splitlines():
+        d = json.loads(l)
+        out[d['chave']] = d['entrada']  # a ultima linha vence
+    return out
 
 
 def test_rodada_invalida_e_recusada(tmp_path):
@@ -113,11 +117,24 @@ def test_retomada_e_checkpoint_corrompido(tmp_path):
     assert len(rede.pedidos) == 2
     _, rede2 = rodar(tmp_path, ls, [Stub()])
     assert rede2.pedidos == []  # 0 downloads
-    ck = frente(tmp_path) / 'estado-rodada-1.json'
-    ck.write_text('{ invalido', encoding='utf-8')
+    ck = frente(tmp_path) / 'estado-rodada-1.jsonl'
+    bom = ck.read_text('utf-8')
+    ruim = 'lixo' + chr(10) + bom
+    ck.write_text(ruim, encoding='utf-8', newline='')  # corrupcao no meio, nao na ultima linha
     with pytest.raises(ValueError, match='corrompido'):
         rodar(tmp_path, ls, [Stub()])
-    assert ck.read_text('utf-8') == '{ invalido'
+    assert ck.read_text('utf-8') == ruim
+
+
+def test_ultima_linha_truncada_do_diario_e_ignorada_com_aviso(tmp_path):
+    ls = [linha('lei', 10, 2000), linha('lei', 11, 2000)]
+    rodar(tmp_path, ls[:1], [Stub()])
+    ck = frente(tmp_path) / 'estado-rodada-1.jsonl'
+    ck.write_text(ck.read_text('utf-8') + '{"chave":"federal:lei:-:11:2000","entr', encoding='utf-8')
+    with pytest.warns(UserWarning, match='truncada'):
+        _, rede = rodar(tmp_path, ls, [Stub()])
+    assert len(rede.pedidos) == 1  # so a lei 11 e coletada de novo
+    assert set(estado(tmp_path)) == {'federal:lei:-:10:2000', 'federal:lei:-:11:2000'}  # diario volta a ser valido
 
 
 def test_mais_citadas_primeiro(tmp_path):
@@ -302,7 +319,7 @@ def test_checkpoint_atomico_tenta_de_novo_quando_replace_falha(tmp_path, monkeyp
     monkeypatch.setattr(nc.os, 'replace', replace)
     monkeypatch.setattr(nc.time, 'sleep', lambda s: None)
     rodar(tmp_path, [linha('lei', 1, 2000)], [Stub()])
-    assert falhas['n'] == 2 and estado(tmp_path)['federal:lei:-:1:2000']['situacao'] == 'coletada'
+    assert falhas['n'] == 2 and (frente(tmp_path) / 'manifesto.json').is_file() and estado(tmp_path)['federal:lei:-:1:2000']['situacao'] == 'coletada'
     assert not list((tmp_path / 'destino').rglob('*.tmp'))
 
 
@@ -364,3 +381,130 @@ def test_rodada_2_lista_mas_nao_coleta_novas(tmp_path):
     assert [(l['chave'], l['situacao']) for l in fora['linhas']] == [('federal:lei:-:4:2002', 'citada_fora_do_limite')]
     assert r['citadas_fora_do_limite'] == 1
     assert 'federal:lei:-:4:2002' not in estado(tmp_path, 2)
+
+
+# ---- rodada de correcao 1 ----
+
+def pdf_sem_texto():
+    from backend.crawler.tests.test_normas_ingest import pdf_bytes
+    return pdf_bytes(None)
+
+
+def test_pdf_sem_texto_nao_e_coleta_e_vira_manual(tmp_path):
+    rede = Rede({'https://a.gov.br/lei-1': (200, pdf_sem_texto())})
+    rodar(tmp_path, [linha('lei', 1, 2000)], [Stub()], rede)
+    e = estado(tmp_path)['federal:lei:-:1:2000']
+    assert e['situacao'] == 'manual' and e['motivo'] == 'PDF sem texto; identidade não verificada'
+    assert e['documentos'] == []
+    cand = e['fontes']['planalto']['candidatos'][0]
+    assert cand['resultado'] == 'sem_texto' and cand['detalhe']
+
+
+def test_pdf_sem_texto_com_outro_candidato_validado_coleta(tmp_path):
+    def dois(n, http):
+        return [Candidato('https://a.gov.br/lei-1', 'planalto', 'compilada'),
+                Candidato('https://a.gov.br/lei-1b', 'planalto', 'original')]
+    rede = Rede({'https://a.gov.br/lei-1': (200, pdf_sem_texto())})
+    rede.rotas['https://a.gov.br/lei-1b'] = (200, html('lei', 1, 2000))
+    rodar(tmp_path, [linha('lei', 1, 2000)], [Stub(ato=dois)], rede)
+    e = estado(tmp_path)['federal:lei:-:1:2000']
+    assert e['situacao'] == 'coletada' and [d['visao'] for d in e['documentos']] == ['original']
+
+
+def test_queda_de_fonte_deixa_resultado_misto_para_repetir(tmp_path):
+    def cai(n, http):
+        raise Indisponivel('503 em https://b.gov.br/x')
+
+    def sem(n, http):
+        raise SemTextoAutomatico('sem texto compilado')
+    ls = [linha('lei', 1, 2000), linha('decreto', 2, 2000)]
+    fontes = [Stub('planalto', tipos=('lei',)), Stub('lexml', tipos=('lei',), ato=cai),
+              Stub('sinj', tipos=('decreto',), ato=sem), Stub('confaz', tipos=('decreto',), ato=cai)]
+    # lei: planalto entrega texto de outro ano (rejeitada) e lexml cai
+    rodar(tmp_path, ls, fontes, Rede(ano=1999))
+    e = estado(tmp_path)
+    assert (e['federal:lei:-:1:2000']['situacao'], e['federal:lei:-:1:2000']['repetir']) == ('ambigua', True)
+    assert (e['federal:decreto:-:2:2000']['situacao'], e['federal:decreto:-:2:2000']['repetir']) == ('manual', True)
+    assert 'sem texto compilado' in e['federal:decreto:-:2:2000']['motivo']
+    _, rede = rodar(tmp_path, ls, fontes, Rede(ano=1999))
+    assert len(rede.pedidos) == 1  # a lei foi tentada de novo; o decreto nao tem candidato para baixar
+
+
+def test_excecao_inesperada_no_worker_nao_derruba_a_execucao(tmp_path, monkeypatch):
+    real = nc._tentar
+
+    def tentar(norma, *a):
+        if norma.numero == 1:
+            raise RuntimeError('boom')
+        return real(norma, *a)
+    monkeypatch.setattr(nc, '_tentar', tentar)
+    msgs = []
+    ls = [linha('lei', 1, 2000, citado=9), linha('lei', 2, 2000, citado=1)]
+    r, _ = rodar(tmp_path, ls, [Stub()], saida=msgs.append)
+    e = estado(tmp_path)
+    assert e['federal:lei:-:2:2000']['situacao'] == 'coletada'
+    um = e['federal:lei:-:1:2000']
+    assert um['situacao'] == 'bloqueada' and um['repetir'] and 'RuntimeError' in um['motivo'] and 'boom' in um['motivo']
+    assert r['erros_inesperados'] == 1 and any('inesperad' in m for m in msgs)
+
+
+def test_indice_de_conhecidas_equivale_ao_casamento_linear():
+    from backend.crawler.inventario_normas import _casa
+    from backend.crawler.normas_id import NormaId
+    ks = [NormaId('lei', n % 50, a, j) for n in range(300) for a in (None, 2000, 2001) for j in ('df', 'federal')]
+    idx = nc._indexar(ks)
+    for n in [NormaId('lei', 7, 2000, 'df'), NormaId('lei', 7, None, 'federal'), NormaId('lei', 99, 2000, 'df'),
+              NormaId('decreto', 7, 2000, 'df'), NormaId('lei', 7, 2005, 'federal')]:
+        for jurs in (('df',), ('federal',), ('df', 'federal')):
+            assert nc._ja_conhecida(idx, n, jurs) == any(_casa(k, n, jurs) for k in ks)
+
+
+def test_rodada_2_usa_o_inventario_da_rodada_1_informado(tmp_path):
+    _doc_rodada1(tmp_path, '<p>Veja a Lei nº 3, de 2001.</p>')
+    inv1 = inventario(tmp_path, [linha('lei', 1, 2000)])
+    inv2 = nc.proxima_rodada(tmp_path / 'destino', inv1)
+    outro = inventario(tmp_path, [linha('lei', 4, 2002)], 'outro.json')  # a rodada 1 informada ja conhece a Lei 4
+    rede = Rede({'https://a.gov.br/lei-3': (200, html('lei', 3, 2001, '<p>Cita a Lei nº 4, de 2002.</p>'))})
+    r = nc.coletar(inv2, tmp_path / 'destino', 2, [Stub()], client=rede.client, workers=1, dormir=lambda s: None,
+                   saida=lambda *a: None, inventario_rodada1=outro)
+    assert r['citadas_fora_do_limite'] == 0
+
+
+def test_inventario_da_rodada_2_e_refeito_quando_o_diario_e_mais_novo(tmp_path):
+    _doc_rodada1(tmp_path, '<p>Veja a Lei nº 3, de 2001.</p>')
+    inv1 = inventario(tmp_path, [linha('lei', 1, 2000)])
+    p = nc.garantir_rodada_2(tmp_path / 'destino', inv1)
+    assert [l['chave'] for l in json.loads(p.read_text('utf-8'))['linhas']] == ['federal:lei:-:3:2001']
+    p.write_text(json.dumps({'run': 'x', 'total': 0, 'linhas': []}), encoding='utf-8')
+    diario = frente(tmp_path) / 'estado-rodada-1.jsonl'
+    os.utime(p, (diario.stat().st_mtime + 10,) * 2)
+    assert nc.garantir_rodada_2(tmp_path / 'destino', inv1) == p
+    assert json.loads(p.read_text('utf-8'))['total'] == 0  # mais novo que o diario: mantido
+    os.utime(p, (diario.stat().st_mtime - 10,) * 2)
+    nc.garantir_rodada_2(tmp_path / 'destino', inv1)
+    assert json.loads(p.read_text('utf-8'))['total'] == 1  # diario mais novo: refeito
+
+
+def test_norma_pulada_pelo_disjuntor_nao_consome_o_limite(tmp_path):
+    ls = [linha('lei', n, 2000, citado=100 - n) for n in range(1, 11)]
+    rede = Rede({f'https://a.gov.br/lei-{n}': (503, b'') for n in range(1, 11)})
+    r, _ = rodar(tmp_path, ls, [Stub()], rede, limite=3, falhas_host=2)
+    assert len(rede.pedidos) == 4 and r['restantes'] == 0  # 2 reais (2 pedidos cada); 8 puladas sem gastar limite
+
+
+def test_staging_da_ingestao_nao_conta_como_documento(tmp_path):
+    _doc_rodada1(tmp_path, '')
+    n = len(list(nc._metadados(frente(tmp_path))))
+    lixo = frente(tmp_path) / 'federal_x' / '.coleta-abc'
+    lixo.mkdir(parents=True)
+    (lixo / 'metadados.json').write_text('{}', encoding='utf-8')
+    assert len(list(nc._metadados(frente(tmp_path)))) == n
+
+
+def test_diario_faz_fsync_por_norma_e_manifesto_atomico(tmp_path, monkeypatch):
+    chamadas = []
+    real = os.fsync
+    monkeypatch.setattr(nc.os, 'fsync', lambda fd: (chamadas.append(fd), real(fd))[1])
+    rodar(tmp_path, [linha('lei', n, 2000) for n in (1, 2, 3)], [Stub()])
+    assert len(chamadas) >= 3 + 2  # 3 linhas do diario + manifesto + manual.md
+    assert len((frente(tmp_path) / 'estado-rodada-1.jsonl').read_text('utf-8').splitlines()) == 3
