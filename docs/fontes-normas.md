@@ -48,7 +48,7 @@ Atenção: na rodada inicial foram feitas 4 chamadas a `legis.senado.leg.br` (li
 
 | Host | Atraso mínimo | Motivo |
 |---|---|---|
-| www.planalto.gov.br | 1,5 s | sem 429 em ~40 chamadas a 1,1 s; páginas grandes (até 1,8 MB) |
+| www.planalto.gov.br | 1 s | sem 429 em ~40 chamadas a 1,1 s e na coleta; páginas grandes (até 1,8 MB) |
 | www2.camara.leg.br / www.camara.leg.br | **6 s** e recuo em 429 | com 1 a 2 s houve **429 Too Many Requests** (corpo nginx de 162 B) após 5 a 6 chamadas; com 6 a 8 s, nenhum. Em 429, esperar 60 s e dobrar o atraso. |
 | www.lexml.gov.br | 5 s | `Crawl-delay: 5` |
 | normas*.receita.fazenda.gov.br | 1,5 s | sem limites observados |
