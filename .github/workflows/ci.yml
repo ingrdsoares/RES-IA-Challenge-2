@@ -1,0 +1,105 @@
+name: CI - Integracao Continua (Socio Digital)
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'docbot/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Qualidade de Codigo (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar Ruff
+        run: pip install ruff
+
+      - name: Checagem Estatica e Linter (Ruff)
+        run: ruff check .
+
+      - name: Validacao de Formatacao (Ruff)
+        run: ruff format --check .
+
+  test:
+    name: Testes Unitarios e Integracao (Pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r backend/api/requirements-eval.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Executar Pytest
+        env:
+          PYTHONPATH: backend/api:.
+        run: pytest
+
+      - name: Executar Testes Fiscais/RAG (se presentes no branch)
+        env:
+          PYTHONPATH: backend/api:.
+        run: |
+          if [ -f test_fiscal.py ]; then python test_fiscal.py; fi
+          if [ -f test_entity_extractor.py ]; then python test_entity_extractor.py; fi
+
+  dvc-validation:
+    name: Validacao de Dados e DVC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar DVC
+        run: pip install dvc
+
+      - name: Checagem de Integridade do DVC
+        run: |
+          dvc doctor
+          dvc status
+
+  docker-smoke-test:
+    name: Validacao da Imagem Docker (FastAPI)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build da Imagem Docker
+        run: docker build -t socio-digital-api:ci -f backend/api/Dockerfile backend/api/

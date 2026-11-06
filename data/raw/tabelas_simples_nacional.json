@@ -1,0 +1,509 @@
+{
+  "versao_legal": "LC 123/2006 atualizada pela LC 155/2016 e Resolução CGSN 140/2018",
+  "limite_anual_simples": 4800000.00,
+  "limite_anual_mei": 81000.00,
+  "tolerancia_limite_mei_percentual": 0.20,
+  "salario_minimo_referencia": 1412.00,
+  "mei_taxas": {
+    "inss_percentual": 0.05,
+    "icms_fixo": 1.00,
+    "iss_fixo": 5.00
+  },
+  "anexos": {
+    "I": {
+      "nome": "Anexo I - Comércio",
+      "descricao": "Empresas comerciais e varejistas (venda de mercadorias).",
+      "tipo": "comercio",
+      "sujeito_fator_r": false,
+      "tributos_inclusos": ["IRPJ", "CSLL", "Cofins", "PIS", "CPP", "ICMS"],
+      "faixas": [
+        {
+          "faixa": 1,
+          "de": 0.00,
+          "ate": 180000.00,
+          "aliquota_nominal": 0.0400,
+          "parcela_deduzir": 0.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1274,
+            "PIS": 0.0276,
+            "CPP": 0.4150,
+            "ICMS": 0.3400
+          }
+        },
+        {
+          "faixa": 2,
+          "de": 180000.01,
+          "ate": 360000.00,
+          "aliquota_nominal": 0.0730,
+          "parcela_deduzir": 5940.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1274,
+            "PIS": 0.0276,
+            "CPP": 0.4150,
+            "ICMS": 0.3400
+          }
+        },
+        {
+          "faixa": 3,
+          "de": 360000.01,
+          "ate": 720000.00,
+          "aliquota_nominal": 0.0950,
+          "parcela_deduzir": 13860.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1274,
+            "PIS": 0.0276,
+            "CPP": 0.4200,
+            "ICMS": 0.3350
+          }
+        },
+        {
+          "faixa": 4,
+          "de": 720000.01,
+          "ate": 1440000.00,
+          "aliquota_nominal": 0.1070,
+          "parcela_deduzir": 22500.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1274,
+            "PIS": 0.0276,
+            "CPP": 0.4200,
+            "ICMS": 0.3350
+          }
+        },
+        {
+          "faixa": 5,
+          "de": 1440000.01,
+          "ate": 3600000.00,
+          "aliquota_nominal": 0.1430,
+          "parcela_deduzir": 87300.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1274,
+            "PIS": 0.0276,
+            "CPP": 0.4200,
+            "ICMS": 0.3350
+          }
+        },
+        {
+          "faixa": 6,
+          "de": 3600000.01,
+          "ate": 4800000.00,
+          "aliquota_nominal": 0.1900,
+          "parcela_deduzir": 378000.00,
+          "reparticao": {
+            "IRPJ": 0.1350,
+            "CSLL": 0.1000,
+            "Cofins": 0.2827,
+            "PIS": 0.0613,
+            "CPP": 0.4210,
+            "ICMS": 0.0000
+          }
+        }
+      ]
+    },
+    "II": {
+      "nome": "Anexo II - Indústria",
+      "descricao": "Empresas industriais e fábricas (transformação de matéria-prima).",
+      "tipo": "industria",
+      "sujeito_fator_r": false,
+      "tributos_inclusos": ["IRPJ", "CSLL", "Cofins", "PIS", "CPP", "IPI", "ICMS"],
+      "faixas": [
+        {
+          "faixa": 1,
+          "de": 0.00,
+          "ate": 180000.00,
+          "aliquota_nominal": 0.0450,
+          "parcela_deduzir": 0.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1151,
+            "PIS": 0.0249,
+            "CPP": 0.3750,
+            "IPI": 0.0750,
+            "ICMS": 0.3200
+          }
+        },
+        {
+          "faixa": 2,
+          "de": 180000.01,
+          "ate": 360000.00,
+          "aliquota_nominal": 0.0780,
+          "parcela_deduzir": 5940.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1151,
+            "PIS": 0.0249,
+            "CPP": 0.3750,
+            "IPI": 0.0750,
+            "ICMS": 0.3200
+          }
+        },
+        {
+          "faixa": 3,
+          "de": 360000.01,
+          "ate": 720000.00,
+          "aliquota_nominal": 0.1000,
+          "parcela_deduzir": 13860.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1151,
+            "PIS": 0.0249,
+            "CPP": 0.3750,
+            "IPI": 0.0750,
+            "ICMS": 0.3200
+          }
+        },
+        {
+          "faixa": 4,
+          "de": 720000.01,
+          "ate": 1440000.00,
+          "aliquota_nominal": 0.1120,
+          "parcela_deduzir": 22500.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1151,
+            "PIS": 0.0249,
+            "CPP": 0.3750,
+            "IPI": 0.0750,
+            "ICMS": 0.3200
+          }
+        },
+        {
+          "faixa": 5,
+          "de": 1440000.01,
+          "ate": 3600000.00,
+          "aliquota_nominal": 0.1470,
+          "parcela_deduzir": 85500.00,
+          "reparticao": {
+            "IRPJ": 0.055,
+            "CSLL": 0.035,
+            "Cofins": 0.1151,
+            "PIS": 0.0249,
+            "CPP": 0.3750,
+            "IPI": 0.0750,
+            "ICMS": 0.3200
+          }
+        },
+        {
+          "faixa": 6,
+          "de": 3600000.01,
+          "ate": 4800000.00,
+          "aliquota_nominal": 0.3000,
+          "parcela_deduzir": 720000.00,
+          "reparticao": {
+            "IRPJ": 0.0850,
+            "CSLL": 0.0750,
+            "Cofins": 0.2091,
+            "PIS": 0.0453,
+            "CPP": 0.2356,
+            "IPI": 0.3500,
+            "ICMS": 0.0000
+          }
+        }
+      ]
+    },
+    "III": {
+      "nome": "Anexo III - Serviços (Gerais ou Fator R >= 28%)",
+      "descricao": "Serviços de instalação, manutenção, reparos, viagens, contabilidade, e atividades intelectuais com Fator R >= 28%.",
+      "tipo": "servicos",
+      "sujeito_fator_r": false,
+      "tributos_inclusos": ["IRPJ", "CSLL", "Cofins", "PIS", "CPP", "ISS"],
+      "faixas": [
+        {
+          "faixa": 1,
+          "de": 0.00,
+          "ate": 180000.00,
+          "aliquota_nominal": 0.0600,
+          "parcela_deduzir": 0.00,
+          "reparticao": {
+            "IRPJ": 0.040,
+            "CSLL": 0.035,
+            "Cofins": 0.1282,
+            "PIS": 0.0278,
+            "CPP": 0.4340,
+            "ISS": 0.3350
+          }
+        },
+        {
+          "faixa": 2,
+          "de": 180000.01,
+          "ate": 360000.00,
+          "aliquota_nominal": 0.1120,
+          "parcela_deduzir": 9360.00,
+          "reparticao": {
+            "IRPJ": 0.040,
+            "CSLL": 0.035,
+            "Cofins": 0.1405,
+            "PIS": 0.0305,
+            "CPP": 0.4340,
+            "ISS": 0.3200
+          }
+        },
+        {
+          "faixa": 3,
+          "de": 360000.01,
+          "ate": 720000.00,
+          "aliquota_nominal": 0.1350,
+          "parcela_deduzir": 17640.00,
+          "reparticao": {
+            "IRPJ": 0.040,
+            "CSLL": 0.035,
+            "Cofins": 0.1364,
+            "PIS": 0.0296,
+            "CPP": 0.4340,
+            "ISS": 0.3250
+          }
+        },
+        {
+          "faixa": 4,
+          "de": 720000.01,
+          "ate": 1440000.00,
+          "aliquota_nominal": 0.1600,
+          "parcela_deduzir": 35640.00,
+          "reparticao": {
+            "IRPJ": 0.040,
+            "CSLL": 0.035,
+            "Cofins": 0.1364,
+            "PIS": 0.0296,
+            "CPP": 0.4340,
+            "ISS": 0.3250
+          }
+        },
+        {
+          "faixa": 5,
+          "de": 1440000.01,
+          "ate": 3600000.00,
+          "aliquota_nominal": 0.2100,
+          "parcela_deduzir": 125640.00,
+          "reparticao": {
+            "IRPJ": 0.040,
+            "CSLL": 0.035,
+            "Cofins": 0.1282,
+            "PIS": 0.0278,
+            "CPP": 0.4340,
+            "ISS": 0.3350
+          }
+        },
+        {
+          "faixa": 6,
+          "de": 3600000.01,
+          "ate": 4800000.00,
+          "aliquota_nominal": 0.3300,
+          "parcela_deduzir": 648000.00,
+          "reparticao": {
+            "IRPJ": 0.3500,
+            "CSLL": 0.1500,
+            "Cofins": 0.1603,
+            "PIS": 0.0347,
+            "CPP": 0.3050,
+            "ISS": 0.0000
+          }
+        }
+      ]
+    },
+    "IV": {
+      "nome": "Anexo IV - Serviços Específicos (Sem CPP no DAS)",
+      "descricao": "Construção de imóveis, obras de engenharia, vigilância, limpeza, conservação e serviços advocatícios (CPP recolhida à parte).",
+      "tipo": "servicos_sem_cpp",
+      "sujeito_fator_r": false,
+      "tributos_inclusos": ["IRPJ", "CSLL", "Cofins", "PIS", "ISS"],
+      "faixas": [
+        {
+          "faixa": 1,
+          "de": 0.00,
+          "ate": 180000.00,
+          "aliquota_nominal": 0.0450,
+          "parcela_deduzir": 0.00,
+          "reparticao": {
+            "IRPJ": 0.1880,
+            "CSLL": 0.1520,
+            "Cofins": 0.1767,
+            "PIS": 0.0383,
+            "ISS": 0.4450
+          }
+        },
+        {
+          "faixa": 2,
+          "de": 180000.01,
+          "ate": 360000.00,
+          "aliquota_nominal": 0.0900,
+          "parcela_deduzir": 8100.00,
+          "reparticao": {
+            "IRPJ": 0.1980,
+            "CSLL": 0.1520,
+            "Cofins": 0.2055,
+            "PIS": 0.0445,
+            "ISS": 0.4000
+          }
+        },
+        {
+          "faixa": 3,
+          "de": 360000.01,
+          "ate": 720000.00,
+          "aliquota_nominal": 0.1020,
+          "parcela_deduzir": 12420.00,
+          "reparticao": {
+            "IRPJ": 0.2080,
+            "CSLL": 0.1520,
+            "Cofins": 0.1973,
+            "PIS": 0.0427,
+            "ISS": 0.4000
+          }
+        },
+        {
+          "faixa": 4,
+          "de": 720000.01,
+          "ate": 1440000.00,
+          "aliquota_nominal": 0.1400,
+          "parcela_deduzir": 39780.00,
+          "reparticao": {
+            "IRPJ": 0.1780,
+            "CSLL": 0.1920,
+            "Cofins": 0.1890,
+            "PIS": 0.0410,
+            "ISS": 0.4000
+          }
+        },
+        {
+          "faixa": 5,
+          "de": 1440000.01,
+          "ate": 3600000.00,
+          "aliquota_nominal": 0.2200,
+          "parcela_deduzir": 183780.00,
+          "reparticao": {
+            "IRPJ": 0.1880,
+            "CSLL": 0.1920,
+            "Cofins": 0.1808,
+            "PIS": 0.0392,
+            "ISS": 0.4000
+          }
+        },
+        {
+          "faixa": 6,
+          "de": 3600000.01,
+          "ate": 4800000.00,
+          "aliquota_nominal": 0.3300,
+          "parcela_deduzir": 828000.00,
+          "reparticao": {
+            "IRPJ": 0.5350,
+            "CSLL": 0.2150,
+            "Cofins": 0.2055,
+            "PIS": 0.0445,
+            "ISS": 0.0000
+          }
+        }
+      ]
+    },
+    "V": {
+      "nome": "Anexo V - Serviços Intelectuais (Fator R < 28%)",
+      "descricao": "Serviços de tecnologia, desenvolvimento de software, consultoria, engenharia, medicina, psicologia, perícia, etc. quando a folha de salários for inferior a 28% do faturamento.",
+      "tipo": "servicos_fator_r",
+      "sujeito_fator_r": true,
+      "tributos_inclusos": ["IRPJ", "CSLL", "Cofins", "PIS", "CPP", "ISS"],
+      "faixas": [
+        {
+          "faixa": 1,
+          "de": 0.00,
+          "ate": 180000.00,
+          "aliquota_nominal": 0.1550,
+          "parcela_deduzir": 0.00,
+          "reparticao": {
+            "IRPJ": 0.2500,
+            "CSLL": 0.1500,
+            "Cofins": 0.1410,
+            "PIS": 0.0305,
+            "CPP": 0.2885,
+            "ISS": 0.1400
+          }
+        },
+        {
+          "faixa": 2,
+          "de": 180000.01,
+          "ate": 360000.00,
+          "aliquota_nominal": 0.1800,
+          "parcela_deduzir": 4500.00,
+          "reparticao": {
+            "IRPJ": 0.2300,
+            "CSLL": 0.1500,
+            "Cofins": 0.1410,
+            "PIS": 0.0305,
+            "CPP": 0.2785,
+            "ISS": 0.1700
+          }
+        },
+        {
+          "faixa": 3,
+          "de": 360000.01,
+          "ate": 720000.00,
+          "aliquota_nominal": 0.1950,
+          "parcela_deduzir": 9900.00,
+          "reparticao": {
+            "IRPJ": 0.2400,
+            "CSLL": 0.1500,
+            "Cofins": 0.1492,
+            "PIS": 0.0323,
+            "CPP": 0.2385,
+            "ISS": 0.1900
+          }
+        },
+        {
+          "faixa": 4,
+          "de": 720000.01,
+          "ate": 1440000.00,
+          "aliquota_nominal": 0.2050,
+          "parcela_deduzir": 17100.00,
+          "reparticao": {
+            "IRPJ": 0.2100,
+            "CSLL": 0.1500,
+            "Cofins": 0.1574,
+            "PIS": 0.0341,
+            "CPP": 0.2385,
+            "ISS": 0.2100
+          }
+        },
+        {
+          "faixa": 5,
+          "de": 1440000.01,
+          "ate": 3600000.00,
+          "aliquota_nominal": 0.2300,
+          "parcela_deduzir": 62100.00,
+          "reparticao": {
+            "IRPJ": 0.2300,
+            "CSLL": 0.1250,
+            "Cofins": 0.1410,
+            "PIS": 0.0305,
+            "CPP": 0.2385,
+            "ISS": 0.2350
+          }
+        },
+        {
+          "faixa": 6,
+          "de": 3600000.01,
+          "ate": 4800000.00,
+          "aliquota_nominal": 0.3050,
+          "parcela_deduzir": 540000.00,
+          "reparticao": {
+            "IRPJ": 0.3500,
+            "CSLL": 0.1550,
+            "Cofins": 0.1644,
+            "PIS": 0.0356,
+            "CPP": 0.2950,
+            "ISS": 0.0000
+          }
+        }
+      ]
+    }
+  }
+}

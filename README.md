@@ -29,6 +29,21 @@ Aproximadamente 95% a 99% das empresas ativas no Brasil são micro e pequenos ne
 
 ---
 
+## Backend inicial de RAG
+
+A API fica em [`backend/api/`](backend/api/). O backend usa FastAPI, Qdrant em Docker
+com persistência e Ollama no macOS para executar `qwen3:8b` e `qwen3-embedding:0.6b`.
+A base começa vazia e será alimentada posteriormente.
+
+Consulte [`backend/README.md`](backend/README.md) para configuração, execução e contrato
+dos documentos. Para iniciar os serviços com Docker Desktop e Ollama disponíveis:
+
+```bash
+docker compose -f backend/compose.yaml up -d --build
+```
+
+API: http://localhost:8000/docs. Qdrant: http://localhost:6333/dashboard.
+
 ## Estrutura da Documentação
 
 A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):
@@ -80,3 +95,9 @@ A expansão inclui ICMS/consultas DF, reforma tributária, histórico CGSN, CNPJ
 Consulte a [sumarização integral do acervo tributário](docs/sumarizacao-acervo-tributario.md), com descrição de todas as frentes, cobertura e referências de cada versão coletada. O [inventário integral de referências](docs/referencias-acervo/inventario-integral.json) permite processamento automatizado.
 
 O refino tem [arquitetura própria](docs/arquitetura-refino.md), [pipeline reproduzível](backend/refino/README.md) e [instruções de continuidade para outros agentes](handoff/refino/CONTINUAR.md). Gere um pacote portátil com python -m backend.refino.exportar.
+
+## Avaliação do RAG
+
+O pipeline de avaliação em [`backend/api/evaluation/`](backend/api/evaluation/) permite
+coleta retomável, ROUGE-L/BERTScore, bootstrap, comparação pareada e exportação Excel.
+Instalação, formato do dataset e comandos: [`backend/evaluation/README.md`](backend/evaluation/README.md).

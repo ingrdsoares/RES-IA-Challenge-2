@@ -1,0 +1,25 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".git",
+    ".dvc",
+    ".pytest_cache",
+    "docs",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["E402"]
+"benchmark_rag.py" = ["E402"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["backend/api/tests"]
+pythonpath = ["backend/api", "."]
+addopts = "-v --tb=short"
+
+markers = ["integration: requires QDRANT_TEST_URL and a real Qdrant instance"]
