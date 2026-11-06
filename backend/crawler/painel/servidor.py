@@ -86,6 +86,16 @@ def criar_servidor(executor: Executor, porta: int, *, pagina: Path = PAGINA) -> 
                 pass
 
         def do_POST(self) -> None:
+            # lê o corpo antes de qualquer recusa: responder e fechar com corpo não lido reseta a conexão no cliente
+            try:
+                tamanho = int(self.headers.get('Content-Length') or 0)
+            except ValueError:
+                return self._erro(400, 'Content-Length inválido')
+            if not 0 <= tamanho <= _LIMITE_CORPO:
+                if tamanho > 0:
+                    self.rfile.read(min(tamanho, 16 * _LIMITE_CORPO))  # acima disso, aceita o reset
+                return self._erro(413, 'Corpo grande demais')
+            corpo = self.rfile.read(tamanho)
             if not self._host_valido():
                 return self._erro(403, 'Host não permitido')
             if self.headers.get('Origin') != f'http://{self.headers.get("Host")}':
@@ -95,13 +105,6 @@ def criar_servidor(executor: Executor, porta: int, *, pagina: Path = PAGINA) -> 
                 return self._erro(404, 'Não encontrado')
             if (self.headers.get('Content-Type') or '').split(';')[0].strip().lower() != 'application/json':
                 return self._erro(415, 'O corpo deve ser application/json')
-            try:
-                tamanho = int(self.headers.get('Content-Length') or 0)
-            except ValueError:
-                return self._erro(400, 'Content-Length inválido')
-            if not 0 <= tamanho <= _LIMITE_CORPO:
-                return self._erro(413, 'Corpo grande demais')
-            corpo = self.rfile.read(tamanho)
             if rota == '/parar':
                 executor.parar()
                 return self._json(200, {'ok': True})

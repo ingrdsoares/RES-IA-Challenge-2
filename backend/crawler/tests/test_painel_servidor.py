@@ -130,6 +130,12 @@ class ServidorTest(unittest.TestCase):
     def test_post_corpo_grande(self):
         self.assertEqual(self.post('/iniciar', ' ' * 70000 + '{}')[0], 413)
 
+    def test_recusa_com_corpo_grande_responde_sem_resetar_a_conexao(self):
+        # recusar sem ler o corpo fecha a conexão com dados pendentes; no Windows o cliente recebe reset (10053)
+        for _ in range(30):
+            self.assertEqual(self.post('/iniciar', ' ' * 60000 + '{}', cabecalhos={'Origin': 'http://outro.com'})[0], 403)
+            self.assertEqual(self.post('/iniciar', ' ' * 200000 + '{}')[0], 413)
+
     def test_previa_iniciar_parar(self):
         status, corpo = self.post('/previa', {'frentes': ['cnae'], 'refazer': ['cnae']})
         self.assertEqual((status, json.loads(corpo)[0]['modulo']), (200, 'cnae'))
