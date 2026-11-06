@@ -74,6 +74,32 @@ def _cell(value) -> str:
     return html.escape(str(value or ''), quote=False).replace('|', '&#124;').replace('\n', '<br>')
 
 
+def render_pages(pages: list[dict]) -> list[str]:
+    """Linhas de Markdown (texto e tabelas) das paginas extraidas por extract_pdf."""
+    lines: list[str] = []
+    for page in pages:
+        lines.extend([f'## Página {page["pagina"]}', '', '### Texto extraído', ''])
+        if page['texto'].strip():
+            fence = '```'
+            while fence in page['texto']:
+                fence += '`'
+            lines.extend([fence + 'text', page['texto'], fence, ''])
+        else:
+            lines.extend(['> OCR PENDENTE: página sem texto extraível; consultar o PDF original.', ''])
+        for number, table in enumerate(page['tabelas'], 1):
+            if not table:
+                continue
+            columns = max(len(row) for row in table)
+            lines.extend([f'### Tabela {number}', '',
+                '| ' + ' | '.join(f'Coluna {n}' for n in range(1, columns+1)) + ' |',
+                '| ' + ' | '.join('---' for _ in range(columns)) + ' |'])
+            for row in table:
+                cells = list(row) + [''] * (columns-len(row))
+                lines.append('| ' + ' | '.join(_cell(cell) for cell in cells) + ' |')
+            lines.append('')
+    return lines
+
+
 def ingest(ref: dict, raw: bytes, output: Path, *, source_sha256: str) -> Path:
     digest = hashlib.sha256(raw).hexdigest()
     parent = Path(output) / str(ref['id_arquivo'])
@@ -104,26 +130,7 @@ def ingest(ref: dict, raw: bytes, output: Path, *, source_sha256: str) -> Path:
                          ('omitir', 'MARCADO PARA OMISSÃO NA FONTE')]:
         if ref[field]:
             lines.extend([f'> {label}. Preservado conforme a visão multivigente.', ''])
-    for page in pages:
-        lines.extend([f'## Página {page["pagina"]}', '', '### Texto extraído', ''])
-        if page['texto'].strip():
-            fence = '```'
-            while fence in page['texto']:
-                fence += '`'
-            lines.extend([fence + 'text', page['texto'], fence, ''])
-        else:
-            lines.extend(['> OCR PENDENTE: página sem texto extraível; consultar o PDF original.', ''])
-        for number, table in enumerate(page['tabelas'], 1):
-            if not table:
-                continue
-            columns = max(len(row) for row in table)
-            lines.extend([f'### Tabela {number}', '',
-                '| ' + ' | '.join(f'Coluna {n}' for n in range(1, columns+1)) + ' |',
-                '| ' + ' | '.join('---' for _ in range(columns)) + ' |'])
-            for row in table:
-                cells = list(row) + [''] * (columns-len(row))
-                lines.append('| ' + ' | '.join(_cell(cell) for cell in cells) + ' |')
-            lines.append('')
+    lines.extend(render_pages(pages))
     parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix='.coleta-', dir=parent))
     try:

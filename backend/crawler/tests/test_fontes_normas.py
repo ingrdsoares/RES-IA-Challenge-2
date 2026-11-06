@@ -28,13 +28,15 @@ class Relogio:
         self.t += s
 
 
-def montar(rotas: dict, atraso=0.0, atrasos=None):
+def montar(rotas: dict, atraso=0.0, atrasos=None, corpos=None):
     """rotas: url -> (status, corpo, content-type). Ausente = 404. Devolve (Http, lista de URLs pedidas, relogio)."""
     pedidos: list[str] = []
     rel = Relogio()
 
     def handler(req: httpx.Request) -> httpx.Response:
         pedidos.append(str(req.url))
+        if corpos is not None and req.method == 'POST':
+            corpos.append(req.content)
         assert 'python-requests' not in req.headers['user-agent'].lower() and '@' not in req.headers['user-agent']
         st, corpo, ct = rotas.get(str(req.url), (404, b'', 'text/html'))
         return httpx.Response(st, content=corpo, headers={'content-type': ct})
@@ -389,3 +391,178 @@ def test_429_honra_retry_after_com_teto_300():
     http, rel = _http_fn(mk('Wed, 21 Oct 2026 07:28:00 GMT'))  # data HTTP: usa o recuo padrao
     http.get('https://x.test/a')
     assert 60.0 in rel.pausas
+
+
+# ---- Task 6: DF, CONFAZ, Receita ----
+import json
+
+from backend.crawler.fontes_normas import (
+    FONTES_CONFAZ, FONTES_DF, FONTES_RFB, Ambigua, Candidato, Confaz, Receita, Sinj,
+)
+
+SINJ_BUSCA = ('https://www.sinj.df.gov.br/sinj/ashx/Datatable/ResultadoDePesquisaNormaDatatable.ashx?'
+              'tipo_pesquisa=norma&nm_tipo_norma={t}&nr_norma={n}&ano_assinatura={a}&bbusca=sinj_norma'
+              '&iDisplayStart=0&iDisplayLength=10&sEcho=1')
+CONFAZ_IDX = 'https://www.confaz.fazenda.gov.br/legislacao/'
+RFB_BUSCA = 'https://normas.receita.fazenda.gov.br/api/indexacao/ato/pesquisar'
+JSON_CT = 'application/json'
+
+
+def rotas_sinj(t, n, a, fixture):
+    return {SINJ_BUSCA.format(t=t, n=n, a=a): (200, fx(fixture), JSON_CT)}
+
+
+def test_listas_por_jurisdicao():
+    assert [f.nome for f in FONTES_DF] == ['sinj']
+    assert [f.nome for f in FONTES_CONFAZ] == ['confaz']
+    assert [f.nome for f in FONTES_RFB] == ['receita']
+
+
+def test_sinj_lei_df_devolve_texto_compilado_com_situacao():
+    http, pedidos, _ = montar(rotas_sinj('Lei', 1254, 1996, 'sinj_busca_lei1254_1996.raw'))
+    norma = NormaId('lei', 1254, 1996, 'df')
+    assert Sinj().aceita(norma)
+    assert Sinj().localizar(norma, http) == [Candidato(
+        'https://www.sinj.df.gov.br/sinj/Norma/49208/Lei_1254.html', 'sinj', 'compilada', 'Alterado')]
+
+
+def test_sinj_nao_aceita_federal_nem_tipo_sem_equivalente():
+    assert not Sinj().aceita(NormaId('lei', 10833, 2003, 'federal'))
+    assert not Sinj().aceita(NormaId('convenio_icms', 52, 2017, 'df'))
+    assert not Sinj().aceita(NormaId('lei', 1254, None, 'df'))
+
+
+def test_sinj_filtra_tipo_exato_e_nao_confunde_portaria_conjunta():
+    http, _, _ = montar(rotas_sinj('Portaria', 42, 2016, 'sinj_busca_portaria_42_2016.raw'))
+    cands = Sinj().localizar(NormaId('portaria', 42, 2016, 'df'), http)
+    assert [c.url for c in cands] == ['https://www.sinj.df.gov.br/sinj/Norma/db70bab2d3844aaa836b1994bbac1a76/iprev_prt_42_2016.html']
+    assert cands[0].situacao_fonte == 'Revogado'
+
+
+def test_sinj_mesmo_tipo_e_numero_duplicado_e_ambigua():
+    d = json.loads(fx('sinj_busca_lei1254_1996.raw'))
+    d['aaData'].append(json.loads(json.dumps(d['aaData'][0])))
+    d['aaData'][1]['_source']['ch_norma'] = '99999'
+    rotas = {SINJ_BUSCA.format(t='Lei', n=1254, a=1996): (200, json.dumps(d).encode(), JSON_CT)}
+    http, _, _ = montar(rotas)
+    with pytest.raises(Ambigua) as e:
+        Sinj().localizar(NormaId('lei', 1254, 1996, 'df'), http)
+    assert e.value.motivo
+
+
+def test_sinj_lc_usa_nome_exato_e_ausente_devolve_vazio():
+    http, pedidos, _ = montar(rotas_sinj('Lei+Complementar', 840, 2011, 'sinj_busca_lc_840_2011.raw'))
+    assert len(Sinj().localizar(NormaId('lc', 840, 2011, 'df'), http)) == 1
+    http, _, _ = montar(rotas_sinj('Lei', 9, 1999, 'sinj_busca_naoencontrado.raw'))
+    assert Sinj().localizar(NormaId('lei', 9, 1999, 'df'), http) == []
+
+
+def test_sinj_5xx_e_indisponivel_nunca_vazio():
+    http, _, _ = montar({SINJ_BUSCA.format(t='Lei', n=1254, a=1996): (503, b'', 'text/html')})
+    with pytest.raises(Indisponivel):
+        Sinj().localizar(NormaId('lei', 1254, 1996, 'df'), http)
+
+
+def test_confaz_convenio_pelo_span_do_indice_anual():
+    rotas = {CONFAZ_IDX + 'convenios/2017': (200, fx('confaz_indice_convenios_2017.raw'), 'text/html; charset=utf-8')}
+    http, _, _ = montar(rotas)
+    norma = NormaId('convenio_icms', 52, 2017, 'confaz')
+    assert Confaz().aceita(norma) and not Confaz().aceita(NormaId('lei', 1, 2017, 'federal'))
+    assert Confaz().localizar(norma, http) == [Candidato(CONFAZ_IDX + 'convenios/2017/CV052_17', 'confaz', 'unica')]
+    assert Confaz().localizar(NormaId('convenio_icms', 9999, 2017, 'confaz'), http) == []
+
+
+def test_confaz_ajuste_ignora_anterior_e_404_do_indice_e_nao_encontrada():
+    rotas = {CONFAZ_IDX + 'ajustes/2005': (200, fx('confaz_indice_ajustes_2005.raw'), 'text/html; charset=utf-8')}
+    http, _, _ = montar(rotas)
+    cands = Confaz().localizar(NormaId('ajuste_sinief', 7, 2005, 'confaz'), http)
+    assert [c.url for c in cands] == [CONFAZ_IDX + 'ajustes/2005/AJ007_05']
+    assert Confaz().localizar(NormaId('ajuste_sinief', 7, 2006, 'confaz'), http) == []  # 404 real
+
+
+def rotas_rfb(fixture):
+    return {RFB_BUSCA: (200, fx(fixture), JSON_CT)}
+
+
+def test_receita_portaria_devolve_visoes_multivigente_e_original_com_situacao():
+    http, _, _ = montar(rotas_rfb('receita_busca_sem_tipo_1750_2018.raw'))
+    norma = NormaId('portaria', 1750, 2018, 'federal', 'rfb')
+    base = 'https://normasinternet2.receita.fazenda.gov.br/api/consulta-externa/ato/96434/visao/'
+    assert Receita().aceita(norma) and not Receita().aceita(NormaId('lei', 1, 2018, 'federal'))
+    assert Receita().localizar(norma, http) == [
+        Candidato(base + 'multivigente', 'receita', 'compilada', 'Vigente'),
+        Candidato(base + 'original', 'receita', 'original', 'Vigente')]
+
+
+def test_receita_envia_numero_e_ano_sem_tipo_e_pagina():
+    corpos = []
+    http, _, _ = montar(rotas_rfb('receita_busca_naoencontrado.raw'), corpos=corpos)
+    assert Receita().localizar(NormaId('in', 1, 2018, 'federal', 'rfb'), http) == []
+    c = json.loads(corpos[0])
+    assert (c['numeroAto'], c['anoAto'], c['tiposAtosSelecionados'], c['paginacaoPaginaAtual']) == ('1', '2018', '', 1)
+
+
+def test_receita_cgsn_140_tem_tres_idato_e_e_ambigua():
+    http, _, _ = montar(rotas_rfb('receita_busca_sem_tipo_140_2018.raw'))
+    with pytest.raises(Ambigua) as e:
+        Receita().localizar(NormaId('resol_cgsn', 140, 2018, 'federal'), http)
+    assert 'idAto' in e.value.motivo
+
+
+def test_receita_in971_dois_idato_mesmo_orgao_e_ambigua():
+    http, _, _ = montar(rotas_rfb('receita_busca_in971_revogada.raw'))
+    with pytest.raises(Ambigua):
+        Receita().localizar(NormaId('in', 971, 2009, 'federal', 'rfb'), http)
+
+
+def test_receita_orgao_none_com_varios_orgaos_e_ambigua_e_com_orgao_filtra():
+    http, _, _ = montar(rotas_rfb('receita_busca_sem_tipo_140_2018.raw'))
+    with pytest.raises(Ambigua) as e:
+        Receita().localizar(NormaId('portaria', 140, 2018, 'federal'), http)
+    assert 'orgao' in e.value.motivo
+    cands = Receita().localizar(NormaId('portaria', 140, 2018, 'federal', 'drf/rj1'), http)
+    assert [c.url.split('/ato/')[1].split('/')[0] for c in cands] == ['96337', '96337']
+
+
+def test_receita_idato_repetido_vira_um_candidato_so():
+    d = json.loads(fx('receita_busca_sem_tipo_1750_2018.raw'))
+    d['atos'].append(d['atos'][0])
+    http, _, _ = montar({RFB_BUSCA: (200, json.dumps(d).encode(), JSON_CT)})
+    assert len(Receita().localizar(NormaId('portaria', 1750, 2018, 'federal'), http)) == 2  # multivigente + original
+
+
+def test_receita_percorre_todas_as_paginas():
+    p1 = json.loads(fx('receita_busca_sem_tipo_1_2018.raw'))
+    p2 = json.loads(fx('receita_busca_sem_tipo_1750_2018.raw'))
+    p2['atos'][0]['numeroAto'] = '1'
+    p2['atos'][0]['anoAto'] = '2018'
+    p1['quantidadePaginas'] = 2
+    p2['quantidadePaginas'] = 2
+    paginas = []
+
+    def handler(req):
+        if req.method == 'GET':  # robots.txt
+            return httpx.Response(404)
+        c = json.loads(req.content)
+        paginas.append(c['paginacaoPaginaAtual'])
+        return httpx.Response(200, content=json.dumps(p1 if c['paginacaoPaginaAtual'] == 1 else p2).encode(),
+                              headers={'content-type': JSON_CT})
+    http = Http(httpx.Client(transport=httpx.MockTransport(handler)), atraso=0.0, relogio=Relogio().agora,
+                dormir=lambda s: None)
+    # pagina 1 tem a Portaria Conjunta PGFN/RFB (tipo aceito) e a pagina 2 a Portaria RFB: 2 atos, 2 visoes cada
+    with pytest.raises(Ambigua):
+        Receita().localizar(NormaId('portaria', 1, 2018, 'federal'), http)
+    assert paginas == [1, 2]
+
+
+def test_receita_5xx_e_indisponivel():
+    http, _, _ = montar({RFB_BUSCA: (500, b'', 'text/html')})
+    with pytest.raises(Indisponivel):
+        Receita().localizar(NormaId('portaria', 1750, 2018, 'federal'), http)
+
+
+def test_http_post_respeita_robots_e_bloqueio():
+    http, pedidos, _ = montar({'https://normas.receita.fazenda.gov.br/robots.txt': (200, b'User-agent: *\nDisallow: /api/\n', 'text/plain')})
+    with pytest.raises(Bloqueada):
+        http.post(RFB_BUSCA, {'a': 1})
+    assert pedidos == ['https://normas.receita.fazenda.gov.br/robots.txt']

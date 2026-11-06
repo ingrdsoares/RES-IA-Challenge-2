@@ -1,4 +1,5 @@
 """Localizacao de normas federais: cliente HTTP educado e estrategias por fonte (sem rede nos testes)."""
+import json
 import re
 import time
 from dataclasses import dataclass
@@ -7,7 +8,9 @@ from urllib.parse import quote, urlencode, urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
 
 import httpx
+from bs4 import BeautifulSoup
 
+from backend.crawler.consultas_rfb import search_payload
 from backend.crawler.normas_id import NormaId
 
 USER_AGENT = 'Mozilla/5.0 (compatible; acervo-pesquisa-bot/0.1)'
@@ -65,7 +68,7 @@ class Http:
         self._ultimo: dict[str, float] = {}
         self._robots: dict[str, RobotFileParser | Bloqueada] = {}
 
-    def _pedir(self, url: str) -> httpx.Response:
+    def _pedir(self, url: str, corpo: dict | None = None) -> httpx.Response:
         """Um salto, sem seguir redirecionamento. 429: recua e tenta de novo; 5xx/rede: tenta de novo."""
         host = _chave_host(urlsplit(url).netloc)
         for tentativa in (1, 2):
@@ -73,7 +76,9 @@ class Http:
             if espera > 0:
                 self.dormir(espera)
             try:
-                resp = self.client.get(url, headers={'User-Agent': USER_AGENT}, follow_redirects=False)
+                cab = {'User-Agent': USER_AGENT}
+                resp = (self.client.get(url, headers=cab, follow_redirects=False) if corpo is None
+                        else self.client.post(url, json=corpo, headers=cab, follow_redirects=False))
             except httpx.TransportError as e:  # inclui timeouts
                 self._ultimo[host] = self.relogio()
                 if tentativa == 2:
@@ -93,11 +98,11 @@ class Http:
             return resp
         raise AssertionError('inalcancavel')
 
-    def _seguir(self, url: str, checar_robots: bool) -> httpx.Response:
+    def _seguir(self, url: str, checar_robots: bool, corpo: dict | None = None) -> httpx.Response:
         for _ in range(_MAX_SALTOS + 1):
             if checar_robots and not self._permitido(url):
                 raise Bloqueada(f'robots.txt proibe {url}')
-            resp = self._pedir(url)
+            resp = self._pedir(url, corpo)
             loc = resp.headers.get('location')
             if resp.status_code in (301, 302, 303, 307, 308) and loc:
                 url = urljoin(url, loc)  # proximo salto repete robots e atraso do host de destino
@@ -128,6 +133,10 @@ class Http:
     def get(self, url: str) -> httpx.Response:
         return self._seguir(url, checar_robots=True)
 
+    def post(self, url: str, corpo: dict) -> httpx.Response:
+        """POST JSON (so a pesquisa da Receita); mesmas regras de robots, atraso e erros do get."""
+        return self._seguir(url, checar_robots=True, corpo=corpo)
+
 
 def _espera_429(resp: httpx.Response) -> float:
     try:
@@ -149,6 +158,14 @@ class Candidato:
     fonte: str
     visao: str  # compilada | original | unica
     situacao_fonte: str | None = None  # so quando a fonte informa expressamente
+
+
+class Ambigua(Exception):
+    """Mais de um ato satisfaz a citacao; nao escolher sozinho. A Task 7 grava situacao 'ambigua' com o motivo."""
+
+    def __init__(self, motivo: str):
+        super().__init__(motivo)
+        self.motivo = motivo
 
 
 class Fonte(Protocol):
@@ -291,3 +308,120 @@ class Camara:
 
 
 FONTES_FEDERAIS: list[Fonte] = [Planalto(), Lexml(), Camara()]
+
+
+class Sinj:
+    """Datatable JSON do SINJ-DF; so o texto compilado (docs/fontes-normas.md, SINJ-DF)."""
+    nome = 'sinj'
+    _BUSCA = 'https://www.sinj.df.gov.br/sinj/ashx/Datatable/ResultadoDePesquisaNormaDatatable.ashx?'
+    _TEXTO = 'https://www.sinj.df.gov.br/sinj/Norma/'
+    _TIPO = {'lei': 'Lei', 'lc': 'Lei Complementar', 'decreto': 'Decreto', 'portaria': 'Portaria',
+             'in': 'Instrução Normativa', 'ade': 'Ato Declaratório'}
+
+    def aceita(self, norma: NormaId) -> bool:
+        return norma.jurisdicao == 'df' and norma.tipo in self._TIPO and norma.ano is not None
+
+    def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
+        nome = self._TIPO[norma.tipo]
+        q = urlencode({'tipo_pesquisa': 'norma', 'nm_tipo_norma': nome, 'nr_norma': norma.numero,
+                       'ano_assinatura': norma.ano, 'bbusca': 'sinj_norma', 'iDisplayStart': 0,
+                       'iDisplayLength': 10, 'sEcho': 1})
+        dados = json.loads(exigir(http.get(self._BUSCA + q), 200).content)
+        achados = []
+        for linha in dados['aaData']:
+            r = linha['_source']  # o filtro de tipo da fonte e aproximado: conferir tudo na resposta
+            siglas = {o.get('sg_orgao', '').lower() for o in r.get('origens') or []}
+            if (r['nm_tipo_norma'] == nome and str(r['nr_norma']) == str(norma.numero)
+                    and str(r.get('dt_assinatura', ''))[-4:] == str(norma.ano)
+                    and (not norma.orgao or norma.orgao.lower() in siglas)):
+                achados.append(r)
+        if len(achados) > 1:
+            raise Ambigua(f'{len(achados)} registros do SINJ com tipo {nome}, numero {norma.numero} e ano {norma.ano}')
+        if not achados or not (achados[0].get('ar_atualizado') or {}).get('filename'):
+            return []  # sem texto compilado nao ha o que coletar (a original nao e coletada)
+        r = achados[0]
+        url = f"{self._TEXTO}{r['ch_norma']}/{r['ar_atualizado']['filename']}"
+        return [Candidato(url, self.nome, 'compilada', r.get('nm_situacao'))]
+
+
+class Confaz:
+    """Indice anual do CONFAZ: casa o <span> do item e segue o href; nunca monta o nome do arquivo."""
+    nome = 'confaz'
+    _BASE = 'https://www.confaz.fazenda.gov.br/legislacao/'
+    _TIPO = {'convenio_icms': ('convenios', 'CONVÊNIO ICMS'), 'ajuste_sinief': ('ajustes', 'AJUSTE SINIEF')}
+
+    def aceita(self, norma: NormaId) -> bool:
+        return norma.jurisdicao == 'confaz' and norma.tipo in self._TIPO and norma.ano is not None
+
+    def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
+        pasta, rotulo = self._TIPO[norma.tipo]
+        resp = exigir(http.get(f'{self._BASE}{pasta}/{norma.ano}'), 200, 404)
+        if resp.status_code == 404:
+            return []
+        alvo = f'{rotulo} {norma.numero}/{norma.ano % 100:02d}'
+        links = []
+        for a in BeautifulSoup(texto(resp), 'html.parser').select('li.navTreeItem a[href]'):
+            span = a.find('span')
+            if span and span.get_text(strip=True) == alvo and not a['href'].endswith('_anterior'):
+                links.append(urljoin(str(resp.url), a['href']))
+        links = list(dict.fromkeys(links))
+        if len(links) > 1:
+            raise Ambigua(f'{len(links)} itens do indice do CONFAZ para {alvo}')
+        return [Candidato(u, self.nome, 'unica') for u in links]
+
+
+class Receita:
+    """Pesquisa por numero e ano (sem tipo) e filtra a resposta por tipo e orgao (docs/fontes-normas.md, Receita)."""
+    nome = 'receita'
+    _BUSCA = 'https://normas.receita.fazenda.gov.br/api/indexacao/ato/pesquisar'
+    _ATO = 'https://normasinternet2.receita.fazenda.gov.br/api/consulta-externa/ato/'
+    _NOMES = {'portaria': {'Portaria', 'Portaria Normativa', 'Portaria Conjunta'},
+              'in': {'Instrução Normativa', 'Instrução Normativa Conjunta'},
+              'ade': {'Ato Declaratório Executivo'}, 'resol_cgsn': {'Resolução'}}
+
+    def aceita(self, norma: NormaId) -> bool:
+        return norma.jurisdicao == 'federal' and norma.tipo in self._NOMES and norma.ano is not None
+
+    def _atos(self, norma: NormaId, http: Http) -> list[dict]:
+        atos, pagina = [], 1
+        while True:
+            corpo = {**search_payload('', pagina, 100), 'tiposAtosSelecionados': '', 'anoAto': str(norma.ano),
+                     'numeroAto': str(norma.numero), 'dataInicio': '', 'dataFim': '', 'orgaosSelecionados': '',
+                     'refino': {'tipoAtoFacet': '', 'siglaOrgaoFacet': '', 'anoAtoFacet': '', 'idTipoAtoFacet': ''}}
+            dados = json.loads(exigir(http.post(self._BUSCA, corpo), 200).content)
+            atos += dados['atos']
+            if pagina >= dados['quantidadePaginas']:
+                return atos
+            pagina += 1
+
+    @staticmethod
+    def _situacao(ato: dict) -> str | None:
+        declarado = ato.get('textoConsulta') or ato.get('resumoRevogado')
+        return declarado or {'1': 'Vigente', '0': 'Não vigente'}.get(str(ato.get('vigente')))
+
+    def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
+        nomes = self._NOMES[norma.tipo]
+        orgao = norma.orgao or ('cgsn' if norma.tipo == 'resol_cgsn' else None)
+        achados: dict[int, dict] = {}
+        for a in self._atos(norma, http):
+            siglas = {o['siglaOrgao'].lower() for o in a.get('orgaos') or []}
+            if (a['tipoAto']['nomeTipoAto'] in nomes and str(a['numeroAto']) == str(norma.numero)
+                    and str(a['anoAto']) == str(norma.ano)
+                    and (orgao is None or orgao.lower() in siglas or set(orgao.lower().split('/')) <= siglas)):
+                achados.setdefault(a['idAto'], a)
+        orgaos = {frozenset(o['siglaOrgao'].lower() for o in a['orgaos']) for a in achados.values()}
+        if orgao is None and len(orgaos) > 1:
+            raise Ambigua(f'orgao nao informado e {len(achados)} atos de orgaos diferentes com o mesmo numero')
+        if len(achados) > 1:
+            raise Ambigua(f'{len(achados)} idAto distintos com o mesmo numero e orgao: {sorted(achados)}')
+        saida = []
+        for ato in achados.values():  # a visao multivigente pode dar 406; a original fica como alternativa
+            for visao, rotulo in (('multivigente', 'compilada'), ('original', 'original')):
+                saida.append(Candidato(f"{self._ATO}{ato['idAto']}/visao/{visao}", self.nome, rotulo,
+                                       self._situacao(ato)))
+        return saida
+
+
+FONTES_DF: list[Fonte] = [Sinj()]
+FONTES_CONFAZ: list[Fonte] = [Confaz()]
+FONTES_RFB: list[Fonte] = [Receita()]
