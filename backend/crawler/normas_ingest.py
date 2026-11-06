@@ -199,7 +199,7 @@ def _html(candidato: Candidato, raw: bytes) -> tuple[str, str]:
     if candidato.fonte == 'sinj':  # o SINJ omite </p> em centenas de blocos; sem isto o parser aninha e estoura a pilha
         marcacao = _fechar_p_abertos(marcacao)
     soup = BeautifulSoup(marcacao, 'html.parser')
-    for no in soup(['script', 'style']):
+    for no in soup(['script', 'style', 'title']):
         no.decompose()
     for no in soup.find_all(_BLOCOS):  # quebras de linha dos blocos: a regra "comeca a linha" precisa delas
         no.insert_before('\n')
@@ -207,7 +207,7 @@ def _html(candidato: Candidato, raw: bytes) -> tuple[str, str]:
     pagina = soup.get_text(' ')  # a epigrafe pode estar fora do bloco que vira Markdown (Camara)
     seletores = {'sinj': ['#div_texto'], 'confaz': ['#content-core', '#plone-content'],
                  'camara': ['.textoNorma'], 'lexml': ['.textoNorma']}.get(candidato.fonte, [])
-    raiz = next((r for r in (soup.select_one(s) for s in seletores) if r is not None), None) or soup.body or soup
+    raiz = next((r for r in (soup.select_one(s) for s in seletores) if r is not None), None) or soup  # nao soup.body: o Planalto fecha </body> no meio da lei
     return pagina, _convert(str(raiz), candidato.url)
 
 

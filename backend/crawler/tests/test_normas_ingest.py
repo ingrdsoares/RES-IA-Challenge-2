@@ -504,3 +504,15 @@ def test_valueerror_da_conversao_vira_erroconversao_mas_identidade_continua_valu
     with pytest.raises(ni.ErroConversao):  # JSON da Receita malformado: falha de leitura, nao identidade
         ingerir(NormaId('portaria', 1, 2018, 'federal', 'rfb'),
                 Candidato('https://x/ato/1/visao/original', 'receita', 'original'), b'{nao e json', tmp_path)
+
+
+def test_texto_depois_de_body_fechado_antes_da_hora_nao_se_perde(tmp_path):
+    """Planalto: o Codigo Civil fecha </body></html> a 4% da pagina; o resto da lei vem depois."""
+    norma = NormaId('lei', 10406, 2002, 'federal')
+    raw = ('<html><head><title>L10406</title></head><body><p>LEI Nº 10.406, DE 10 DE JANEIRO DE 2002</p>'
+           '<p>Art. 1º Toda pessoa.</p></body></html><p><strike>Art. 2º revogado.</strike></p>'
+           '<p>Art. 2.046. Ultimo artigo.</p>').encode('utf-8')
+    cand = Candidato('https://www.planalto.gov.br/ccivil_03/leis/2002/l10406.htm', 'planalto', 'unica')
+    md = (ingerir(norma, cand, raw, tmp_path) / 'documento.md').read_text(encoding='utf-8')
+    assert 'Art. 2.046' in md and '~~Art. 2º revogado.~~' in md
+    assert 'L10406' not in md
