@@ -19,6 +19,7 @@ ignore = ["E501"]
 [tool.ruff.lint.per-file-ignores]
 "test_*.py" = ["E402"]
 "benchmark_rag.py" = ["E402"]
+"scripts/*.py" = ["E402"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
