@@ -1,0 +1,32 @@
+# CNPJ tabelas auxiliares
+
+Dados cadastrais e tabelas auxiliares oficiais da Receita. Códigos, portes e naturezas são mantidos como texto. Capital declarado não é faturamento e códigos de município da Receita não equivalem automaticamente aos do IBGE.
+
+Entradas: 8. URLs distintas vinculadas: 9.
+
+## Entradas e descrições
+
+| ID | Título | Descrição e situação | Origem | Arquivos locais |
+|---|---|---|---|---|
+| 599 | CNPJ — tabela auxiliar cnaes | Tipo: artefato_documental. Registros: 1359. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:01.592050+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Cnaes.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/cnaes/e3cee921b7055c2f77ecb92ab328603ac2adb099f883a94437382673133a36a9/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/cnaes/e3cee921b7055c2f77ecb92ab328603ac2adb099f883a94437382673133a36a9/dados.md) |
+| 600 | CNPJ — amostra de Empresas, portes 01/03 | Tipo: artefato_documental. Registros: 100. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:02.638821+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Empresas1.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/empresas-amostra/226713337ad77b876be58d7ac9cc92a7d9144f5780991515a0b3506b1a4a9900-n100/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/empresas-amostra/226713337ad77b876be58d7ac9cc92a7d9144f5780991515a0b3506b1a4a9900-n100/dados.md) |
+| 601 | CNPJ — leiaute oficial dos dados abertos | Tipo: leiaute. Páginas: 6. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:03.624800+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9); [Fonte 2](https://www.gov.br/receitafederal/dados/cnpj-metadados.pdf) | [Metadados](../../backend/crawler/data/cnpj/2026-10/leiaute/0a52d6bdfb61a07425e352a0e692932306a5ec9ecad682f5f9e28059e1a5fce0/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/leiaute/0a52d6bdfb61a07425e352a0e692932306a5ec9ecad682f5f9e28059e1a5fce0/documento.md) |
+| 602 | CNPJ — tabela auxiliar motivos | Tipo: artefato_documental. Registros: 63. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:02.530293+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Motivos.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/motivos/0f9a0795f37a828d4f882800d39d4b5af3394276b34a6fba2bfa4d4ae83565eb/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/motivos/0f9a0795f37a828d4f882800d39d4b5af3394276b34a6fba2bfa4d4ae83565eb/dados.md) |
+| 603 | CNPJ — tabela auxiliar municipios | Tipo: artefato_documental. Registros: 5572. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:02.140028+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Municipios.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/municipios/e5521c91e7fa62879f441af8223e3ed07564c855105edc39939190c108411d4a/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/municipios/e5521c91e7fa62879f441af8223e3ed07564c855105edc39939190c108411d4a/dados.md) |
+| 604 | CNPJ — tabela auxiliar naturezas | Tipo: artefato_documental. Registros: 92. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:01.767424+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Naturezas.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/naturezas/c92728a7d9acc9535baa752a8fce1ebe100155909209df650af3771368e01986/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/naturezas/c92728a7d9acc9535baa752a8fce1ebe100155909209df650af3771368e01986/dados.md) |
+| 605 | CNPJ — tabela auxiliar paises | Tipo: artefato_documental. Registros: 255. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:02.342140+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Paises.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/paises/9f2c4b89931626e1f15c3f4e78e58b525c10f4fbfe807f6dfe3dc4e6a78fbc7f/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/paises/9f2c4b89931626e1f15c3f4e78e58b525c10f4fbfe807f6dfe3dc4e6a78fbc7f/dados.md) |
+| 606 | CNPJ — tabela auxiliar qualificacoes | Tipo: artefato_documental. Registros: 68. Estado: extraido. Revisão: pendente. Coleta: 2026-11-03T20:02:01.953067+00:00. | [Fonte 1](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Qualificacoes.zip) | [Metadados](../../backend/crawler/data/cnpj/2026-10/qualificacoes/6e8600e3af8543be0fc2281bd24c08499bd81aa17dd76d7b8bffa58c1cbddba3/metadados.json) · [Conteúdo](../../backend/crawler/data/cnpj/2026-10/qualificacoes/6e8600e3af8543be0fc2281bd24c08499bd81aa17dd76d7b8bffa58c1cbddba3/dados.md) |
+
+## Todas as referências desta frente
+
+Cada URL aparece uma vez nesta lista, com todas as entradas vinculadas. As versões e os arquivos correspondentes estão no JSON integral.
+
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9) — referencia_contextual; entradas: 601.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Cnaes.zip) — arquivo_auditado, origem_declarada; entradas: 599.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Empresas1.zip) — arquivo_auditado, origem_declarada, original_referenciado; entradas: 600, 608, 609.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Motivos.zip) — arquivo_auditado, origem_declarada; entradas: 602.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Municipios.zip) — arquivo_auditado, origem_declarada; entradas: 603.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Naturezas.zip) — arquivo_auditado, origem_declarada; entradas: 604.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Paises.zip) — arquivo_auditado, origem_declarada; entradas: 605.
+- [Referência oficial/declarada](https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Qualificacoes.zip) — arquivo_auditado, origem_declarada; entradas: 606.
+- [Referência oficial/declarada](https://www.gov.br/receitafederal/dados/cnpj-metadados.pdf) — arquivo_auditado, origem_declarada; entradas: 601.

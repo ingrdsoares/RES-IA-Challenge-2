@@ -1,0 +1,10 @@
+{
+  "entradas": 7213,
+  "urls": 10760,
+  "capitulos": 40,
+  "links_locais_verificados": 14566,
+  "erros": [],
+  "integridade": "sem_divergencias",
+  "testes_crawler": 332,
+  "testes_api": 1
+}

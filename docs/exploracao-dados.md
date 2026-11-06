@@ -134,9 +134,13 @@ Para cada fonte, preencher uma linha no catálogo (modelo na seção 6) responde
 | Lei nº 10.406/2002 (Código Civil), arts. 1.179 a 1.195 | Escrituração, balanço e livros do empresário |
 | Decreto-Lei nº 9.295/1946 | Cria o Conselho Federal de Contabilidade e define a profissão |
 | Lei nº 6.404/1976 | Lei das S.A. (referência de demonstrações financeiras) |
-| NBC TG 1000 (CPC PME) | Contabilidade para pequenas e médias empresas |
-| ITG 1000 | Modelo contábil para microempresa e empresa de pequeno porte |
+| NBC TG 1000 (R1), correlacionada ao CPC PME R1 | Contabilidade para pequenas e médias empresas |
+| ITG 1000, de 15/12/2022 | Normas aplicáveis e modelos de plano de contas e demonstrações contábeis para microentidade e pequena empresa |
+| NBC TG 1001 | Contabilidade para pequenas empresas |
+| NBC TG 1002 | Contabilidade para microentidades |
 | Lei nº 8.934/1994 | Registro público de empresas |
+
+Títulos contábeis conferidos em 03/11/2026 no [catálogo oficial de normas simplificadas do CFC](https://cfc.org.br/tecnica/normas-brasileiras-de-contabilidade/normas-simplificadas-para-pmes/). A coleta inicial dos quatro PDFs está documentada em [backend/crawler](../backend/crawler/README.md). Essa conferência de catálogo não substitui revisão de vigência ou enquadramento por empresa.
 
 **Reforma Tributária (P1, monitorar)**
 
@@ -309,3 +313,36 @@ Cada fonte aprovada deve virar uma linha em uma tabela como esta (futuramente um
 5. **Desenhar o esquema de metadados** do corpus de legislação (norma, artigo, vigência, URL, camada).
 6. **Avaliar riscos de LGPD** na ingestão do CNPJ (sócios) antes de armazenar.
 7. Revisar este documento com Jhessica (modelagem do RAG) e Clara e Nasser (modelo de dados).
+
+## 8. Ampliação da coleta — notas CNAE e consultas da Receita
+
+Após os recortes iniciais, a próxima ampliação autorizada contempla duas frentes do levantamento:
+
+1. Notas explicativas da CNAE/CONCLA, preservando a versão da publicação, as inclusões/exclusões e a cobertura dos códigos em relação à API do IBGE.
+2. Soluções de Consulta e Divergência da Receita, com descoberta temática para Simples Nacional, MEI, Fator R e segregação de receitas, distinguindo ementas de textos integrais.
+
+Os comandos e limites ficam no [README do crawler](../backend/crawler/README.md). Os resultados locais ficam nos índices `backend/crawler/data/notas-cnae/indice.md` e `backend/crawler/data/consultas-rfb/indice.md`, com cobertura e falhas no manifesto de cada coletor. O [catálogo consolidado local](../backend/crawler/data/catalogo/indice.md) agrega as versões e verifica hashes. Esta ampliação não substitui revisão jurídica e contábil nem conclui as demais fontes deste levantamento.
+
+## 9. Recorte distrital e ampliação das etapas 3 a 8
+
+Em 04/11/2026, o usuário confirmou **Brasília/Distrito Federal como foco da coleta local de ISS e NFS-e**. O recorte inclui legislação e serviços distritais, retenções e documentação de emissão, sem presumir aplicabilidade de normas de outros municípios.
+
+A ampliação também contempla DCTFWeb/eSocial/EFD-Reinf, legislação complementar, notas técnicas e classificações fiscais, regularização pública Receita/PGFN e indicadores Mapa de Empresas/Sebrae/JUCIS-DF. Fontes selecionadas, versões, falhas e limites estão nos manifestos e índices locais relacionados no [README do crawler](../backend/crawler/README.md). O plano e os resultados da execução estão em [coleta etapas 3 a 8](superpowers/plans/2026-11-04-coleta-etapas-3-a-8.md).
+
+As publicações estatísticas mantêm conceitos e datas próprios: estoque, aberturas, fechamentos, empresas e MEIs não são somados ou reconciliados automaticamente. HTML de indisponibilidade não é classificado como dado coletado. Acesso restrito a painéis deve ser registrado, usando publicações ou fontes oficiais alternativas quando disponíveis.
+
+## 10. Expansão ampla e dimensão do acervo
+
+As oito frentes de expansão foram executadas: ICMS/consultas DF, reforma tributária, histórico Simples/MEI, CNPJ por todos os lotes da competência, documentação fiscal, jurisprudência selecionada e candidatos a exemplos oficiais. Consulte o [plano da expansão](superpowers/plans/2026-11-04-expansao-ampla-coleta.md) e o [README do crawler](../backend/crawler/README.md).
+
+A fotografia consolidada de 04/11/2026 contém 2.664 snapshots/versões e 4.316 conteúdos originais distintos por hash, incluindo respostas de API, PDFs e ZIPs; estes números não equivalem a quantidade de normas distintas. São 2.791 arquivos Markdown, 18.745 páginas físicas em 1.372 PDFs distintos e 183 conteúdos XSD distintos, incluindo pacotes ZIP. O armazenamento contado soma 8.087 GiB em 15.596 arquivos, incluindo históricos e checkpoints.
+
+O acervo derivado tem 413.739 raízes de empresas distintas. O novo recorte DF 2026-10 contém 413.539 empresas de portes 01/03 com estabelecimento ativo no DF, após ler dez lotes de estabelecimentos, dez de empresas e Simples. Foram percorridas 195.132.919 linhas brutas das três tabelas, sem confundir linhas com empresas distintas. As 20.220 ausências no arquivo Simples permanecem nulas, sem inferência de opção N. Uma linha por raiz não é inventário de todas as filiais.
+
+A contagem é reproduzível com `python -m backend.crawler.estatisticas`; o [relatório local](../backend/crawler/data/estatisticas/indice.md) registra unidades e limites. A integridade técnica passou sem divergências; vigência e aplicabilidade permanecem pendentes de revisão. Há 65 anexos legados/imagens preservados sem conversão/OCR, falhas remotas e dependências XSD ausentes explícitas nos manifestos. Os 766 trechos candidatos a exemplos são enriquecimento literal de 24 arquivos existentes, não documentos oficiais novos nem casos de cálculo certificados.
+
+## 11. Nove frentes e sumarização integral
+
+A rodada de 05/11/2026 amplia súmulas/precedentes, classificação de mercadorias, consultas/TARF DF, retenções/fora do DAS, fiscalização/defesa, restituição/compensação, recortes setoriais e histórico por competência. Recuperou também 382 anexos Word/imagens preservados. A coleta usa multithreading com limites por host; Office e PDFium respeitam as restrições de concorrência de cada extrator.
+
+A [sumarização integral](sumarizacao-acervo-tributario.md) descreve o acervo completo, com 40 capítulos de referências, 7.213 entradas e 10.760 URLs. O [JSON do inventário](referencias-acervo/inventario-integral.json) relaciona fontes, arquivos, datas e hashes. São 10.601 conteúdos originais distintos por hash e 30.806 páginas PDF; versões, anexos, empresas e linhas brutas têm unidades distintas e não são somados. A contagem e os links foram validados; isso não certifica vigência, completude jurídica, força vinculante ou fidelidade semântica do OCR.
