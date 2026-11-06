@@ -508,3 +508,71 @@ def test_diario_faz_fsync_por_norma_e_manifesto_atomico(tmp_path, monkeypatch):
     rodar(tmp_path, [linha('lei', n, 2000) for n in (1, 2, 3)], [Stub()])
     assert len(chamadas) >= 3 + 2  # 3 linhas do diario + manifesto + manual.md
     assert len((frente(tmp_path) / 'estado-rodada-1.jsonl').read_text('utf-8').splitlines()) == 3
+
+
+def test_erro_de_conversao_termina_manual_com_motivo_e_nao_repete(tmp_path, monkeypatch):
+    from backend.crawler import normas_ingest as ni
+    monkeypatch.setattr(ni, '_convert', lambda *a: (_ for _ in ()).throw(RecursionError('fundo')))
+    ls = [linha('lei', 10, 2000)]
+    r, rede = rodar(tmp_path, ls, [Stub()])
+    e = estado(tmp_path)['federal:lei:-:10:2000']
+    assert e['situacao'] == 'manual' and not e['repetir'] and 'conversão' in e['motivo'] and 'RecursionError' in e['motivo']
+    assert r['a_repetir'] == 0
+    _, rede2 = rodar(tmp_path, ls, [Stub()])
+    assert rede2.pedidos == []
+
+
+def test_ordem_1_e_tentada_quando_a_ordem_0_nao_tem_regra(tmp_path):
+    # DF sem fonte que a aceite: manual local, sem rede; a federal (ordem 1) tem de ser tentada
+    df, fed = linha('lei', 5, 2000, 'df', ordem=0), linha('lei', 5, 2000, 'federal', ordem=1)
+    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('planalto'), 'federal')])
+    e = estado(tmp_path)
+    assert e['df:lei:-:5:2000']['situacao'] == 'manual' and e['df:lei:-:5:2000']['tentativas'] == 0
+    assert e['federal:lei:-:5:2000']['situacao'] == 'coletada' and len(rede.pedidos) == 1
+
+
+def test_ordem_1_fica_ambigua_se_a_ordem_0_ja_existia(tmp_path):
+    df, fed = linha('lei', 5, 2000, 'df', ordem=0, situacao='ja_existia'), linha('lei', 5, 2000, 'federal', ordem=1)
+    _, rede = rodar(tmp_path, [df, fed], [so_jur(Stub('planalto'), 'federal')])
+    e = estado(tmp_path)['federal:lei:-:5:2000']
+    assert (e['situacao'], e['motivo']) == ('ambigua', 'resolvida pela candidata de ordem 0') and rede.pedidos == []
+
+
+def test_sem_ano_de_numeracao_anual_e_manual_com_motivo_sem_rede(tmp_path):
+    from backend.crawler.fontes_normas import FONTES_FEDERAIS
+    ls = [linha('portaria', 7, None, orgao='rfb'), linha('resol_cgsn', 7, None)]
+    _, rede = rodar(tmp_path, ls, FONTES_FEDERAIS)
+    for e in estado(tmp_path).values():
+        assert (e['situacao'], e['motivo']) == ('manual', 'ano não citado; numeração recomeça a cada ano')
+    assert rede.pedidos == []
+
+
+def test_reprocessar_retenta_so_o_que_casa_e_so_acrescenta_ao_diario(tmp_path):
+    ls = [linha('lei', 1, 2000), linha('lei', 2, 2000), linha('lei', 3, 2000)]
+    rodar(tmp_path, ls, [Stub('planalto', ato=lambda n, h: [])])  # tudo nao_encontrada
+    antes = (frente(tmp_path) / 'estado-rodada-1.jsonl').read_text('utf-8')
+    assert set(e['situacao'] for e in estado(tmp_path).values()) == {'nao_encontrada'}
+    _, rede = rodar(tmp_path, ls, [Stub()], reprocessar=['nao_encontrada'], limite=2)
+    depois = (frente(tmp_path) / 'estado-rodada-1.jsonl').read_text('utf-8')
+    assert depois.startswith(antes) and len(depois.splitlines()) == 5  # 3 antigas + 2 novas (--limite vale)
+    e = estado(tmp_path)
+    assert [e[f'federal:lei:-:{n}:2000']['situacao'] for n in (1, 2, 3)] == ['coletada', 'coletada', 'nao_encontrada']
+    assert len(rede.pedidos) == 2
+
+
+def test_reprocessar_filtra_pelo_trecho_do_motivo(tmp_path):
+    ls = [linha('lei', 1, 2000), linha('lei', 2, 2000)]
+    def ato(n, h):
+        raise Ambigua('dois registros' if n.numero == 1 else 'outra coisa')
+    rodar(tmp_path, ls, [Stub('planalto', ato=ato)])
+    _, rede = rodar(tmp_path, ls, [Stub()], reprocessar=['ambigua:DOIS reg'])
+    e = estado(tmp_path)
+    assert e['federal:lei:-:1:2000']['situacao'] == 'coletada' and e['federal:lei:-:2:2000']['situacao'] == 'ambigua'
+    assert len(rede.pedidos) == 1
+
+
+def test_cli_reprocessar_repetivel_e_valida_a_situacao():
+    import argparse
+    assert nc.parse_reprocessar(['manual:sem regra', 'ambigua']) == [('manual', 'sem regra'), ('ambigua', None)]
+    with pytest.raises(argparse.ArgumentTypeError):
+        nc.parse_reprocessar(['pendente'])

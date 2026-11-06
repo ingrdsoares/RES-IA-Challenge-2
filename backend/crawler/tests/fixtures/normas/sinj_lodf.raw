@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+    <html>
+
+    <head id="Head1"><meta content="IE=Edge" http-equiv="X-UA-Compatible"/><meta content="pt-br" http-equiv="Content-Language"/><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><title>
+	
+            Lei Orgânica  de 08/06/1993
+        
+</title><meta name="keywords" content="Lei Orgânica  de 08/06/1993,sinj,distrito,federal,df"/><meta name="description" content="[Organiza os Poderes do Distrito Federal, estabelece suas competências, e dá outras providências]."/><meta content="index,follow" name="robots"/><meta content="index,follow" name="googlebot"/><script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/platform.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/liblight.js"></script>
+
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/funcoes_norma.js?4.4.00134"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/ckeditor/adapters/jquery.js"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.form.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.cookie.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/on_error.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Jquery-ui/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/liblight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/stacktrace.js"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.ajaxLight.js?3.2.00001"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.autocompleteLight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jMenu.jquery.min.js"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.modalLight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/login.js?3.2.00001"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/funcoes_sinj.js?3.2.00001"
+            charset="utf-8"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/sessao_sinj.js?3.2.00001"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/stacktable.js"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/platform.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/tooltip.js"></script>
+
+        <script type="text/javascript" language="javascript">
+            function Print() {
+                $('div.control').hide();
+                window.print();
+                $('div.control').show();
+            }
+            function exibirAlteracoes(el) {
+                if (el.getAttribute('refresh')) {
+                    location.reload();
+                }
+                else {
+
+                    // NOTE: Essa funcionalidade faz com o que o texto alterado "se transforme" 
+                    // em compilado (basicamente remove informações de vide), mas define 
+                    // um comportamento diferenciado para para os parágrafos que contiverem 
+                    // vides com os seguintes textos no link "revogado pelo(a)" ou 
+                    // "declarado(a) inconstitucional pelo(a)". By Questor
+                    
+                    var regex = undefined;
+                    regex = new RegExp(/Revogado.*?pelo\(a\)/);
+                    $('p[replaced_by]:contains("Revogado")').each(function (k, p) {
+                        if (regex.test($(p).text())) {
+                            var aLinkVide = $('a.link_vide', $(p));
+                            if (aLinkVide.length > 0) {
+                                var aTexto = $(aLinkVide[aLinkVide.length - 1]).text();
+                                if (regex.test(aTexto)) {
+                                    var ds = generateDescriptionToParagraph($(p).text());
+                                    $(p).text(ds + ' ');
+                                    $(aLinkVide[aLinkVide.length - 1]).appendTo($(p));
+                                    $(p).removeAttr('replaced_by');
+                                }
+                            }
+                        }
+                    });
+                    regex = new RegExp(/Inconstitucional.*?pelo\(a\)/);
+                    $('p[replaced_by]:contains("Inconstitucional")').each(function (k, p) {
+                        if (regex.test($(p).text())) {
+                            var aLinkVide = $('a.link_vide', $(p));
+                            if (aLinkVide.length > 0) {
+                                var aTexto = $(aLinkVide[aLinkVide.length - 1]).text();
+                                if (regex.test(aTexto)) {
+                                    var ds = generateDescriptionToParagraph($(p).text());
+                                    $(p).text(ds + ' ');
+                                    $(aLinkVide[aLinkVide.length - 1]).appendTo($(p));
+                                    $(p).removeAttr('replaced_by');
+                                }
+                            }
+                        }
+                    });
+                    $('p[replaced_by]').remove();
+                    $(el).attr('refresh', '1');
+                    $(el).text('Exibir Alterações');
+                }
+            }
+
+            //Verifica os links de LECO, ordena e insere o link 'exibir mais...' e 'exibir menos...' caso exista mais de 3 links de LECO
+            function verificarLinks() {
+                var aP = $('#div_texto > p');
+                var i = 0;
+                var length = aP.length;
+                var pAfter = null;
+                var aOrder = [];
+                for (; i < length; i++) {
+                    if ($('a[href]', aP[i]).length == 1 && $('a[href]', aP[i]).text().toLowerCase().indexOf('legislação correlata') == 0) {
+                        $('a[href]', aP[i]).attr('show', '1').attr('leco', 'leco');
+                        aOrder.push({ 'text': $('a[href]', aP[i]).text(), 'href': $('a[href]', aP[i]).attr('href') });
+                        if (i >= 3) {
+                            $('a[href]', aP[i]).attr('show', '0');
+                            pAfter = aP[i];
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+                aOrder.sort(function (a1, a2) {
+                    return a1.text > a2.text ? 1 : a1.text < a2.text ? -1 : 0;
+                });
+                $('#div_texto a[leco="leco"]').each(function (i, o) {
+                    o.innerText = aOrder[i].text;
+                    o.href = aOrder[i].href;
+                });
+                if (pAfter != null && $('a[show="0"]').length > 3) {
+                    $('a[show="0"]').closest('p').hide();
+                    $('<p id="p_show"><a href="javascript:void(0);" onclick="exibirLinks()">Exibir mais...</a></p>').insertAfter($(pAfter));
+                    $('<p id="p_hide" style="display:none"><a href="javascript:void(0);" onclick="esconderLinks()">Exibir menos...</a></p>').insertAfter($(pAfter));
+                }
+            }
+            function exibirLinks() {
+                $('a[show="0"]').closest('p').show();
+                $('#p_hide').show();
+                $('#p_show').hide();
+            }
+            function esconderLinks() {
+                $('a[show="0"]').closest('p').hide();
+                $('#p_hide').hide();
+                $('#p_show').show();
+            }
+
+            function generateDescriptionToParagraph(text) {
+                var ds = '';
+                text = $.trim(text);
+                if (text != "") {
+                    var palavras = text.split(' ');
+                    if (palavras[0] == 'ANEXO' || palavras[0] == 'TÍTULO' || palavras[0] == 'CAPÍTULO' || palavras[0] == 'Art.' || (palavras[0] == 'Parágrafo' && palavras[1] == 'Único') || palavras[0] == '§') {
+                        ds = palavras[0] + ' ' + palavras[1];
+                    }
+                    else if (ehInciso(palavras[0]) || ehAlinea(palavras[0]) || ehNum(palavras[0])) {
+                        ds = palavras[0];
+                    }
+                    else {
+                        ds = "...";
+                    }
+                }
+                return ds;
+            }
+
+            function ehInciso(termo) {
+                var lastIndex = termo.indexOf("-");
+                if (lastIndex > 0) {
+                    termo = termo.substring(0, lastIndex);
+                }
+                return termo.match(/^[IVXLCDM]+$/i);
+            }
+
+            function ehAlinea(termo) {
+                var lastIndex = termo.indexOf(")");
+                if (lastIndex < 0) {
+                    return false;
+                }
+                if (termo.length == (lastIndex + 1)) {
+                    termo = termo.substring(0, lastIndex);
+                    return termo.match(/[a-z]/i);
+                }
+                return false;
+            }
+
+            function ehNum(termo) {
+                var lastIndex = termo.indexOf(".");
+                if (lastIndex < 0) {
+                    return false;
+                }
+                if (termo.length == (lastIndex + 1)) {
+                    termo = termo.substring(0, lastIndex);
+                    return isInt(termo);
+                }
+                return false;
+            }
+
+            $(document).ready(function () {
+                //A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378
+
+
+
+                var urlPath = window.location.pathname;
+                var urlSplited = urlPath.split("/");
+                var numeroNorma = urlSplited[3];
+
+                //Pegar o texto do h1
+                var elementoh1 = $('#div_texto > h1')[0].textContent;
+                //Adicionar a tag 'a'
+                $('#div_texto > h1')[0].innerHTML = '<a>' + elementoh1 + '</a>';
+
+                //Adicionar o link
+                $("#div_texto h1 a").attr('href', '/' + urlSplited[1] + '/DetalhesDeNorma.aspx?id_norma=' + numeroNorma).attr("target", '_blank');
+                //--------------------------------------------------------------------------------------
+
+
+
+
+                // var paragrafo = $('p');
+                // for (var i = 0; i < paragrafo.length; i++) {
+                //     if (paragrafo[i].innerText.match(/Os anexos constam no DODF/g)) {
+    
+                //         var spanParagrafo = paragrafo[i].textContent;
+                //         var form_consultar_diario = "\"form_consultar_diario\"";
+                //         var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+    
+                //         $(paragrafo)[i].innerHTML = _form + _button + "<span>" + spanParagrafo + "<span>" + "</a></form>";
+    
+                //     }
+
+                //     if (paragrafo[i].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                //         var span = paragrafo[i].textContent;
+                //         var form_consultar_diario = "\"form_consultar_diario\"";
+                //         var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var arraySpan = $("p > span");
+                //         $(paragrafo)[i].innerHTML = _form + _button + "<span style='text-decoration: underline red; color: red;' >" + span + "<span>" + "</a></form>";
+                //     }
+                // }
+                // if (!paragrafo[i - 1].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                //     $('#paginaEColuna').hide();
+                // }
+                //--------------------------------------------------------------------------------------
+
+
+
+                if ($('#div_erro').length > 0) {
+                    $('#div_norma').hide();
+                }
+                else {
+                    if ($('p[replaced_by]').length <= 0 || $('p').length == $('p[replaced_by]').length) {
+                        $('.compilado').hide();
+                    }
+                    verificarLinks();
+                }
+            });
+
+
+            var normaOVEmFunction = new normaOVEmFunction();
+            
+                //A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378
+
+
+            if (normaOVEmFunction != true) {
+
+                    var urlPath = window.location.pathname;
+                    var urlSplited = urlPath.split("/");
+                    var numeroNorma = urlSplited[3];
+
+                    //Pegar o texto do h1
+                    var elementoh1 = $('#div_texto > h1')[0].textContent;
+                    //Adicionar a tag 'a'
+                    $('#div_texto > h1')[0].innerHTML = '<a>' + elementoh1 + '</a>';
+
+                    //Adicionar o link
+                    $("#div_texto h1").attr('href', '/' + urlSplited[1] + '/DetalhesDeNorma.aspx?id_norma=' + numeroNorma).attr("target", '_blank');
+                    //--------------------------------------------------------------------------------------
+
+                //consultarDiarioAspErro
+                    var paragrafo = $('p');
+
+                    for (var i = 0; i < paragrafo.length; i++) {
+
+                        if (paragrafo[i].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                            var span = paragrafo[i].textContent;
+                            var form_consultar_diario = "\"form_consultar_diario\"";
+                            var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                            var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioAspErro(" + form_consultar_diario + ")\'>";
+                            var arraySpan = $("p > span");
+                            $(paragrafo)[i].innerHTML = _form + _button + "<span style='text-decoration: underline red; color: red;' >" + span + "<span>" + "</a></form>";
+                        }
+                    }
+                    if (!paragrafo[i - 1].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                        $('#paginaEColuna').hide();
+                    }
+                    //--------------------------------------------------------------------------------------
+
+                    if ($('#div_erro').length > 0) {
+                        $('#div_norma').hide();
+                    }
+                    else {
+                        if ($('p[replaced_by]').length <= 0 || $('p').length == $('p[replaced_by]').length) {
+                            $('.compilado').hide();
+                        }
+                        verificarLinks();
+                    }
+             }
+        </script>
+        <style type="text/css">
+            .control {
+                width: 100%;
+                float: left;
+            }
+
+            .print {
+                float: right;
+            }
+
+            .compilado {
+                float: left;
+            }
+
+            div.strike {
+                text-decoration: line-through;
+            }
+
+            body,
+            p,
+            h1 {
+                font-family: Tahoma;
+                font-size: 14px;
+            }
+
+            p[nota=nota] {
+                font-size: 12px;
+                border: 1px solid #777;
+                padding: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="div_norma">
+            <!-- A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378-->
+            
+            <!-- corpo dela epigrafe-->
+
+            <a href="/sinj/ ~/" title="Visitar o SINJ-DF - Sistema Integrado de Normas Jurídicas do
+                DF"><img src="http://www.sinj.df.gov.br/sinjpadrao/Imagens/logo_sinj.png" alt="SINJ-DF" /></a>
+
+            <div class="control">
+                <div class="compilado">
+                    <a href="javascript:void(0)" onclick="javascript:exibirAlteracoes(this);">
+                        Texto Compilado
+                    </a>
+                </div>
+                <div class="print">
+                    <a href="javascript:void(0);" onclick="javascript:Print();" title="Imprimir">
+                        <img alt="print" src="http://www.sinj.df.gov.br/sinjpadrao/Imagens/ico_print_p.png" />
+                    </a>
+                </div>
+            </div>
+            <div id="div_texto"><p ch_norma_info="69107"><a href="/sinj/Norma/69107/Lei_4614_2011.html#art1">Legislação Correlata - Lei 4614 de 12/08/2011</a>
+
+<p ch_norma_info="e151236ef55946c6ab6ce1b7d36d9d1c"><a href="/sinj/Norma/e151236ef55946c6ab6ce1b7d36d9d1c/exec_dec_41773_2021.html#art1_par2_incIII">Legislação Correlata - Decreto 41773 de 04/02/2021</a>
+
+<h1 epigrafe="epigrafe" noindex="" nota="" style="font-weight:bold; text-align:center">LEI ORGÂNICA DO DISTRITO FEDERAL</h1>
+
+<p linkname="txt_b7f48e1c657f48e4f90fcaf2ca650a16" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_b7f48e1c657f48e4f90fcaf2ca650a16" name="txt_b7f48e1c657f48e4f90fcaf2ca650a16"></a>PREÂMBULO
+
+<p linkname="txt_f10cb6f91da040bf67e72fb2c954573e" style="text-align:justify"><a class="linkname" id="txt_f10cb6f91da040bf67e72fb2c954573e" name="txt_f10cb6f91da040bf67e72fb2c954573e"></a>Sob a proteção de Deus, nós, Deputados Distritais, legítimos representantes do povo do Distrito Federal, investidos de Poder Constituinte, respeitando os preceitos da Constituição da República Federativa do Brasil, promulgamos a presente Lei Orgânica, que constitui a Lei Fundamental do Distrito Federal, com o objetivo de organizar o exercício do poder, fortalecer as instituições democráticas e os direitos da pessoa humana.
+
+<p linkname="titl" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titl" name="titl"></a>TÍTULO I
+
+<p linkname="txt_0269047da7d14a8b23feab0817085746" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_0269047da7d14a8b23feab0817085746" name="txt_0269047da7d14a8b23feab0817085746"></a>DOS FUNDAMENTOS DA ORGANIZAÇÃO DOS PODERES E DO DISTRITO FEDERAL
+
+<p linkname="titl_art1" style="text-align:justify"><a class="linkname" id="titl_art1" name="titl_art1"></a>Art. 1° O Distrito Federal, no pleno exercício de sua autonomia política, administrativa e financeira, observados os princípios constitucionais, reger-se-á por esta Lei Orgânica.
+
+<p linkname="titl_art1_par" style="text-align:justify"><a class="linkname" id="titl_art1_par" name="titl_art1_par"></a>Parágrafo único. Todo o poder emana do povo, que o exerce por meio de representantes eleitos ou diretamente, nos termos da Constituição Federal e desta Lei Orgânica.
+
+<p linkname="titl_art2" style="text-align:justify"><a class="linkname" id="titl_art2" name="titl_art2"></a>Art. 2° O Distrito Federal integra a união indissolúvel da República Federativa do Brasil e tem como valores fundamentais:
+
+<p linkname="titl_art2_incI" style="text-align:justify"><a class="linkname" id="titl_art2_incI" name="titl_art2_incI"></a>I - a preservação de sua autonomia como unidade federativa;
+
+<p linkname="titl_art2_incII" style="text-align:justify"><a class="linkname" id="titl_art2_incII" name="titl_art2_incII"></a>II - a plena cidadania;
+
+<p linkname="titl_art2_incIII" style="text-align:justify"><a class="linkname" id="titl_art2_incIII" name="titl_art2_incIII"></a>III - a dignidade da pessoa humana;
+
+<p linkname="titl_art2_incIV" style="text-align:justify"><a class="linkname" id="titl_art2_incIV" name="titl_art2_incIV"></a>IV - os valores sociais do trabalho e da livre iniciativa;
+
+<p linkname="titl_art2_incV" style="text-align:justify"><a class="linkname" id="titl_art2_incV" name="titl_art2_incV"></a>V - o pluralismo político.
+
+<p linkname="titl_art2_par_replaced" replaced_by="74993" style="display:block; text-align:justify"><s><a name="titl_art2_par_replaced"></a>Parágrafo único. Ninguém será discriminado ou prejudicado em razão de nascimento, idade, etnia, raça, cor, sexo, estado civil, trabalho rural ou urbano, religião, convicções políticas ou filosóficas, orientação sexual, deficiência física, imunológica, sensorial ou mental, por ter cumprido pena, nem por qualquer particularidade ou condição, observada a Constituição Federal.</s>
+
+<p linkname="titl_art2_par" style="text-align:justify"><a class="linkname" id="titl_art2_par" name="titl_art2_par"></a>Parágrafo único. Ninguém será discriminado ou prejudicado em razão de nascimento, idade, etnia, raça, cor, sexo, características genéticas, estado civil, trabalho rural ou urbano, religião, convicções políticas ou filosóficas, orientação sexual, deficiência física, imunológica, sensorial ou mental, por ter cumprido pena, nem por qualquer particularidade ou condição, observada a Constituição Federal. <a href="/sinj/Norma/74993/cldf_elo_65_2013.html#art1">(Parágrafo alterado(a) pelo(a) Emenda à Lei Orgânica 65 de 30/08/2013)</a>
+
+<p linkname="titl_art3" style="text-align:justify"><a class="linkname" id="titl_art3" name="titl_art3"></a>Art. 3° São objetivos prioritários do Distrito Federal:
+
+<p linkname="titl_art3_incI" style="text-align:justify"><a class="linkname" id="titl_art3_incI" name="titl_art3_incI"></a>I - garantir e promover os direitos humanos assegurados na Constituição Federal e na Declaração Universal dos Direitos Humanos;
+
+<p linkname="titl_art3_incII" style="text-align:justify"><a class="linkname" id="titl_art3_incII" name="titl_art3_incII"></a>II - assegurar ao cidadão o exercício dos direitos de iniciativa que lhe couberem, relativos ao controle da legalidade e legitimidade dos atos do Poder Público e da eficácia dos serviços públicos;
+
+<p linkname="titl_art3_incIII" style="text-align:justify"><a class="linkname" id="titl_art3_incIII" name="titl_art3_incIII"></a>III - preservar os interesses gerais e coletivos;
+
+<p linkname="titl_art3_incIV" style="text-align:justify"><a class="linkname" id="titl_art3_incIV" name="titl_art3_incIV"></a>IV - promover o bem de todos;
+
+<p linkname="titl_art3_incV" style="text-align:justify"><a class="linkname" id="titl_art3_incV" name="titl_art3_incV"></a>V - proporcionar aos seus habitantes condições de vida compatíveis com a dignidade humana, a justiça social e o bem comum;
+
+<p linkname="titl_art3_incVI" style="text-align:justify"><a class="linkname" id="titl_art3_incVI" name="titl_art3_incVI"></a>VI - dar prioridade ao atendimento das demandas da sociedade nas áreas de educação, saúde, trabalho, transporte, segurança pública, moradia, saneamento básico, lazer e assistência social;
+
+<p linkname="titl_art3_incVII" style="text-align:justify"><a class="linkname" id="titl_art3_incVII" name="titl_art3_incVII"></a>VII - garantir a prestação de assistência jurídica integral e gratuita aos que comprovarem insuficiência de recursos;
+
+<p linkname="titl_art3_incVIII" style="text-align:justify"><a class="linkname" id="titl_art3_incVIII" name="titl_art3_incVIII"></a>VIII - preservar sua identidade, adequando as exigências do desenvolvimento à preservação de sua memória, tradição e peculiaridades;
+
+<p linkname="titl_art3_incIX" style="text-align:justify"><a class="linkname" id="titl_art3_incIX" name="titl_art3_incIX"></a>IX - valorizar e desenvolver a cultura local, de modo a contribuir para a cultura brasileira.
+
+<p linkname="titl_art3_incIX_add_0" style="text-align:justify"><a name="titl_art3_incIX_add_0"></a>X - assegurar, por parte do poder público, a proteção individualizada à vida e à integridade física e psicológica das vítimas e das testemunhas de infrações penais e de seus respectivos familiares. <a href="/sinj/Norma/66572/ELO_6.html#art1">(Inciso acrescido(a) pelo(a) Emenda à Lei Orgânica 6 de 14/10/1996)</a>
+
+<p linkname="titl_art3_incIX_add_0_add_0" style="text-align:justify"><a name="titl_art3_incIX_add_0_add_0"></a>XI - zelar pelo conjunto urbanístico de Brasília, tombado sob a inscrição n° 532 do Livro do Tombo Histórico, respeitadas as definições e critérios constantes do Decreto n° 10.829, de 2 de outubro de 1987, e da Portaria n° 314, de 8 de outubro de 1992, do então Instituto Brasileiro do Patrimônio Cultural - IBPC, hoje Instituto do Patrimônio Histórico e Artístico Nacional - IPHAN. <a href="/sinj/Norma/66578/ELO_12.html#art1">(Inciso acrescido(a) pelo(a) Emenda à Lei Orgânica 12 de 12/12/1996)</a>
+
+<p linkname="titl_art3_incIX_add_0_add_0_add_0" style="text-align:justify"><a name="titl_art3_incIX_add_0_add_0_add_0"></a>XII – promover, proteger e defender os direitos da criança, do adolescente e do jovem. <a href="/sinj/Norma/76683/cldf_elo_73_2014.html#art1">(Inciso acrescido(a) pelo(a) Emenda à Lei Orgânica 73 de 23/04/2014)</a>
+
+<p linkname="titl_art3_incIX_add_0_add_0_add_0_add_0" style="text-align:justify"><a name="titl_art3_incIX_add_0_add_0_add_0_add_0"></a>XIII - valorizar a vida e adotar políticas públicas de saúde, de assistência e de educação preventivas do suicídio. <a class="link_vide" href="/sinj/Norma/a9e102f582214b8194fbca63da54eff6/ELO_103.html#art1">(Inciso acrescido(a) pelo(a) Emenda à Lei Orgânica 103 de 06/12/2017)</a>
+
+<p linkname="titl_art3_incXIV" style="text-align:justify"><a class="linkname" id="titl_art3_incXIV" name="titl_art3_incXIV"></a>XIV - promover a inclusão digital, o direito de acesso à Internet, o exercício da cidadania em meios digitais e a prestação de serviços públicos por múltiplos canais de acesso. <a class="link_vide" href="/sinj/Norma/a4e4ee33144c4705a517467fcdc7be14/ELO_115_2019.html#txt_929a9f48ca8a4933bda0fbd67d4392f4">(Inciso acrescido(a) pelo(a) Emenda à Lei Orgânica 115 de 08/10/2019)</a>
+
+<p linkname="titl_art4" style="text-align:justify"><a class="linkname" id="titl_art4" name="titl_art4"></a>Art. 4° É assegurado o exercício do direito de petição ou representação, independentemente de pagamento de taxas ou emolumentos, ou de garantia de instância.
+
+<p linkname="titl_art5" style="text-align:justify"><a class="linkname" id="titl_art5" name="titl_art5"></a>Art. 5° A soberania popular será exercida pelo sufrágio universal e pelo voto direto e secreto, com valor igual para todos e, nos termos da lei, mediante: <a href="/sinj/Norma/f94bc70f26cf49c0ac859ae6c6c97ba7/Lei_5608.html#txt_14e9c72206dd4c8fe2fed4dc27f5b417">(Artigo regulamentado(a) pelo(a) Lei 5608 de 07/01/2016)</a>
+
+<p linkname="titl_art5_incI" style="text-align:justify"><a class="linkname" id="titl_art5_incI" name="titl_art5_incI"></a>I - plebiscito; <a href="/sinj/Norma/49600/Lei_1642.html#txt_9271834b911f4ee2fda44dfc4d2e4e64">(Inciso regulamentado(a) pelo(a) Lei 1642 de 17/09/1997)</a>
+
+<p linkname="titl_art5_incII" style="text-align:justify"><a class="linkname" id="titl_art5_incII" name="titl_art5_incII"></a>II - referendo; <a href="/sinj/Norma/49600/Lei_1642.html#txt_9271834b911f4ee2fda44dfc4d2e4e64">(Inciso regulamentado(a) pelo(a) Lei 1642 de 17/09/1997)</a>
+
+<p linkname="titl_art5_incIII" style="text-align:justify"><a class="linkname" id="titl_art5_incIII" name="titl_art5_incIII"></a>III - iniciativa popular.
+
+<p linkname="titII" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII" name="titII"></a>TÍTULO II
+
+<p linkname="txt_f97f35708f8d4833c0df4b3b063b033c" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_f97f35708f8d4833c0df4b3b063b033c" name="txt_f97f35708f8d4833c0df4b3b063b033c"></a>DA ORGANIZAÇÃO DO DISTRITO FEDERAL
+
+<p linkname="titII_capl" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII_capl" name="titII_capl"></a>CAPÍTULO I
+
+<p linkname="txt_fd976d6fc2e042ea2692076312e45077" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_fd976d6fc2e042ea2692076312e45077" name="txt_fd976d6fc2e042ea2692076312e45077"></a>DAS DISPOSIÇÕES GERAIS
+
+<p linkname="titII_capl_art6" style="text-align:justify"><a class="linkname" id="titII_capl_art6" name="titII_capl_art6"></a>Art. 6° Brasília, Capital da República Federativa do Brasil, é a sede do governo do Distrito Federal.
+
+<p linkname="titII_capl_art7" style="text-align:justify"><a class="linkname" id="titII_capl_art7" name="titII_capl_art7"></a>Art. 7° São símbolos do Distrito Federal a bandeira, o hino e o brasão.
+
+<p linkname="titII_capl_art7_par" style="text-align:justify"><a class="linkname" id="titII_capl_art7_par" name="titII_capl_art7_par"></a>Parágrafo único. A lei poderá estabelecer outros símbolos e dispor sobre seu uso no território do Distrito Federal.
+
+<p linkname="titII_capl_art8" style="text-align:justify"><a class="linkname" id="titII_capl_art8" name="titII_capl_art8"></a>Art. 8° O território do Distrito Federal compreende o espaço físico-geográfico que se encontra sob seu domínio e jurisdição.
+
+<p linkname="titII_capl_art9" style="text-align:justify"><a class="linkname" id="titII_capl_art9" name="titII_capl_art9"></a>Art. 9° O Distrito Federal, na execução de seu programa de desenvolvimento econômico-social, buscará a integração com a região do entorno do Distrito Federal.
+
+<p linkname="titII_capII" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII_capII" name="titII_capII"></a>CAPÍTULO II
+
+<p linkname="txt_c62c65d2bb4443ef87d051312fd1e6ad" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_c62c65d2bb4443ef87d051312fd1e6ad" name="txt_c62c65d2bb4443ef87d051312fd1e6ad"></a>DA ORGANIZAÇÃO ADMINISTRATIVA DO DISTRITO FEDERAL
+
+<p linkname="titII_capII_art10" style="text-align:justify"><a class="linkname" id="titII_capII_art10" name="titII_capII_art10"></a>Art. 10. O Distrito Federal organiza-se em Regiões Administrativas, com vistas à descentralização administrativa, à utilização racional de recursos para o desenvolvimento sócio-econômico e à melhoria da qualidade de vida.
+
+<p linkname="titII_capII_art10_par1_replaced" replaced_by="86603923813148a0a2bfae9dbff80a4e" style="text-align:justify"><s><a class="linkname" id="titII_capII_art10_par1" name="titII_capII_art10_par1_replaced"></a>§ 1° A lei disporá sobre a participação popular no processo de escolha do Administrador Regional. <a href="/sinj/Norma/49757/Lei_1799.html#txt_43e937b7e0944b6be45da9a02c2d9971">(Parágrafo regulamentado(a) pelo(a) Lei 1799 de 16/10/1997)</a></s>&nbsp;<a class="link_vide" href="/sinj/DetalhesDeNorma.aspx?id_norma=86603923813148a0a2bfae9dbff80a4e">(Parágrafo Declarado(a) Inconstitucional pelo(a) ADI 20130020162276 de 09/05/2014)</a>
+
+<p linkname="titII_capII_art10_par2_replaced" replaced_by="66610" style="display:block; text-align:justify"><s><a name="titII_capII_art10_par2_replaced"></a>§ 2° A remuneração dos Administradores Regionais não poderá ser superior à fixada para os Secretários de Governo do Distrito Federal.</s>
+
+<p linkname="titII_capII_art10_par2" style="text-align:justify"><a class="linkname" id="titII_capII_art10_par2" name="titII_capII_art10_par2"></a>§ 2° A remuneração dos Administradores Regionais não poderá ser superior à fixada para os Secretários de Estado do Distrito Federal. <a href="/sinj/Norma/66610/ELO_44.html#txt_9813eed024824847a0fdb7cd20f04cd0">(Parágrafo alterado(a) pelo(a) Emenda à Lei Orgânica 44 de 29/11/2005)</a>
+
+<p linkname="titII_capII_art10_par2_add_0" style="text-align:justify"><a name="titII_capII_art10_par2_add_0"></a>§ 3° A proibição de que trata o art. 19, § 8°, aplica-se à nomeação de administrador regional. <a href="/sinj/Norma/70263/cldf_elo_60_2011.html#art1">(Parágrafo acrescido(a) pelo(a) Emenda à Lei Orgânica 60 de 20/12/2011)</a>
+
+<p linkname="titII_capII_art11" style="text-align:justify"><a class="linkname" id="titII_capII_art11" name="titII_capII_art11"></a>Art. 11. As Administrações Regionais integram a estrutura administrativa do Distrito Federal.
+
+<p linkname="titII_capII_art12_replaced" replaced_by="86603923813148a0a2bfae9dbff80a4e" style="text-align:justify"><s><a class="linkname" id="titII_capII_art12" name="titII_capII_art12_replaced"></a>Art. 12. Cada Região Administrativa do Distrito Federal terá um Conselho de Representantes Comunitários, com funções consultivas e fiscalizadoras, na forma da lei.</s>&nbsp;<a class="link_vide" href="/sinj/DetalhesDeNorma.aspx?id_norma=86603923813148a0a2bfae9dbff80a4e">(Artigo Declarado(a) Inconstitucional pelo(a) ADI 20130020162276 de 09/05/2014)</a>
+
+<p linkname="titII_capII_art13" style="text-align:justify"><a class="linkname" id="titII_capII_art13" name="titII_capII_art13"></a>Art. 13. A criação ou extinção de Regiões Administrativas ocorrerá mediante lei aprovada pela maioria absoluta dos Deputados Distritais.
+
+<p linkname="titII_capII_art13_add_0" style="text-align:justify"><a name="titII_capII_art13_add_0"></a>Parágrafo único. Com a criação de nova região administrativa, fica criado, automaticamente, conselho tutelar para a respectiva região. <a href="/sinj/Norma/77522/cldf_elo_83_2014.html#art1">(Parágrafo acrescido(a) pelo(a) Emenda à Lei Orgânica 83 de 20/08/2014)</a>
+
+<p linkname="titII_capIII" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII_capIII" name="titII_capIII"></a>CAPÍTULO III
+
+<p linkname="txt_8074b8e651c7449ff7b6c0433df61935" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_8074b8e651c7449ff7b6c0433df61935" name="txt_8074b8e651c7449ff7b6c0433df61935"></a>DA COMPETÊNCIA DO DISTRITO FEDERAL
+
+<p linkname="titII_capIII_art14" style="text-align:justify"><a class="linkname" id="titII_capIII_art14" name="titII_capIII_art14"></a>Art. 14. Ao Distrito Federal são atribuídas as competências legislativas reservadas aos Estados e Municípios, cabendo-lhe exercer, em seu território, todas as competências que não lhe sejam vedadas pela Constituição Federal.
+
+<p linkname="txt_b63fae108c9b4a7a0b43172a75e95df5" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_b63fae108c9b4a7a0b43172a75e95df5" name="txt_b63fae108c9b4a7a0b43172a75e95df5"></a>Seção I
+
+<p linkname="txt_a52cad46c2204438e7c10353fda74a25" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_a52cad46c2204438e7c10353fda74a25" name="txt_a52cad46c2204438e7c10353fda74a25"></a>Da Competência Privativa
+
+<p linkname="titII_capIII_art15" style="text-align:justify"><a class="linkname" id="titII_capIII_art15" name="titII_capIII_art15"></a>Art. 15. Compete privativamente ao Distrito Federal:
+
+<p linkname="titII_capIII_art15_incI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incI" name="titII_capIII_art15_incI"></a>I - organizar seu Governo e Administração;
+
+<p linkname="titII_capIII_art15_incII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incII" name="titII_capIII_art15_incII"></a>II - criar, organizar ou extinguir Regiões Administrativas, de acordo com a legislação vigente;
+
+<p linkname="titII_capIII_art15_incIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incIII" name="titII_capIII_art15_incIII"></a>III - instituir e arrecadar tributos, observada a competência cumulativa do Distrito Federal;
+
+<p linkname="titII_capIII_art15_incIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incIV" name="titII_capIII_art15_incIV"></a>IV - fixar, fiscalizar e cobrar tarifas e preços públicos de sua competência;
+
+<p linkname="titII_capIII_art15_incV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incV" name="titII_capIII_art15_incV"></a>V - dispor sobre a administração, utilização, aquisição e alienação dos bens públicos;
+
+<p linkname="titII_capIII_art15_incVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incVI" name="titII_capIII_art15_incVI"></a>VI - organizar e prestar, diretamente ou sob regime de concessão ou permissão, os serviços de interesse local, incluído o de transporte coletivo, que tem caráter essencial;
+
+<p linkname="titII_capIII_art15_incVII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incVII" name="titII_capIII_art15_incVII"></a>VII - manter, com a cooperação técnica e financeira da União, programas de educação, prioritariamente de ensino fundamental e pré-escolar;
+
+<p linkname="titII_capIII_art15_incVIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incVIII" name="titII_capIII_art15_incVIII"></a>VIII - celebrar e firmar ajustes, consórcios, convênios, acordos e decisões administrativas com a União, Estados e Municípios, para execução de suas leis e serviços;
+
+<p linkname="titII_capIII_art15_incIX" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incIX" name="titII_capIII_art15_incIX"></a>IX - elaborar e executar o plano plurianual, as diretrizes orçamentárias e o orçamento anual;
+
+<p linkname="titII_capIII_art15_incX_replaced" replaced_by="d640cc8d51f64603bcd735036f9c752d" style="display:block; text-align:justify"><s><a name="titII_capIII_art15_incX_replaced"></a>X - elaborar e executar o plano diretor de ordenamento territorial e os planos diretores locais, para promover adequado ordenamento territorial integrado aos valores ambientais, mediante planejamento e controle do uso, parcelamento e ocupação do solo urbano;</s>
+
+<p linkname="titII_capIII_art15_incX" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incX" name="titII_capIII_art15_incX"></a>X - elaborar e executar o Plano Diretor de Ordenamento Territorial, a Lei de Uso e Ocupação do Solo e Planos de Desenvolvimento Local, para promover adequado ordenamento territorial, integrado aos valores ambientais, mediante planejamento e controle do uso, parcelamento e ocupação do solo urbano; <a href="/sinj/Norma/d640cc8d51f64603bcd735036f9c752d/ cldf_elo_49_2007.html#txt_2eb8aaf0876649001b4959ed177c23f0">(Inciso alterado(a) pelo(a) Emenda à Lei Orgânica 49 de 28/09/2007)</a>
+
+<p linkname="titII_capIII_art15_incXI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXI" name="titII_capIII_art15_incXI"></a>XI - autorizar, conceder ou permitir, bem como regular, licenciar e fiscalizar os serviços de veículos de aluguéis;
+
+<p linkname="titII_capIII_art15_incXII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXII" name="titII_capIII_art15_incXII"></a>XII - dispor sobre criação, transformação e extinção de cargos, empregos e funções públicas;
+
+<p linkname="titII_capIII_art15_incXIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXIII" name="titII_capIII_art15_incXIII"></a>XIII - dispor sobre a organização do quadro de seus servidores; instituição de planos de carreira, na administração direta, autarquias e fundações-públicas do Distrito Federal; remuneração e regime jurídico único dos servidores;
+
+<p linkname="titII_capIII_art15_incXIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXIV" name="titII_capIII_art15_incXIV"></a>XIV - exercer o poder de polícia administrativa;
+
+<p linkname="titII_capIII_art15_incXV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXV" name="titII_capIII_art15_incXV"></a>XV - licenciar estabelecimento industrial, comercial, prestador de serviços e similar ou cassar o alvará de licença dos que se tornarem danosos ao meio ambiente, à saúde, ao bem-estar da população ou que infringirem dispositivos legais;
+
+<p linkname="titII_capIII_art15_incXVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXVI" name="titII_capIII_art15_incXVI"></a>XVI - regulamentar e fiscalizar o comércio ambulante, inclusive o de papéis e de outros resíduos recicláveis;
+
+<p linkname="titII_capIII_art15_incXVII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXVII" name="titII_capIII_art15_incXVII"></a>XVII - dispor sobre a limpeza de logradouros públicos, remoção e destino do lixo domiciliar e de outros resíduos;
+
+<p linkname="titII_capIII_art15_incXVIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXVIII" name="titII_capIII_art15_incXVIII"></a>XVIII - dispor sobre serviços funerários e administração dos cemitérios;
+
+<p linkname="titII_capIII_art15_incXIX" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXIX" name="titII_capIII_art15_incXIX"></a>XIX - dispor sobre apreensão, depósito e destino de animais e mercadorias apreendidas em decorrência de transgressão da legislação local;
+
+<p linkname="titII_capIII_art15_incXX" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXX" name="titII_capIII_art15_incXX"></a>XX - disciplinar e fiscalizar, no âmbito de sua competência, competições esportivas, espetáculos, diversões públicas e eventos de natureza semelhante, realizados em locais de acesso público;
+
+<p linkname="titII_capIII_art15_incXXI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXI" name="titII_capIII_art15_incXXI"></a>XXI - dispor sobre a utilização de vias e logradouros públicos;
+
+<p linkname="titII_capIII_art15_incXXII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXII" name="titII_capIII_art15_incXXII"></a>XXII - disciplinar o trânsito local, sinalizando as vias urbanas e estradas do Distrito Federal;
+
+<p linkname="titII_capIII_art15_incXXIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXIII" name="titII_capIII_art15_incXXIII"></a>XXIII - exercer inspeção e fiscalização sanitária, de postura ambiental, tributária, de segurança pública e do trabalho, relativamente ao funcionamento de estabelecimento comercial, industrial, prestador de serviços e similar, no âmbito de sua competência, respeitada a legislação federal;
+
+<p linkname="titII_capIII_art15_incXXIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXIV" name="titII_capIII_art15_incXXIV"></a>XXIV - adquirir bens, inclusive por meio de desapropriação, por necessidade, utilidade pública ou interesse social, nos termos da legislação em vigor;
+
+<p linkname="titII_capIII_art15_incXXV" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXV" name="titII_capIII_art15_incXXV"></a>XXV - licenciar a construção de qualquer obra;
+
+<p linkname="titII_capIII_art15_incXXVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXVI" name="titII_capIII_art15_incXXVI"></a>XXVI - interditar edificações em ruína, em condições de insalubridade e as que apresentem as irregularidades previstas na legislação específica, bem como faiei demolir construções que ameacem a segurança individual ou coletiva;
+
+<p linkname="titII_capIII_art15_incXXVII" style="text-align:justify"><a class="linkname" id="titII_capIII_art15_incXXVII" name="titII_capIII_art15_incXXVII"></a>XXVII - dispor sobre publicidade externa, em especial sobre exibição de cartazes, anúncios e quaisquer outros meios de publicidade ou propaganda, em logradouros públicos, em locais de acesso público ou destes visíveis.
+
+<p linkname="txt_05391ebccdfc4e568c3505c6ca0f5881" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_05391ebccdfc4e568c3505c6ca0f5881" name="txt_05391ebccdfc4e568c3505c6ca0f5881"></a>Seção II
+
+<p linkname="txt_c76f0a017a4d42bea2731c6614a006e1" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_c76f0a017a4d42bea2731c6614a006e1" name="txt_c76f0a017a4d42bea2731c6614a006e1"></a>Da Competência Comum
+
+<p linkname="titII_capIII_art16" style="text-align:justify"><a class="linkname" id="titII_capIII_art16" name="titII_capIII_art16"></a>Art. 16. É competência do Distrito Federal, em comum com a União:
+
+<p linkname="titII_capIII_art16_incI" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incI" name="titII_capIII_art16_incI"></a>I - zelar pela guarda da&nbsp;Constituição Federal, desta Lei Orgânica, das leis e das instituições democráticas;
+
+<p linkname="titII_capIII_art16_incII" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incII" name="titII_capIII_art16_incII"></a>II - conservar o patrimônio público;
+
+<p linkname="titII_capIII_art16_incIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incIII" name="titII_capIII_art16_incIII"></a>III - proteger documentes e outros bens de valor histórico e cultural, monumentos, paisagens naturais notáveis e sítios arqueológicos, bem como impedir sua evasão, destruição e descaracterização;
+
+<p linkname="titII_capIII_art16_incIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incIV" name="titII_capIII_art16_incIV"></a>IV - proteger o meio ambiente e combater a poluição em qualquer de suas formas;
+
+<p linkname="titII_capIII_art16_incV" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incV" name="titII_capIII_art16_incV"></a>V - preservar a fauna, a flora e o cerrado;
+
+<p linkname="titII_capIII_art16_incVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incVI" name="titII_capIII_art16_incVI"></a>VI - proporcionar os meios de acesso à cultura, à educação e à ciência;
+
+<p linkname="titII_capIII_art16_incVII" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incVII" name="titII_capIII_art16_incVII"></a>VII - prestar serviços de assistência à saúde da população e de proteção e garantia a pessoas portadoras de deficiência com a cooperação técnica e financeira da União;
+
+<p linkname="titII_capIII_art16_incVIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incVIII" name="titII_capIII_art16_incVIII"></a>VIII - combater as causas da pobreza, a subnutrição e os fatores de marginalização, promovendo a integração social dos segmentos desfavorecidos;
+
+<p linkname="titII_capIII_art16_incIX" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incIX" name="titII_capIII_art16_incIX"></a>IX - fomentar a produção agropecuária e organizar o abastecimento alimentar;
+
+<p linkname="titII_capIII_art16_incX" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incX" name="titII_capIII_art16_incX"></a>X - promover programas de construção de moradias e a melhoria das condições habitacionais e de saneamento básico;
+
+<p linkname="titII_capIII_art16_incXI" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incXI" name="titII_capIII_art16_incXI"></a>XI - registrar, acompanhar e fiscalizar as concessões de direitos de pesquisa e exploração de recursos hídricos e minerais em seu território;
+
+<p linkname="titII_capIII_art16_incXII" style="text-align:justify"><a class="linkname" id="titII_capIII_art16_incXII" name="titII_capIII_art16_incXII"></a>XII - estabelecer e implantar política de educação para a segurança do trânsito.
+
+<p linkname="titII_capIII_art16_incXII_add_0" style="text-align:justify"><a name="titII_capIII_art16_incXII_add_0"></a>Parágrafo único. Lei complementar deve fixar norma para a cooperação entre a União e o Distrito Federal, tendo em vista o equilíbrio do desenvolvimento e o bem-estar no âmbito do território do Distrito Federal. <a href="/sinj/Norma/77414/cldf_elo_80_2014.html">(Parágrafo acrescido(a) pelo(a) Emenda à Lei Orgânica 80 de 31/07/2014)</a>
+
+<p linkname="txt_c6869e7814c5453e9b4b18a4e4f52283" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_c6869e7814c5453e9b4b18a4e4f52283" name="txt_c6869e7814c5453e9b4b18a4e4f52283"></a>Seção III
+
+<p linkname="txt_262f79d5e34e445ab38d325d393dfef4" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_262f79d5e34e445ab38d325d393dfef4" name="txt_262f79d5e34e445ab38d325d393dfef4"></a>Da Competência Concorrente
+
+<p linkname="titII_capIII_art17" style="text-align:justify"><a class="linkname" id="titII_capIII_art17" name="titII_capIII_art17"></a>Art. 17. Compete ao Distrito Federal, concorrentemente com a União, legislar sobre:
+
+<p linkname="titII_capIII_art17_incI" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incI" name="titII_capIII_art17_incI"></a>I - direito tributário, financeiro, penitenciário, econômico e urbanístico;
+
+<p linkname="titII_capIII_art17_incII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incII" name="titII_capIII_art17_incII"></a>II - orçamento;
+
+<p linkname="titII_capIII_art17_incIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incIII" name="titII_capIII_art17_incIII"></a>III - junta comercial;
+
+<p linkname="titII_capIII_art17_incIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incIV" name="titII_capIII_art17_incIV"></a>IV - custas de serviços forenses;
+
+<p linkname="titII_capIII_art17_incV" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incV" name="titII_capIII_art17_incV"></a>V - produção e consumo;
+
+<p linkname="titII_capIII_art17_incVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incVI" name="titII_capIII_art17_incVI"></a>VI - cerrado, caça, pesca, fauna, conservação da natureza, defesa do solo e dos recursos naturais, proteção do meio ambiente e controle da poluição;
+
+<p linkname="titII_capIII_art17_incVII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incVII" name="titII_capIII_art17_incVII"></a>VII - proteção do patrimônio histórico, cultural, artístico, paisagístico e turístico;
+
+<p linkname="titII_capIII_art17_incVIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incVIII" name="titII_capIII_art17_incVIII"></a>VIII - responsabilidade por danos ao meio ambiente, ao consumidor e a bens e direitos de valor artístico, estético, histórico, espeleológico, turístico e paisagístico;
+
+<p linkname="titII_capIII_art17_incIX" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incIX" name="titII_capIII_art17_incIX"></a>IX - educação, cultura, ensino e desporto;
+
+<p linkname="titII_capIII_art17_incX" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incX" name="titII_capIII_art17_incX"></a>X - previdência social, proteção e defesa da saúde;
+
+<p linkname="titII_capIII_art17_incXI_replaced" replaced_by="77414" style="display:block; text-align:justify"><s><a name="titII_capIII_art17_incXI_replaced"></a>XI - assistência jurídica nos termos da legislação em vigor;</s>
+
+<p linkname="titII_capIII_art17_incXI" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXI" name="titII_capIII_art17_incXI"></a>XI – defensoria pública e assistência jurídica nos termos da legislação em vigor; <a href="/sinj/Norma/77414/cldf_elo_80_2014.html#art1">(Inciso alterado(a) pelo(a) Emenda à Lei Orgânica 80 de 31/07/2014)</a>
+
+<p linkname="titII_capIII_art17_incXII_replaced" replaced_by="77414" style="display:block; text-align:justify"><s><a name="titII_capIII_art17_incXII_replaced"></a>XII - proteção e integração social das pessoas portadoras de deficiência;</s>
+
+<p linkname="titII_capIII_art17_incXII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXII" name="titII_capIII_art17_incXII"></a>XII – proteção e integração social das pessoas com deficiência; <a href="/sinj/Norma/77414/cldf_elo_80_2014.html#art1">(Inciso alterado(a) pelo(a) Emenda à Lei Orgânica 80 de 31/07/2014)</a>
+
+<p linkname="titII_capIII_art17_incXIII" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXIII" name="titII_capIII_art17_incXIII"></a>XIII - proteção à infância e à juventude;
+
+<p linkname="titII_capIII_art17_incXIV" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXIV" name="titII_capIII_art17_incXIV"></a>XIV - manutenção da ordem e segurança internas;
+
+<p linkname="titII_capIII_art17_incXV" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXV" name="titII_capIII_art17_incXV"></a>XV - procedimentos em matéria processual;
+
+<p linkname="titII_capIII_art17_incXVI" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_incXVI" name="titII_capIII_art17_incXVI"></a>XVI - organização, garantias, direitos e deveres da polícia civil. <a class="link_vide" href="/sinj/Norma/a55676f936094cd4ae9eef09be3e7a33/cldf_elo_90_2015.html#txt_eecc90ad9f74440d4dfd134a49e9a7e7">(Inciso regulamentado(a) pelo(a) Emenda à Lei Orgânica 90 de 16/09/2015)</a>
+
+<p linkname="titII_capIII_art17_par1" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_par1" name="titII_capIII_art17_par1"></a>§ 1° O Distrito Federal, no exercício de sua competência suplementar, observará as normas gerais estabelecidas pela União.
+
+<p linkname="titII_capIII_art17_par2" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_par2" name="titII_capIII_art17_par2"></a>§ 2° Inexistindo lei federal sobre normas gerais, o Distrito Federal exercerá competência legislativa plena, para atender suas peculiaridades.
+
+<p linkname="titII_capIII_art17_par3" style="text-align:justify"><a class="linkname" id="titII_capIII_art17_par3" name="titII_capIII_art17_par3"></a>§ 3° A superveniência de lei federal sobre normas gerais suspende a eficácia de lei local, no que lhe for contrário.
+
+<p linkname="titII_capIV" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII_capIV" name="titII_capIV"></a>CAPÍTULO IV
+
+<p linkname="txt_ec7de99ff12645c34b36988bbc1574f7" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_ec7de99ff12645c34b36988bbc1574f7" name="txt_ec7de99ff12645c34b36988bbc1574f7"></a>DAS VEDAÇÕES
+
+<p linkname="titII_capIV_art18" style="text-align:justify"><a class="linkname" id="titII_capIV_art18" name="titII_capIV_art18"></a>Art. 18. É vedado ao Distrito Federal:
+
+<p linkname="titII_capIV_art18_incI" style="text-align:justify"><a class="linkname" id="titII_capIV_art18_incI" name="titII_capIV_art18_incI"></a>I - estabelecer cultos religiosos ou igrejas, subvencioná-los, embaraçar-lhes o funcionamento ou manter com eles ou seus representantes relações de dependência ou aliança, ressalvada, na forma da lei, a colaboração de interesse público;
+
+<p linkname="titII_capIV_art18_incII" style="text-align:justify"><a class="linkname" id="titII_capIV_art18_incII" name="titII_capIV_art18_incII"></a>II - recusar fé aos documentos públicos;
+
+<p linkname="titII_capIV_art18_incIII" style="text-align:justify"><a class="linkname" id="titII_capIV_art18_incIII" name="titII_capIV_art18_incIII"></a>III - subvencionar ou auxiliar, de qualquer modo, com recursos públicos, quer pela imprensa, rádio, televisão, serviço de alto-falante ou qualquer outro meio de comunicação, propaganda político-partidária ou com fins estranhos à administração pública;
+
+<p linkname="titII_capIV_art18_incIV" style="text-align:justify"><a class="linkname" id="titII_capIV_art18_incIV" name="titII_capIV_art18_incIV"></a>IV - doar bens imóveis de seu patrimônio ou constituir sobre eles ónus real, bem como conceder isenções fiscais ou remissões de dívidas, sem expressa autorização da Câmara Legislativa, sob pena de nulidade do ato.
+
+<p linkname="titII_capV" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="titII_capV" name="titII_capV"></a>CAPÍTULO V
+
+<p linkname="txt_960fa6a7007d4a4e24958f76ec2c166b" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_960fa6a7007d4a4e24958f76ec2c166b" name="txt_960fa6a7007d4a4e24958f76ec2c166b"></a>DA ADMINISTRAÇÃO PÚBLICA
+
+<p linkname="txt_96b726ef957b45a7eb82b08691178728" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_96b726ef957b45a7eb82b08691178728" name="txt_96b726ef957b45a7eb82b08691178728"></a>Seção I
+
+<p linkname="txt_f96207c1388b4b130e1c39dc754c8d29" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_f96207c1388b4b130e1c39dc754c8d29" name="txt_f96207c1388b4b130e1c39dc754c8d29"></a>Disposições Gerais
+
+<p linkname="titII_capV_art19_replaced" replaced_by="75344" style="display:block; text-align:justify"><s><a name="titII_capV_art19_replaced"></a>Art. 19. A administração pública direta, indireta ou fundacional, de qualquer dos Poderes do Distrito Federal, obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade, razoabilidade, motivação e interesse público, e também ao seguinte:</s>
+
+<p linkname="titII_capV_art19_replaced_replaced" replaced_by="77414" style="display:block; text-align:justify"><s><a name="titII_capV_art19_replaced_replaced"></a>Art. 19. A administração pública direta, indireta ou fundacional, de qualquer dos Poderes do Distrito Federal, obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade, transparência das contas públicas, razoabilidade, motivação e interesse público, e também ao seguinte:</s> <a href="/sinj/Norma/75344/cldf_elo_68_2013.html#art2">(Artigo alterado(a) pelo(a) Emenda à Lei Orgânica 68 de 30/10/2013)</a>
+
+<p linkname="titII_capV_art19_replaced_replaced_replaced" replaced_by="05c5e69fa60742fa9ded55074509600c" style="display:block; text-align:justify"><s><a name="titII_capV_art19_replaced_replaced_replaced"></a>Art. 19. A administração pública direta e indireta de qualquer dos Poderes do Distrito Federal obedece aos princípios de legalidade, impessoalidade, moralidade, publici
+<!-- FIXTURE TRUNCADO -->

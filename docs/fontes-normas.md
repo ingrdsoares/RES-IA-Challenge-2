@@ -77,6 +77,9 @@ Base: `https://www.planalto.gov.br/ccivil_03/`. Não há busca. A URL depende de
 | Medida provisória, de 2001 em diante, sem reedição | `_ato{ciclo}/{ano}/mpv/mpv{N}.htm` | `_ato2019-2022/2019/mpv/mpv881.htm`, `_ato2023-2026/2023/mpv/mpv1185.htm` |
 | Medida provisória reeditada (até 2001) | `mpv/{N}-{reedição}.htm`, só se a citação trouxer a reedição | `mpv/2158-35.htm` |
 
+| Constituição Federal | — | `constituicao/constituicao.htm` (verificado 2026-11-06; fixture `planalto_constituicao.raw`, cortada) | `constituicao/constituicao.htm` |
+| Emenda constitucional (1992 em diante) | — | `constituicao/emendas/emc/emc{NN}.htm`, `NN` com dois dígitos (`emc05.htm`, `emc103.htm`, `emc132.htm`; fixtures `planalto_emc_132.raw`, `planalto_emc_103.raw`). Emendas anteriores não têm padrão verificado (`manual`) | `emc132.htm` |
+
 Ciclos (todos verificados): `_ato2004-2006`, `_ato2007-2010`, `_ato2011-2014`, `_ato2015-2018`, `_ato2019-2022`, `_ato2023-2026` (anos 2023 e 2025). Os `{N}` não levam zeros à esquerda (exceto decreto-lei).
 
 **Medida provisória:** decisão baseada nas evidências. Pós-2001 o URL é derivável de ano e número (`mpv{N}.htm` no ciclo do ano). Antes de 2001 e nas reeditadas o Planalto usa `mpv/{N}-{reedição}.htm` e a reedição não se deduz do número (a MP 2.158 só existe como `2158-35`; a URN `medida.provisoria:2001;2158` do LexML dá "urn não encontrada", fixture `lexml_medida_provisoria_2001_2158.raw`). Portanto: MP com ano a partir de 2001 e sem reedição, tentar o Planalto; MP anterior ou reeditada, Planalto só quando a citação der a reedição; senão LexML (`urn:lex:br:federal:medida.provisoria:{ano};{N}` funciona para 2023, fixture `lexml_medida_provisoria_2023_1185.raw`, com links Câmara `.../medpro/2023/medidaprovisoria-1185-...-norma-pe.html`), depois Câmara, e `manual` se nenhum entregar.
@@ -187,7 +190,7 @@ Decisão sobre o resultado, depois de filtrar a resposta por esses nomes:
 - órgão da citação conhecido: manter só os atos cujo `orgaos[].siglaOrgao` contém esse órgão (sem caixa; atos conjuntos trazem dois, por exemplo `PGFN` e `RFB`);
 - órgão `None` e mais de um órgão distinto entre os correspondentes: `ambigua`;
 - mesmo `idAto` repetido: um candidato só;
-- `idAto` diferentes com o mesmo número e o mesmo órgão: `ambigua`. Evidência: Resolução CGSN 140/2018 volta com três `idAto` (116138, 114000, 92278), todos `CGSN` (`receita_busca_sem_tipo_140_2018.raw`; 92278 é o ato usado no acervo), e a IN RFB 971/2009 com dois (51538 e 15937) (`receita_busca_in971_revogada.raw`). Não escolher sozinho.
+- `idAto` diferentes com o mesmo número e o mesmo órgão (regra mudada na Task 8a): **não** é `ambigua`. Todos viram candidatos (multivigente e original de cada um) e cada documento é validado pela identidade no texto; os que validam são coletados como versões. Se nenhum validar, a norma fica `ambigua`. Evidência: Resolução CGSN 140/2018 volta com três `idAto` (116138, 114000, 92278), todos `CGSN` (`receita_busca_sem_tipo_140_2018.raw`; 92278 é o ato usado no acervo), e a IN RFB 971/2009 com dois (51538 e 15937) (`receita_busca_in971_revogada.raw`).
 
 Colisão por número, exemplo: número 140 em 2018 tem Resolução CGSN, Portaria DRF/RJ1, ADE de várias delegacias e SC Cosit.
 
@@ -232,6 +235,10 @@ Não encontrado:
 
 Codificação: UTF-8 (meta e bytes). Algumas URLs `http://www.sinj.df.gov.br/sinjpadrao/...` dão 301 para https. O formulário de relatório usa captcha (não necessário, não usar).
 
+**Lei Orgânica do DF** (verificado 2026-11-06): `nm_tipo_norma` = `Lei Orgânica` (1 registro no índice inteiro), `nr_norma` vazio, `dt_assinatura` 08/06/1993, `ch_norma` 66634, `ar_atualizado.filename` `LODF.html`, situação "Alterado" (`sinj_busca_lodf_1993.raw`, `sinj_lodf.raw`). O filtro `nm_tipo_norma` com tipo acentuado é ignorado pelo servidor, mas `nr_norma=0&ano_assinatura=1993` devolve os 184 atos de 1993 sem número; com `iDisplayLength=200` a LODF vem na mesma página. Regra: essa busca, filtrando `nm_tipo_norma == 'Lei Orgânica'`; texto em `/sinj/Norma/66634/LODF.html`.
+
+**Busca sem ano** (verificado 2026-11-06, 3 requisições): `nr_norma` sem `ano_assinatura` funciona (Lei 1254 → 1 registro Lei, mais Portarias e Decreto Legislativo com o mesmo número; Decreto 25508 → 1; Lei Complementar 840 → 1 LC entre 12 registros de tipos variados, `sinj_busca_lei1254_sem_ano.raw`, `sinj_busca_lc840_sem_ano.raw`). Regra: só lei, LC e decreto do DF (numeração contínua), com `iDisplayLength=100`; se `iTotalDisplayRecords` for maior que a página, `ambigua` (unicidade não verificável); filtrar pelo tipo exato e aceitar só um registro. Portaria, IN e ADE sem ano ficam `manual`.
+
 Fixtures: `sinj_busca_decreto_25508_2005.raw`, `sinj_busca_lc_840_2011.raw`, `sinj_busca_portaria_42_2016.raw`, `sinj_agregacao_tipos_2016.raw`, `sinj_busca_lei1254_1996.raw`, `sinj_busca_naoencontrado.raw`, `sinj_lei_1254_atualizada.raw` (60 KB de 435 KB), `sinj_soft404.raw`.
 
 ## CONFAZ
@@ -259,12 +266,16 @@ Fixtures: `confaz_convenio_52_17.raw` e `confaz_convenio_100_97.raw` (cabeçalho
 
 | Citação (tipo do projeto) | 1ª | 2ª | 3ª | Notas |
 |---|---|---|---|---|
-| Lei, LC, decreto-lei, decreto federais | Planalto (URL por regra) | LexML | Câmara (`-normaatualizada-`, `-publicacaooriginal-`) | texto original limpo só na Câmara |
+| Lei, LC, decreto-lei, decreto federais | Planalto (URL por regra) | LexML | Câmara (`-normaatualizada-`, `-publicacaooriginal-`) | texto original limpo só na Câmara. **Sem ano:** só a Câmara (busca por tipo e número), aceita se vier exatamente uma norma e a página de resultados for a lista inteira; várias = `ambigua`; o ano sai do cabeçalho validado |
+| Constituição Federal (`constituicao`, número 0) | Planalto `constituicao/constituicao.htm` | Câmara (busca "constituição federal 1988", pasta `consti/1988/constituicao-1988-`) | | identidade pelo título "CONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL" no início de uma linha do cabeçalho |
+| Emenda constitucional federal (ano 1992 em diante) | Planalto `emendas/emc/emc{NN}.htm` | Câmara (pasta `emecon`, busca "emenda constitucional N") | | identidade pelo cabeçalho "EMENDA CONSTITUCIONAL Nº N, DE ..."; EC anterior a 1992 ou sem ano: `manual` |
+| Portaria, IN, ADE, resolução CGSN sem ano | nenhuma | | | `manual`, motivo "ano não citado; numeração recomeça a cada ano" |
 | MP federal | Planalto só se ano a partir de 2001 sem reedição, ou se a citação traz a reedição | LexML | Câmara | `manual` se nenhum entregar |
 | Portaria, IN, ADE, Resolução CGSN (federais) | Receita | | | LexML e Planalto não trazem |
 | Convênio ICMS, ajuste SINIEF | CONFAZ (índice anual) | | | |
-| Lei, LC, decreto, portaria, IN, ADE do DF | SINJ-DF (compilado) | | | |
-| Emenda constitucional, Constituição, Lei Orgânica do DF, decreto legislativo/decreto-lei do DF, MP do DF, "assunto" | sem regra de localização verificada | | | `manual` |
+| Lei, LC, decreto, portaria, IN, ADE do DF | SINJ-DF (compilado) | | | sem ano: só lei, LC e decreto, registro único |
+| Lei Orgânica do DF (`lodf`, número 0) | SINJ-DF (tipo `Lei Orgânica`, número 0, ano 1993) | | | identidade pelo título "LEI ORGÂNICA DO DISTRITO FEDERAL" |
+| Emenda constitucional do DF, decreto legislativo/decreto-lei do DF, MP do DF, "assunto" | sem regra de localização verificada | | | `manual` |
 
 O Senado (API e páginas `/norma/`) está excluído até aval do usuário e não aparece na ordem.
 
@@ -307,4 +318,5 @@ A estimativa pode errar em 30% ou mais, principalmente na taxa de queda do Plana
 - Planalto, LexML, SINJ e CONFAZ: nenhum termo publicado encontrado.
 - Planalto: sem robots; cp1252; URL varia por era; a URL "pura" já é anotada.
 - Respostas com status 200 que significam "não encontrado": LexML (página de ~1 KB), SINJ (busca com `aaData: []` e texto com `ch_norma` inválido), Receita (`quantidadeTotal: 0`) e Câmara (busca com "de 0 a 0 de 0"); Senado (XML vazio) fica fora do pipeline. Erro 404 real: Planalto, Câmara (página da norma), CONFAZ.
+- Task 8a: a página `-norma-` da Constituição na Câmara não foi baixada (só a busca); o teste da reserva usa a busca real e uma página `-norma-` sintética com os links relativos. Câmara sem ano compara só a primeira página de resultados (20), por isso aceita só quando "de 1 a N de N" cobre tudo.
 - Não verificado: SRU do LexML, Planalto antes de 1964, emenda constitucional e demais tipos sem regra.

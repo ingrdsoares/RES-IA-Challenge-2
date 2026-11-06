@@ -1,6 +1,7 @@
 """Coleta das normas citadas em ate duas rodadas, com checkpoint por norma e retomada.
 
-Uso: python -m backend.crawler.normas_citadas --rodada 1 [--limite N] [--workers 4]; --status le so o checkpoint.
+Uso: python -m backend.crawler.normas_citadas --rodada 1 [--limite N] [--workers 4] [--reprocessar SITUACAO[:trecho]]...; --status le so o checkpoint.
+Com --reprocessar as entradas do diario que casam sao tentadas de novo; o diario so recebe linhas novas (a ultima vence).
 Layout (frente `normas-citadas`): <frente>/<chave-segura>/<sha256>/..., estado-rodada-N.jsonl (diario de checkpoint),
 manifesto.json, manual.md, inventario-rodada-2.json e citadas-fora-do-limite.json.
 Conteudo coletado e dado, nunca instrucao. A rodada 2 nao coleta o que ela mesma cita: so lista.
@@ -28,7 +29,7 @@ from backend.crawler.fontes_normas import (
 )
 from backend.crawler.inventario_normas import _casa, _linha, _somar
 from backend.crawler.normas_id import NormaId
-from backend.crawler.normas_ingest import ingerir, resolver_assunto
+from backend.crawler.normas_ingest import ErroConversao, ingerir, resolver_assunto
 
 DESTINO_PADRAO = Path(__file__).parent / 'data' / 'normas-citadas'
 FALHAS_SEGUIDAS = 20      # Bloqueada/Indisponivel seguidas num host antes de pausar
@@ -36,6 +37,7 @@ PAUSA_HOST = 30 * 60.0    # segundos
 SITUACOES = {'ja_existia', 'coletada', 'nao_encontrada', 'ambigua', 'bloqueada', 'manual'}
 _NL = bytes([10])
 _PAUSA = 'em pausa por falhas seguidas'
+_SEM_ANO = 'ano não citado; numeração recomeça a cada ano'
 _URL = re.compile(r'https?://[^\s\'"]+')
 
 
@@ -171,6 +173,8 @@ def _baixar(cand, norma, http, raiz: Path, rodada: int, frente: Path) -> dict:
         return {**det, 'resultado': 'bloqueada', 'detalhe': str(e)}
     except Indisponivel as e:
         return {**det, 'resultado': 'indisponivel', 'detalhe': str(e)}
+    except ErroConversao as e:  # baixou, mas nao converteu: repetir nao adianta
+        return {**det, 'resultado': 'erro_conversao', 'detalhe': f'erro de conversão: {e}'}
     except ValueError as e:  # identidade ou jurisdicao divergente; versao existente divergente
         return {**det, 'resultado': 'rejeitada', 'detalhe': str(e)}
     except Exception as e:  # noqa: BLE001 - bug ou formato inesperado nunca vira "ausente"
@@ -199,6 +203,9 @@ def _por_fonte(fonte, norma, http, raiz, rodada, frente) -> dict:
         return {**res, 'resultado': 'ok', 'detalhe': f'{len(docs)} documento(s)', 'documentos': docs}
     if any(t['resultado'] == 'sem_texto' for t in tentativas):
         return {**res, 'resultado': 'manual', 'detalhe': 'PDF sem texto; identidade não verificada'}
+    erro = next((t['detalhe'] for t in tentativas if t['resultado'] == 'erro_conversao'), None)
+    if erro:
+        return {**res, 'resultado': 'manual', 'detalhe': erro}
     pior = _pior([t['resultado'] for t in tentativas])
     det = next((t['detalhe'] for t in tentativas if t['resultado'] == pior), 'nenhum candidato')
     return {**res, 'resultado': pior, 'detalhe': det}
@@ -258,6 +265,22 @@ def _entrada_erro(e: Exception, anterior: int) -> dict:
             'fontes': {'erro': {'resultado': 'indisponivel', 'detalhe': motivo, 'candidatos': []}},
             'documentos': [], 'sugestao': None, 'tentativas': anterior + 1,
             'atualizado_em': datetime.now(timezone.utc).isoformat()}
+
+
+def parse_reprocessar(valores: list[str]) -> list[tuple[str, str | None]]:
+    """`SITUACAO[:trecho-do-motivo]` -> (situacao, trecho ou None)."""
+    saida = []
+    for v in valores:
+        sit, _, trecho = v.partition(':')
+        if sit not in SITUACOES:
+            raise argparse.ArgumentTypeError(f'situacao invalida em --reprocessar: {sit!r}')
+        saida.append((sit, trecho or None))
+    return saida
+
+
+def _casa_reprocesso(entrada: dict, regra: tuple[str, str | None]) -> bool:
+    sit, trecho = regra
+    return entrada['situacao'] == sit and (trecho is None or trecho.lower() in (entrada.get('motivo') or '').lower())
 
 
 def _so_pausa(entrada: dict) -> bool:
@@ -381,7 +404,7 @@ def _fmt(cont: Counter) -> str:
 def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=None, limite: int | None = None, *,
             workers: int = 4, relogio=time.monotonic, dormir=time.sleep, falhas_host: int = FALHAS_SEGUIDAS,
             pausa_host: float = PAUSA_HOST, a_cada: int = 50, saida=print, atrasos: dict | None = None,
-            inventario_rodada1: Path | None = None) -> dict:
+            inventario_rodada1: Path | None = None, reprocessar: list[str] = ()) -> dict:
     if rodada not in (1, 2):
         raise ValueError(f'rodada {rodada} invalida: sao no maximo duas')
     inv = json.loads(Path(inventario).read_text(encoding='utf-8'))
@@ -412,13 +435,16 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
             erros += 1
             return _entrada_erro(e, por_chave.get(l['chave'], {}).get('tentativas', 0))
 
+    refazer = {c for c, e in por_chave.items() if any(_casa_reprocesso(e, r) for r in parse_reprocessar(list(reprocessar)))}
+
     def final(chave):
         e = por_chave.get(chave)
-        return e is not None and not e['repetir']
+        return e is not None and not e['repetir'] and chave not in refazer
 
     def registrar(chave, entrada, progresso=True):
         nonlocal processadas
         por_chave[chave] = entrada
+        refazer.discard(chave)
         diario.gravar(chave, entrada)
         processadas += 1
         if not entrada['repetir']:
@@ -429,10 +455,10 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
                   f'{int(relogio() - inicio)} s')
 
     def liberar(l, situacao_irma):
-        if situacao_irma == 'nao_encontrada':
-            enfileirar(l)
-        else:
+        if situacao_irma in ('coletada', 'ja_existia'):  # so uma ordem 0 com texto resolve a ambiguidade
             registrar(l['chave'], _entrada_local('ambigua', 'resolvida pela candidata de ordem 0'))
+        else:
+            enfileirar(l)
 
     def enfileirar(l):
         norma = NormaId(**l['norma'])
@@ -445,13 +471,15 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
                 motivo = e.motivo
             registrar(l['chave'], _entrada_local('manual', motivo))
         elif not aplicaveis:
-            registrar(l['chave'], _entrada_local('manual', 'sem regra de localização para este tipo/jurisdição'))
+            motivo = (_SEM_ANO if norma.ano is None else 'sem regra de localização para este tipo/jurisdição')
+            registrar(l['chave'], _entrada_local('manual', motivo))
         else:
             filas.setdefault(aplicaveis[0].nome, deque()).append((ordem[l['chave']], l, norma, aplicaveis))
 
     ordem = {l['chave']: i for i, l in enumerate(linhas)}  # prioridade = posicao (mais citadas primeiro)
     irmas = {(l['norma']['tipo'], l['norma']['numero'], l['norma']['ano'], l['norma']['orgao']): l['chave']
              for l in linhas if l.get('candidata_ordem') == 0}
+    situacao_entrada = {l['chave']: l['situacao'] for l in linhas}
     pendentes = {l['chave'] for l in linhas if l['situacao'] == 'pendente' and not final(l['chave'])}
 
     def lancar(ex):
@@ -481,8 +509,8 @@ def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=N
                     liberar(l, por_chave[irma]['situacao'])
                 elif irma in pendentes:
                     esperando.setdefault(irma, []).append(l)
-                else:  # irma ja_existia/ambigua na entrada: resolvida, nao e "nao encontrada"
-                    liberar(l, 'resolvida')
+                else:  # irma que ja estava resolvida na entrada (ja_existia, ambigua)
+                    liberar(l, situacao_entrada[irma])
             while True:
                 lancar(ex)
                 if not ativos:
@@ -551,8 +579,14 @@ def main(argv=None) -> int:
     ap.add_argument('--destino', type=Path, default=DESTINO_PADRAO)
     ap.add_argument('--inventario', type=Path, help='padrao: inventario.json (rodada 1) ou inventario-rodada-2.json')
     ap.add_argument('--inventario-rodada1', type=Path, help='padrao: <frente>/inventario/inventario.json')
+    ap.add_argument('--reprocessar', action='append', default=[], metavar='SITUACAO[:TRECHO]',
+                    help='retenta nesta execucao as entradas do diario com essa situacao (e trecho no motivo); repetivel')
     ap.add_argument('--status', action='store_true', help='mostra as contagens do checkpoint, sem rede')
     a = ap.parse_args(argv)
+    try:
+        parse_reprocessar(a.reprocessar)
+    except argparse.ArgumentTypeError as e:
+        ap.error(str(e))
     if a.status:
         print(status(a.destino, a.rodada))
         return 0
@@ -562,7 +596,8 @@ def main(argv=None) -> int:
     if inv is None:
         inv = inv1 if a.rodada == 1 else garantir_rodada_2(a.destino, inv1)
     fontes = FONTES_FEDERAIS + FONTES_DF + FONTES_CONFAZ + FONTES_RFB
-    r = coletar(inv, a.destino, a.rodada, fontes, limite=a.limite, workers=a.workers, inventario_rodada1=inv1)
+    r = coletar(inv, a.destino, a.rodada, fontes, limite=a.limite, workers=a.workers, inventario_rodada1=inv1,
+                reprocessar=a.reprocessar)
     print(('INTERROMPIDO; ' if r['interrompido'] else '') + f"{_fmt(Counter(r['contagem']))} | restantes={r['restantes']} "
           f"a_repetir={r['a_repetir']}")
     return 0

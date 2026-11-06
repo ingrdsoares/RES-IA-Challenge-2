@@ -382,3 +382,69 @@ def test_semtextoautomatico_e_resolver_assunto():
     with pytest.raises(SemTextoAutomatico) as exc:
         resolver_assunto('IPTU', SemRede())
     assert 'IPTU' in exc.value.motivo
+
+
+# ---- SINJ: <p> sem </p> (Task 8a) ----
+
+def test_sinj_p_abertos_nao_estoura_a_pilha_e_preserva_rasura(tmp_path):
+    norma = NormaId('lei', 4567, 2011, 'df')
+    cand = Candidato('https://www.sinj.df.gov.br/sinj/Norma/68572/Lei_4567.html', 'sinj', 'compilada')
+    pasta = ingerir(norma, cand, fx('sinj_lei_4567_p_abertos.raw'), tmp_path)
+    md = (pasta / 'documento.md').read_text(encoding='utf-8')
+    assert md.count('Legisla') > 40  # o texto dos ~400 paragrafos abertos sobrevive
+    assert '~~' in md and 'Art. 9' in md  # a rasura (<s>) vira ~~ e o artigo tachado fica
+
+
+def test_sinj_tabela_em_paragrafos_abertos_sobrevive(tmp_path):
+    corpo = '<h1>Lei 5 de 01/01/2020</h1>' + ''.join(f'<p>Art. {i} Texto {i}' for i in range(1, 600)) + \
+        '<table><tr><td>Faixa</td><td>12,5%</td></tr></table>'
+    raw = f'<html><body><div id="div_texto">{corpo}</div></body></html>'.encode()
+    pasta = ingerir(NormaId('lei', 5, 2020, 'df'), Candidato('https://x/s.html', 'sinj', 'compilada'), raw, tmp_path)
+    md = (pasta / 'documento.md').read_text(encoding='utf-8')
+    assert 'Texto 599' in md and '12,5%' in md and 'Faixa' in md
+
+
+def test_erro_de_conversao_vira_erroconversao_nao_valueerror(tmp_path, monkeypatch):
+    from backend.crawler import normas_ingest as ni
+    monkeypatch.setattr(ni, '_convert', lambda *a: (_ for _ in ()).throw(RecursionError('fundo')))
+    with pytest.raises(ni.ErroConversao, match='RecursionError'):
+        ingerir(LEI, PLAN, lei_html(), tmp_path)
+
+
+# ---- Task 8a: Constituicao, LODF e emenda constitucional ----
+
+CF = NormaId('constituicao', 0, 1988, 'federal')
+LODF = NormaId('lodf', 0, 1993, 'df')
+SINJ_LODF = Candidato('https://www.sinj.df.gov.br/sinj/Norma/66634/LODF.html', 'sinj', 'compilada')
+
+
+def test_constituicao_valida_pelo_titulo(tmp_path):
+    cand = Candidato('https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm', 'planalto', 'unica')
+    pasta = ingerir(CF, cand, fx('planalto_constituicao.raw'), tmp_path)
+    meta = json.loads((pasta / 'metadados.json').read_text(encoding='utf-8'))
+    assert meta['tipo'] == 'constituicao' and meta['numero'] == 0 and meta['ano'] == 1988
+    assert 'Constituição' in meta['titulo'] and 'nº 0' not in meta['titulo']
+    with pytest.raises(ValueError, match='identidade'):  # outro texto sob o titulo da Constituicao
+        ingerir(CF, cand, lei_html(), tmp_path)
+
+
+def test_lei_organica_do_df_valida_pelo_titulo(tmp_path):
+    pasta = ingerir(LODF, SINJ_LODF, fx('sinj_lodf.raw'), tmp_path)
+    assert json.loads((pasta / 'metadados.json').read_text(encoding='utf-8'))['jurisdicao'] == 'df'
+    assert (pasta / 'documento.md').is_file()
+    with pytest.raises(ValueError, match='identidade'):
+        ingerir(LODF, SINJ_LODF, fx('sinj_lei_4567_p_abertos.raw'), tmp_path)
+
+
+def test_titulo_citado_no_meio_do_texto_nao_vale():
+    assert not validar_identidade(CF, 'LEI Nº 1, DE 1º DE JANEIRO DE 2000\nEmenta. Segundo a Constituição da República '
+                                      'Federativa do Brasil de 1988, fica. Art. 1º Texto.')
+    assert validar_identidade(CF, 'Presidência da República\nCONSTITUIÇÃO DA REPÚBLICA FEDERATIVA DO BRASIL DE 1988\nArt. 1º X')
+
+
+def test_emenda_constitucional_valida_numero_e_rejeita_a_errada(tmp_path):
+    ec132 = NormaId('ec', 132, 2023, 'federal')
+    cand = Candidato('https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc132.htm', 'planalto', 'unica')
+    assert ingerir(ec132, cand, fx('planalto_emc_132.raw'), tmp_path).is_dir()
+    with pytest.raises(ValueError, match='identidade'):  # a pagina da EC 103 sob a EC 132
+        ingerir(ec132, cand, fx('planalto_emc_103.raw'), tmp_path)

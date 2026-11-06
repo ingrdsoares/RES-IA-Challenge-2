@@ -212,13 +212,16 @@ def _milhar(n: int) -> str:
     return f'{n:,}'.replace(',', '.')
 
 
+CONTINUAS = {'lei', 'lc', 'dl', 'decreto'}  # numeracao continua: o numero basta sem o ano
+
+
 class Planalto:
     nome = 'planalto'
     _BASE = 'https://www.planalto.gov.br/ccivil_03/'
-    _TIPOS = {'lei', 'lc', 'decreto', 'dl', 'mp'}
+    _TIPOS = {'lei', 'lc', 'decreto', 'dl', 'mp', 'ec', 'constituicao'}
 
     def aceita(self, norma: NormaId) -> bool:
-        return norma.jurisdicao == 'federal' and norma.tipo in self._TIPOS
+        return norma.jurisdicao == 'federal' and norma.tipo in self._TIPOS and norma.ano is not None
 
     @staticmethod
     def caminhos(norma: NormaId) -> list[str]:
@@ -226,6 +229,10 @@ class Planalto:
         n, a, t = norma.numero, norma.ano, norma.tipo
         if a is None:
             return []
+        if t == 'constituicao':
+            return ['constituicao/constituicao.htm']
+        if t == 'ec':  # emendas anteriores a CF/88 (e a EC 1/1992) nao seguem este padrao verificado
+            return [f'constituicao/emendas/emc/emc{n:02d}.htm'] if a >= 1992 else []
         if t == 'lc':
             return [f'leis/lcp/lcp{n}.htm', f'leis/lcp/lcp{n}compilado.htm']
         if t == 'dl':
@@ -294,24 +301,40 @@ class Lexml:
 
 class Camara:
     nome = 'camara'
-    _PASTA = {'lei': 'lei', 'lc': 'leicom', 'dl': 'declei', 'decreto': 'decret', 'mp': 'medpro'}
+    _PASTA = {'lei': 'lei', 'lc': 'leicom', 'dl': 'declei', 'decreto': 'decret', 'mp': 'medpro', 'ec': 'emecon',
+              'constituicao': 'consti'}
     _BUSCA = {'lei': 'lei', 'lc': 'lei complementar', 'dl': 'decreto-lei', 'decreto': 'decreto',
-              'mp': 'medida provisória'}
+              'mp': 'medida provisória', 'ec': 'emenda constitucional'}
+    _CF = '/legin/fed/consti/1988/constituicao-1988-'
+    _PAGINA = re.compile(r'Exibindo resultados de \d+ a (\d+) de (\d+)')
     _ARQ = re.compile(r'-(\d+)-\d{1,2}-[a-zç]+-(\d{4})-\d+-norma-p[le]\.html$')
 
     def aceita(self, norma: NormaId) -> bool:
-        return norma.jurisdicao == 'federal' and norma.tipo in self._PASTA
+        # sem ano so a numeracao continua (docs/fontes-normas.md, "Normas sem ano")
+        return (norma.jurisdicao == 'federal' and norma.tipo in self._PASTA
+                and (norma.ano is not None or norma.tipo in CONTINUAS))
 
     def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
-        q = urlencode({'abrangencia': 'Legislação Federal', 'geral': f'{self._BUSCA[norma.tipo]} {norma.numero}'})
+        geral = 'constituição federal 1988' if norma.tipo == 'constituicao' else f'{self._BUSCA[norma.tipo]} {norma.numero}'
+        q = urlencode({'abrangencia': 'Legislação Federal', 'geral': geral})
         html = texto(exigir(http.get('https://www.camara.leg.br/legislacao/busca?' + q), 200))
         pasta = f'/legin/fed/{self._PASTA[norma.tipo]}/'
         achadas = []
         paginas = re.findall(r'href="(https://www2\.camara\.leg\.br/legin/fed/[^"]+-norma-p[le]\.html)"', html)
         for u in dict.fromkeys(paginas):
+            if norma.tipo == 'constituicao':
+                if self._CF in u:
+                    achadas.append(u)
+                continue
             m = self._ARQ.search(u)  # a busca e por texto: conferir tipo (pasta), numero e ano
             if pasta in u and m and int(m[1]) == norma.numero and (norma.ano is None or int(m[2]) == norma.ano):
                 achadas.append(u)
+        if norma.ano is None:  # so uma norma, e so se a pagina de resultados for a lista inteira
+            pag = self._PAGINA.search(html)
+            if len(achadas) > 1:
+                raise Ambigua(f'{len(achadas)} normas da Camara com tipo {norma.tipo} e numero {norma.numero} (ano nao citado)')
+            if achadas and pag and int(pag[2]) > int(pag[1]):
+                raise Ambigua(f'busca da Camara com {pag[2]} resultados e so {pag[1]} na pagina; unicidade nao verificavel')
         saida = []
         for u in achadas:
             resp = exigir(http.get(u), 200, 404)
@@ -339,24 +362,36 @@ class Sinj:
              'in': 'Instrução Normativa', 'ade': 'Ato Declaratório'}
 
     def aceita(self, norma: NormaId) -> bool:
-        return norma.jurisdicao == 'df' and norma.tipo in self._TIPO and norma.ano is not None
+        if norma.jurisdicao != 'df':
+            return False
+        if norma.ano is None:  # sem ano so lei, LC e decreto (numeracao continua; verificado em 2026-11-06)
+            return norma.tipo in ('lei', 'lc', 'decreto')
+        return norma.tipo in self._TIPO or norma.tipo == 'lodf'
 
     def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
-        nome = self._TIPO[norma.tipo]
-        q = urlencode({'tipo_pesquisa': 'norma', 'nm_tipo_norma': nome, 'nr_norma': norma.numero,
-                       'ano_assinatura': norma.ano, 'bbusca': 'sinj_norma', 'iDisplayStart': 0,
-                       'iDisplayLength': 10, 'sEcho': 1})
+        lodf = norma.tipo == 'lodf'  # a LODF nao tem numero: busca por numero 0 e ano traz os atos sem numero
+        nome = 'Lei Orgânica' if lodf else self._TIPO[norma.tipo]
+        completa = lodf or norma.ano is None  # unicidade so se a pagina trouxer todos os registros
+        campos = {'tipo_pesquisa': 'norma', 'nm_tipo_norma': nome, 'nr_norma': norma.numero}
+        if norma.ano is not None:
+            campos['ano_assinatura'] = norma.ano
+        q = urlencode({**campos, 'bbusca': 'sinj_norma', 'iDisplayStart': 0,
+                       'iDisplayLength': 200 if lodf else 100 if completa else 10, 'sEcho': 1})
         dados = json.loads(exigir(http.get(self._BUSCA + q), 200).content)
+        if completa and dados.get('iTotalDisplayRecords', 0) > len(dados['aaData']):
+            raise Ambigua(f"busca do SINJ com {dados['iTotalDisplayRecords']} registros e so {len(dados['aaData'])} "
+                          'na pagina: mais resultados que a pagina; unicidade nao verificavel')
         achados = []
         for linha in dados['aaData']:
             r = linha['_source']  # o filtro de tipo da fonte e aproximado: conferir tudo na resposta
             siglas = {o.get('sg_orgao', '').lower() for o in r.get('origens') or []}
-            if (r['nm_tipo_norma'] == nome and str(r['nr_norma']) == str(norma.numero)
-                    and str(r.get('dt_assinatura', ''))[-4:] == str(norma.ano)
+            numero_ok = not r['nr_norma'] if lodf else str(r['nr_norma']) == str(norma.numero)
+            if (r['nm_tipo_norma'] == nome and numero_ok
+                    and (norma.ano is None or str(r.get('dt_assinatura', ''))[-4:] == str(norma.ano))
                     and (not norma.orgao or norma.orgao.lower() in siglas)):
                 achados.append(r)
         if len(achados) > 1:
-            raise Ambigua(f'{len(achados)} registros do SINJ com tipo {nome}, numero {norma.numero} e ano {norma.ano}')
+            raise Ambigua(f'{len(achados)} registros do SINJ com tipo {nome}, numero {norma.numero} e ano {norma.ano or "nao citado"}')
         if not achados:
             return []
         if not (achados[0].get('ar_atualizado') or {}).get('filename'):  # a original do SINJ nao e coletada
@@ -434,9 +469,7 @@ class Receita:
         orgaos = {frozenset(o['siglaOrgao'].lower() for o in a['orgaos']) for a in achados.values()}
         if orgao is None and len(orgaos) > 1:
             raise Ambigua(f'orgao nao informado e {len(achados)} atos de orgaos diferentes com o mesmo numero')
-        if len(achados) > 1:
-            raise Ambigua(f'{len(achados)} idAto distintos com o mesmo numero e orgao: {sorted(achados)}')
-        saida = []
+        saida = []  # varios idAto com o mesmo numero e orgao: todos viram candidatos; a identidade no texto decide
         for ato in achados.values():  # a visao multivigente pode dar 406; a original fica como alternativa
             for visao, rotulo in (('multivigente', 'compilada'), ('original', 'original')):
                 saida.append(Candidato(f"{self._ATO}{ato['idAto']}/visao/{visao}", self.nome, rotulo,

@@ -429,7 +429,6 @@ def test_sinj_lei_df_devolve_texto_compilado_com_situacao():
 def test_sinj_nao_aceita_federal_nem_tipo_sem_equivalente():
     assert not Sinj().aceita(NormaId('lei', 10833, 2003, 'federal'))
     assert not Sinj().aceita(NormaId('convenio_icms', 52, 2017, 'df'))
-    assert not Sinj().aceita(NormaId('lei', 1254, None, 'df'))
 
 
 def test_sinj_filtra_tipo_exato_e_nao_confunde_portaria_conjunta():
@@ -500,19 +499,6 @@ def test_receita_envia_numero_e_ano_sem_tipo_e_pagina():
     assert Receita().localizar(NormaId('in', 1, 2018, 'federal', 'rfb'), http) == []
     c = json.loads(corpos[0])
     assert (c['numeroAto'], c['anoAto'], c['tiposAtosSelecionados'], c['paginacaoPaginaAtual']) == ('1', '2018', '', 1)
-
-
-def test_receita_cgsn_140_tem_tres_idato_e_e_ambigua():
-    http, _, _ = montar(rotas_rfb('receita_busca_sem_tipo_140_2018.raw'))
-    with pytest.raises(Ambigua) as e:
-        Receita().localizar(NormaId('resol_cgsn', 140, 2018, 'federal'), http)
-    assert 'idAto' in e.value.motivo
-
-
-def test_receita_in971_dois_idato_mesmo_orgao_e_ambigua():
-    http, _, _ = montar(rotas_rfb('receita_busca_in971_revogada.raw'))
-    with pytest.raises(Ambigua):
-        Receita().localizar(NormaId('in', 971, 2009, 'federal', 'rfb'), http)
 
 
 def test_receita_orgao_none_com_varios_orgaos_e_ambigua_e_com_orgao_filtra():
@@ -607,3 +593,124 @@ def test_atraso_por_host_vale_entre_threads():
     [t.start() for t in ts]
     [t.join() for t in ts]
     assert len(chegadas) == 2 and abs(chegadas[1] - chegadas[0]) >= 2.0
+
+
+# ---- Task 8a: Constituicao, EC, LODF, sem ano, varios idAto ----
+
+CAM_BUSCA = 'https://www.camara.leg.br/legislacao/busca?abrangencia=Legisla%C3%A7%C3%A3o+Federal&geral='
+SINJ_SEM_ANO = ('https://www.sinj.df.gov.br/sinj/ashx/Datatable/ResultadoDePesquisaNormaDatatable.ashx?'
+                'tipo_pesquisa=norma&nm_tipo_norma={t}&nr_norma={n}&bbusca=sinj_norma'
+                '&iDisplayStart=0&iDisplayLength=100&sEcho=1')
+SINJ_LODF = ('https://www.sinj.df.gov.br/sinj/ashx/Datatable/ResultadoDePesquisaNormaDatatable.ashx?'
+             'tipo_pesquisa=norma&nm_tipo_norma=Lei+Org%C3%A2nica&nr_norma=0&ano_assinatura=1993&bbusca=sinj_norma'
+             '&iDisplayStart=0&iDisplayLength=200&sEcho=1')
+CF = NormaId('constituicao', 0, 1988, 'federal')
+LODF = NormaId('lodf', 0, 1993, 'df')
+
+
+def test_planalto_constituicao_e_emenda():
+    assert Planalto.caminhos(CF) == ['constituicao/constituicao.htm']
+    assert Planalto.caminhos(NormaId('ec', 132, 2023, 'federal')) == ['constituicao/emendas/emc/emc132.htm']
+    assert Planalto.caminhos(NormaId('ec', 5, 1995, 'federal')) == ['constituicao/emendas/emc/emc05.htm']
+    assert Planalto.caminhos(NormaId('ec', 1, 1969, 'federal')) == []  # anterior a CF/88: URL nao verificada
+    assert Planalto.caminhos(NormaId('ec', 132, None, 'federal')) == []
+    assert Planalto().aceita(CF) and Planalto().aceita(NormaId('ec', 132, 2023, 'federal'))
+
+
+def test_planalto_localiza_emenda_e_constituicao():
+    http, pedidos, _ = montar({PL + 'constituicao/emendas/emc/emc132.htm': (200, fx('planalto_emc_132.raw'), 'text/html'),
+                               PL + 'constituicao/constituicao.htm': (200, fx('planalto_constituicao.raw'), 'text/html')})
+    assert Planalto().localizar(NormaId('ec', 132, 2023, 'federal'), http)[0].url.endswith('emc/emc132.htm')
+    assert Planalto().localizar(CF, http)[0].url.endswith('constituicao/constituicao.htm')
+
+
+def test_camara_reserva_para_constituicao_e_emenda():
+    cb = fx('camara_busca_constituicao.raw')
+    pagina = 'https://www2.camara.leg.br/legin/fed/consti/1988/constituicao-1988-5-outubro-1988-322142-norma-pl.html'
+    corpo = b'<a href="constituicao-1988-5-outubro-1988-322142-normaatualizada-pl.html">x</a>'
+    http, _, _ = montar({CAM_BUSCA + 'constitui%C3%A7%C3%A3o+federal+1988': (200, cb, 'text/html; charset=utf-8'),
+                         pagina: (200, corpo, 'text/html')})
+    c = Camara().localizar(CF, http)
+    assert [x.url for x in c] == [pagina.replace('-norma-', '-normaatualizada-')]
+    http, _, _ = montar({CAM_BUSCA + 'emenda+constitucional+132': (200, fx('camara_busca_ec132.raw'), 'text/html; charset=utf-8')})
+    assert Camara().localizar(NormaId('ec', 132, 2024, 'federal'), http) == []  # ano errado
+    assert Camara().aceita(NormaId('ec', 132, 2023, 'federal')) and not Camara().aceita(NormaId('ec', 132, None, 'federal'))
+
+
+def test_sinj_lei_organica_do_df_pela_busca_sem_numero():
+    http, pedidos, _ = montar({SINJ_LODF: (200, fx('sinj_busca_lodf_1993.raw'), JSON_CT)})
+    assert Sinj().aceita(LODF)
+    c = Sinj().localizar(LODF, http)
+    assert [x.url for x in c] == ['https://www.sinj.df.gov.br/sinj/Norma/66634/LODF.html']
+    assert c[0].situacao_fonte == 'Alterado'
+
+
+def test_sinj_lodf_ausente_ou_duplicada():
+    d = json.loads(fx('sinj_busca_lodf_1993.raw'))
+    sem = dict(d, aaData=[l for l in d['aaData'] if l['_source']['nm_tipo_norma'] != 'Lei Orgânica'], iTotalDisplayRecords=2)
+    http, _, _ = montar({SINJ_LODF: (200, json.dumps(sem).encode(), JSON_CT)})
+    assert Sinj().localizar(LODF, http) == []
+    dup = dict(d, aaData=d['aaData'] + [d['aaData'][0]], iTotalDisplayRecords=4)
+    http, _, _ = montar({SINJ_LODF: (200, json.dumps(dup).encode(), JSON_CT)})
+    with pytest.raises(Ambigua):
+        Sinj().localizar(LODF, http)
+
+
+def test_camara_sem_ano_aceita_so_um_resultado():
+    n = NormaId('lei', 10833, None, 'federal')
+    assert Camara().aceita(n) and not Planalto().aceita(n)
+    assert not Camara().aceita(NormaId('mp', 10, None, 'federal'))
+    assert not Camara().aceita(NormaId('portaria', 10, None, 'federal', 'rfb'))
+    norma = 'https://www2.camara.leg.br/legin/fed/lei/2003/lei-10833-29-dezembro-2003-497045-norma-pl.html'
+    http, _, _ = montar({CAM_BUSCA + 'lei+10833': (200, fx('camara_busca_lei10833.raw'), 'text/html; charset=utf-8'),
+                         norma: (200, fx('camara_lei_10833.raw'), 'text/html; charset=utf-8')})
+    assert len(Camara().localizar(n, http)) == 2
+
+
+def test_camara_sem_ano_varios_resultados_ou_pagina_incompleta_e_ambigua():
+    n = NormaId('lei', 10833, None, 'federal')
+    b = fx('camara_busca_lei10833.raw').decode('utf-8')
+    href = 'https://www2.camara.leg.br/legin/fed/lei/2003/lei-10833-29-dezembro-2003-497045-norma-pl.html'
+    outra = href.replace('2003', '2010').replace('497045', '111111')
+    dupla = b.replace(href, href + '"></a><a href="' + outra, 1)
+    http, _, _ = montar({CAM_BUSCA + 'lei+10833': (200, dupla.encode(), 'text/html; charset=utf-8')})
+    with pytest.raises(Ambigua):
+        Camara().localizar(n, http)
+    mais = b.replace('de 1 a 5 de 5', 'de 1 a 5 de 60')
+    http, _, _ = montar({CAM_BUSCA + 'lei+10833': (200, mais.encode(), 'text/html; charset=utf-8')})
+    with pytest.raises(Ambigua):
+        Camara().localizar(n, http)
+
+
+def test_sinj_sem_ano_so_lei_lc_decreto_e_so_registro_unico():
+    assert Sinj().aceita(NormaId('lei', 1254, None, 'df')) and Sinj().aceita(NormaId('decreto', 1, None, 'df'))
+    assert not Sinj().aceita(NormaId('portaria', 42, None, 'df')) and not Sinj().aceita(NormaId('in', 1, None, 'df'))
+    http, _, _ = montar({SINJ_SEM_ANO.format(t='Lei', n=1254): (200, fx('sinj_busca_lei1254_sem_ano.raw'), JSON_CT)})
+    c = Sinj().localizar(NormaId('lei', 1254, None, 'df'), http)
+    assert [x.url for x in c] == ['https://www.sinj.df.gov.br/sinj/Norma/49208/Lei_1254.html']
+    d = json.loads(fx('sinj_busca_lc840_sem_ano.raw'))
+    d['iTotalDisplayRecords'] = len(d['aaData']) + 2  # pagina incompleta: unicidade nao verificavel
+    http, _, _ = montar({SINJ_SEM_ANO.format(t='Lei+Complementar', n=840): (200, json.dumps(d).encode(), JSON_CT)})
+    with pytest.raises(Ambigua, match='mais resultados'):
+        Sinj().localizar(NormaId('lc', 840, None, 'df'), http)
+
+
+def test_sinj_sem_ano_dois_registros_do_mesmo_tipo_e_ambigua():
+    d = json.loads(fx('sinj_busca_lei1254_sem_ano.raw'))
+    lei = next(l for l in d['aaData'] if l['_source']['nm_tipo_norma'] == 'Lei')
+    outra = json.loads(json.dumps(lei))
+    outra['_source'].update(ch_norma='999', dt_assinatura='01/01/2001')
+    d['aaData'].append(outra)
+    d['iTotalDisplayRecords'] = len(d['aaData'])
+    http, _, _ = montar({SINJ_SEM_ANO.format(t='Lei', n=1254): (200, json.dumps(d).encode(), JSON_CT)})
+    with pytest.raises(Ambigua):
+        Sinj().localizar(NormaId('lei', 1254, None, 'df'), http)
+
+
+def test_receita_varios_idato_mesmo_orgao_devolve_todos_os_candidatos():
+    http, _, _ = montar(rotas_rfb('receita_busca_sem_tipo_140_2018.raw'))
+    cands = Receita().localizar(NormaId('resol_cgsn', 140, 2018, 'federal'), http)
+    assert {c.url.split('/ato/')[1].split('/')[0] for c in cands} == {'116138', '92278', '114000'}
+    assert len(cands) == 6
+    http, _, _ = montar(rotas_rfb('receita_busca_in971_revogada.raw'))
+    assert len(Receita().localizar(NormaId('in', 971, 2009, 'federal', 'rfb'), http)) == 4

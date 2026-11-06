@@ -1,0 +1,1382 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="pt-br"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="pt-br"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="pt-br"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="pt-br">
+<!--<![endif]-->
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="facebook-domain-verification" content="bxxobfdomarwwsu1tu7b9wv9oy0gw2" />
+  
+  <title>
+      Busca de legislação - Portal da Câmara dos Deputados
+  </title>
+  <meta name="description" content="Busca de legislação">
+  
+  <meta name="msapplication-TileColor" content="#00a300">
+  <meta name="msapplication-TileImage" content="https://www.camara.leg.br/tema/mstile-144x144.png">
+  <meta name="theme-color" content="#009e49">
+  
+  
+  <meta itemprop="name" content="Busca de legislação" />
+  
+  <meta itemprop="description" content="Busca de legislação" />
+  
+  <meta itemprop="image" content="https://www.camara.leg.br/tema/assets/images/imagens-compartilhamento/imagem-padrao.jpg" />
+  
+  <meta property="og:site_name" content="Portal da Câmara dos Deputados" />
+  <meta property="fb:app_id" content="305358806340223" />
+  
+  <meta property="og:title" content="Busca de legislação" />
+  
+  <meta property="og:description" content="Busca de legislação">
+  
+  
+  <meta property="og:type" content="website" />
+  
+  <meta property="og:image:secure_url" content="https://www.camara.leg.br/tema/assets/images/imagens-compartilhamento/imagem-padrao.jpg" />
+  
+      <meta property="og:image" content="https://www.camara.leg.br/tema/assets/images/imagens-compartilhamento/imagem-padrao.jpg" />
+  <meta name="twitter:card" content="summary" />
+  
+  <meta name="twitter:title" content="Busca de legislação" />
+  
+  <meta name="twitter:description" content="Busca de legislação" />
+  
+  <meta name="twitter:image" content="https://www.camara.leg.br/tema/assets/images/imagens-compartilhamento/imagem-padrao.jpg" />
+  
+  
+  
+  
+
+  <link rel="apple-touch-icon" href="https://www.camara.leg.br/tema/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="https://www.camara.leg.br/tema/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://www.camara.leg.br/tema/apple-touch-icon-180x180.png">
+  <link rel="apple-touch-icon-precomposed" href="https://www.camara.leg.br/tema/apple-touch-icon-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://www.camara.leg.br/tema/apple-touch-icon-152x152-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="https://www.camara.leg.br/tema/apple-touch-icon-180x180-precomposed.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://www.camara.leg.br/tema/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://www.camara.leg.br/tema/favicon-16x16.png">
+  <link rel="manifest" href="https://www.camara.leg.br/tema/site.webmanifest">
+  <link rel="mask-icon" href="https://www.camara.leg.br/tema/safari-pinned-tab.svg" color="#009e49">
+  <link rel="stylesheet" rel="preload" as="style" href="https://www.camara.leg.br/tema/global/vendor-bundle.css">
+  <link rel="stylesheet" rel="preload" as="style" href="https://www.camara.leg.br/tema/global/camara-custom.css">
+
+    <link rel="stylesheet" href="https://www.camara.leg.br/legislacao/static/alteracoes.css">
+    <link rel="stylesheet" href="https://www.camara.leg.br/tema/atividade/legislacao/busca-legislacao.css">
+
+  <style type="text/css">
+    /* Regra geral para no-fouc */
+    .js .u-no-fouc {
+      visibility: hidden;
+      opacity: 0
+    }
+
+    /* Elementos no-fouc que não podem ocupar espaço durante a carga da página */
+    .js .u-no-fouc--no-size {
+      display: none
+    }
+  </style>
+  <script type="text/javascript">
+    // Concatena a classe 'js' à tag html
+    document.documentElement.className += ' js';
+  </script>
+
+</head>
+
+<body>
+  <div class="js-mmenu-container">
+    <header class="l-cabecalho-portal" role="banner">
+      <ul aria-label="Acesso direto" class="acesso-direto">
+        <!-- Links para saltar diretamente para áreas importantes da página accesskey 2 = conteúdo e 3 = navegação -->
+        <li><a class="acesso-direto__link" href="#main-content" accesskey="2">Ir ao conteúdo</a></li>
+        <li><a class="acesso-direto__link" href="#main-nav" accesskey="3">Ir à navegação principal</a></li>
+      </ul>
+    
+      <!--[if lte IE 9]>
+        <p class="browserupgrade">Você está usando um navegador <strong>defasado</strong>. Por favor, <a href="https://browsehappy.com/">atualize seu navegador</a> para melhorar sua experiência e sua segurança.</p>
+        <![endif]-->
+    
+      <div class="nav-top">
+        <div class="container nav-top--container">
+          <a href="https://www.camara.leg.br" class="logo-camara" accesskey="1"><span class="sr-only">Página inicial</span></a>
+    
+        <div class="nav-top__palacio">
+    
+        </div>
+        
+        <div class="nav-top__menu-superior">
+          <ul aria-label="Ferramentas de apoio" class="links-apoio ">
+              <li class="links-apoio__item links-apoio__item--acessibilidade"><a href="https://www2.camara.leg.br/acessibilidade/recursos-de-acessibilidade" accesskey="0">Acessibilidade</a></li>
+              <li class="links-apoio__item links-apoio__item--faleconosco"><a href="https://www.camara.leg.br/fale-conosco" accesskey="9">Fale Conosco</a></li>
+          </ul>
+          <ul class="orgaos-parceiros" aria-label="Órgãos parceiros">
+            <li class="orgaos-parceiros__item orgaos-parceiros__item--congresso"><a
+                href="http://www.congressonacional.leg.br"><span>Congresso</span></a></li>
+            <li class="orgaos-parceiros__item orgaos-parceiros__item--senado"><a
+                href="http://www.senado.leg.br"><span>Senado</span></a></li>
+          </ul>
+    
+          <div class="lista-idiomas">
+              <button class="botao-idioma-topo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="4,0">
+                  <span class="botao-idioma-topo__sigla">PT</span>
+              </button>
+          
+              <ul class="dropdown-menu dropdown-menu-right l-lista-idiomas" aria-label="Idioma">
+                  <li class="l-lista-idiomas__item">
+                      <a href="https://www2.camara.leg.br/english" class="idioma-topo">
+                          <span class="idioma-topo__bandeira idioma-topo__bandeira--ingles" aria-hidden="true"></span>
+                          <span class="idioma-topo__nome">English</span>
+                          <span class="idioma-topo__sigla">EN</span>
+                      </a>
+                  </li>
+                  <li class="l-lista-idiomas__item">
+                      <a href="https://www2.camara.leg.br/espanol" class="idioma-topo">
+                          <span class="idioma-topo__bandeira idioma-topo__bandeira--espanhol" aria-hidden="true"></span>
+                          <span class="idioma-topo__nome">Español</span>
+                          <span class="idioma-topo__sigla">ES</span>            
+                      </a>
+                  </li>
+              </ul>
+          </div>
+            <a href="https://www.camara.leg.br/login" class="btn nav-top__botao-entrar">Entrar</a>
+        </div>
+        </div>
+      </div>
+    
+      <nav class="menu-global navbar navbar-expand-lg" role="navigation" aria-label="Navegação principal" id="menuglobal">
+        <div class="container menu-global--container">
+    
+          <!-- icone menu -->
+          <a href="#navbarportal" class="menu-global--btnmenu navbar-toggler"
+            aria-label="Navegação principal - abrir/fechar">
+            <span class="menu-global--icon"></span>
+          </a>
+    
+          <!-- icone busca -->
+          <button class="menu-global--btnsearch" type="button" data-toggle="collapse" data-target="#buscaportal"
+            aria-controls="buscaportal" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="fa fa-search"></span>
+          </button>
+    
+          <div class="js-mmenu u-no-fouc u-no-fouc--no-size" id="navbarportal">
+            <ul aria-label="Navegação Principal" id="main-nav" class="">
+                <li class="">
+                  <span class="menu-global__item-temas" id="temas">Assuntos</span>
+                  <ul class="" aria-labelledby="temas">
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/agropecuaria">Agropecuária</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/cidades-e-transportes">Cidades e transportes</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/ciencia-tecnologia-e-comunicacoes">Ciência, tecnologia e comunicações</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/consumidor">Consumidor</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/direitos-humanos">Direitos humanos</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/economia">Economia</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/educacao-cultura-e-esportes">Educação, cultura e esportes</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/meio-ambiente-e-energia">Meio ambiente e energia</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/politica-e-administracao-publica">Política e administração pública</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/relacoes-exteriores">Relações exteriores</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/saude">Saúde</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/seguranca">Segurança</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assuntos/trabalho-previdencia-e-assistencia">Trabalho, previdência e assistência</a></li>
+                  </ul>
+                </li>
+                <li class="">
+                  <span class="menu-global__item-institucional" id="institucional">Institucional</span>
+                  <ul class="" aria-labelledby="institucional">
+                      <li class=""><a href="https://www.camara.leg.br/agenda">Agenda</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/transparencia/servicos-ao-cidadao">Serviços</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/a-camara/estruturaadm/mesa/presidencia">Presidência</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/biblioteca-e-publicacoes/">Biblioteca e publicações</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/escola-da-camara/">Escola da Câmara</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/papel-e-estrutura/">Papel e estrutura</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/historia-e-arquivo/">História e arquivo</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/a-camara/visiteacamara">Visite</a></li>
+                  </ul>
+                </li>
+                <li class="">
+                  <span class="menu-global__item-deputados" id="deputados">Deputados</span>
+                  <ul class="" aria-labelledby="deputados">
+                      <li class=""><a href="https://www.camara.leg.br/deputados/quem-sao">Quem são</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/deputados/liderancas-e-bancadas-partidarias">Lideranças e bancadas</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/deputados/frentes-e-grupos-parlamentares">Frentes e grupos parlamentares</a></li>
+                  </ul>
+                </li>
+                <li class="">
+                  <span class="menu-global__item-atvlegislativa" id="atvlegislativa">Atividade Legislativa</span>
+                  <ul class="" aria-labelledby="atvlegislativa">
+                      <li class=""><a href="https://www.camara.leg.br/busca-portal/proposicoes/pesquisa-simplificada">Propostas legislativas</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/plenario">Plenário</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/comissoes">Comissões</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/sessoesereunioes">Sessões e reuniões</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/atividade-legislativa/estudos-e-notas-tecnicas">Estudos legislativos</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/atividade-legislativa/orcamento-da-uniao">Orçamento da União</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/legislacao">Legislação</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/entenda-o-processo-legislativo/">Entenda o processo legislativo</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/atividade-legislativa/participe">Participe</a></li>
+                  </ul>
+                </li>
+                <li class="">
+                  <span class="menu-global__item-comunicacao" id="comunicacao">Comunicação</span>
+                  <ul class="" aria-labelledby="comunicacao">
+                      <li class=""><a href="https://www.camara.leg.br/noticias">Agência Câmara de Notícias</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/radio">Rádio Câmara</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/tv">TV Câmara</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/banco-imagens">Banco de Imagens</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/assessoria-de-imprensa">Assessoria de Imprensa</a></li>
+                      <li class=""><a href="https://www.camara.leg.br/comprove">Comprove uma notícia</a></li>
+                  </ul>
+                </li>
+                <li class="">
+                  <span class="menu-global__item-transprestcontas" id="transprestcontas">Transparência e prestação de contas</span>
+                  <ul class="" aria-labelledby="transprestcontas">
+                      <li class=""><a href="https://www.camara.leg.br/transparencia/">Transparência</a></li>
+                      <li class=""><a href="https://www2.camara.leg.br/transparencia/prestacao-de-contas">Prestação de contas</a></li>
+                      <li class=""><a href="https://dadosabertos.camara.leg.br/">Dados abertos</a></li>
+                  </ul>
+                </li>
+            </ul>
+          </div>
+    
+          <div class="collapse box-search" id="buscaportal">
+            <form role="search" accesskey="4" class="box-search__busca form-inline" method="get"
+              action="https://www.camara.leg.br/busca-geral">
+              <label for="termo-busca-geral" class="sr-only box-search__label">Pesquise no Portal da Câmara</label>
+              <input class="form-control box-search__campo" type="search" name="termo" id="termo-busca-geral"
+                placeholder="Buscar" aria-label="Search">
+              <button class="btn sr-only box-search__botao" type="submit">Buscar</button>
+              <!-- Colque aqui a estrutura de seu formulário de busca -->
+            </form>
+          </div>
+        </div>
+      </nav>
+    
+    </header>
+
+    <main role="main" id="main-content">
+      <!-- Os cabeçalhos devem aparecer nesta área -->
+        <div class="container largest-container">
+            <nav aria-label="Onde estou">
+                <ol class="breadcrumb portal-breadcrumbs">
+                    <li class="breadcrumb-item"><a href="/">Início</a></li>
+                    <li class="breadcrumb-item">
+                            <a href="https://www2.camara.leg.br/atividade-legislativa">
+                        Atividade legislativa
+                            </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                            <a href="/legislacao">
+                        Legislação
+                            </a>
+                    </li>
+
+                    <li class="breadcrumb-item active" aria-current="page">Esta página</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="g-contexto-compartilhamento u-template-breadcrumbs
+            
+            ">
+        </div>
+
+        <div class="l-identificacao-landing">
+            <div class="container">
+                <h1 class="titulo-landing">
+                        Busca de legislação
+                </h1>
+            </div>
+        </div>
+        <div class="g-contexto-compartilhamento
+            
+            ">
+        </div>
+
+
+
+    <div class="container">
+        <section id="topo-atas">
+            <form action="" role="geral">
+                <div class="form-search  mt-4 mb-4 row">
+                    <div class="col-sm-12 col-lg-10 d-flex justify-content-center ">
+                        <label for="busca"></label>
+                        <input type="text" class="form-control" value="emenda constitucional 132"id="geral" name="geral" placeholder="Digite aqui sua busca">
+                    </div>
+                    <div class="col-sm-12 col-lg-2 d-flex justify-content-center justify-content-md-end">
+                        <button class="button campo-busca__botao">
+                            <span class="btn__icon fas fa-search"></span>
+                            <span class="btn__text">Buscar</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <hr class="mb-4 separador-legislacao">
+        </section>        <div class="row">
+            <div class="l-busca__secao l-busca__secao--refine ">
+                <aside id="refine-busca" class="refine-busca">
+                    <div class="modal fade refine-busca__modal" tabindex="-1" role="dialog" aria-labelledby="refine-busca__titulo">
+                        <div class="modal-dialog modal-dialog__full-screen refine-busca__modal-dialog" role="document">
+                            <div class="modal-content js-modal-content refine-busca__modal-content">
+                                <div class="modal-body refine-busca__modal-body">
+                                    <div class="refine-busca__descricao">
+                                        <h3 id="refine-busca__titulo" class="titulo-secao   refine-busca__titulo">
+                                        
+                                        
+                                        
+                                            <span class="titulo-secao__texto">Refine sua busca</span>
+                                        
+                                        
+                                        
+                                        </h3>                            <div class="js-refine-tags-filtros-conteiner" aria-live="polite">
+                                        </div>
+                                    </div>
+            
+                                    <div class="refine-busca__filtros" id="refine-busca__filtros" aria-live="polite">
+                                        <div class="card accordion accordion--full-mobile">
+                                            <div class="card-header accordion__header refine-busca__header" id="cabecalho-ano">
+                                                <h4 class="accordion__heading">
+                                                    <button class="btn collapsed accordion__trigger" data-toggle="collapse"
+                                                        data-target="#categoria-ano" aria-expanded="false"
+                                                        aria-controls="categoria-ano">
+                                                        <span class="sr-only">Refinar por </span>
+                                                        Ano
+                                                        <span class="accordion__icon" aria-hidden="true"></span>
+                                                    </button>
+                                                </h4>
+                                            </div>
+                                            <div id="categoria-ano" class="collapse refine-busca__collapse"
+                                                aria-labelledby="cabecalho-deputado" data-parent="#refine-busca__filtros">
+                                                <div class="card-body accordion__body">
+                                                    <ul class="accordion__list">
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2026&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2026</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2025&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2025</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">5<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2024&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2024</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2023&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2023</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2022&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2022</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2021&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2021</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2020&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2020</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2019&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2019</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">6<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2018&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2018</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2017&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2017</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2016&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2016</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2015&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2015</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">5<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2013&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2013</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2012&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2012</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2011&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2011</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2010&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2010</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2009&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2009</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2008&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2008</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">6<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2007&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2007</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item  refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?ano=2006&abrangencia=Legislação Federal&tipo=&origem=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="refine-busca__list-link accordion__list-linkUrl"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>2006</span>
+                                                                <span
+                                                                    class="accordion__list-badge accordion__list-badge--selected refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtro encontrado</span>
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card accordion accordion--full-mobile">
+                                            <div class="card-header accordion__header refine-busca__header"
+                                                id="cabecalho-abrangencia">
+                                                <h4 class="accordion__heading refine-busca__heading">
+                                                    <button class="btn collapsed accordion__trigger" data-toggle="collapse"
+                                                        data-target="#categoria-abrangencia" aria-expanded="true"
+                                                        aria-controls="categoria-abrangencia">
+                                                        <span class="sr-only">Refinar por </span>
+                                                        Abrangência
+                                                        <span class="accordion__icon" aria-hidden="true"></span>
+                                                    </button>
+                                                </h4>
+                                            </div>
+                                            <div id="categoria-abrangencia" class="collapse refine-busca__collapse"
+                                                aria-labelledby="cabecalho-formato" data-parent="#refine-busca__filtros">
+                                                <div class="card-body accordion__body">
+                                                    <ul class="accordion__list">
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?abrangencia=Legislação Federal&ano=&tipo=&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Legislação Federal</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">146<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?abrangencia=Legislação Interna&ano=&tipo=&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Legislação Interna</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">11<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card accordion accordion--full-mobile">
+                                            <div class="card-header accordion__header refine-busca__header" id="cabecalho-norma">
+                                                <h4 class="accordion__heading refine-busca__heading">
+                                                    <button class="btn collapsed accordion__trigger" data-toggle="collapse"
+                                                        data-target="#categoria-norma" aria-expanded="true"
+                                                        aria-controls="categoria-norma">
+                                                        <span class="sr-only">Refinar por </span>
+                                                        Tipos de norma
+                                                        <span class="accordion__icon" aria-hidden="true"></span>
+                                                    </button>
+                                                </h4>
+                                            </div>
+                                            <div id="categoria-norma" class="collapse refine-busca__collapse"
+                                                aria-labelledby="cabecalho-formato" data-parent="#refine-busca__filtros">
+                                                <div class="card-body accordion__body">
+                                                    <ul class="accordion__list">
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Ato Declaratório do Presidente da Mesa&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Ato Declaratório do Presidente da Mesa </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Ato do Presidente da Mesa Sem Número&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Ato do Presidente da Mesa Sem Número </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Constituição&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Constituição </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">6<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Decreto&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Decreto </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">54<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Decreto Legislativo&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Decreto Legislativo </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Decreto do Conselho de Ministros&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Decreto do Conselho de Ministros </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Decreto-Lei&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Decreto-Lei </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Emenda Constitucional&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Emenda Constitucional </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Lei Complementar&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Lei Complementar </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Lei Ordinária&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Lei Ordinária </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">45<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Lei Sem Número&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Lei Sem Número </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Medida Provisória&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Medida Provisória </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">8<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Resolução da Câmara dos Deputados&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Resolução da Câmara dos Deputados </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">10<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Resolução da Mesa Sem Número&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Resolução da Mesa Sem Número </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Resolução do Congresso Nacional&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Resolução do Congresso Nacional </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?tipo=Resolução do Senado Federal&ano=&abrangencia=Legislação Federal&origem=&situacao=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Resolução do Senado Federal </span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card accordion accordion--full-mobile">
+                                            <div class="card-header accordion__header refine-busca__header" id="cabecalho-situacao">
+                                                <h4 class="accordion__heading refine-busca__heading">
+                                                    <button class="btn collapsed accordion__trigger" data-toggle="collapse"
+                                                        data-target="#categoria-situacao" aria-expanded="true"
+                                                        aria-controls="categoria-situacao">
+                                                        <span class="sr-only">Refinar por </span>
+                                                        Situação
+                                                        <span class="accordion__icon" aria-hidden="true"></span>
+                                                    </button>
+                                                </h4>
+                                            </div>
+                                            <div id="categoria-situacao" class="collapse refine-busca__collapse"
+                                                aria-labelledby="cabecalho-situacao" data-parent="#refine-busca__filtros">
+                                                <div class="card-body accordion__body">
+                                                    <ul class="accordion__list">
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Convertida em Lei&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Convertida em Lei</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">7<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Não Informado&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Não Informado</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">3<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Não consta revogação expressa&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Não consta revogação expressa</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">82<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Revogada&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Revogada</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">40<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Revogada por MPV&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Revogada por MPV</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Sem Eficácia&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Sem Eficácia</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">4<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Vigente até a Constituição de 1891&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Vigente até a Constituição de 1891</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Vigente até a Constituição de 1937&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Vigente até a Constituição de 1937</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Vigente até a Constituição de 1946&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Vigente até a Constituição de 1946</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Vigente até a Constituição de 1967&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Vigente até a Constituição de 1967</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?situacao=Vigente até a Constituição de 1988&ano=&abrangencia=Legislação Federal&tipo=&origem=&geral=emenda constitucional 132"
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Vigente até a Constituição de 1988</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">1<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card accordion accordion--full-mobile">
+                                            <div class="card-header accordion__header refine-busca__header" id="cabecalho-origem">
+                                                <h4 class="accordion__heading refine-busca__heading">
+                                                    <button class="btn collapsed accordion__trigger" data-toggle="collapse"
+                                                        data-target="#categoria-origem" aria-expanded="true"
+                                                        aria-controls="categoria-origem">
+                                                        <span class="sr-only">Refinar por </span>
+                                                        Origem
+                                                        <span class="accordion__icon" aria-hidden="true"></span>
+                                                    </button>
+                                                </h4>
+                                            </div>
+                                            <div id="categoria-origem" class="collapse refine-busca__collapse"
+                                                aria-labelledby="cabecalho-origem" data-parent="#refine-busca__filtros">
+                                                <div class="card-body accordion__body">
+                                                    <ul class="accordion__list">
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?origem=Congresso Nacional&ano=&abrangencia=Legislação Federal&tipo=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Congresso Nacional</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?origem=Câmara dos Deputados&ano=&abrangencia=Legislação Federal&tipo=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Câmara dos Deputados</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">2<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?origem=Poder Executivo&ano=&abrangencia=Legislação Federal&tipo=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Poder Executivo</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">65<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="accordion__list-item refine-busca__list-item">
+                                                            <a href="https://www.camara.leg.br/legislacao/busca?origem=Poder Legislativo&ano=&abrangencia=Legislação Federal&tipo=&situacao=&geral=emenda constitucional 132&dataInicio=&dataFim="
+                                                                class="accordion__list-linkUrl refine-busca__list-link"
+                                                                aria-roledescription="Selecionar filtro" role="button">
+                                                                <span>Poder Legislativo</span>
+                                                                <span
+                                                                    class="accordion__list-badge refine-busca__list-badge">77<span
+                                                                        class="sr-only"> filtros encontrados</span></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>            <div class="l-busca__secao l-busca__secao--resultado ">
+                <section class="navegacao-busca">
+                    <button class="button filtro-mobile" type="button" data-toggle="modal" data-target=".refine-busca__modal">
+                        <img src="https://www.camara.leg.br/legislacao/static/icon-filtro.png">
+                        Opções de
+                        filtragem
+                    </button>
+                    <div class="js-navegacao-tags-filtros-conteiner">
+                        <ul class="tags" aria-label="Filtros aplicados">
+            
+                            <li class="tags__tag tags__tag--activated">
+                                <span class="tags__text"><strong>Abrangência: </strong>Legislação Federal</span>
+                                <a class="tags__remove"
+                                    href="https://www.camara.leg.br/legislacao/busca?&ano=&tipo=&origem=&situacao=&geral=emenda constitucional 132&numero=">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                                <span class="sr-only">Remover filtro aplicado "Abrangência: Legislação Federal"</span>
+                            </li>
+            
+            
+            
+            
+            
+                        </ul>
+                    </div>
+                </section>
+            
+                <section class="conteudo-busca">
+                    <h2 class="sr-only">Resultados da Busca por Licitações</h2>
+                    <div class="resultado-busca" aria-live="polite">
+                        <div class="busca-info">
+                            <div class="busca-info__resultado busca-info__resultado--informado">
+                                <i>Exibindo resultados de 1 a 20 de 146</i>
+                            </div>
+                            <div class="busca-info__resultado busca-info__resultado--download">
+                                <span class="linkImpressao">
+                                    <spanclass="btn__icon fas fa-arrow-down "></span>
+                                        <a target="_blank" href="https://www.camara.leg.br/legislacao/busca/exportar?&geral=emenda constitucional 132&ano=&ordenacao=relevancia:DESC&abrangencia=Legislação Federal&tipo=&origem=&situacao=&numero=">
+                                        <span class="resultados-info__link resultados-info__link--download" id="link-download"></span>Baixar (limitado a 300 documentos)</a></span>
+                            </div>
+                        </div>
+                        <form action="" id="form-ordernacao" class="busca-info__ordenacao-form">
+                            <div class="busca-info__ordenacao-item">
+                                <input type="hidden" value="emenda constitucional 132"
+                                    name="geral" />
+                                <input type="hidden" value="" name="ano" />
+                                <input type="hidden" value=""
+                                    name="situacao" />
+                                <input type="hidden"
+                                    value="Legislação Federal"
+                                    name="abrangencia" />
+                                <input type="hidden" value=""
+                                    name="tipo" />
+                                <input type="hidden" value=""
+                                    name="origem" />
+                                <input type="hidden" value=""
+                                    name="numero" />
+                                <label for="ordem-1" class="busca-info__etiqueta">Ordenar por: </label>
+                                <select name="ordenacao" id="ordem-1" onchange="submitExec()">
+                                    <option value="relevancia:DESC"  selected='selected'
+                                        >mais relevantes</option>
+                                    <option value="data:DESC" >mais recentes</option>
+                                    <option value="data:ASC" >mais antigas</option>
+                                </select>
+                            </div>
+                            <input class="d-none" type="submit" value="Ordenar">
+                        </form>
+                        <div class="busca-info__resultado--download-mobile">
+                            <span class="linkImpressao">
+                                    <a onclick="CriaPDF();" href="https://www.camara.leg.br/legislacao/busca/exportar?&geral=emenda constitucional 132&ano=&ordenacao=relevancia:DESC&abrangencia=Legislação Federal&tipo=&origem=&situacao=&numero=">
+                                        <span class="resultados-info__link resultados-info__link--download" id="link-download"></span>(limitado a 300 documentos)</a></span>
+                        </div>
+                        
+                        <div id="impressaoPDF">
+                            <ul class="busca-resultados">
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/emecon/2023/emendaconstitucional-132-20-dezembro-2023-795084-norma-pl.html" class="bold">Emenda Constitucional nº 132, de 2023</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Altera o Sistema Tributário Nacional.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/atoprtm_sn/2003/atodopresidentedamesa-54-17-dezembro-2003-497442-norma-cn.html" class="bold">Ato do Presidente da Mesa  de 17 de Dezembro de 2003</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Prorroga a vigência pelo período de sessenta dias, a partir de 20 de dezembro de 2003, da Medida Provisória nº 132, de 20 de outubro de 2003, que &quot; Cria o Programa Bolsa Família e dá outras providências &quot;.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/decret/2025/decreto-12799-26-dezembro-2025-798610-norma-pe.html" class="bold">Decreto nº 12.799, de 26 de Dezembro de 2025</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Altera o Decreto nº 10.457, de 13 de agosto de 2020, que regulamenta o incentivo de que trata o art. 11-C da Lei nº 9.440, de 14 de março de 1997.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/atodecpm/2024/atodeclaratoriodopresidentedamesa-36-11-junho-2024-795749-norma-cn.html" class="bold">Ato Declaratório do Presidente da Mesa nº 36, de 11 de Junho de 2024</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Faz saber que foi encaminhada ao Excelentíssimo Senhor Presidente da República a Mensagem nº 72 (CN), de 11 de junho de 2024, que rejeita sumariamente e considera não escritos os incisos III e IV do art. 1º, o art. 5º e o art. 6º, todos da Medida Provisória nº 1.227, de 2024, que &quot;Prevê condições para fruição de benefícios fiscais, delega competência para julgamento de processo administrativo fiscal relativo ao Imposto sobre a Propriedade Territorial Rural (ITR), limita a compensação de créditos relativos a tributos administrados pela Secretaria Especial da Receita Federal do Brasil do Ministério da Fazenda e revoga hipóteses de ressarcimento e de compensação de créditos presumidos da Contribuição para o PIS/Pasep e da Cofins&quot;, e declara o encerramento da vigência e eficácia, desde a data de sua edição, dos referidos dispositivos, negando-lhes tramitação no Congresso Nacional.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/rescad/1991/resolucaodacamaradosdeputados-10-3-outubro-1991-320701-norma-pl.html" class="bold">Resolução da Câmara dos Deputados nº 10, de 1991</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Altera dispositivos do Regimento Interno.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2016/lei-13325-29-julho-2016-783458-norma-pl.html" class="bold">Lei nº 13.325, de 29 de Julho de 2016</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Altera a remuneração, as regras de promoção, as regras de incorporação de gratificação de desempenho a aposentadorias e pensões de servidores públicos da área da educação, e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2025/lei-15141-2-junho-2025-797540-norma-pl.html" class="bold">Lei nº 15.141, de 2 de Junho de 2025</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Cria a Carreira de Desenvolvimento Socioeconômico, a Carreira de Desenvolvimento das Políticas de Justiça e Defesa e a Carreira de Fiscalização da Comissão de Valores Mobiliários, altera a remuneração de servidores e empregados públicos do Poder Executivo federal, altera a remuneração de cargos em comissão, de funções de confiança e de gratificações do Poder Executivo federal, reestrutura cargos efetivos, planos de cargos e carreiras, padroniza e unifica regras de incorporação de gratificações de desempenho, transforma cargos efetivos vagos em outros cargos efetivos, em cargos em comissão e em funções de confiança, altera a regra de designação dos membros dos conselhos deliberativos e fiscais das entidades fechadas de previdência complementar e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/medpro/2024/medidaprovisoria-1286-31-dezembro-2024-796848-norma-pe.html" class="bold">Medida Provisória nº 1.286, de 31 de Dezembro de 2024</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Cria a Carreira de Desenvolvimento Socioeconômico, a Carreira de Desenvolvimento das Políticas de Justiça e Defesa e a Carreira de Fiscalização da Comissão de Valores Mobiliários, altera a remuneração de servidores e empregados públicos do Poder Executivo federal, altera a remuneração de cargos em comissão, de funções de confiança e de gratificações do Poder Executivo federal, reestrutura cargos efetivos, planos de cargos e carreiras, padroniza e unifica regras de incorporação de gratificações de desempenho, altera as regras do Sistema de Desenvolvimento na Carreira, transforma cargos efetivos vagos em outros cargos efetivos, em cargos em comissão e em funções de confiança, altera a regra de designação dos membros dos conselhos deliberativos e fiscais das entidades fechadas de previdência complementar e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Sem Eficácia
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/emecon/1998/emendaconstitucional-19-4-junho-1998-372816-norma-pl.html" class="bold">Emenda Constitucional nº 19, de 1998</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Modifica o regime e dispõe sobre princípio e normas da Administração Pública, Servidores e Agentes políticos, controle de despesas e finanças públicas e custeio de atividades a cargo do Distrito Federal, e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2024/lei-15082-30-dezembro-2024-796846-norma-pl.html" class="bold">Lei nº 15.082, de 30 de Dezembro de 2024</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Altera a Lei nº 13.576, de 26 de dezembro de 2017, que dispõe sobre a Política Nacional de Biocombustíveis (RenovaBio), para nela incluir os produtores independentes de matéria-prima destinada à produção de biocombustível; e altera a Lei nº 9.478, de 6 de agosto de 1997.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2022/lei-14436-9-agosto-2022-793096-norma-pl.html" class="bold">Lei nº 14.436, de 9 de Agosto de 2022</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e a execução da Lei Orçamentária de 2023 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2019/lei-13898-11-novembro-2019-789393-norma-pl.html" class="bold">Lei nº 13.898, de 11 de Novembro de 2019</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e a execução da Lei Orçamentária de 2020 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2020/lei-14116-31-dezembro-2020-790971-norma-pl.html" class="bold">Lei nº 14.116, de 31 de Dezembro de 2020</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e a execução da Lei Orçamentária de 2021 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2007/lei-11462-28-marco-2007-552503-norma-pl.html" class="bold">Lei nº 11.462, de 28 de Março de 2007</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Autoriza a Superintendência da Zona Franca de Manaus - SUFRAMA a efetuar doação de área ao Governo do Estado do Amazonas, objeto de ocupação, localizada na Área de Expansão do Distrito Industrial, para atender ao interesse público e social.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2015/lei-13242-30-dezembro-2015-782230-norma-pl.html" class="bold">Lei nº 13.242, de 30 de Dezembro de 2015</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária de 2016 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2017/lei-13473-8-agosto-2017-785285-norma-pl.html" class="bold">Lei nº 13.473, de 8 de Agosto de 2017</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária de 2018 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2018/lei-13707-14-agosto-2018-787073-norma-pl.html" class="bold">Lei nº 13.707, de 14 de Agosto de 2018</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária de 2019 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/medpro/2023/medidaprovisoria-1202-28-dezembro-2023-795193-norma-pe.html" class="bold">Medida Provisória nº 1.202, de 28 de Dezembro de 2023</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Revoga os benefícios fiscais de que tratam o art. 4º da Lei nº 14.148, de 3 de maio de 2021, e os art. 7º a art. 10 da Lei nº 12.546, de 14 de dezembro de 2011, desonera parcialmente a contribuição previdenciária sobre a folha de pagamento, revoga a alíquota reduzida da contribuição previdenciária aplicável a determinados Municípios e limita a compensação de créditos decorrentes de decisões judiciais transitadas em julgado.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Convertida em Lei
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2015/lei-13080-2-janeiro-2015-779925-norma-pl.html" class="bold">Lei nº 13.080, de 2 de Janeiro de 2015</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária de 2015 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                                <li class="busca-resultados__item ">
+            
+                                    <h3 class="busca-resultados__cabecalho">
+                                        <a target="_blank" href="https://www2.camara.leg.br/legin/fed/lei/2012/lei-12708-17-agosto-2012-774039-norma-pl.html" class="bold">Lei nº 12.708, de 17 de Agosto de 2012</a>
+                                    </h3>
+                                    <div class=" js-read-more-parent">
+                                        <p class="busca-resultados__descricao js-fade-read-more"><span
+                                                class="bold color-gray">Ementa:</span> Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária de 2013 e dá outras providências.
+                                        </p>
+                                    </div>
+                                    <p class="busca-resultados__situacao"><span class="bold color-gray">Situação:</span>
+                                        Não consta revogação expressa
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+            
+                    </div>
+                    <nav class="pagination pagination--circular--up-xs" aria-label="Navegação entre páginas">
+                        <ul class="pagination-list pagination-list--circular">
+                            <li class="pagination-list__nav pagination-list__nav--prev disabled">
+                                <a href="?&geral=emenda constitucional 132&ano=&abrangencia=Legislação Federal&ordenacao=relevancia:DESC&tipo=&origem=&situacao=&numero=&pagina=0"
+                                    class="pagination-list__nav-link" tabindex="-1">
+                                    <span class="sr-only">Página </span>Anterior
+            
+                                </a>
+                            </li>
+                            <li class="pagination-list__number active">
+                                <a class="pagination-list__number-link" id="numero-1"
+                                    href="?&geral=emenda constitucional 132&ano=&abrangencia=Legislação Federal&ordenacao=relevancia:DESC&tipo=&origem=&situacao=&numero=&pagina=1">
+                                    <span class="sr-only">página </span>
+                                    1
+                                </a>
+            
+                            </li>
+                            <li class="pagination-list__number ">
+            
+                                <a class="pagination-list__number-link" id="numero-2"
+                                    href="?&geral=emenda constitucional 132&ano=&ordenacao=relevancia:DESC&abrangencia=Legislação Federal&tipo=&origem=&situacao=&numero=&pagina=2">2</a>
+                            </li>
+                            <li class="pagination-list__number ">
+            
+                                <a class="pagination-list__number-link" id="numero-3"
+                                    href="?&geral=emenda constitucional 132&ano=&ordenacao=relevancia:DESC&abrangencia=Legislação Federal&tipo=&origem=&situacao=&numero=&pagina=3">3</a>
+                            </li>
+                  
+<!-- FIXTURE TRUNCADO -->

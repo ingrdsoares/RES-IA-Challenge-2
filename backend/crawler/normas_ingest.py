@@ -31,7 +31,10 @@ _ROTULOS = [
 _NOME = {'lc': 'Lei Complementar', 'dl': 'Decreto-Lei', 'mp': 'Medida Provisória', 'ec': 'Emenda Constitucional',
          'lei': 'Lei', 'decreto': 'Decreto', 'portaria': 'Portaria', 'in': 'Instrução Normativa',
          'ade': 'Ato Declaratório Executivo', 'resol_cgsn': 'Resolução', 'convenio_icms': 'Convênio ICMS',
-         'ajuste_sinief': 'Ajuste SINIEF'}
+         'ajuste_sinief': 'Ajuste SINIEF', 'constituicao': 'Constituição da República Federativa do Brasil',
+         'lodf': 'Lei Orgânica do Distrito Federal'}
+# sem numero (0): a identidade e o titulo, no inicio de uma linha do cabecalho
+_TITULOS = {'constituicao': 'constituicao da republica federativa do brasil', 'lodf': 'lei organica do distrito federal'}
 # epigrafe = rotulo [orgao] [nº] numero + data ("de 29 de dezembro de 2003", "de 08/11/1996") ou "/2003", "/03"
 _EPIGRAFE = re.compile(
     r'\b(?:' + '|'.join(f'(?P<{k}>{p})' for k, p in _ROTULOS) + r')'
@@ -97,6 +100,8 @@ def _orgao_no_cabecalho(orgao: str, cab: str) -> bool:
 
 
 def validar_identidade(norma: NormaId, texto: str) -> bool:
+    if norma.tipo in _TITULOS:  # titulo citado no meio de um texto nao e o titulo do texto
+        return any(l.strip().lower().startswith(_TITULOS[norma.tipo]) for l in _cabecalho(texto).splitlines())
     achada = identificar_cabecalho(texto)
     if achada is None:
         return False
@@ -135,8 +140,15 @@ def _charset(raw: bytes) -> str | None:
     return m[1].decode('ascii') if m else None
 
 
+class ErroConversao(Exception):
+    """O documento foi baixado mas nao deu para converte-lo (bug ou formato inesperado): termina `manual`, sem repetir."""
+
+
 def _html(candidato: Candidato, raw: bytes) -> tuple[str, str]:
-    soup = BeautifulSoup(decodificar(raw, _charset(raw)), 'html.parser')
+    marcacao = decodificar(raw, _charset(raw))
+    if candidato.fonte == 'sinj':  # o SINJ omite </p> em centenas de blocos; sem isto o parser aninha e estoura a pilha
+        marcacao = re.sub(r'(?i)(<p(?:\s[^>]*|)>)', r'</p>\1', marcacao)
+    soup = BeautifulSoup(marcacao, 'html.parser')
     for no in soup(['script', 'style']):
         no.decompose()
     for no in soup.find_all(_BLOCOS):  # quebras de linha dos blocos: a regra "comeca a linha" precisa delas
@@ -202,16 +214,24 @@ def ingerir(norma: NormaId, candidato: Candidato, raw: bytes, destino: Path, *, 
     if alvo.exists():
         _confere_existente(alvo, raw)
         return alvo
-    extensao, validar, markdown = _lido(candidato, raw)
+    try:
+        extensao, validar, markdown = _lido(candidato, raw)
+    except ValueError:
+        raise
+    except Exception as e:  # noqa: BLE001 - nao e identidade divergente nem fonte fora do ar
+        raise ErroConversao(f'{type(e).__name__}: {e}') from e
     achada = None
     if markdown is not None:
-        achada = identificar_cabecalho(validar)
+        achada = None if norma.tipo in _TITULOS else identificar_cabecalho(validar)
         if not validar_identidade(norma, validar):
             raise ValueError(f'identidade divergente: o texto de {candidato.url} nao e {norma.chave}')
     instante = coletado_em or datetime.now(timezone.utc)
     if instante.tzinfo is None:
         raise ValueError('Data da coleta deve incluir fuso horário.')
-    titulo = f'{_NOME[norma.tipo]} nº {norma.numero}' + (f'/{achada[2] if achada else norma.ano}' if (achada or norma.ano) else '')
+    if norma.tipo in _TITULOS:
+        titulo = _NOME[norma.tipo]
+    else:
+        titulo = f'{_NOME[norma.tipo]} nº {norma.numero}' + (f'/{achada[2] if achada else norma.ano}' if (achada or norma.ano) else '')
     meta = {'source_url': candidato.url, 'source_id': f'{candidato.fonte}:{norma.chave}', 'titulo': titulo,
             'sha256': sha, 'markdown_sha256': None, 'markdown_arquivo': None, 'original': f'original.{extensao}',
             'coletado_em': instante.astimezone(timezone.utc).isoformat(),
