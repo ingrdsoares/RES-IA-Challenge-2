@@ -1,0 +1,68 @@
+{
+  "versao": 1,
+  "perfil": "tributario_df",
+  "perfis": {
+    "mei_simples_df": {
+      "foco": "MEI e Simples Nacional; DF como foco local",
+      "amplo": false,
+      "prioriza_df": true
+    },
+    "tributario_df": {
+      "foco": "Regimes tributários com foco DF",
+      "amplo": true,
+      "prioriza_df": true
+    },
+    "tributario_nacional": {
+      "foco": "Cobertura tributária nacional",
+      "amplo": true,
+      "prioriza_df": false
+    }
+  },
+  "familias_nucleo": [
+    "legislacao",
+    "mei",
+    "manuais",
+    "anexos-cgsn140"
+  ],
+  "familias_dados": [
+    "cnpj",
+    "cnpj-ampliado",
+    "cnpj-df",
+    "cnpj-df-censo",
+    "cnae",
+    "tabelas-fiscais",
+    "ibge-indicadores"
+  ],
+  "tipos_dados": [
+    "tabela_ncm_oficial",
+    "esquemas_xsd",
+    "leiaute_regras_eventos"
+  ],
+  "tipos_evidencia": [
+    "catalogo_tecnico",
+    "catalogo_disponibilidade",
+    "agenda_indice",
+    "indice_agendas_pdf",
+    "comparacao_cnae"
+  ],
+  "termos_nucleo": [
+    "simples nacional",
+    "microempreendedor individual",
+    "simei",
+    "pgdas",
+    "dasn-simei",
+    "fator r",
+    "cgsn",
+    "lc 123",
+    "lei complementar 123"
+  ],
+  "categorias": [
+    "nucleo",
+    "complementar",
+    "historico",
+    "revisao",
+    "evidencia",
+    "dados_estruturados"
+  ],
+  "limite": "Classificação candidata e explicável; não certifica vigência ou aplicabilidade. Não apagar originais nem deduplicar versões pelo hash primário."
+}
