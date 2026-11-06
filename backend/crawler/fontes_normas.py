@@ -168,6 +168,14 @@ class Ambigua(Exception):
         self.motivo = motivo
 
 
+class SemTextoAutomatico(Exception):
+    """A norma existe (ou nao ha regra de busca), mas nao ha texto que se possa coletar sozinho: a Task 7 grava `manual`."""
+
+    def __init__(self, motivo: str):
+        super().__init__(motivo)
+        self.motivo = motivo
+
+
 class Fonte(Protocol):
     nome: str
 
@@ -337,8 +345,10 @@ class Sinj:
                 achados.append(r)
         if len(achados) > 1:
             raise Ambigua(f'{len(achados)} registros do SINJ com tipo {nome}, numero {norma.numero} e ano {norma.ano}')
-        if not achados or not (achados[0].get('ar_atualizado') or {}).get('filename'):
-            return []  # sem texto compilado nao ha o que coletar (a original nao e coletada)
+        if not achados:
+            return []
+        if not (achados[0].get('ar_atualizado') or {}).get('filename'):  # a original do SINJ nao e coletada
+            raise SemTextoAutomatico(f"registro {achados[0]['ch_norma']} do SINJ sem texto compilado")
         r = achados[0]
         url = f"{self._TEXTO}{r['ch_norma']}/{r['ar_atualizado']['filename']}"
         return [Candidato(url, self.nome, 'compilada', r.get('nm_situacao'))]

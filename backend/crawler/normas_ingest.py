@@ -8,15 +8,16 @@ import json
 import re
 import shutil
 import tempfile
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
 from bs4 import BeautifulSoup
 
 from backend.crawler.anexos import extract_pdf, render_pages
-from backend.crawler.fontes_normas import Candidato, Http, decodificar
+from backend.crawler.fontes_normas import Candidato, Http, SemTextoAutomatico, decodificar
 from backend.crawler.legislacao import _convert
-from backend.crawler.normas_id import NormaId, _sem_acento
+from backend.crawler.normas_id import NormaId
 
 _JURISDICAO_DA_FONTE = {'sinj': 'df', 'confaz': 'confaz'}  # as demais fontes sao federais
 _ROTULOS = [
@@ -36,31 +37,63 @@ _EPIGRAFE = re.compile(
     r'\b(?:' + '|'.join(f'(?P<{k}>{p})' for k, p in _ROTULOS) + r')'
     r'\s+(?:(?!no?\b)(?P<orgao>[a-z]{2,6}(?:/[a-z]{2,6})*)\s+)?'
     r'(?:n\s*[º°o.]*\s*)?(?P<num>\d{1,3}(?:\.\d{3})+|\d{1,6})'
-    r'(?:\s*,?\s*de\s+(?:\d{1,2}[º°o]?\s+de\s+[a-z]+\s+de\s+(?P<a2>\d{4})|\d{1,2}/\d{1,2}/(?P<a3>\d{4}))'
-    r'|\s*/\s*(?P<a1>\d{4}|\d{2})\b)')
-_CITADA = re.compile(r'\b(?:a|as|o|os|da|do|das|dos|na|no|nas|nos|pela|pelo|pelas|pelos|ao|aos|com|em|e|ou|que|vide)\s+$')
+    r'(?:\s*,?\s*de\s+(?:\d{1,2}[º°o]?\s+de\s+[a-z]{3,9}\.?\s+de\s+(?P<a2>\d{4})|\d{1,2}[./]\d{1,2}[./](?P<a3>\d{4}))'
+    r'|\s*/\s*(?P<a1>\d{4}|\d{2})\b)', re.I)
+# sigla -> nome por extenso que pode aparecer no cabecalho quando a epigrafe nao traz o orgao
+_NOMES_ORGAO = {'rfb': 'receita federal', 'srf': 'secretaria da receita federal',
+                'pgfn': 'procuradoria-geral da fazenda nacional', 'cgsn': 'comite gestor do simples nacional'}
 _DISPOSITIVO = re.compile(r'\bart\.?\s*1\s*[º°o]?(?!\d)|\bclausula\s+primeira')
 _LIMITE_CABECALHO = 5000
+_BLOCOS = ['title', 'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'tr', 'td', 'th', 'br', 'table', 'center',
+           'blockquote', 'dir']
+
+
+def _sem_acento_caixa(t: str) -> str:
+    """Tira acentos sem mudar caixa nem posicoes (cada caractere vira um caractere)."""
+    return ''.join(next((b for b in unicodedata.normalize('NFD', c) if not unicodedata.combining(b)), c) for c in t)
+
+
+def _cabecalho(texto: str) -> str:
+    """Texto sem acentos ate o primeiro dispositivo (maximo 5000 caracteres); quebras de linha preservadas."""
+    linhas = (' '.join(l.split()) for l in texto.splitlines())
+    t = _sem_acento_caixa('\n'.join(l for l in linhas if l))
+    corte = _DISPOSITIVO.search(t.lower())
+    return t[:min(corte.start() if corte else len(t), _LIMITE_CABECALHO)]
 
 
 def identificar_cabecalho(texto: str) -> tuple[str, int, int, str | None] | None:
-    """(tipo, numero, ano, orgao) da primeira epigrafe do cabecalho; None se nao houver.
+    """(tipo, numero, ano, orgao) da epigrafe do cabecalho; None se nao der para ter certeza (fail-closed).
 
-    O cabecalho vai ate o primeiro dispositivo. Epigrafe precedida de preposicao/"Vide" e citacao de outra
-    norma ("Altera a Lei nº 9.718, de ...") e e ignorada.
+    Epigrafe = a primeira em CAIXA ALTA no cabecalho (ate o primeiro dispositivo); se nao houver nenhuma, a primeira
+    em caixa mista, so se comecar a linha. Qualquer outra ("Altera a Lei nº 9.718, de ...") e citacao.
     """
-    t = _sem_acento(' '.join(texto.split()))
-    corte = _DISPOSITIVO.search(t)
-    cab = t[:min(corte.start() if corte else len(t), _LIMITE_CABECALHO)]
-    for m in _EPIGRAFE.finditer(cab):
-        if _CITADA.search(cab[max(0, m.start() - 12):m.start()]):
-            continue
-        tipo = next(k for k, _ in _ROTULOS if m.group(k))
-        ano = int(m.group('a2') or m.group('a3') or m.group('a1'))
-        if ano < 100:
-            ano += 2000 if ano < 40 else 1900
-        return tipo, int(m.group('num').replace('.', '')), ano, m.group('orgao')
-    return None
+    cab = _cabecalho(texto)
+    todas = list(_EPIGRAFE.finditer(cab))
+    escolhida = None
+    for m in todas:
+        k = next(k for k, _ in _ROTULOS if m.group(k))
+        if m.group(k).isupper() and (m.group('orgao') or 'A').isupper():
+            escolhida = m
+            break
+    if escolhida is None and todas and cab[:todas[0].start()].split('\n')[-1].strip() == '':
+        escolhida = todas[0]
+    if escolhida is None:
+        return None
+    m = escolhida
+    tipo = next(k for k, _ in _ROTULOS if m.group(k))
+    ano = int(m.group('a2') or m.group('a3') or m.group('a1'))
+    if ano < 100:
+        ano += 2000 if ano < 40 else 1900
+    return tipo, int(m.group('num').replace('.', '')), ano, (m.group('orgao') or '').lower() or None
+
+
+def _orgao_no_cabecalho(orgao: str, cab: str) -> bool:
+    c = cab.lower()
+    for sigla in orgao.split('/'):
+        nome = _NOMES_ORGAO.get(sigla)
+        if not (re.search(rf'(?<![a-z0-9]){re.escape(sigla)}(?![a-z0-9])', c) or (nome and nome in c)):
+            return False
+    return True
 
 
 def validar_identidade(norma: NormaId, texto: str) -> bool:
@@ -70,9 +103,11 @@ def validar_identidade(norma: NormaId, texto: str) -> bool:
     tipo, numero, ano, orgao = achada
     if tipo != norma.tipo or numero != norma.numero or (norma.ano is not None and ano != norma.ano):
         return False
-    if norma.orgao and orgao:
+    if norma.orgao:
         esperado = norma.orgao.lower()
-        return esperado == orgao or set(esperado.split('/')) <= set(orgao.split('/'))
+        if orgao:  # ato conjunto: o conjunto de orgaos tem de ser exatamente o mesmo
+            return set(esperado.split('/')) == set(orgao.split('/'))
+        return _orgao_no_cabecalho(esperado, _cabecalho(texto))
     return True
 
 
@@ -90,9 +125,9 @@ def chave_segura(chave: str) -> str:
 
 
 def resolver_assunto(assunto: str, http: Http) -> list[NormaId]:
-    """Sementes por assunto (IPTU, ITBI, IPVA, ITCD). Sem fixture que prove busca textual no SINJ (so ha busca
-    por tipo, numero e ano), devolve [] sem pedir nada: essas sementes terminam como `manual`."""
-    return []
+    """Sementes por assunto (IPTU, ITBI, IPVA, ITCD). Nao ha fixture que prove busca textual no SINJ (so por tipo,
+    numero e ano) e nenhuma regra de busca: levanta SemTextoAutomatico sem pedir nada, e a semente termina `manual`."""
+    raise SemTextoAutomatico(f'sem regra de busca por assunto no SINJ para {assunto!r}')
 
 
 def _charset(raw: bytes) -> str | None:
@@ -104,7 +139,10 @@ def _html(candidato: Candidato, raw: bytes) -> tuple[str, str]:
     soup = BeautifulSoup(decodificar(raw, _charset(raw)), 'html.parser')
     for no in soup(['script', 'style']):
         no.decompose()
-    pagina = soup.get_text(' ', strip=True)  # a epigrafe pode estar fora do bloco que vira Markdown (Camara)
+    for no in soup.find_all(_BLOCOS):  # quebras de linha dos blocos: a regra "comeca a linha" precisa delas
+        no.insert_before('\n')
+        no.insert_after('\n')
+    pagina = soup.get_text(' ')  # a epigrafe pode estar fora do bloco que vira Markdown (Camara)
     seletores = {'sinj': ['#div_texto'], 'confaz': ['#content-core', '#plone-content'],
                  'camara': ['.textoNorma'], 'lexml': ['.textoNorma']}.get(candidato.fonte, [])
     raiz = next((r for r in (soup.select_one(s) for s in seletores) if r is not None), None) or soup.body or soup
@@ -126,7 +164,7 @@ def _receita(candidato: Candidato, raw: bytes) -> tuple[str, str]:
         if marcas:
             linhas += ['> ' + '; '.join(marcas) + '. Preservado conforme a fonte.', '']
         linhas += [_convert(seg['textoIntegra'], candidato.url), '']
-    return dados['epigrafeCompleta'] + ' ' + '\n'.join(linhas), '\n'.join(linhas)
+    return dados['epigrafeCompleta'] + '\n' + '\n'.join(linhas), '\n'.join(linhas)
 
 
 def _lido(candidato: Candidato, raw: bytes) -> tuple[str, str, str | None]:

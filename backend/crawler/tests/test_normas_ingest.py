@@ -285,8 +285,100 @@ def test_chave_segura_estavel_curta_sem_colisao_e_valida_no_exfat():
     assert chave_segura(NormaId('lei', 1, None, 'df').chave) != chave_segura(NormaId('lei', 1, 2000, 'df').chave)
 
 
-def test_resolver_assunto_sem_fixture_de_busca_textual_devolve_vazio_sem_rede():
+# ---- Fix round 1: fail-closed ----
+from backend.crawler.fontes_normas import SemTextoAutomatico  # noqa: E402
+from backend.crawler.normas_ingest import _html  # noqa: E402
+
+
+@pytest.mark.parametrize('texto,norma', [
+    ('Regulamenta Lei nº 10.833, de 29 de dezembro de 2003.\nArt. 1º', NormaId('lei', 10833, 2003, 'federal')),
+    ('Altera Lei Complementar nº 123, de 14 de dezembro de 2006.\nArt. 1º', NormaId('lc', 123, 2006, 'federal')),
+    ('Revoga Lei nº 10.833/2003\nArt. 1º', NormaId('lei', 10833, 2003, 'federal')),
+    ('Produção de efeito Lei nº 10.637, de 30 de dezembro de 2002 LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003\nArt. 1º',
+     NormaId('lei', 10637, 2002, 'federal')),
+    ('Lei nº 9.718, de 27 de novembro de 1998 (Texto compilado) Mensagem de veto LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003\nArt. 1º',
+     NormaId('lei', 9718, 1998, 'federal')),
+    ('LEI Nº 10.833, DE 29.12.2003 Altera Lei nº 9.430, de 27 de dezembro de 1996\nArt. 1º',
+     NormaId('lei', 9430, 1996, 'federal')),
+])
+def test_citacao_nunca_vira_titulo(texto, norma):
+    assert not validar_identidade(norma, texto)
+
+
+@pytest.mark.parametrize('texto', [
+    'LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003\nArt. 1º', 'LEI Nº 10.833, DE 29.12.2003\nArt. 1º',
+    'LEI Nº 10.833, DE 29/12/2003\nArt. 1º', 'LEI Nº 10.833, DE 29 DE DEZ. DE 2003\nArt. 1º',
+    'LEI Nº 10.833/2003\nArt. 1º', 'Lei nº 10.833, de 29 de dezembro de 2003\nArt. 1º',
+    'Lei nº 10.833, de 29 de dez. de 2003 (Texto compilado)\nArt. 1º',
+    'Produção de efeito Lei nº 10.637, de 30 de dezembro de 2002 LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003\nArt. 1º',
+    'Lei nº 9.718, de 27 de novembro de 1998 (Texto compilado) Mensagem de veto LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003\nArt. 1º',
+    'LEI Nº 10.833, DE 29.12.2003 Altera Lei nº 9.430, de 27 de dezembro de 1996\nArt. 1º',
+])
+def test_formatos_de_data_e_titulo_correto_passam(texto):
+    assert validar_identidade(LEI, texto)
+
+
+PORT33 = 'PORTARIA Nº 33, DE 8 DE FEVEREIRO DE 2018'
+
+
+def test_orgao_ausente_da_epigrafe_precisa_aparecer_no_cabecalho():
+    pgfn = 'PROCURADORIA-GERAL DA FAZENDA NACIONAL ' + PORT33 + '\nArt. 1º'
+    assert not validar_identidade(NormaId('portaria', 33, 2018, 'federal', 'rfb'), pgfn)
+    assert validar_identidade(NormaId('portaria', 33, 2018, 'federal', 'pgfn'), pgfn)
+    assert validar_identidade(NormaId('portaria', 33, 2018, 'federal'), pgfn)
+    assert not validar_identidade(NormaId('portaria', 33, 2018, 'federal', 'rfb'), PORT33 + '\nArt. 1º')
+    sigla = 'MINISTÉRIO DA FAZENDA SECRETARIA DA RECEITA FEDERAL ' + PORT33 + '\nArt. 1º'
+    assert validar_identidade(NormaId('portaria', 33, 2018, 'federal', 'srf'), sigla)
+    assert validar_identidade(NormaId('resol_cgsn', 5, 2007, 'federal', 'cgsn'),
+                              'COMITÊ GESTOR DO SIMPLES NACIONAL RESOLUÇÃO Nº 5, DE 30 DE MAIO DE 2007\nArt. 1º')
+
+
+def test_ato_conjunto_exige_o_mesmo_conjunto_de_orgaos():
+    t = 'PORTARIA CONJUNTA RFB/PGFN Nº 33, DE 8 DE FEVEREIRO DE 2018\nArt. 1º'
+    p = lambda o: NormaId('portaria', 33, 2018, 'federal', o)  # noqa: E731
+    assert validar_identidade(p('rfb/pgfn'), t) and validar_identidade(p('pgfn/rfb'), t) and validar_identidade(p(None), t)
+    assert not validar_identidade(p('rfb'), t) and not validar_identidade(p('pgfn'), t)
+
+
+FIXTURES_16 = [
+    ('planalto_lei_10833.raw', 'planalto', NormaId('lei', 10833, 2003, 'federal')),
+    ('planalto_lei_10833_compilado.raw', 'planalto', NormaId('lei', 10833, 2003, 'federal')),
+    ('planalto_decreto_70235.raw', 'planalto', NormaId('decreto', 70235, 1972, 'federal')),
+    ('planalto_decreto_11356_2023.raw', 'planalto', NormaId('decreto', 11356, 2023, 'federal')),
+    ('planalto_lei_14592_2023.raw', 'planalto', NormaId('lei', 14592, 2023, 'federal')),
+    ('planalto_lei_15270_2025.raw', 'planalto', NormaId('lei', 15270, 2025, 'federal')),
+    ('planalto_lc_214_2025.raw', 'planalto', NormaId('lc', 214, 2025, 'federal')),
+    ('planalto_mpv_1185_2023.raw', 'planalto', NormaId('mp', 1185, 2023, 'federal')),
+    ('planalto_mpv_881_2019.raw', 'planalto', NormaId('mp', 881, 2019, 'federal')),
+    ('planalto_decreto_lei_4657_compilado.raw', 'planalto', NormaId('dl', 4657, 1942, 'federal')),
+    ('planalto_lei_10865_2004.raw', 'planalto', NormaId('lei', 10865, 2004, 'federal')),
+    ('planalto_lei_4320_1964.raw', 'planalto', NormaId('lei', 4320, 1964, 'federal')),
+    ('planalto_decreto_3000_cabecalho.raw', 'planalto', NormaId('decreto', 3000, 1999, 'federal')),
+    ('camara_lei_10833.raw', 'camara', NormaId('lei', 10833, 2003, 'federal')),
+    ('camara_lei_10833_original.raw', 'camara', NormaId('lei', 10833, 2003, 'federal')),
+    ('camara_decreto_70235.raw', 'camara', NormaId('decreto', 70235, 1972, 'federal')),
+    ('sinj_lei_1254_atualizada.raw', 'sinj', NormaId('lei', 1254, 1996, 'df')),
+    ('confaz_convenio_52_17.raw', 'confaz', NormaId('convenio_icms', 52, 2017, 'confaz')),
+    ('confaz_convenio_100_97.raw', 'confaz', NormaId('convenio_icms', 100, 1997, 'confaz')),
+]
+
+
+@pytest.mark.parametrize('arquivo,fonte,norma', FIXTURES_16)
+def test_paginas_reais_identificam_a_propria_norma_e_so_ela(arquivo, fonte, norma):
+    import dataclasses
+    pagina, _ = _html(Candidato('https://x.gov.br/a', fonte, 'unica'), fx(arquivo))
+    assert validar_identidade(norma, pagina)
+    assert not validar_identidade(dataclasses.replace(norma, numero=norma.numero + 1), pagina)
+    assert not validar_identidade(dataclasses.replace(norma, ano=norma.ano + 1), pagina)
+
+
+def test_semtextoautomatico_e_resolver_assunto():
+    e = SemTextoAutomatico('x')
+    assert e.motivo == 'x'
+
     class SemRede:
         def get(self, url):
             raise AssertionError('nao deve pedir nada')
-    assert resolver_assunto('IPTU', SemRede()) == []
+    with pytest.raises(SemTextoAutomatico) as exc:
+        resolver_assunto('IPTU', SemRede())
+    assert 'IPTU' in exc.value.motivo

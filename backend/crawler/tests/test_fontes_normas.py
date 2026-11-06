@@ -566,3 +566,13 @@ def test_http_post_respeita_robots_e_bloqueio():
     with pytest.raises(Bloqueada):
         http.post(RFB_BUSCA, {'a': 1})
     assert pedidos == ['https://normas.receita.fazenda.gov.br/robots.txt']
+
+
+def test_sinj_registro_sem_texto_compilado_levanta_sem_texto_automatico():
+    from backend.crawler.fontes_normas import SemTextoAutomatico
+    d = json.loads(fx('sinj_busca_lei1254_1996.raw'))
+    d['aaData'][0]['_source']['ar_atualizado'] = None
+    http, _, _ = montar({SINJ_BUSCA.format(t='Lei', n=1254, a=1996): (200, json.dumps(d).encode(), JSON_CT)})
+    with pytest.raises(SemTextoAutomatico) as e:
+        Sinj().localizar(NormaId('lei', 1254, 1996, 'df'), http)
+    assert e.value.motivo
