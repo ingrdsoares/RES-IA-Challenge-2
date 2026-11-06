@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel de coleta</title>
+<link rel="icon" href="data:,">
 <style>
 :root {
   color-scheme: light dark;
@@ -122,6 +123,7 @@ dialog .botoes { display: flex; justify-content: flex-end; gap: 8px; margin-top:
     <p class="aviso falha" id="erro" role="alert" hidden></p>
     <p class="aviso etapa" id="etapa" role="status" hidden></p>
     <p class="aviso" id="aviso" role="status" hidden></p>
+    <p class="aviso" id="sem-catalogo" role="status" hidden>Catálogo não encontrado ou ilegível: as contagens abaixo não refletem o acervo.</p>
     <div class="kpis">
       <div class="kpi caixa"><b id="k-restante">—</b><span>tempo restante</span></div>
       <div class="kpi caixa"><b id="k-feitas">—</b><span>frentes feitas</span></div>
@@ -204,6 +206,7 @@ function criarSelecao(frentes, finais) {
     rotulo.title = f.nome;
     const outro = el('label', 'refazer');
     outro.title = 'Coletar de novo mesmo que já tenha dados';
+    refazer.setAttribute('aria-label', `Rodar de novo: ${f.nome}`);
     outro.append(refazer, 'rodar de novo');
     li.append(rotulo, outro);
     $('lista').append(li);
@@ -252,11 +255,12 @@ function criarLinha(modulo, nome, completa) {
     raiz.append(p.barra, p.meta, p.item, p.etiquetas);
   }
   p.horas = el('div', 'suave');
+  p.nota = el('p', 'suave', 'Falhas registradas por esta parada ficam no manifesto até a frente rodar de novo.');
   p.forcada = el('p', 'forcada', 'Encerrada à força; pode haver arquivo de cache sem recibo');
   p.log = el('details'); p.log.append(el('summary', null, 'Ver log do erro'));
   p.logTexto = el('pre'); p.log.append(p.logTexto);
   p.log.addEventListener('toggle', () => { if (p.log.open) carregarLog(modulo, p.logTexto); });
-  raiz.append(p.horas, p.forcada, p.log);
+  raiz.append(p.horas, p.nota, p.forcada, p.log);
   return { raiz, p };
 }
 async function carregarLog(modulo, destino) {
@@ -267,11 +271,13 @@ async function carregarLog(modulo, destino) {
   } catch { por(destino, 'Sem conexão com o painel.'); }
 }
 
+const fmtItens = (n) => `${fmtNum(n)} ${n === 1 ? 'item' : 'itens'}`;
 function textoFeitos(f, ativa) {
   const fonte = f.fonte ? ` · ${f.fonte}` : '';
-  if (f.total != null) return `${fmtNum(f.feitos)} de ${fmtNum(f.total)}${fonte}`;
+  if (ativa && f.total != null) return `${fmtNum(f.feitos)} de ${fmtNum(f.total)}${fonte}`;
   if (ativa) return `total desconhecido · ${fmtNum(f.requisicoes)} requisições · ${fmtBytes(f.bytes)}${fonte}`;
-  if (f.itens > 0) return `${fmtNum(f.itens)} itens${fonte}`;
+  if (f.coletados != null && f.fim) return fmtItens(f.coletados) + fonte;  // o que a rodada coletou, não o catálogo
+  if (f.itens > 0) return fmtItens(f.itens) + fonte;
   return `sem dados coletados${fonte}`;
 }
 function textoRestante(f) {
@@ -316,13 +322,14 @@ function atualizarLinha({ raiz, p }, f, completa) {
     atualizarBarra(p, f, ativa);
     por(p.feitos, textoFeitos(f, ativa));
     por(p.restante, textoRestante(f));
-    por(p.item, ativa && f.item_atual ? '→ ' + f.item_atual : '');
+    por(p.item, ativa && f.item_atual ? '→ ' + f.item_atual + (f.bytes_item != null ? ` · arquivo atual: ${fmtBytes(f.bytes_item)}` : '') : '');
     p.item.hidden = !(ativa && f.item_atual);
     atualizarEtiquetas(p, f);
   }
   por(p.horas, textoHoras(f));
   p.horas.hidden = !p.horas.textContent;
   p.forcada.hidden = !f.forcada;
+  p.nota.hidden = !(completa && f.estado === 'interrompida');
   const comErro = f.estado === 'erro';
   if (!comErro && p.log.open) p.log.open = false;
   p.log.hidden = !comErro;
@@ -337,7 +344,7 @@ function textoRestanteGeral(d) {
 }
 function textoEtapa(d) {
   if (d.etapa === 'catalogo') return 'Atualizando o catálogo com o que foi coletado. Pode levar alguns minutos; o painel segue funcionando.';
-  if (d.etapa === 'parando') return 'Parando: aguardando a frente atual encerrar…';
+  if (d.etapa === 'parando') return 'Parando: até 1 min; depois disso a frente é encerrada à força.';
   if (d.etapa === 'finais') return 'Rodando as etapas finais…';
   return '';
 }
@@ -363,6 +370,7 @@ function render(d) {
   por($('situacao'), textoSituacao(d));
   mostrar($('etapa'), textoEtapa(d));
   mostrar($('aviso'), d.aviso);
+  $('sem-catalogo').hidden = d.catalogo_lido !== false;
   por($('k-restante'), d.rodando ? textoRestanteGeral(d) : '—');
   por($('k-feitas'), d.total ? `${fmtNum(d.feitas)} de ${fmtNum(d.total)}` : '—');
   por($('k-itens'), d.total ? fmtNum(d.itens) : '—');
@@ -412,6 +420,7 @@ async function iniciar() {
   try { plano = await enviar('/previa', corpo); } catch (e) { return falha(e); }
   const dest = $('previa-corpo');
   dest.replaceChildren();
+  if (ultimo.catalogo_lido === false) dest.append(el('p', 'forcada', $('sem-catalogo').textContent));
   const rodar = plano.filter((i) => i.acao === 'rodar');
   listar(`Vai rodar (${rodar.length})`, rodar, itemPrevia);
   const pular = plano.filter((i) => i.acao === 'pular');

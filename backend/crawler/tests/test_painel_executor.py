@@ -228,8 +228,45 @@ espera({str(self.solta)!r})""")
         self.assertEqual(estado['feitas'], 1)
         self.assertEqual(self.linha(estado, 'a')['estado'], 'verificando')
         self.assertEqual(estado['sem_estimativa'], 0)
-        self.assertEqual(estado['itens'], 1)
+        self.assertEqual(estado['itens'], 0)  # catálogo de 'a' já tinha 1 item e não houve novidade
         self.assertGreater(self.linha(estado, 'b')['restante_s'], 0)
+
+    def test_repetir_frente_sem_novidade_mostra_zero_itens(self):
+        self.gravar_catalogo(catalogo('pasta-a', origens=[f'https://x.gov.br/{i}' for i in range(1462)]))
+        self.catalogo_final = self.catalogo_final | catalogo('pasta-a', origens=[f'https://x.gov.br/{i}' for i in range(1462)])
+        self.script('a')
+        e = self.executor()
+        estado = self.rodada(e, ['a'], ['a'])
+        linha = self.linha(estado, 'a')
+        self.assertEqual((estado['itens'], linha['coletados'], linha['itens']), (0, 0, 1462))
+
+    def test_itens_novos_somam_a_diferenca_do_catalogo(self):
+        self.gravar_catalogo(catalogo('pasta-a', origens=['https://x.gov.br/1']))
+        self.catalogo_final = catalogo('pasta-a', origens=['https://x.gov.br/1', 'https://x.gov.br/2', 'https://x.gov.br/3'])
+        self.script('a')
+        estado = self.rodada(self.executor(), ['a'], ['a'])
+        self.assertEqual((estado['itens'], self.linha(estado, 'a')['coletados']), (2, 2))
+
+    def test_catalogo_com_forma_errada_vale_como_ausente(self):
+        e = self.executor()
+        self.assertFalse(e.estado()['catalogo_lido'])  # ausente
+        for dados in ({'snapshots': [{}]}, {'cobertura_frentes': [{'pasta': 'pasta-a', 'pendencias_extracao': None}]},
+                      {'snapshots': [1]}, {'cobertura_frentes': [{'pasta': 'pasta-a', 'snapshots': None,
+                                                                   'erros_manifesto_mais_recente': None}]}):
+            with self.subTest(dados=dados):
+                self.gravar_catalogo(dados)
+                e = self.executor()
+                estado = e.estado()
+                json.dumps(estado)
+                self.assertEqual(len(estado['frentes']), 2)
+        self.gravar_catalogo([1, 2])
+        self.assertFalse(self.executor().estado()['catalogo_lido'])
+
+    def test_catalogo_lido(self):
+        self.gravar_catalogo(catalogo('pasta-a'))
+        self.assertTrue(self.executor().estado()['catalogo_lido'])
+        (self.data / 'catalogo' / 'catalogo.json').write_text('{', encoding='utf-8')
+        self.assertFalse(self.executor().estado()['catalogo_lido'])
 
     def test_parada_suave_nao_inicia_seguintes(self):
         self.script('a', "espera(os.environ['PAINEL_PARAR'])")

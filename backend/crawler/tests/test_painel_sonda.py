@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -17,6 +18,7 @@ RAIZ = Path(__file__).resolve().parents[3]
 class SondaTests(unittest.TestCase):
     def setUp(self):
         self._send = httpx.Client.send
+        self._sleep = time.sleep
         self._dir = tempfile.TemporaryDirectory()
         self.tmp = Path(self._dir.name)
         self.eventos = self.tmp / 'e.jsonl'
@@ -27,6 +29,7 @@ class SondaTests(unittest.TestCase):
 
     def tearDown(self):
         httpx.Client.send = self._send
+        time.sleep = self._sleep
         self._dir.cleanup()
 
     def _responder(self, request):
@@ -62,6 +65,26 @@ class SondaTests(unittest.TestCase):
         instalar(self.tmp / 'pasta-inexistente' / 'e.jsonl', self.parar, 'cnae')
         with httpx.Client(transport=self.mock) as c:
             self.assertEqual(c.get('https://x.gov.br/b').status_code, 200)
+
+    def test_erro_com_surrogate_nao_derruba_a_gravacao(self):
+        instalar(self.eventos, self.parar, 'cnae')
+        mensagem = 'url ruim ' + chr(0xD800)
+
+        def quebra(request):
+            raise httpx.ConnectError(mensagem)
+        with httpx.Client(transport=httpx.MockTransport(quebra)) as c, self.assertRaises(httpx.ConnectError):
+            c.get('https://x.gov.br/a')
+        self.assertEqual(self.ler()[-1]['tipo'], 'falha')
+
+    def test_sleep_volta_na_hora_so_depois_de_parar(self):
+        dormiu = []
+        time.sleep = dormiu.append
+        instalar(self.eventos, self.parar, 'cnae')
+        time.sleep(3)
+        self.assertEqual(dormiu, [3])
+        self.parar.touch()
+        time.sleep(3)
+        self.assertEqual(dormiu, [3])
 
     def test_erro_de_rede_propaga(self):
         instalar(self.eventos, self.parar, 'cnae')

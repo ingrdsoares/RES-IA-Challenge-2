@@ -11,6 +11,7 @@ from .executor import Executor, RodadaAtiva
 from .frentes import ETAPAS_FINAIS, POR_MODULO
 from .servidor import criar_servidor
 
+AVISO_CATALOGO = 'Catálogo não encontrado ou ilegível: as contagens não refletem o acervo.'
 CRAWLER = Path(__file__).resolve().parents[1]
 
 
@@ -65,7 +66,6 @@ def _pagina(args, executor) -> int:
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:
-        print('Encerrando: parando a rodada em andamento (Ctrl+C de novo para forçar)')
         _parar(executor)
     finally:
         servidor.server_close()
@@ -73,6 +73,7 @@ def _pagina(args, executor) -> int:
 
 
 def _parar(executor) -> None:
+    print('Encerrando: parando a rodada em andamento (Ctrl+C de novo para forçar)')
     try:
         executor.parar()
         while executor.estado()['rodando']:  # espera curta em laço: join sem prazo não é interrompível no Windows
@@ -90,11 +91,25 @@ def _parar(executor) -> None:
             pass
 
 
+def _imprimir_previa(plano, estado) -> None:
+    if not estado.get('catalogo_lido', True):
+        print(f'Aviso: {AVISO_CATALOGO}')
+    por_modulo = {l['modulo']: l for l in estado.get('frentes', [])}
+    for i in plano:
+        l = por_modulo.get(i['modulo']) or {}
+        if i['acao'] == 'pular':
+            print(f'{i["modulo"]} pulada ({i["motivo"]}): {l.get("itens", 0)} itens, última coleta {l.get("ultima_coleta") or "—"}')
+        elif l.get('pesada'):
+            print(f'{i["modulo"]}: coleta pesada. {l["pesada"]}')
+
+
 def _terminal(args, executor) -> int:
     selecionadas, finais = set(args.frentes), set(args.finais)
     refazer = selecionadas if args.rodar_de_novo else set()
     # inclui dependências que o plano acrescentar e exclui as que ele pular
-    rodar = {i['modulo'] for i in executor.previa(selecionadas, refazer) if i['acao'] == 'rodar'} if selecionadas else set()
+    plano = executor.previa(selecionadas, refazer) if selecionadas else []
+    rodar = {i['modulo'] for i in plano if i['acao'] == 'rodar'}
+    _imprimir_previa(plano, executor.estado())
     try:
         executor.iniciar(selecionadas, refazer, finais)
     except RodadaAtiva as e:
@@ -116,9 +131,10 @@ def _terminal(args, executor) -> int:
                 break
             time.sleep(0.5)
     except KeyboardInterrupt:
-        print('Encerrando: parando a rodada em andamento (Ctrl+C de novo para forçar)')
         _parar(executor)
         return 1
+    if estado.get('aviso'):
+        print(f'Aviso: {estado["aviso"]}')
     return 1 if falhou else 0
 
 

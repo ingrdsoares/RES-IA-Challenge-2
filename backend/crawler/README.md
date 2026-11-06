@@ -53,6 +53,7 @@ python -m backend.crawler.painel --sem-pagina --finais estatisticas,sumarizacao
 - **Rodar de novo não garante dado novo:** muitos coletores usam a cópia local ou marcas de período fixo, então a frente pode concluir sem criar versão. O conteúdo só muda se a fonte mudou.
 - **Parcial:** frente coletada com pendências aparece como "parcial".
 - **Parar em duas etapas:** "Parar" pede o fim cooperativo (nada novo inicia, o coletor atual termina e o catálogo ainda é atualizado). Passados 60 s, o coletor atual é encerrado à força e marcado como forçado. No terminal, o primeiro Ctrl+C faz a parada cooperativa e o segundo força o encerramento.
+- **Falhas de uma parada:** as falhas que o coletor registra ao ser parado ficam no manifesto dele até a frente rodar de novo.
 - **Dados do painel:** logs e histórico das execuções ficam em `backend/crawler/.painel/`, fora do Git.
 
 ## Testes

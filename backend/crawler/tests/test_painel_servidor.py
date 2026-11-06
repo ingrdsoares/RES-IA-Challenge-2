@@ -196,6 +196,19 @@ class ServidorTest(unittest.TestCase):
         self.assertEqual(dados.count(b'HTTP/1.'), 1)
         self.assertEqual(self.ex.de('iniciar'), [])
 
+    def test_erro_inesperado_do_handler_aparece_no_stderr(self):
+        servidor = criar_servidor(self.ex, 0)
+        self.addCleanup(servidor.server_close)
+        erro = io.StringIO()
+        with contextlib.redirect_stderr(erro):
+            for exc in (ConnectionResetError(), ValueError('estourou')):
+                try:
+                    raise exc
+                except Exception:
+                    servidor.handle_error(None, ('127.0.0.1', 1))
+        self.assertIn('estourou', erro.getvalue())
+        self.assertNotIn('ConnectionResetError', erro.getvalue())
+
     def test_porta_ocupada(self):
         with socket.socket() as ocupada:
             ocupada.bind(('127.0.0.1', 0))
@@ -212,7 +225,7 @@ class ServidorTest(unittest.TestCase):
 
 class TerminalTest(unittest.TestCase):
     def rodar(self, argv, estados):
-        ex = Falso(estados)
+        ex = Falso([estados[0], *estados])  # o primeiro estado alimenta a prévia, antes de iniciar
         saida, erro = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(saida), contextlib.redirect_stderr(erro):
             codigo = main(argv, executor=ex)
@@ -236,6 +249,27 @@ class TerminalTest(unittest.TestCase):
         self.assertEqual(self.rodar(base, [self.estado(False, 'concluida', 'erro')])[0], 0)  # final não pedida
         self.assertEqual(self.rodar(base + ['--finais', 'estatisticas'], [self.estado(False, 'concluida', 'erro')])[0], 1)
 
+    def test_terminal_previa_e_aviso(self):
+        antes = {'rodando': False, 'catalogo_lido': False, 'finais': [], 'frentes': [
+            {'modulo': 'cnae', 'estado': 'ja_coletada', 'saida': None, 'itens': 12, 'ultima_coleta': '2026-01-02',
+             'pesada': 'Baixa muita coisa.'}]}
+        depois = {**antes, 'aviso': 'Catálogo velho', 'frentes': [{'modulo': 'cnae', 'estado': 'concluida', 'saida': 0}]}
+
+        class Plano(Falso):
+            def previa(self, selecionadas, refazer):
+                return [{'modulo': 'cnae', 'acao': 'pular', 'motivo': 'já tem dados'},
+                        {'modulo': 'mei', 'acao': 'rodar', 'motivo': 'selecionada'}]
+        ex = Plano([antes, depois])
+        antes['frentes'].append({'modulo': 'mei', 'estado': 'sem_dados', 'pesada': 'Pesada de verdade.'})
+        saida = io.StringIO()
+        with contextlib.redirect_stdout(saida):
+            main(['--sem-pagina', '--frentes', 'cnae,mei'], executor=ex)
+        texto = saida.getvalue()
+        self.assertIn('cnae pulada (já tem dados): 12 itens, última coleta 2026-01-02', texto)
+        self.assertIn('mei: coleta pesada. Pesada de verdade.', texto)
+        self.assertIn('Catálogo não encontrado ou ilegível', texto)
+        self.assertTrue(texto.rstrip().endswith('Aviso: Catálogo velho'))
+
     def test_terminal_argumentos_invalidos(self):
         for argv in (['--sem-pagina'], ['--sem-pagina', '--frentes', 'nao_existe'],
                      ['--sem-pagina', '--frentes', 'cnae', '--finais', 'cnae'], ['--frentes', 'cnae'],
@@ -256,7 +290,7 @@ class CtrlCTest(unittest.TestCase):
     def test_ctrl_c_para_e_aguarda(self):
         class Interrompe(Falso):
             def estado(self):
-                if not self.de('estado'):
+                if len(self.de("estado")) == 1:  # a primeira chamada alimenta a prévia
                     super().estado()
                     raise KeyboardInterrupt
                 return super().estado()
@@ -268,7 +302,10 @@ class CtrlCTest(unittest.TestCase):
 
     def test_parar_espera_em_laco_curto(self):
         ex = Falso([{'rodando': True}, {'rodando': True}, {'rodando': False}])
-        _parar(ex)
+        saida = io.StringIO()
+        with contextlib.redirect_stdout(saida):
+            _parar(ex)
+        self.assertIn('Encerrando', saida.getvalue())  # a mensagem é de _parar, valendo para página e terminal
         self.assertEqual([c[0] for c in ex.chamadas if c[0] != 'estado'], ['parar', 'aguardar', 'aguardar'])
 
     def test_segundo_ctrl_c_forca_antes_de_voltar(self):

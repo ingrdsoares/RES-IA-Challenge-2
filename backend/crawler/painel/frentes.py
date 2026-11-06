@@ -71,27 +71,28 @@ POR_MODULO: dict[str, Frente] = {f.modulo: f for f in FRENTES}
 
 def carregar_catalogo(data: Path) -> dict | None:
     try:
-        return json.loads((Path(data) / 'catalogo' / 'catalogo.json').read_text(encoding='utf-8'))
+        catalogo = json.loads((Path(data) / 'catalogo' / 'catalogo.json').read_text(encoding='utf-8'))
+        return catalogo if isinstance(catalogo, dict) else None
     except (OSError, ValueError):
         return None
 
 
 def resumir_catalogo(catalogo: dict | None) -> dict[str, dict]:
-    if not catalogo:
+    if not catalogo or not isinstance(catalogo, dict):
         return {}
     por_pasta: dict[str, dict] = {}
-    for s in catalogo.get('snapshots', []):
+    for s in catalogo.get('snapshots') or []:
         r = por_pasta.setdefault(s['diretorio'].split('/')[0], {'itens': 0, 'ultima_coleta': None, 'origens': set()})
         r['itens'] += 1
         if s.get('coletado_em') and (r['ultima_coleta'] is None or s['coletado_em'] > r['ultima_coleta']):
             r['ultima_coleta'] = s['coletado_em']
         if s.get('origem'):
             r['origens'].add(s['origem'])
-    for c in catalogo.get('cobertura_frentes', []):
+    for c in catalogo.get('cobertura_frentes') or []:
         r = por_pasta.setdefault(c['pasta'], {'itens': 0, 'ultima_coleta': None, 'origens': set()})
-        r['itens'] = c.get('snapshots', r['itens'])
+        r['itens'] = r['itens'] if c.get('snapshots') is None else c['snapshots']
         r['situacao'] = c.get('situacao')
-        r['pendencias'] = c.get('erros_manifesto_mais_recente', 0) + c.get('pendencias_extracao', 0)
+        r['pendencias'] = (c.get('erros_manifesto_mais_recente') or 0) + (c.get('pendencias_extracao') or 0)
     for r in por_pasta.values():
         dominios = Counter(urlsplit(o).hostname for o in r['origens'])
         r['fonte'] = dominios.most_common(1)[0][0] if dominios else None

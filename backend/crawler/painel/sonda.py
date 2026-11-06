@@ -24,7 +24,7 @@ def instalar(eventos: Path, parar: Path, modulo: str) -> None:
     trava = threading.Lock()
 
     def gravar(**ev) -> None:
-        linha = json.dumps({'t': datetime.now(timezone.utc).isoformat(), 'modulo': modulo, **ev}, ensure_ascii=False)
+        linha = json.dumps({'t': datetime.now(timezone.utc).isoformat(), 'modulo': modulo, **ev})  # ASCII puro: um surrogate na URL não pode derrubar a coleta com UnicodeEncodeError
         try:
             with trava, open(eventos, 'a', encoding='utf-8') as f:
                 f.write(linha + '\n')
@@ -53,6 +53,15 @@ def instalar(eventos: Path, parar: Path, modulo: str) -> None:
         return resp
 
     httpx.Client.send = send
+
+    dormir = time.sleep
+
+    def sleep(segundos) -> None:
+        # a retentativa dos coletores dorme entre tentativas recusadas; depois de Parar isso só atrasa a saída
+        if not parar.exists():
+            dormir(segundos)
+
+    time.sleep = sleep
 
 
 def main(argv=None) -> int:

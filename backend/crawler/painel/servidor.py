@@ -1,6 +1,7 @@
 """Servidor HTTP local do painel: página, estado, eventos (SSE), log e comandos."""
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import sys
 from pathlib import Path
 import time
 from urllib.parse import parse_qs, urlsplit
@@ -18,7 +19,8 @@ class _Servidor(ThreadingHTTPServer):
     allow_reuse_address = False  # no Windows, reuso permitiria abrir um segundo painel na mesma porta
 
     def handle_error(self, request, client_address) -> None:
-        pass  # cliente que some no meio da resposta não é erro do painel
+        if not isinstance(sys.exc_info()[1], _DESCONEXAO):  # cliente que some no meio da resposta não é erro
+            super().handle_error(request, client_address)
 
 
 def criar_servidor(executor: Executor, porta: int, *, pagina: Path = PAGINA) -> ThreadingHTTPServer:

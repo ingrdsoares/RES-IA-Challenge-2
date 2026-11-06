@@ -98,7 +98,7 @@ def _panorama(f, resumos: dict, ultimas: dict) -> dict:
             'estado': estado, 'itens': r.get('itens', 0), 'ultima_coleta': r.get('ultima_coleta'),
             'fonte': r.get('fonte'), 'pendencias': r.get('pendencias', 0),
             'inicio': u.get('inicio'), 'fim': u.get('fim'), 'saida': None, 'requisicoes': 0, 'bytes': 0,
-            'item_atual': None, 'bytes_item': None, 'fracao': None, 'base': None, 'feitos': 0, 'total': None,
+            'item_atual': None, 'bytes_item': None, 'itens_antes': 0, 'coletados': None, 'fracao': None, 'base': None, 'feitos': 0, 'total': None,
             'restante_s': None, 'forcada': bool(u.get('forcada'))}
 
 
@@ -113,7 +113,7 @@ class Executor:
         self.intervalo = intervalo
         self.historico = self.painel / 'historico.jsonl'
         self._trava = threading.Lock()  # protege todo o estado da rodada abaixo
-        self._cache_catalogo = (None, {})
+        self._cache_catalogo = (None, {}, False)
         self._thread = None
         self._arquivo_trava = None
         self._rodando = False
@@ -202,12 +202,18 @@ class Executor:
         with self._trava:
             frentes = [dict(self._linhas.get(f.modulo) or _panorama(f, resumos, ultimas)) for f in self.frentes]
             restante, sem_estimativa = self._estimar(frentes)
-            da_rodada = [(self._linhas[m], len(self._casadas[m])) for m in self._rodar]
+            for m in self._rodar:  # itens da rodada, não o total do catálogo: repetir sem novidade dá 0
+                linha, n = self._linhas[m], len(self._casadas[m])
+                coletados = max(linha['itens'] - linha['itens_antes'], n) if linha['fim'] else n
+                for f in frentes:
+                    if f['modulo'] == m:
+                        f['coletados'] = coletados
+            da_rodada = [f for f in frentes if f['modulo'] in self._rodar]
             return {'rodando': self._rodando, 'etapa': self._etapa, 'inicio': self._inicio, 'fim': self._fim,
                     'restante_s': restante, 'sem_estimativa': sem_estimativa,
-                    'feitas': sum(1 for linha, _ in da_rodada if linha['fim']), 'total': len(da_rodada),
+                    'feitas': sum(1 for f in da_rodada if f['fim']), 'total': len(da_rodada),
                     # snapshots, não requisições: em base 1 `feitos` da linha conta requisições
-                    'itens': sum(max(linha['itens'], n) if linha['fim'] else n for linha, n in da_rodada),
+                    'itens': sum(f['coletados'] for f in da_rodada), 'catalogo_lido': self._cache_catalogo[2],
                     'aviso': self._aviso, 'frentes': frentes, 'finais': [dict(f) for f in self._finais]}
 
     def _estimar(self, frentes: list[dict]) -> tuple[float | None, int]:
@@ -235,7 +241,11 @@ class Executor:
         except OSError:
             chave = None
         if chave != self._cache_catalogo[0]:  # o catálogo tem milhares de linhas e estado() é chamado sem parar
-            self._cache_catalogo = (chave, resumir_catalogo(carregar_catalogo(self.data)))
+            catalogo = carregar_catalogo(self.data)
+            try:
+                self._cache_catalogo = (chave, resumir_catalogo(catalogo), catalogo is not None)
+            except (KeyError, TypeError, AttributeError):  # JSON válido com forma errada vale como sem catálogo
+                self._cache_catalogo = (chave, {}, False)
         return self._cache_catalogo[1]
 
     def _travar_arquivo(self) -> None:
@@ -277,7 +287,7 @@ class Executor:
             if item['acao'] == 'pular':
                 linha['estado'] = 'pulada'
             else:
-                linha.update(estado='na_fila', inicio=None, fim=None, forcada=False)
+                linha.update(estado='na_fila', inicio=None, fim=None, forcada=False, itens_antes=linha['itens'])
                 self._rodar.append(f.modulo)
             self._linhas[f.modulo] = linha
         self._finais = [self._linha_final(m, 'na_fila' if m in finais else 'nao_iniciada') for m in ETAPAS_FINAIS]
