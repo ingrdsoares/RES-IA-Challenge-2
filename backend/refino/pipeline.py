@@ -279,13 +279,15 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
             parent=sha(('rfb:ato:'+doc['chave_origem'].split(':')[2]).encode())
             if parent in docs:relations.append(dict(documento_id=doc['id'],relacionado_id=parent,tipo='anexo_de',evidencia='identificadores_explicitos_na_url_rfb'))
     from backend.refino import auditoria_extracao  # local: o módulo importa pipeline
-    auditoria=auditoria_extracao.auditar_lote(occurrences,root,policy['auditoria_extracao'],workers)  # só relata; nada sai do índice
+    auditoria_todas=auditoria_extracao.auditar_lote(occurrences,root,policy['auditoria_extracao'],workers)  # só relata; nada sai do índice
+    auditoria=sorted([r for r in auditoria_todas if r['problemas']],key=lambda r:(r.get('razao_texto') is None,r.get('razao_texto') or 0))
+    fila_auditoria=[f for f in map(auditoria_extracao.para_fila,auditoria) if f]
     duplicatas=list(auditoria_extracao.duplicatas_fisicas(occurrences))
     write_jsonl(stage/'auditoria_extracao.jsonl',auditoria);write_jsonl(stage/'duplicatas_fisicas.jsonl',duplicatas)
     for name,rows in [('documentos',docs.values()),('versoes',versions.values()),('ocorrencias',occurrences),('conteudos',contents.values()),('datasets',datasets),('relacoes',relations)]:
         write_jsonl(stage/(name+'.jsonl'),sorted(rows,key=lambda r:r.get('id') or encoded(r).decode()))
     for category,rows in indexes.items():
-        if category=='revisao':rows=rows+[dict(tipo='auditoria_extracao',**r) for r in auditoria]
+        if category=='revisao':rows=rows+fila_auditoria
         write_jsonl(stage/('indice_'+category+'.jsonl' if category!='revisao' else 'fila_revisao.jsonl'),sorted(rows,key=lambda r:r['documento_id']))
     # Similaridade é relatório: lê só os textos já escritos e não altera índice nem documentos. CNPJ/dados não têm texto aqui.
     pares=similaridade.comparar({cid:stage/contents[cid]['arquivo'] for cid in doc_por_conteudo},workers=workers,documentos=doc_por_conteudo,params=similar_params)
@@ -304,7 +306,8 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
     lines+=['| '+k+' | '+str(v)+' |' for k,v in sorted(counts.items())]
     lines+=['','## Consulta padrão','',f"Núcleo candidato: {len(indexes['nucleo'])} documentos, em indice_nucleo.jsonl. Complementares, histórico e revisão têm índices próprios; apoio (agendas e conteúdo restrito) em indice_apoio.jsonl, fora do núcleo. Todas as ocorrências e suas fontes permanecem em ocorrencias.jsonl.",'', 'A redução de entradas no índice não representa liberação de espaço na camada bruta nem validação jurídica.']
     (stage/'indice.md').write_bytes(('\n'.join(lines)+'\n').encode())
-    report['auditoria_problemas']=dict(sorted(Counter(p for r in auditoria for p in r['problemas']).items()));report['duplicatas_fisicas']=len(duplicatas)
+    report['auditoria_problemas']=dict(sorted(Counter(p for r in auditoria_todas for p in r['problemas']).items()))
+    report['auditoria_sem_verificacao']=sum(bool(r.get('sem_verificacao')) for r in auditoria_todas);report['duplicatas_fisicas']=len(duplicatas)
     report['artefatos_sha256']={p.relative_to(stage).as_posix():file_sha(p) for p in stage.rglob('*') if p.is_file()}
     (stage/'manifesto.json').write_bytes(encoded(report)+b'\n')
     if stage.resolve().parent!=output or target.resolve().parent!=output:raise ValueError('Destino de publicação inválido')

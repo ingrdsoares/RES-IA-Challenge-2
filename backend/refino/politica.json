@@ -29,7 +29,8 @@
   "limiar_bytes_preferida": 0.2,
   "auditoria_extracao": {
     "razao_texto_minima": 0.5,
-    "bytes_apos_body_precoce": 2000
+    "bytes_apos_body_precoce": 2000,
+    "ancora_rodape": "Este conteúdo não substitui"
   },
   "similaridade": {
     "shingles": 5,
