@@ -58,3 +58,18 @@ Valida:
 4. Extração de valores de débito, termo de exclusão e certidão CPEN.
 5. Extração de CNPJ e CNAE com cálculo do Simples Nacional.
 6. **Integração Tripla:** Pergunta do usuário $\to$ Extração de Entidades $\to$ Cálculo Determinístico no Motor Fiscal $\to$ Recuperação do Artigo Legal exato via RAG vetorial.
+
+---
+
+## 4. Recorte RAG v1 (CSV e ponte para Qdrant)
+
+```bash
+# CSV do índice núcleo do refino (versão preferida por documento; entrada de pipeline, não planilha)
+python -m src.rag.recorte_csv --run <dir do refino> --saida <arquivo.csv>
+
+# Confere o que subiria (sem modelo, sem Qdrant); depois sobe de verdade
+python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --dry-run
+python -m src.rag.csv_para_qdrant --csv <arquivo.csv> [--limite N]
+```
+O upsert usa a coleção e o Ollama configurados em `backend/api/app/config.py` (`Settings`).
+Os pontos têm id estável (versão + índice do chunk), então reexecutar não duplica.
