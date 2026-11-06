@@ -86,6 +86,16 @@ Para habilitar a publicação automática em `https://ingrdsoares.github.io/RES-
    - **Deploy from a branch:** Selecione a branch `main` e a pasta `/docs`, depois clique em **Save**.
 4. O site estará disponível em instantes em: [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
 
+## Backend e coleta de dados
+
+A API está em [backend/api](backend/api), e a preparação da coleta em [backend/crawler](backend/crawler). Consulte [backend/README.md](backend/README.md) para executar a API e [o plano da coleta inicial](backend/crawler/README.md).
+
+A expansão inclui ICMS/consultas DF, reforma tributária, histórico CGSN, CNPJ DF por todos os lotes, documentação fiscal, jurisprudência e candidatos a exemplos oficiais. Os resultados e limites estão no [README do crawler](backend/crawler/README.md). Execute `python -m backend.crawler.estatisticas` para atualizar a [contagem consolidada local](backend/crawler/data/estatisticas/indice.md), com documentos, versões, páginas, empresas e volume separados.
+
+Consulte a [sumarização integral do acervo tributário](docs/sumarizacao-acervo-tributario.md), com descrição de todas as frentes, cobertura e referências de cada versão coletada. O [inventário integral de referências](docs/referencias-acervo/inventario-integral.json) permite processamento automatizado.
+
+O refino tem [arquitetura própria](docs/arquitetura-refino.md), [pipeline reproduzível](backend/refino/README.md) e [instruções de continuidade para outros agentes](handoff/refino/CONTINUAR.md). Gere um pacote portátil com python -m backend.refino.exportar.
+
 ## Avaliação do RAG
 
 O pipeline de avaliação em [`backend/api/evaluation/`](backend/api/evaluation/) permite
