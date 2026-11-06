@@ -12,7 +12,9 @@ import hashlib
 import io
 import json
 import os
+import re
 import sys
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -26,7 +28,20 @@ NATUREZAS_PERMITIDAS = frozenset(
         "anexo_convertido",
         "quadro_sumulas_com_referencias_precedentes",
         "orientacao_oficial",
+        "consulta_acordao_administrativo",
+        "diario_com_consulta_tributaria",
+        "diario_com_jurisprudencia_tributaria",
+        "informativo_jurisprudencial",
+        "perguntas_respostas",
+        "orientacao_mei",
+        "manual",
+        "documentacao_classificacao_oficial",
     }
+)
+# Natureza genérica do refino: entra só quando título ou chave_origem identifica ato legal.
+NATUREZAS_CONDICIONAIS = frozenset({"nao_informada", "pagina_oficial"})
+_ATO_LEGAL = re.compile(
+    r"\b(?:lei|lc|decreto|dl|portaria|in|ajuste|convenio|emenda)\b|df-(?:lei|decreto)-"
 )
 # O refino grava "nao_verificada" em toda ocorrência: não é informação da fonte.
 VIGENCIAS_SEM_INFORMACAO = frozenset({"", "nao_verificada"})
@@ -56,14 +71,34 @@ def _jsonl(caminho: Path):
                 yield json.loads(linha)
 
 
+def _sem_acento(texto: str) -> str:
+    return unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().lower()
+
+
+_HOST = re.compile(r"https?://[^/\s]+")
+
+
+def _ato_legal(ocorrencia: dict) -> bool:
+    # O host sai da busca: "in.gov.br" não pode fazer uma página do portal passar por IN.
+    texto = _HOST.sub(" ", f"{ocorrencia['titulo']} {ocorrencia['chave_origem']}")
+    return bool(_ATO_LEGAL.search(_sem_acento(texto)))
+
+
+def _permitida(ocorrencia: dict) -> bool:
+    natureza = ocorrencia["natureza"]
+    if natureza in NATUREZAS_PERMITIDAS:
+        return True
+    return natureza in NATUREZAS_CONDICIONAIS and _ato_legal(ocorrencia)
+
+
 def _motivo_exclusao(ocorrencias: list[dict]) -> str | None:
+    """Documento entra só se todas as ocorrências da versão forem permitidas."""
     if any(o["frente"].startswith("cnpj") for o in ocorrencias):
         return "frente_cnpj"
-    naturezas = {o["natureza"] for o in ocorrencias}
-    if len(naturezas) > 1:
-        return "natureza_ambigua"
-    (natureza,) = naturezas
-    return None if natureza in NATUREZAS_PERMITIDAS else natureza
+    for o in ocorrencias:
+        if not _permitida(o):
+            return o["natureza"]
+    return None
 
 
 def gerar_recorte(run: Path, saida: Path, teto_bytes: int = TETO_BYTES) -> dict:
@@ -80,6 +115,7 @@ def gerar_recorte(run: Path, saida: Path, teto_bytes: int = TETO_BYTES) -> dict:
     por_natureza: Counter = Counter()
     bytes_por_natureza: Counter = Counter()
     excluidos: dict[str, dict[str, int]] = {}
+    condicionais_excluidos: list[dict] = []
 
     try:
         with open(tmp, "wb") as f:
@@ -107,6 +143,14 @@ def gerar_recorte(run: Path, saida: Path, teto_bytes: int = TETO_BYTES) -> dict:
                     registro = excluidos.setdefault(motivo, {"documentos": 0, "bytes_texto": 0})
                     registro["documentos"] += 1
                     registro["bytes_texto"] += tamanho
+                    if motivo in NATUREZAS_CONDICIONAIS:
+                        condicionais_excluidos.append(
+                            {
+                                "natureza": motivo,
+                                "titulo": ocs[0]["titulo"],
+                                "chave_origem": ocs[0]["chave_origem"],
+                            }
+                        )
                     continue
 
                 rep = ocs[0]
@@ -146,6 +190,7 @@ def gerar_recorte(run: Path, saida: Path, teto_bytes: int = TETO_BYTES) -> dict:
         "contagens_por_natureza": dict(por_natureza),
         "bytes_texto_por_natureza": dict(bytes_por_natureza),
         "excluidos": excluidos,
+        "condicionais_excluidos": condicionais_excluidos,
     }
     saida.with_name(saida.name + ".manifesto.json").write_text(
         json.dumps(manifesto, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8"

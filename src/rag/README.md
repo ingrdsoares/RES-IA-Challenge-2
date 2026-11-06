@@ -69,7 +69,8 @@ python -m src.rag.recorte_csv --run <dir do refino> --saida <arquivo.csv>
 
 # Confere o que subiria (sem modelo, sem Qdrant); depois sobe de verdade
 python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --dry-run
-python -m src.rag.csv_para_qdrant --csv <arquivo.csv> [--limite N]
+python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --colecao <nome> [--limite N]
 ```
-O upsert usa a coleção e o Ollama configurados em `backend/api/app/config.py` (`Settings`).
+A gravação exige `--colecao` (sem padrão); o Ollama vem de `backend/api/app/config.py` (`Settings`).
+Antes de subir um documento, seus pontos antigos saem pelo `document_id`. Texto com `~~riscado~~` ou marcado como tachado na fonte não é embeddado; o original fica em `texto_com_rasuras`.
 Os pontos têm id estável (versão + índice do chunk), então reexecutar não duplica.
