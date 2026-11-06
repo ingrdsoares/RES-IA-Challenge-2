@@ -11,6 +11,7 @@ CREATE TABLE refino.documento (
     titulos jsonb NOT NULL,
     naturezas jsonb NOT NULL,
     representacao_preferida char(64),
+    etiquetas jsonb NOT NULL DEFAULT '[]',
     criterio_representacao text NOT NULL
 );
 CREATE TABLE refino.conteudo (

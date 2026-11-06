@@ -290,3 +290,91 @@ def test_original_sem_compilada_tem_motivo_de_conteudo_nao_novo(tmp_path):
     folder,_=refine(tmp_path,[citada('u','unica',base),citada('o','original',base.rsplit('\n',1)[0])])
     row=read_rows(folder,'indice_nucleo.jsonl')[0]
     assert [f['motivo'] for f in row['fora_do_indice']]==['versao_sem_conteudo_novo']
+
+
+def norma_citada(name,texto,**more):
+    return (name,'https://x.gov.br/'+name,texto,'normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 9.985, de 18 de julho de 2000',**more))
+
+
+def test_relacionada_recebe_etiqueta_e_fica_no_indice(tmp_path):
+    # Norma citada cujo título e ementa não têm termo tributário: etiqueta relacionada, sem sair do índice.
+    folder,_=refine(tmp_path,[norma_citada('p','# Lei\nInstitui o Sistema Nacional de Unidades de Conservação.\nArt. 1 Texto.')])
+    row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['etiquetas']==['relacionada'] and row['versoes']
+    assert read_rows(folder,'documentos.jsonl')[0]['etiquetas']==['relacionada']
+
+
+def test_relacionada_nao_marca_norma_com_termo_tributario_na_ementa(tmp_path):
+    folder,_=refine(tmp_path,[norma_citada('t','# Lei\nDispõe sobre o Simples Nacional e o imposto de renda.\nArt. 1 Texto.')])
+    assert read_rows(folder,'indice_nucleo.jsonl')[0]['etiquetas']==[]
+
+
+def test_revogada_so_com_informacao_da_fonte(tmp_path):
+    # situacao_fonte só existe quando a fonte informa; ausência ou "não consta" não gera etiqueta.
+    folder,_=refine(tmp_path,[
+        norma_citada('r','# Lei\nArt. 1 A.',situacao_fonte='Revogada'),
+        norma_citada('s','# Lei\nArt. 1 B.'),
+        norma_citada('n','# Lei\nArt. 1 C.',situacao_fonte='Não consta revogação expressa')])
+    by_url={r['source_url']:r for r in read_rows(folder,'ocorrencias.jsonl')}
+    docs={d['chave_origem']:d for d in read_rows(folder,'documentos.jsonl')}
+    etiquetas={r['chave_origem']:r['etiquetas'] for r in read_rows(folder,'documentos.jsonl')}
+    assert len(by_url)==3 and len(docs)==3
+    assert etiquetas['url:https://x.gov.br/r']==['relacionada','revogada']
+    assert sum('revogada' in v for v in etiquetas.values())==1
+    assert by_url['https://x.gov.br/r']['situacao_fonte']=='Revogada'
+    assert len(read_rows(folder,'indice_nucleo.jsonl'))==3
+
+
+def test_toda_ocorrencia_e_rastreavel(tmp_path):
+    root=tmp_path/'raw';base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    catalog=make_input(root,[citada('c','multivigente',base),citada('o','original',base+'\nRedação original'),norma_citada('x','# Lei\nOutra norma.')])
+    report=run(root,catalog,tmp_path/'refined');folder=tmp_path/'refined'/report['run_id']
+    ocorrencias=read_rows(folder,'ocorrencias.jsonl')
+    assert len(ocorrencias)==3
+    docs={d['id']:d for d in read_rows(folder,'documentos.jsonl')}
+    versoes={v['id']:v for v in read_rows(folder,'versoes.jsonl')}
+    for oc in ocorrencias:
+        assert oc['source_url'].startswith('https://') and oc['versao_id'] in versoes and oc['documento_id'] in docs
+        assert oc['id'] in versoes[oc['versao_id']]['ocorrencias'] and oc['id'] in docs[oc['documento_id']]['ocorrencias']
+        raw=(root/oc['metadados_ref']).read_bytes()
+        assert hashlib.sha256(raw).hexdigest()==oc['hash_metadados']
+    assert sorted(o for d in docs.values() for o in d['ocorrencias'])==sorted(o['id'] for o in ocorrencias)
+
+
+def test_toda_saida_do_indice_tem_motivo(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[
+        citada('c','multivigente',base),citada('o','original',base+'\nRedação original'),
+        ('e','https://x.gov.br/e','','normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte='unica',natureza_documental='legislacao',titulo='Lei nº 9/2000')),
+        ('k','https://x.gov.br/k','# Catálogo\nResumo técnico.','catalogo-tecnico-x',dict(tipo='catalogo_tecnico',titulo='Catálogo técnico'))])
+    motivos_validos={'original_com_compilada','versao_sem_conteudo_novo','sem_texto_extraido','em_revisao','categoria_sem_indice'}
+    indexadas=set()
+    for r in all_rows(folder):indexadas|=set(r['versoes'])
+    for r in all_rows(folder):
+        for f in r['fora_do_indice']:assert f['motivo'] in motivos_validos
+    fora={f['versao']:f['motivo'] for d in read_rows(folder,'documentos.jsonl') for f in d['fora_do_indice']}
+    fora.update({f['versao']:f['motivo'] for r in all_rows(folder) for f in r['fora_do_indice']})
+    versoes={v['id'] for v in read_rows(folder,'versoes.jsonl')}
+    assert versoes==indexadas|set(fora) and not indexadas&set(fora)
+    assert set(fora.values())>={'sem_texto_extraido','categoria_sem_indice'}
+
+
+def test_antes_depois_compara_indice_bytes_normas_e_parcial(tmp_path):
+    from backend.refino.pipeline import antes_depois
+    full='# Lei\n'+'\n'.join('Art. %d Texto integral.'%i for i in range(60))
+    base_dir=tmp_path/'base';atual_dir=tmp_path/'atual'
+    base_folder,base_report=refine(base_dir,[citada('f','unica',full,jurisdicao='DF')])
+    atual_folder,atual_report=refine(atual_dir,[citada('f','unica',full,jurisdicao='DF'),citada('s','multivigente','# Lei\nResumo.',jurisdicao='SP'),
+        ('o','https://x.gov.br/o','# Outra\nTexto de outra norma.','normas-citadas',dict(natureza_documental='legislacao',titulo='Lei nº 77, de 1 de janeiro de 2001'))])
+    normas=tmp_path/'normas.json';normas.write_text(json.dumps({'normas':{'x':{'situacao':'nao_encontrada'},'y':{'situacao':'bloqueada'},'z':{'situacao':'manual'},'w':{'situacao':'coletada'}}}),encoding='utf8')
+    out=antes_depois(atual_folder,base_folder,normas_atual=normas,normas_base=None)
+    saida=json.loads((atual_folder/'antes_depois.json').read_bytes())
+    assert saida==out
+    assert saida['atual']['documentos_no_indice']==len({r['documento_id'] for f in atual_folder.glob('indice_*.jsonl') for r in read_rows(atual_folder,f.name)})
+    assert saida['base']['documentos_no_indice']==len({r['documento_id'] for f in base_folder.glob('indice_*.jsonl') for r in read_rows(base_folder,f.name)})
+    assert saida['delta']['documentos_no_indice']==saida['atual']['documentos_no_indice']-saida['base']['documentos_no_indice']
+    assert saida['atual']['bytes_textuais_entrada']==atual_report['bytes_textuais_entrada'] and saida['base']['bytes_conteudos_unicos']==base_report['bytes_conteudos_unicos']
+    assert saida['atual']['apenas_versao_parcial']['count']==1 and saida['base']['apenas_versao_parcial']['count']==0
+    assert saida['atual']['normas']=={'ausentes':1,'bloqueadas_ou_manuais':2,'situacoes':{'nao_encontrada':1,'bloqueada':1,'manual':1,'coletada':1}}
+    assert saida['base']['normas'] is None
+    assert saida['atual']['extracao_curta']==sum('extracao_curta' in r['problemas'] for r in read_rows(atual_folder,'auditoria_extracao.jsonl'))

@@ -94,5 +94,40 @@
   "ruido": {
     "minimo_textos_sugestao": 50
   },
-  "limite": "Classificação candidata e explicável; não certifica vigência ou aplicabilidade. Não apagar originais nem deduplicar versões pelo hash primário."
+  "limite": "Classificação candidata e explicável; não certifica vigência ou aplicabilidade. Não apagar originais nem deduplicar versões pelo hash primário.",
+  "etiquetas": {
+    "relacionada": {
+      "frentes": [
+        "normas-citadas"
+      ],
+      "termos_tributarios": [
+        "\\btribut",
+        "\\bimposto",
+        "\\bcontribuic",
+        "\\bsimples nacional",
+        "\\bmicroempreendedor",
+        "\\bnota fiscal",
+        "\\bicms\\b",
+        "\\biss(qn)?\\b",
+        "\\bipi\\b",
+        "\\bpis\\b",
+        "\\bcofins\\b",
+        "\\birpj\\b",
+        "\\bcsll\\b",
+        "\\birrf\\b",
+        "\\bsimei\\b",
+        "\\bmei\\b",
+        "\\bcgsn\\b",
+        "\\bcnae\\b",
+        "\\bnfs-?e\\b",
+        "\\bsped\\b",
+        "\\bdctf\\b"
+      ]
+    },
+    "revogada": {
+      "campo": "situacao_fonte",
+      "padrao": "\\brevogad[oa]\\b",
+      "negacao": "\\bnao\\b[^.;]{0,30}revogad"
+    }
+  }
 }

@@ -24,6 +24,7 @@ Atualize `backend/crawler/data/catalogo/catalogo.json` com o coletor de catálog
 | `indice_nucleo.jsonl` | Uma entrada por documento candidato à consulta padrão |
 | `indice_complementar.jsonl` / `indice_historico.jsonl` | Material complementar e histórico preservados |
 | `fila_revisao.jsonl` | Casos incertos ou com problemas de integridade/extração |
+| `antes_depois.json` | Comparação com uma execução anterior (`--comparar-com`): documentos no índice, bytes, `extracao_curta`, `apenas_versao_parcial` e normas ausentes/bloqueadas/manuais |
 | `politica.json` / `manifesto.json` | Política, perfil, evidência de execução e hashes |
 
 Deduplicação textual compartilha conteúdo; não une autoridades ou jurisdições. A consolidação por identidade mantém todas as versões e ocorrências. Não se escolhe vigência pela data da coleta. A representação preferida é técnica e não autoriza ignorar outras versões.
@@ -31,6 +32,8 @@ Deduplicação textual compartilha conteúdo; não une autoridades ou jurisdiç�
 ## Relevância
 
 O perfil padrão é `tributario_df`. Fontes tributárias federais e distritais são candidatas ao núcleo, cobrindo Simples, MEI e demais regimes. Modelos, editoriais e atos administrativos operacionais ficam complementares; tipos explícitos de pessoal não são promovidos por mencionar Simples. Outras jurisdições explicitamente identificadas ficam fora do núcleo local. Dúvidas permanecem para revisão.
+
+Etiquetas em `documentos.jsonl` e em cada linha de índice: `relacionada` (norma citada sem termo tributário no título nem na ementa) e `revogada` (só quando `situacao_fonte` da fonte diz revogada). Etiqueta nunca remove documento do índice.
 
 Alternativas: `--perfil mei_simples_df` e `--perfil tributario_nacional`. Regras e motivos são versionados em `politica.json`. A classificação inicial é candidata: Portarias genéricas ainda podem requerer revisão de ementa para separar procedimento fiscal de organização interna. Não há exclusão física por palavras-chave.
 

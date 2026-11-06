@@ -91,6 +91,33 @@ def searchable(text):
     return ''.join(c for c in unicodedata.normalize('NFD',text).lower() if not unicodedata.combining(c))
 
 
+def ementa(text):
+    # ponytail: aproximação da ementa = primeiro parágrafo que não é título, citação ou fonte; upgrade: campo ementa da fonte.
+    for linha in text.split('\n'):
+        s=linha.strip()
+        if s and not s.startswith(('#','>','[','---')):return s[:1000]
+    return ''
+
+
+def termo_tributario(texto,padroes):
+    s=searchable(texto)
+    return any(re.search(p,s) for p in padroes)
+
+
+def revogada(situacao,cfg):
+    """Só a situação informada pela fonte; ausência de informação nunca vira revogada."""
+    s=searchable(str(situacao or ''))
+    return bool(re.search(cfg['padrao'],s)) and not re.search(cfg['negacao'],s)
+
+
+def etiquetas_documento(rows,policy):
+    """Etiquetas só acrescentam informação; nenhuma tira o documento do índice."""
+    cfg=policy['etiquetas'];out=[]
+    if any(r['frente'] in cfg['relacionada']['frentes'] for r in rows) and not any(r['termo_tributario'] for r in rows):out.append('relacionada')
+    if any(revogada(r.get('situacao_fonte'),cfg['revogada']) for r in rows):out.append('revogada')
+    return out
+
+
 def _conteudo_restrito(text,marcadores):
     """Stub de acesso restrito: o corpo, sem títulos, Fonte e citações, é só o aviso de autenticação."""
     linhas=[searchable(l.strip()) for l in text.split('\n')]
@@ -182,13 +209,14 @@ def load_occurrence(snapshot,root,policy):
     if not title and text:
         first=re.search(r'^#\s+(.+)$',text,re.M);title=first[1] if first else None
     title=str(title or meta.get('source_id') or key)
+    tributaria=termo_tributario(title+' '+ementa(text),policy['etiquetas']['relacionada']['termos_tributarios'])
     views=meta.get('visoes_fonte') or ([{'visao':meta.get('visao_fonte')}] if meta.get('visao_fonte') else [])
     visao=_VISAO.get(str(meta.get('visao_fonte') or ''),'unica')
     occurrence=dict(id=oid,documento_id=did,versao_id=version_id,chave_origem=key,titulo=title,frente=front,
         metadados_ref=snapshot['metadados'],hash_metadados=sha(meta_raw),markdown_ref=md.relative_to(root).as_posix() if md else None,
         visao=visao,hash_markdown=md_sha,source_url=source,originais=originals,coletado_em=meta.get('coletado_em'),
         natureza=str(meta.get('natureza_documental') or meta.get('tipo') or 'nao_informada'),visoes=views,
-        vigencia=meta.get('vigencia','nao_verificada'),classificacao=category,motivos=reasons,qualidade=quality,erros=errors,
+        vigencia=meta.get('vigencia','nao_verificada'),situacao_fonte=meta.get('situacao_fonte'),termo_tributario=tributaria,classificacao=category,motivos=reasons,qualidade=quality,erros=errors,
         conteudo_id=content_id,bytes_texto=len(text.encode()) if content_id else 0,hashes_originais=raw_set,revisao_semantica='pendente')
     dataset=None
     if category=='dados_estruturados':
@@ -196,6 +224,12 @@ def load_occurrence(snapshot,root,policy):
             competencia=meta.get('competencia'),registros=meta.get('registros'),artefatos=meta.get('artefatos_sha256',{}),
             limite='Registro do dataset de origem; registros/partições não foram copiados nem recontados neste refino.')
     return occurrence,text,dataset
+
+
+def _motivo_fora(versao):
+    if versao['classificacao']=='revisao':return 'em_revisao'
+    if 'sem_documento_textual' in versao['motivos'] or (not versao['conteudo_id'] and versao['classificacao'] not in ('evidencia','dados_estruturados')):return 'sem_texto_extraido'
+    return 'categoria_sem_indice'
 
 
 def verify_output(folder,manifest):
@@ -237,12 +271,12 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
             contents[cid]=dict(id=cid,arquivo='conteudos/'+cid+'.md',bytes=row['bytes_texto'],normalizacao='NFC+finais_de_linha+frontmatter_de_coleta')
             (stage/contents[cid]['arquivo']).write_bytes(text.encode())
             limpo,removidas=ruido.limpar(text,ruido.aplicaveis(regras_ruido,METADADOS_INDICE));(stage/'busca'/(cid+'.md')).write_bytes(limpo.encode());ruido_removido.update(removidas)
-        version=versions.setdefault(row['versao_id'],dict(id=row['versao_id'],visao=row['visao'],documento_id=row['documento_id'],conteudo_id=cid,ocorrencias=[],categorias=set(),hashes_originais=set(),qualidade=set(),revisao_semantica='pendente'))
-        version['ocorrencias'].append(row['id']);version['categorias'].add(row['classificacao']);version['hashes_originais'].update(row['hashes_originais']);version['qualidade'].update(row['qualidade'])
+        version=versions.setdefault(row['versao_id'],dict(id=row['versao_id'],visao=row['visao'],documento_id=row['documento_id'],conteudo_id=cid,ocorrencias=[],categorias=set(),motivos=set(),hashes_originais=set(),qualidade=set(),revisao_semantica='pendente'))
+        version['ocorrencias'].append(row['id']);version['categorias'].add(row['classificacao']);version['motivos'].update(row['motivos']);version['hashes_originais'].update(row['hashes_originais']);version['qualidade'].update(row['qualidade'])
         doc=docs.setdefault(row['documento_id'],dict(id=row['documento_id'],chave_origem=row['chave_origem'],titulos=set(),naturezas=set(),versoes=set(),ocorrencias=[],categorias=set()))
         doc['titulos'].add(row['titulo']);doc['naturezas'].add(row['natureza']);doc['versoes'].add(row['versao_id']);doc['ocorrencias'].append(row['id']);doc['categorias'].add(row['classificacao'])
     for v in versions.values():
-        for key in ('categorias','hashes_originais','qualidade'):v[key]=sorted(v[key])
+        for key in ('categorias','motivos','hashes_originais','qualidade'):v[key]=sorted(v[key])
         v['classificacao']=min(v['categorias'],key=priority.get)
         v['indexavel_nucleo']=v['conteudo_id'] is not None and v['classificacao']=='nucleo'
     def lines(vid):return {l.strip() for l in (stage/contents[versions[vid]['conteudo_id']]['arquivo']).read_text(encoding='utf8').splitlines() if l.strip()}
@@ -259,7 +293,8 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
             pool=[v for v in vids if size(v)>=policy['limiar_bytes_preferida']*big]
             return (min(pool,key=rank),False) if pool else (min(vids,key=lambda v:(-size(v),rank(v))),True)
         doc['representacao_preferida']=pick(doc['versoes'])[0]
-        doc['fora_do_indice']=[dict(versao=v,motivo='em_revisao' if versions[v]['classificacao']=='revisao' else 'sem_texto_extraido') for v in doc['versoes'] if versions[v]['classificacao']=='revisao' or not versions[v]['conteudo_id']]
+        doc['fora_do_indice']=[dict(versao=v,motivo=_motivo_fora(versions[v])) for v in doc['versoes'] if versions[v]['classificacao'] in ('revisao','evidencia','dados_estruturados') or not versions[v]['conteudo_id']]
+        doc['etiquetas']=etiquetas_documento([rowmap[oid] for oid in doc['ocorrencias']],policy)
         doc['criterio_representacao']='Preferência técnica de extração; não significa versão vigente. Todas as versões permanecem em versoes.jsonl e ocorrencias.jsonl; o índice lista a preferida e as extras com conteúdo novo, e fora_do_indice registra o motivo das demais.'
         for category in indexes:
             vids=[vid for vid in doc['versoes'] if versions[vid]['classificacao']==category and (category=='revisao' or versions[vid]['conteudo_id'])]
@@ -274,7 +309,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
                     mine=lines(v);new={l for l in mine-ref if not _OMISSAO.fullmatch(l)}
                     if new and (len(new)/len(mine)>policy['limiar_linhas_ausentes_versao_extra'] or any(c.isdigit() for l in new for c in l)):shown.append(v)
                     else:out.append(dict(versao=v,motivo='versao_sem_conteudo_novo'))
-            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],versoes=shown,fora_do_indice=out,apenas_versao_parcial=partial,representacao_preferida=best,revisao_semantica='pendente'))
+            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],etiquetas=doc['etiquetas'],versoes=shown,fora_do_indice=out,apenas_versao_parcial=partial,representacao_preferida=best,revisao_semantica='pendente'))
         if doc['chave_origem'].startswith('rfb:anexo:'):
             parent=sha(('rfb:ato:'+doc['chave_origem'].split(':')[2]).encode())
             if parent in docs:relations.append(dict(documento_id=doc['id'],relacionado_id=parent,tipo='anexo_de',evidencia='identificadores_explicitos_na_url_rfb'))
@@ -315,7 +350,35 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
     return report
 
 
+def _resumo_execucao(folder,normas):
+    manifesto=json.loads((folder/'manifesto.json').read_bytes())
+    indexados=set();parciais=[]
+    for arquivo in sorted(folder.glob('indice_*.jsonl')):
+        for linha in arquivo.read_text(encoding='utf8').splitlines():
+            row=json.loads(linha);indexados.add(row['documento_id'])
+            if row['apenas_versao_parcial']:parciais.append(row['documento_id'])
+    auditoria=[json.loads(l) for l in (folder/'auditoria_extracao.jsonl').read_text(encoding='utf8').splitlines() if l.strip()]
+    if normas is None:situacoes=None
+    else:
+        situacoes=dict(sorted(Counter(v['situacao'] for v in json.loads(Path(normas).read_bytes())['normas'].values()).items()))
+    return dict(run_id=manifesto['run_id'],documentos_no_indice=len(indexados),indices_documentos=manifesto['indices_documentos'],
+        bytes_textuais_entrada=manifesto['bytes_textuais_entrada'],bytes_conteudos_unicos=manifesto['bytes_conteudos_unicos'],bytes_busca=manifesto['bytes_busca'],
+        extracao_curta=sum('extracao_curta' in r['problemas'] for r in auditoria),
+        apenas_versao_parcial=dict(count=len(parciais),documentos=sorted(parciais)),
+        normas=None if situacoes is None else dict(ausentes=situacoes.get('nao_encontrada',0),bloqueadas_ou_manuais=situacoes.get('bloqueada',0)+situacoes.get('manual',0),situacoes=situacoes))
+
+
+def antes_depois(atual,base,normas_atual=None,normas_base=None):
+    """Compara duas execuções e grava antes_depois.json na execução atual; não altera o manifesto nem os índices."""
+    atual=Path(atual);a=_resumo_execucao(atual,normas_atual);b=_resumo_execucao(Path(base),normas_base)
+    numeros=lambda r:dict(documentos_no_indice=r['documentos_no_indice'],bytes_textuais_entrada=r['bytes_textuais_entrada'],bytes_conteudos_unicos=r['bytes_conteudos_unicos'],bytes_busca=r['bytes_busca'],extracao_curta=r['extracao_curta'],apenas_versao_parcial=r['apenas_versao_parcial']['count'])
+    na,nb=numeros(a),numeros(b);out=dict(atual=a,base=b,delta={k:na[k]-nb[k] for k in na})
+    (atual/'antes_depois.json').write_text(json.dumps(out,ensure_ascii=False,indent=2,sort_keys=True)+'\n',encoding='utf8')
+    return out
+
+
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--data',type=Path,default=DATA);p.add_argument('--catalogo',type=Path);p.add_argument('--output',type=Path,default=OUTPUT);p.add_argument('--politica',type=Path);p.add_argument('--perfil');p.add_argument('--workers',type=int,default=8);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--data',type=Path,default=DATA);p.add_argument('--catalogo',type=Path);p.add_argument('--output',type=Path,default=OUTPUT);p.add_argument('--politica',type=Path);p.add_argument('--perfil');p.add_argument('--workers',type=int,default=8);p.add_argument('--comparar-com',type=Path,help='execução anterior; grava antes_depois.json na execução atual');p.add_argument('--normas-atual',type=Path);p.add_argument('--normas-base',type=Path);a=p.parse_args()
     report=run(a.data,a.catalogo,a.output,a.politica,a.perfil,a.workers)
     print(json.dumps({k:v for k,v in report.items() if k!='artefatos_sha256'},ensure_ascii=False,indent=2))
+    if a.comparar_com:antes_depois(a.output.resolve()/report['run_id'],a.comparar_com,a.normas_atual,a.normas_base)
