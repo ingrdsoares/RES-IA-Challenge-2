@@ -24,6 +24,7 @@ ATRASOS = {
 }
 _RECUO_429 = 60.0
 _RETRY_AFTER_MAX = 300.0
+_ATRASO_MAX = 30.0  # teto do atraso apos 429; sem teto, 6 s virava 384 s e travava a rodada
 _MAX_SALTOS = 5
 
 
@@ -66,6 +67,7 @@ class Http:
                  relogio: Callable[[], float] = time.monotonic, dormir: Callable[[float], None] = time.sleep):
         self.client, self.atraso, self.relogio, self.dormir = client, atraso, relogio, dormir
         self.atrasos = {**ATRASOS, **(atrasos or {})}
+        self._atrasos_base = dict(self.atrasos)
         self._ultimo: dict[str, float] = {}
         self._robots: dict[str, RobotFileParser | Bloqueada] = {}
         self._travas: dict[str, threading.Lock] = {}
@@ -97,9 +99,13 @@ class Http:
                 continue
             self._ultimo[host] = self.relogio()
             if resp.status_code == 429 and tentativa == 1:
-                self.atrasos[host] = 2 * self.atrasos.get(host, self.atraso)
+                base = self._atrasos_base.get(host, self.atraso)
+                self.atrasos[host] = max(base, min(2 * self.atrasos.get(host, self.atraso), _ATRASO_MAX))
                 self.dormir(_espera_429(resp))
                 continue
+            if resp.status_code != 429:  # sem 429 o atraso recua aos poucos ate o normal do host
+                base = self._atrasos_base.get(host, self.atraso)
+                self.atrasos[host] = max(base, 0.9 * self.atrasos.get(host, self.atraso))
             if resp.status_code in (401, 403, 429):
                 raise Bloqueada(f'{resp.status_code} em {url}')
             if resp.status_code >= 500:
