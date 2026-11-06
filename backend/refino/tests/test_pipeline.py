@@ -251,3 +251,42 @@ def test_original_limpo_vence_compilada_com_ressalva_e_compilada_vira_extra(tmp_
     vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
     assert row['representacao_preferida']==vs['original']['id']
     assert vs['compilada']['id'] in row['versoes']
+
+
+def all_rows(folder):
+    return [r for n in ('indice_nucleo','indice_complementar','indice_historico','fila_revisao') for r in read_rows(folder,n+'.jsonl')]
+
+
+def test_toda_versao_de_todo_documento_esta_indexada_ou_tem_motivo(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    items=[citada('c','multivigente',base),citada('o','original',base+'\nRedação original'),
+        ('e','https://x.gov.br/e','','normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte='unica',natureza_documental='legislacao',titulo='Lei nº 9/2000')),
+        ('r','https://x.gov.br/r','# Lei\nFalha.','normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte='exclusiva',natureza_documental='legislacao',titulo='Lei nº 9/2000',status='erro'))]
+    folder,_=refine(tmp_path,items)
+    covered=set()
+    for r in all_rows(folder):
+        covered|=set(r['versoes'])|{f['versao'] for f in r['fora_do_indice']}
+    doc=read_rows(folder,'documentos.jsonl')[0]
+    motivos={f['versao']:f['motivo'] for f in doc['fora_do_indice']}
+    assert {v['id'] for v in read_rows(folder,'versoes.jsonl')}<=covered|set(motivos)
+    assert set(motivos.values())=={'sem_texto_extraido','em_revisao'}
+
+
+def test_stub_sozinho_em_categoria_nao_vira_preferida_e_linha_fica_parcial(tmp_path):
+    full='# Lei\n'+'\n'.join('Art. %d Texto integral.'%i for i in range(60))
+    items=[citada('f','unica',full,jurisdicao='DF'),citada('s','multivigente','# Lei\nResumo.')]
+    # o stub é de outra categoria: perfil/jurisdição explícita fora do foco o torna complementar
+    items[1][4]['jurisdicao']='SP'
+    folder,_=refine(tmp_path,items)
+    vs=versions_by_visao(folder);doc=read_rows(folder,'documentos.jsonl')[0]
+    assert doc['representacao_preferida']==vs['unica']['id']
+    row=read_rows(folder,'indice_complementar.jsonl')[0]
+    assert row['apenas_versao_parcial'] is True and row['representacao_preferida']==vs['compilada']['id']
+    assert read_rows(folder,'indice_nucleo.jsonl')[0]['apenas_versao_parcial'] is False
+
+
+def test_original_sem_compilada_tem_motivo_de_conteudo_nao_novo(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('u','unica',base),citada('o','original',base.rsplit('\n',1)[0])])
+    row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert [f['motivo'] for f in row['fora_do_indice']]==['versao_sem_conteudo_novo']
