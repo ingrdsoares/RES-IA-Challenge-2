@@ -1,0 +1,82 @@
+{
+  "type": "array",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "title": "Id",
+        "type": "string"
+      },
+      "category": {
+        "title": "Category",
+        "type": "string"
+      },
+      "question": {
+        "title": "Question",
+        "type": "string"
+      },
+      "ground_truth": {
+        "title": "Ground Truth",
+        "type": "string"
+      },
+      "expected_sources": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "title": "Expected Sources",
+        "type": "array"
+      },
+      "metadata": {
+        "additionalProperties": true,
+        "title": "Metadata",
+        "type": "object"
+      },
+      "expected_behavior": {
+        "default": "answer",
+        "enum": [
+          "answer",
+          "abstain",
+          "clarify"
+        ],
+        "title": "Expected Behavior",
+        "type": "string"
+      },
+      "split": {
+        "default": "development",
+        "enum": [
+          "development",
+          "final"
+        ],
+        "title": "Split",
+        "type": "string"
+      },
+      "group_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Group Id"
+      }
+    },
+    "required": [
+      "id",
+      "category",
+      "question",
+      "ground_truth"
+    ],
+    "title": "EvalCase",
+    "type": "object"
+  }
+}

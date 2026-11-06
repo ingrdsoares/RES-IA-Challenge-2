@@ -1,0 +1,285 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 7 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+7 0 obj
+<< /Length 5792 >>
+stream
+q 0.06 0.12 0.28 rg 45 745 505.28 65 re f Q
+q 0.85 0.65 0.13 rg 45 807 505.28 3 re f Q
+BT /F2 14.5 Tf 1 1 1 rg 60 782 Td (SÓCIO DIGITAL: RELATÓRIO DE ENTREGAS DA EQUIPE) Tj ET
+BT /F1 9 Tf 0.85 0.90 0.98 rg 60 766 Td (RES-IA Challenge 2 — Grupo 08 | Clara, Ingrid, Jhessica, Lucas, Nasser) Tj ET
+BT /F2 8.5 Tf 0.95 0.75 0.25 rg 60 752 Td (MAPA TÉCNICO DE ATUAÇÃO: CÓDIGO, ARQUITETURA, DADOS E MLOPS) Tj ET
+q 0.95 0.98 1.00 rg 0.60 0.75 0.95 RG 0.8 w 45 602 505.28 124 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 712 Td (Quadro Sinóptico de Atuação do Grupo 08) Tj ET
+q 0.20 0.40 0.70 rg 58 701 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 699 Td (Jhessica \(Ciência de Dados\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( RAG factual, Chunking hierárquico, NER fiscal, Guardrails) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 687 Td (anti-alucinação e RAGService.) Tj ET
+q 0.20 0.40 0.70 rg 58 677 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 675 Td (Lucas \(Engenharia de Dados & Dev\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Ingestão estruturada de CNAEs/LC 123, Motor) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 663 Td (determinístico em Python e base FastAPI.) Tj ET
+q 0.20 0.40 0.70 rg 58 653 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 651 Td (Clara e Nasser \(Arquitetura\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Topologia em camadas, desacoplamento cálculo/LLM, LGPD e) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 639 Td (fronteira ética com o CRC.) Tj ET
+q 0.20 0.40 0.70 rg 58 629 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 627 Td (Ingrid \(DevOps & MLOps\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( CI/CD no GitHub Actions, portal no GitHub Pages, governança de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 615 Td (modelos e relatórios PDF.) Tj ET
+q 0.10 0.28 0.65 rg 45 581 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 583 Td (1. Jhessica — Ciência de Dados e Inteligência Artificial) Tj ET
+q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 580 130 14 re B Q
+BT /F2 7.5 Tf 0.10 0.30 0.70 rg 428 584 Td (CIÊNCIA DE DADOS) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 570 Td (Modelagem de RAG factual, extração de entidades fiscais, engenharia de prompts e avaliação.) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 552.2 Td (Jhessica liderou a frente de inteligência do Sócio Digital, desenvolvendo o pipeline de ingestão e recuperação) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 540.2 Td (jurídica de ponta a ponta, projetado para garantir zero alucinação em matérias contábeis.) Tj ET
+q 0.15 0.35 0.70 rg 47 527.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 525.5 Td (Chunking Hierárquico Jurídico \(src/rag/chunker.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Particionamento de normas \(LC 123/2006, CGSN 140/2018\)) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 514.0 Td (respeitando Artigos, Parágrafos e Incisos, com injeção de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 502.5 Td (contexto \(Context Injection\) para eliminar chunks) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 491.0 Td (descontextualizados.) Tj ET
+q 0.15 0.35 0.70 rg 47 479.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 477.5 Td (Vector Store Híbrido com Fallback \(src/rag/vector_store.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Persistência em banco SQLite combinando busca) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 466.0 Td (por similaridade de cosseno \(embeddings densos) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 454.5 Td (MiniLM\) com 30% de correspondência léxica e) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 443.0 Td (suporte a fallback offline.) Tj ET
+q 0.15 0.35 0.70 rg 47 431.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 429.5 Td (Extrator de Entidades Fiscais - NER \(src/rag/entity_extractor.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Classificação de intenções tributárias,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 418.0 Td (extração automatizada de CNAEs, CNPJs,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 406.5 Td (valores monetários \(R$\) e expansão de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 395.0 Td (queries com sinônimos legais da Receita) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 383.5 Td (Federal.) Tj ET
+q 0.15 0.35 0.70 rg 47 372.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 370.0 Td (RAGService com Guardrails \(src/rag/service.py, prompts.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Orquestrador central que une o RAG ao motor) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 358.5 Td (determinístico de cálculo, impondo formatação) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 347.0 Td (mandatória em planos de 3 passos, citações) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 335.5 Td (oficiais e abstenção contra fraudes.) Tj ET
+q 0.96 0.98 0.96 rg 0.70 0.88 0.70 RG 0.8 w 45 242.5 505.28 88 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 316.5 Td (Suítes de Testes e Validação Entregues por Jhessica) Tj ET
+q 0.20 0.40 0.70 rg 58 305.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 303.5 Td (test_pipeline.py:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( 4/4 casos de recuperação canônica aprovados com 100% de precisão de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 291.5 Td (contexto.) Tj ET
+q 0.20 0.40 0.70 rg 58 281.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 279.5 Td (test_entity_extractor.py:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( 5/5 casos de extração NER e teste de integração tripla aprovados.) Tj ET
+q 0.20 0.40 0.70 rg 58 269.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 267.5 Td (test_rag_service.py:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( 5/5 casos de governança, fidelidade factual \(faithfulness\) e abstenção) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 255.5 Td (ética aprovados.) Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Relatório de Entregas da Equipe | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 1 de 3) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 9 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+9 0 obj
+<< /Length 6389 >>
+stream
+q 0.08 0.16 0.32 rg 45 808 505.28 2 re f Q
+BT /F2 8 Tf 0.30 0.38 0.48 rg 45 814 Td (SÓCIO DIGITAL — MAPEAMENTO DE ENTREGAS DA EQUIPE) Tj ET
+BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2 — Grupo 08) Tj ET
+q 0.10 0.28 0.65 rg 45 775 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 777 Td (2. Lucas — Engenharia de Dados & Desenvolvimento \(Dev\)) Tj ET
+q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 774 130 14 re B Q
+BT /F2 7.5 Tf 0.10 0.30 0.70 rg 428 778 Td (DADOS & BACKEND) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 764 Td (Ingestão estruturada da LC 123/2006, base de CNAEs, motor determinístico e API FastAPI.) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 746.2 Td (Lucas estruturou o alicerce matemático e cadastral do projeto, garantindo que o sistema processe alíquotas) Tj ET
+BT /F1 8.8 Tf 0.15 0.20 0.28 rg 45 734.2 Td (oficiais com total exatidão e forneça consultas ágeis de atividades econômicas.) Tj ET
+q 0.15 0.35 0.70 rg 47 721.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 719.5 Td (Ingestão de Tabelas da LC 123/2006 \(data/raw/tabelas_simples_nacional.json\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Estruturação das 30 faixas) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 708.0 Td (fiscais dos Anexos I, II, III,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 696.5 Td (IV e V, incluindo alíquotas) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 685.0 Td (nominais e parcelas a deduzir) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 673.5 Td (oficiais.) Tj ET
+q 0.15 0.35 0.70 rg 47 662.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 660.0 Td (Base de CNAEs do IBGE \(data/raw/cnaes_base.json\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Catalogação saneada de 46 subclasses de CNAEs com marcações) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 648.5 Td (de elegibilidade ao MEI e sujeição ao Fator R.) Tj ET
+q 0.15 0.35 0.70 rg 47 637.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 635.0 Td (Repositório com Busca FTS5 \(src/fiscal/repository.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Banco relacional SQLite \(fiscal.db\) com índice de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 623.5 Td (texto completo \(Full-Text Search\) para localização) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 612.0 Td (instantânea de CNAEs por palavras-chave.) Tj ET
+q 0.15 0.35 0.70 rg 47 600.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 598.5 Td (Motor Fiscal Determinístico \(src/fiscal/calculator.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Implementação da fórmula oficial da alíquota efetiva,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 587.0 Td (cálculo exato do Fator R \(>= 28%\), comparativo de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 575.5 Td (economia e validação de excesso de faturamento no MEI) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 564.0 Td (\(> 20%\).) Tj ET
+q 0.15 0.35 0.70 rg 47 552.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 550.5 Td (Pesquisa de Fontes e Crawler \(docs/crawler-arquitetura.md, exploracao-dados.md\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Mapeamento das fontes) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 539.0 Td (governamentais e desenho) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 527.5 Td (arquitetural do coletor por) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 516.0 Td (fonte.) Tj ET
+q 0.15 0.35 0.70 rg 47 504.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 502.5 Td (API REST FastAPI \(api/app/main.py\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Construção do template de backend em FastAPI e conteinerização Docker.) Tj ET
+q 0.95 0.98 1.00 rg 0.60 0.75 0.95 RG 0.8 w 45 421.5 505.28 76 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 483.5 Td (Validação do Motor Determinístico Fiscal \(Lucas\)) Tj ET
+q 0.20 0.40 0.70 rg 58 472.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 470.5 Td (test_fiscal.py:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( 6/6 casos canônicos de simulação fiscal aprovados com 100% de exatidão) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 458.5 Td (matemática.) Tj ET
+q 0.20 0.40 0.70 rg 58 448.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 446.5 Td (Integração:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O RAGService consome diretamente o FiscalCalculator, sem risco de alucinação) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 434.5 Td (numérica.) Tj ET
+q 0.10 0.28 0.65 rg 45 400.5 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 402.5 Td (3. Clara e Nasser — Arquitetura de Soluções) Tj ET
+q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 399.5 130 14 re B Q
+BT /F2 7.5 Tf 0.10 0.30 0.70 rg 428 403.5 Td (ARQUITETURA) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 389.5 Td (Topologia desacoplada, contratos de dados, modelo de segurança e fronteira ética com o CRC.) Tj ET
+q 0.15 0.35 0.70 rg 47 374.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 372.0 Td (Topologia em Três Camadas \(docs/arquitetura.md\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Desacoplamento estrito entre Camada de Dados \(Lucas\), Camada) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 360.5 Td (de Inteligência/RAG \(Jhessica\) e Camada de Serviços/Backend.) Tj ET
+q 0.15 0.35 0.70 rg 47 349.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 347.0 Td (Diretriz de Ouro do Sistema:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O LLM é expressamente proibido de calcular alíquotas de cabeça; toda conta) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 335.5 Td (matemática é delegada ao motor determinístico em Python.) Tj ET
+q 0.15 0.35 0.70 rg 47 324.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 322.0 Td (Fronteira Ética com o CRC \(Decreto-Lei nº 9.295/1946\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Definição dos limites de atuação consultiva,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 310.5 Td (garantindo que o copiloto atue no letramento sem) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 299.0 Td (usurpar prerrogativas exclusivas de contadores) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 287.5 Td (habilitados.) Tj ET
+q 0.15 0.35 0.70 rg 47 276.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 274.0 Td (Requisitos Não Funcionais \(RNFs\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Especificação de segurança multi-tenant \(RNF01\), conformidade estrita com) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 262.5 Td (LGPD \(RNF02\) e tratamento de incertezas \(RNF04\).) Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Relatório de Entregas da Equipe | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 2 de 3) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 11 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+11 0 obj
+<< /Length 7734 >>
+stream
+q 0.08 0.16 0.32 rg 45 808 505.28 2 re f Q
+BT /F2 8 Tf 0.30 0.38 0.48 rg 45 814 Td (SÓCIO DIGITAL — MAPEAMENTO DE ENTREGAS DA EQUIPE) Tj ET
+BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2 — Grupo 08) Tj ET
+q 0.10 0.28 0.65 rg 45 775 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 777 Td (4. Ingrid — Ops \(DevOps & MLOps\)) Tj ET
+q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 774 130 14 re B Q
+BT /F2 7.5 Tf 0.10 0.30 0.70 rg 428 778 Td (DEVOPS & MLOPS) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 764 Td (Esteiras de CI/CD, governança de modelos/dados, GitHub Pages e consolidação de entregáveis.) Tj ET
+q 0.15 0.35 0.70 rg 47 748.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 746.5 Td (Automação de GitHub Pages \(.github/workflows/pages.yml\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Deploy contínuo e automático da documentação no) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 735.0 Td (padrão Docs-as-Code via Docsify com suporte nativo a) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 723.5 Td (diagramas Mermaid.) Tj ET
+q 0.15 0.35 0.70 rg 47 712.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 710.0 Td (Pacote de Definição do Projeto \(docs/definicao-projeto.md\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Formalização do problema, Essential Question,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 698.5 Td (mapa de stakeholders, personas \(Carlos, Mariana,) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 687.0 Td (Rafael\), riscos e catálogo de 12 RFs e 10 RNFs.) Tj ET
+q 0.15 0.35 0.70 rg 47 675.5 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 673.5 Td (Fundamentação de Qualidade de Vida \(docs/guiding-questions.md\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Vínculo do terror fiscal e sobrecarga) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 662.0 Td (administrativa ao estresse crônico dos) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 650.5 Td (pequenos empreendedores.) Tj ET
+q 0.15 0.35 0.70 rg 47 639.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 637.0 Td (Planejamento MLOps \(docs/devops-mlops.md\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Arquitetura da esteira de integração contínua para validação de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 625.5 Td (fidelidade \(Ragas/MLflow\) e versionamento de dados via DVC.) Tj ET
+q 0.15 0.35 0.70 rg 47 614.0 3.5 3.5 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 612.0 Td (Consolidação dos Entregáveis em PDF:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Diagramação e publicação oficial dos relatórios formais da Residência em) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 57 600.5 Td (IA.) Tj ET
+q 0.10 0.28 0.65 rg 45 582.5 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 584.5 Td (5. Matriz de Integração dos Componentes do Grupo 08) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 571.5 Td (Como as frentes se conectam operacionalmente no repositório.) Tj ET
+q 0.10 0.18 0.35 rg 45 544.5 505.28 18 re f Q
+BT /F2 8 Tf 1 1 1 rg 50 550.0 Td (Componente) Tj ET
+BT /F2 8 Tf 1 1 1 rg 165 550.0 Td (Responsável) Tj ET
+BT /F2 8 Tf 1 1 1 rg 260 550.0 Td (Integração no Sistema) Tj ET
+BT /F2 8 Tf 1 1 1 rg 465 550.0 Td (Status) Tj ET
+q 0.96 0.97 1.0 rg 45 518.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 518.5 m 550.28 518.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 535.0 Td (Tabelas Simples e CNAEs) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 535.0 Td (Lucas) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 535.0 Td (Base de dados consultada por FTS5 e) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 525.5 Td (cálculos.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 535.0 Td (100% Concluído) Tj ET
+q 1 1 1 rg 45 492.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 492.5 m 550.28 492.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 509.0 Td (Motor Determinístico) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 509.0 Td (Lucas) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 509.0 Td (Executa alíquotas efetivas e regra do Fator) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 499.5 Td (R.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 509.0 Td (100% Concluído) Tj ET
+q 0.96 0.97 1.0 rg 45 466.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 466.5 m 550.28 466.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 483.0 Td (Chunking e Vector Store) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 483.0 Td (Jhessica) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 483.0 Td (Indexação hierárquica e busca híbrida de) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 473.5 Td (leis.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 483.0 Td (100% Concluído) Tj ET
+q 1 1 1 rg 45 440.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 440.5 m 550.28 440.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 457.0 Td (NER Fiscal e Guardrails) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 457.0 Td (Jhessica) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 457.0 Td (Extração de parâmetros e filtro) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 447.5 Td (anti-alucinação.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 457.0 Td (100% Concluído) Tj ET
+q 0.96 0.97 1.0 rg 45 414.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 414.5 m 550.28 414.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 431.0 Td (RAGService) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 431.0 Td (Jhessica) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 431.0 Td (Une Vector Store ao Motor Fiscal e gera 3) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 421.5 Td (passos.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 431.0 Td (100% Concluído) Tj ET
+q 1 1 1 rg 45 388.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 388.5 m 550.28 388.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 405.0 Td (Topologia Desacoplada) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 405.0 Td (Clara / Nasser) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 405.0 Td (Garante respeito aos contratos e fronteira) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 395.5 Td (CRC.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 405.0 Td (100% Aderente) Tj ET
+q 0.96 0.97 1.0 rg 45 362.5 505.28 26 re f Q
+q 0.85 0.88 0.94 RG 0.5 w 45 362.5 m 550.28 362.5 l S Q
+BT /F2 7.5 Tf 0.08 0.14 0.28 rg 50 379.0 Td (Docsify e GitHub Pages) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 165 379.0 Td (Ingrid) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 379.0 Td (Publicação contínua da documentação e) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 260 369.5 Td (relatórios.) Tj ET
+BT /F1 7.5 Tf 0.18 0.22 0.30 rg 465 379.0 Td (Ativo no Pages) Tj ET
+q 0.70 0.76 0.88 RG 0.75 w 45 360.5 505.28 202 re S Q
+q 0.10 0.28 0.65 rg 45 337.5 4 15 re f Q
+BT /F2 11 Tf 0.08 0.14 0.25 rg 55 339.5 Td (6. Conclusão e Prontidão para a Próxima Fase) Tj ET
+BT /F3 8.5 Tf 0.40 0.45 0.55 rg 55 326.5 Td (Status de prontidão para unificação e deploy.) Tj ET
+q 0.95 0.98 1.00 rg 0.10 0.28 0.65 RG 0.8 w 45 217.5 505.28 100 re B Q
+BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 303.5 Td (Declaração de Alinhamento e Prontidão Técnica) Tj ET
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 57 290.5 Td (Integração Total:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( O repositório possui 100% de cobertura nos testes fiscais, de extração e de) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 278.5 Td (RAG.) Tj ET
+q 0.20 0.40 0.70 rg 58 268.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 266.5 Td (Fase 2 \(Dados e Modelagem\):) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Concluída com êxito pleno em conformidade com as diretrizes do) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 254.5 Td (Challenge 2.) Tj ET
+q 0.20 0.40 0.70 rg 58 244.5 3 3 re f Q
+BT /F2 8.5 Tf 0.10 0.15 0.25 rg 66 242.5 Td (Próximo Passo Conjunto:) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ( Lucas expor o RAGService na API FastAPI e Ingrid plugar o CI no) Tj ET
+BT /F1 8.5 Tf 0.20 0.25 0.35 rg 66 230.5 Td (GitHub Actions.) Tj ET
+q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q
+BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (Sócio Digital — Relatório de Entregas da Equipe | RES-IA Challenge 2 — Grupo 08) Tj ET
+BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td (Página 3 de 3) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000134 00000 n 
+0000000231 00000 n 
+0000000333 00000 n 
+0000000438 00000 n 
+0000000590 00000 n 
+0000006434 00000 n 
+0000006586 00000 n 
+0000013027 00000 n 
+0000013181 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R >>
+startxref
+20968
+%%EOF

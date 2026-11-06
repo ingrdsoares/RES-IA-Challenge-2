@@ -1,0 +1,30 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".git",
+    ".dvc",
+    ".pytest_cache",
+    "docs",
+    # Coletores e refino anteriores ao lint; backend/crawler/painel continua verificado.
+    "backend/refino",
+    "backend/crawler/{__init__,anexos,calendario_df,casos_oficiais,catalogo,cnae,cnpj,cnpj_ampliado,cnpj_df,cnpj_df_censo,complemento_contabil,consultas_df_amplas,consultas_rfb,contabilidade,distrital_df,documentos_fiscais,documentos_jurisprudencia,economia,esquemas,estatisticas,fontes_recuperadas,historico_competencias,ibge_indicadores,icms_consultas_df,indicadores_empresariais,legislacao,legislacao_complementar,manuais,mei,notas_cnae,notas_tecnicas_fiscais,obrigacoes,obrigacoes_avancadas,paginas,recuperar_anexos,reforma,reforma_historico,regularizacao_fiscal,retencoes_defesa_setores,sebrae,sped_complementar,sumarizacao,sumulas_classificacao,tabelas_fiscais,tributacao_lucro,xmls_exemplo}.py",
+    "backend/crawler/tests/{test_anexos,test_calendario_df,test_casos_oficiais,test_catalogo,test_cnae,test_cnpj,test_cnpj_ampliado,test_cnpj_df,test_cnpj_df_censo,test_complemento_contabil,test_consultas_df_amplas,test_consultas_rfb,test_contabilidade,test_distrital_df,test_documentos_fiscais,test_documentos_jurisprudencia,test_economia,test_esquemas,test_estatisticas,test_fontes_recuperadas,test_historico_competencias,test_ibge_sebrae,test_icms_consultas_df,test_indicadores_empresariais,test_legislacao,test_legislacao_complementar,test_manuais,test_mei,test_notas_cnae,test_notas_tecnicas_fiscais,test_obrigacoes,test_obrigacoes_avancadas,test_paginas,test_recuperar_anexos,test_reforma,test_reforma_historico,test_regularizacao_fiscal,test_retencoes_defesa_setores,test_sped_complementar,test_sumarizacao,test_sumulas_classificacao,test_tabelas_fiscais,test_tributacao_lucro,test_xmls_exemplo}.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["E402"]
+"benchmark_rag.py" = ["E402"]
+"scripts/*.py" = ["E402"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["backend/api/tests"]
+pythonpath = ["backend/api", "."]
+addopts = "-v --tb=short"
+
+markers = ["integration: requires QDRANT_TEST_URL and a real Qdrant instance"]

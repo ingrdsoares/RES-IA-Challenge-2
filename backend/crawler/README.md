@@ -38,6 +38,24 @@ Toda a resposta é validada antes da escrita. Lista vazia, JSON inválido, códi
 
 Os arquivos de `data/` são ignorados pelo Git. Eles ficam no disco local; backup externo ainda não está configurado. Não há agendamento automático nesta fase.
 
+## Painel de coleta
+
+Executor único das frentes de coleta, com uma página local que mostra o estado, as contagens do catálogo e o andamento de cada uma. O servidor atende só o endereço local (`127.0.0.1`) e roda uma rodada por vez.
+
+```bash
+python -m backend.crawler.painel                    # abre http://127.0.0.1:8765
+python -m backend.crawler.painel --porta 9000 --sem-navegador
+python -m backend.crawler.painel --sem-pagina --frentes cnae,mei --rodar-de-novo
+python -m backend.crawler.painel --sem-pagina --finais estatisticas,sumarizacao
+```
+
+- **Pular:** uma frente selecionada que já tem dados é pulada, a menos que esteja marcada em "rodar de novo" ou que a última execução tenha terminado em erro ou interrompida. Dependências sem dados entram na rodada automaticamente; a prévia mostra o que roda e o que é pulado.
+- **Rodar de novo não garante dado novo:** muitos coletores usam a cópia local ou marcas de período fixo, então a frente pode concluir sem criar versão. O conteúdo só muda se a fonte mudou.
+- **Parcial:** frente coletada com pendências aparece como "parcial".
+- **Parar em duas etapas:** "Parar" pede o fim cooperativo (nada novo inicia, o coletor atual termina e o catálogo ainda é atualizado). Passados 60 s, o coletor atual é encerrado à força e marcado como forçado. No terminal, o primeiro Ctrl+C faz a parada cooperativa e o segundo força o encerramento.
+- **Falhas de uma parada:** as falhas que o coletor registra ao ser parado ficam no manifesto dele até a frente rodar de novo.
+- **Dados do painel:** logs e histórico das execuções ficam em `backend/crawler/.painel/`, fora do Git.
+
 ## Testes
 
 ```bash

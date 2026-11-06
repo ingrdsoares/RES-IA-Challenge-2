@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sócio Digital — Gestão Fiscal Inteligente</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+    body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+    .font-mono-num { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="h-full text-slate-900 antialiased flex flex-col md:flex-row bg-[#f8fafc]">
+
+  <!-- SIDEBAR FIXA (ESTILO FINTECH: STRIPE / MERCURY) -->
+  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800">
+    <div>
+      <!-- Marca & Identidade -->
+      <div class="h-16 flex items-center px-6 border-b border-slate-800/80 gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-base shadow-sm">
+          S
+        </div>
+        <div>
+          <span class="text-sm font-bold text-white tracking-tight">Sócio Digital</span>
+          <span class="block text-[10px] font-medium text-slate-400">Gestão Fiscal & Simples</span>
+        </div>
+      </div>
+
+      <!-- Seletor de Empresa Ativa -->
+      <div class="p-4 mx-3 my-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
+        <div class="flex items-center justify-between text-[11px] text-slate-400">
+          <span>Empresa Ativa</span>
+          <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-medium border border-emerald-500/30">ME</span>
+        </div>
+        <div class="text-xs font-bold text-white truncate">TecnoSoft Tecnologia Ltda</div>
+        <div class="text-[11px] font-mono-num text-slate-400">45.123.890/0001-44</div>
+      </div>
+
+      <!-- Menu de Navegação -->
+      <nav class="px-3 space-y-1 text-xs font-medium">
+        <a href="#dashboard" onclick="setSection('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20 transition-all">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Visão Geral & Tributos
+        </a>
+
+        <a href="#simulador" onclick="setSection('simulador')" id="nav-simulador" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          Simulador de Fator R
+        </a>
+
+        <a href="#consultor" onclick="setSection('consultor')" id="nav-consultor" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Diagnóstico & Planos de Ação
+          <span class="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        </a>
+
+        <a href="#certidoes" onclick="setSection('certidoes')" id="nav-certidoes" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          Certidões & Regularidade
+        </a>
+
+        <a href="#configuracoes" onclick="setSection('configuracoes')" id="nav-configuracoes" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Cadastro e CNAEs
+        </a>
+      </nav>
+    </div>
+
+    <!-- Rodapé da Barra Lateral -->
+    <div class="p-4 border-t border-slate-800/80 text-xs text-slate-400 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px]">Ambiente</span>
+        <span class="text-white font-mono text-[10px] bg-slate-800 px-1.5 py-0.5 rounded">Produção 2026</span>
+      </div>
+      <div class="text-[10px] text-slate-500">
+        Base legal atualizada: LC 123/2006 • CGSN 140/2018
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+    <!-- Top Navbar -->
+    <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-bold text-slate-900 tracking-tight">Painel de Conformidade Fiscal</h1>
+        <span class="text-slate-300">/</span>
+        <span class="text-xs text-slate-500">Competência: <b>Outubro/2026</b> (Vencimento 20/Nov)</span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Status de Regularidade -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          Regular perante a Receita Federal
+        </div>
+
+        <button onclick="copiarPixDAS()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+          Copiar PIX do DAS
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL (DASHBOARD) -->
+    <div class="p-6 md:p-8 space-y-6 max-w-7xl">
+
+      <!-- GRID DE CARDS FINANCEIROS (ESTILO STRIPE/MERCURY) -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Card 1: Próximo DAS -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>Guia DAS (Simples)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">A Vencer</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl font-bold font-mono-num text-slate-900 tracking-tight">R$ 2.020,00</div>
+            <div class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+              <span>Vencimento:</span>
+              <strong class="text-slate-700">20/11/2026</strong>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-emerald-700 font-medium text-[11px]">Anexo III Aplicado</span>
+            <button onclick="verDetalhesDAS()" class="text-blue-600 font-semibold hover:text-blue-800 text-[11px]">Ver Composição &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Card 2: Fator R & Alíquota -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>Fator R Acumulado</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Enquadrado</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl font-bold font-mono-num text-slate-900 tracking-tight flex items-baseline gap-2">
+              30,0%
+              <span class="text-xs font-semibold text-emerald-600">&ge; 28%</span>
+            </div>
+            <div class="text-xs text-slate-500 mt-1">
+              Alíquota efetiva atual: <b class="text-slate-800 font-mono-num">8,08%</b>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-slate-500 text-[11px]">Economia mensal:</span>
+            <strong class="text-emerald-700 font-mono-num text-[11px]">R$ 1.855,00/mês</strong>
+          </div>
+        </div>
+
+        <!-- Card 3: Receita Bruta Acumulada -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>Receita 12 Meses (RBT12)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">Faixa 2</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl font-bold font-mono-num text-slate-900 tracking-tight">R$ 300.000</div>
+            <div class="text-xs text-slate-500 mt-1">
+              Teto de Microempresa: <b class="text-slate-700 font-mono-num">R$ 360k</b>
+            </div>
+          </div>
+          <!-- Barra de Progresso do Teto -->
+          <div class="mt-4 pt-3 border-t border-slate-100 space-y-1">
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-slate-900 h-1.5 rounded-full" style="width: 83.3%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>83% do limite de ME</span>
+              <span>Transição para EPP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Certidão Negativa (CND) -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs hover:border-slate-300 transition-all">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>CND Federal (RFB/PGFN)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">100% Regular</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-base font-bold text-slate-900 flex items-center gap-1.5">
+              <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              Certidão Negativa Válida
+            </div>
+            <div class="text-xs text-slate-500 mt-1">
+              Zero débitos impeditivos ativos
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-slate-400 text-[11px]">Expira em:</span>
+            <strong class="text-slate-700 text-[11px]">20/12/2026</strong>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- CORPO CENTRAL: 2 COLUNAS (CALENDÁRIO & CONSULTORIA OBJETIVA) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Coluna Esquerda: Diagnóstico Fiscal & Plano em 3 Passos (8 Colunas) -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <!-- Painel de Diagnóstico em 3 Etapas -->
+          <div class="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Roteiro Fiscal Ativo: Manutenção do Anexo III (Fator R)
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Procedimento mensal para assegurar a menor alíquota tributária prevista em lei.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-700 text-xs font-semibold font-mono-num">
+                Etapa 1 de 3
+              </span>
+            </div>
+
+            <!-- Steps List -->
+            <div class="space-y-3">
+              
+              <!-- Passo 1 -->
+              <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/30 space-y-2">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center font-mono-num shrink-0">1</span>
+                    <h3 class="text-xs font-bold text-slate-900">Transmitir fechamento da folha e pró-labore ao escritório contábil</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 shrink-0">Até 05/Nov</span>
+                </div>
+                <p class="text-xs text-slate-600 pl-8 leading-relaxed">
+                  Para que a Receita considere a folha acumulada de <b>R$ 90.000,00</b> no PGDAS-D, o fechamento do eSocial de Outubro precisa constar como apurado antes do fechamento do DAS.
+                </p>
+                <div class="pl-8 pt-1 flex items-center gap-3">
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                    <input type="checkbox" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-0">
+                    <span>Folha enviada ao contador</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Passo 2 -->
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center font-mono-num shrink-0">2</span>
+                    <h3 class="text-xs font-bold text-slate-800">Conferir enquadramento no Anexo III na emissão do DAS</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600 shrink-0">Até 20/Nov</span>
+                </div>
+                <p class="text-xs text-slate-600 pl-8 leading-relaxed">
+                  Verificar no extrato do PGDAS-D se a alíquota aplicada foi de <b>8,08%</b> e não 15,50%. A guia correta é de <b>R$ 2.020,00</b>.
+                </p>
+              </div>
+
+              <!-- Passo 3 -->
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center font-mono-num shrink-0">3</span>
+                    <h3 class="text-xs font-bold text-slate-800">Arquivar o Extrato de Apuração do Simples e Recibo de Transmissão</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600 shrink-0">Até 30/Nov</span>
+                </div>
+                <p class="text-xs text-slate-600 pl-8 leading-relaxed">
+                  Guardar o PDF oficial de apuração para comprovação da conformidade em caso de fiscalização da Receita Federal.
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Base Legal Auditável (Card Limpo) -->
+            <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+              <div class="flex items-center justify-between text-slate-700 font-semibold text-[11px]">
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  Fundamentação Legal e Vigência
+                </span>
+                <span class="text-slate-400 font-mono text-[10px]">LC 123/2006</span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                Artigo 18, §§ 5º-J e 5º-M da Lei Complementar nº 123/2006 e Resolução CGSN nº 140/2018. Esta ferramenta organiza a gestão contábil; a escrituração formal privativa compete ao profissional registrado no CRC.
+              </p>
+            </div>
+          </div>
+
+          <!-- Timeline de Próximas Obrigações -->
+          <div class="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">Obrigações e Vencimentos Oficiais</h2>
+
+            <div class="divide-y divide-slate-100 text-xs">
+              
+              <div class="py-3 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 font-bold flex flex-col items-center justify-center font-mono-num shrink-0">
+                    <span class="text-[11px] leading-none">20</span>
+                    <span class="text-[8px] uppercase tracking-wider text-slate-400">NOV</span>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Guia DAS Mensal (Simples Nacional)</h4>
+                    <p class="text-slate-500 text-[11px]">Competência Outubro/2026 • R$ 2.020,00</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">A vencer</span>
+                  <button onclick="copiarPixDAS()" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] transition-colors">Copiar PIX</button>
+                </div>
+              </div>
+
+              <div class="py-3 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 font-bold flex flex-col items-center justify-center font-mono-num shrink-0">
+                    <span class="text-[11px] leading-none">05</span>
+                    <span class="text-[8px] uppercase tracking-wider text-slate-400">DEZ</span>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Fechamento do eSocial / DCTFWeb</h4>
+                    <p class="text-slate-500 text-[11px]">Folha de pagamento de Novembro e apuração de pró-labore</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">Rotina Regular</span>
+              </div>
+
+              <div class="py-3 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 font-bold flex flex-col items-center justify-center font-mono-num shrink-0">
+                    <span class="text-[11px] leading-none">31</span>
+                    <span class="text-[8px] uppercase tracking-wider text-slate-400">MAI</span>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Declaração DEFIS (Ano-Base 2026)</h4>
+                    <p class="text-slate-500 text-[11px]">Declaração anual de informações socioeconômicas e fiscais</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400">Em 2027</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Coluna Direita: Simulador Determinístico em Tempo Real (5 Colunas) -->
+        <div class="lg:col-span-5 space-y-6">
+
+          <div class="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-5">
+            <div class="border-b border-slate-100 pb-4">
+              <h2 class="text-sm font-bold text-slate-900 tracking-tight flex items-center justify-between">
+                <span>Calculadora de Fator R</span>
+                <span class="text-[11px] font-normal text-slate-400 font-mono">Motor Fiscal v2</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Teste variações de faturamento e folha para calcular alíquotas oficiais.</p>
+            </div>
+
+            <!-- Controles Sliders -->
+            <div class="space-y-4">
+              
+              <!-- Input Faturamento -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs">
+                  <label class="text-slate-600 font-medium">Receita 12 Meses (RBT12)</label>
+                  <span id="label-fat" class="font-bold font-mono-num text-slate-900">R$ 300.000,00</span>
+                </div>
+                <input type="range" id="input-fat" min="100000" max="600000" step="10000" value="300000" oninput="calcularImpostos()" class="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                  <span>R$ 100k</span>
+                  <span>R$ 360k (Teto ME)</span>
+                  <span>R$ 600k</span>
+                </div>
+              </div>
+
+              <!-- Input Folha -->
+              <div class="space-y-1.5 pt-2">
+                <div class="flex justify-between text-xs">
+                  <label class="text-slate-600 font-medium">Folha Salarial + Pró-Labore (12m)</label>
+                  <span id="label-folha" class="font-bold font-mono-num text-slate-900">R$ 90.000,00</span>
+                </div>
+                <input type="range" id="input-folha" min="10000" max="250000" step="5000" value="90000" oninput="calcularImpostos()" class="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                  <span>R$ 10k</span>
+                  <span>R$ 90k (30%)</span>
+                  <span>R$ 250k</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Box de Resultado do Cálculo -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">Fator R Resultante</span>
+                <span id="tag-anexo" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Anexo III Ativo
+                </span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="calc-fator" class="text-3xl font-black font-mono-num text-slate-900 tracking-tight">30,0%</span>
+                <span class="text-xs text-slate-500">(Mínimo exigido: 28%)</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-semibold">DAS Mensal (Anexo III)</span>
+                  <strong id="calc-das" class="text-slate-900 font-bold font-mono-num text-sm">R$ 2.020,00</strong>
+                  <span id="calc-aliq" class="block text-[10px] text-emerald-700">8,08% efetivo</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-semibold">Se estivesse no Anexo V</span>
+                  <strong id="calc-das-sem" class="text-slate-500 font-bold font-mono-num text-sm">R$ 3.875,00</strong>
+                  <span class="block text-[10px] text-slate-400">15,50% nominal</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Destaque de Economia Financeira -->
+            <div class="p-4 rounded-xl bg-slate-900 text-white space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Economia Gerada pelo Fator R</span>
+              <div id="calc-economia" class="text-xl font-bold font-mono-num text-emerald-400">R$ 1.855,00 / mês</div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Projeção anual de <b>R$ 22.260,00</b> economizados com a alocação correta de pró-labore.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Alerta Institucional de Enquadramento -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-2 text-xs">
+            <h4 class="font-bold text-slate-900 flex items-center gap-1.5">
+              <span>💡</span> Orientação de Crescimento da Empresa
+            </h4>
+            <p class="text-slate-600 leading-relaxed text-[11px]">
+              Seu faturamento acumulado de R$ 300 mil está próximo ao limite de R$ 360 mil. Ao transitar para EPP, a tributação continua no Simples Nacional e você ganha margem para faturar até R$ 4,8 milhões/ano.
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- LÓGICA DE INTERATIVIDADE -->
+  <script>
+    function setSection(name) {
+      document.querySelectorAll('aside nav a').forEach(a => {
+        a.className = 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all';
+      });
+      const activeNav = document.getElementById('nav-' + name);
+      if (activeNav) {
+        activeNav.className = 'flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20 transition-all';
+      }
+    }
+
+    function calcularImpostos() {
+      const fat = parseFloat(document.getElementById('input-fat').value);
+      const folha = parseFloat(document.getElementById('input-folha').value);
+
+      document.getElementById('label-fat').textContent = 'R$ ' + fat.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('label-folha').textContent = 'R$ ' + folha.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      const fator = (fat > 0) ? (folha / fat) : 0;
+      const perc = (fator * 100).toFixed(1);
+      document.getElementById('calc-fator').textContent = perc + '%';
+
+      const tagAnexo = document.getElementById('tag-anexo');
+      const calcDas = document.getElementById('calc-das');
+      const calcAliq = document.getElementById('calc-aliq');
+      const calcDasSem = document.getElementById('calc-das-sem');
+      const calcEco = document.getElementById('calc-economia');
+
+      // Alíquotas Simples Nacional
+      const aliqIII = 0.0808; // 8.08%
+      const aliqV = 0.1550;   // 15.50%
+
+      const mensalIII = (fat / 12) * aliqIII;
+      const mensalV = (fat / 12) * aliqV;
+      calcDasSem.textContent = 'R$ ' + mensalV.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      if (fator >= 0.28) {
+        tagAnexo.textContent = 'Anexo III Ativo';
+        tagAnexo.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+        calcDas.textContent = 'R$ ' + mensalIII.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        calcAliq.textContent = '8,08% efetivo';
+        calcAliq.className = 'block text-[10px] text-emerald-700';
+
+        const eco = mensalV - mensalIII;
+        calcEco.textContent = 'R$ ' + eco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ' / mês';
+      } else {
+        tagAnexo.textContent = 'Anexo V Aplicado';
+        tagAnexo.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200';
+        calcDas.textContent = 'R$ ' + mensalV.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        calcAliq.textContent = '15,50% nominal';
+        calcAliq.className = 'block text-[10px] text-amber-700';
+
+        calcEco.textContent = 'R$ 0,00 (Sem Economia)';
+      }
+    }
+
+    function copiarPixDAS() {
+      navigator.clipboard?.writeText("00020126580014br.gov.bcb.pix0136receita.federal.gov.br/simples/das-outubro-202652040000530398654072020.005802BR5925RECEITA FEDERAL DO BRASIL6009SAO PAULO62070503***6304E8A2");
+      alert("Código PIX Copia-e-Cola da Guia DAS (R$ 2.020,00) copiado para a área de transferência!");
+    }
+
+    function verDetalhesDAS() {
+      alert("Composição da Guia DAS (Outubro/2026 - R$ 2.020,00):\n• ISS (Município): R$ 670,00\n• CPP (Previdência Patronal): R$ 850,00\n• PIS/COFINS: R$ 320,00\n• IRPJ/CSLL: R$ 180,00\n\nTotal com Fator R no Anexo III: R$ 2.020,00 (8,08% efetivo)");
+    }
+  </script>
+
+</body>
+</html>

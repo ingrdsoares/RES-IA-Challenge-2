@@ -1,0 +1,10 @@
+FROM python:3.12-slim
+WORKDIR /srv
+COPY requirements.txt requirements-eval.txt ./
+RUN pip install --no-cache-dir -r requirements-eval.txt
+COPY app app
+COPY evaluation evaluation
+COPY tests tests
+COPY pytest.ini .
+ENV MPLCONFIGDIR=/tmp/evaluation-matplotlib
+CMD ["python", "-m", "evaluation", "--help"]
