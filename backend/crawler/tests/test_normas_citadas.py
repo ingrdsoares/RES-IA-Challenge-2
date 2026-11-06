@@ -645,3 +645,22 @@ def test_simultaneas_permite_mais_de_uma_norma_por_fonte(tmp_path):
     ls = [linha('lei', 1, 2000), linha('lei', 2, 2000)]
     rodar(tmp_path, ls, [Stub('planalto', ato=ato)], simultaneas={'planalto': 2}, workers=2)
     assert set(e['situacao'] for e in estado(tmp_path).values()) == {'nao_encontrada'}
+
+
+def test_uma_versao_pega_compilada_primeiro_e_nao_gasta_outra_pagina(tmp_path):
+    orig, comp = 'https://a.gov.br/orig', 'https://a.gov.br/lei-1'
+    def ato(n, h):
+        return [Candidato(orig, 'planalto', 'original'), Candidato(comp, 'planalto', 'compilada')]
+    _, rede = rodar(tmp_path, [linha('lei', 1, 2000)], [Stub('planalto', ato=ato)], uma_versao=True)
+    assert rede.pedidos == [comp]
+    assert estado(tmp_path)['federal:lei:-:1:2000']['situacao'] == 'coletada'
+
+
+def test_uma_versao_cai_para_a_original_se_a_compilada_falha(tmp_path):
+    comp, orig = 'https://a.gov.br/falta', 'https://a.gov.br/lei-1'
+    def ato(n, h):
+        return [Candidato(orig, 'planalto', 'original'), Candidato(comp, 'planalto', 'compilada')]
+    rede = Rede(rotas={comp: (404, b'')})
+    rodar(tmp_path, [linha('lei', 1, 2000)], [Stub('planalto', ato=ato)], rede=rede, uma_versao=True)
+    assert rede.pedidos == [comp, orig]
+    assert estado(tmp_path)['federal:lei:-:1:2000']['situacao'] == 'coletada'

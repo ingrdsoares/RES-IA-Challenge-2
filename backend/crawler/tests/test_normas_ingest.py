@@ -73,6 +73,27 @@ def test_tipo_diferente_e_rejeitado():
     assert not validar_identidade(NormaId('decreto', 214, 2025, 'federal'), lc)
 
 
+@pytest.mark.parametrize('abertura', [
+    '# Solução de Consulta Cosit nº 112, de 12 de junho de 2023',
+    'Declaração de Ineficácia 19/2023',
+    'TARF — Acórdão 93/2023',
+    'Acórdão nº 12/2020',
+    'Parecer nº 3/2019',
+])
+def test_documento_de_outro_tipo_que_cita_a_norma_nao_passa(abertura):
+    for citacao in ('LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003', 'Lei nº 10.833, de 29 de dezembro de 2003'):
+        texto = '\n'.join((abertura, 'Fundamentação legal:', citacao, 'Texto.'))
+        assert identificar_cabecalho(texto) is None
+        assert not validar_identidade(LEI, texto)
+
+
+def test_caixa_mista_so_vale_perto_do_inicio():
+    relato = ['Relata a consulente que tributa suas receitas conforme a legislação.'] * 4
+    citacao = 'Lei nº 10.833, de 29 de dezembro de 2003, com alterações.'
+    assert not validar_identidade(LEI, '\n'.join([*relato, citacao, 'Texto.']))
+    assert validar_identidade(LEI, '\n'.join(['Presidência da República', 'Casa Civil', citacao, 'Art. 1º X']))
+
+
 def test_lei_que_apenas_cita_outra_no_preambulo_nao_passa():
     texto = ('LEI Nº 10.637, DE 30 DE DEZEMBRO DE 2002. Altera a Lei nº 9.718, de 27 de novembro de 1998, e dá outras '
              'providências. Art. 1º Texto.')

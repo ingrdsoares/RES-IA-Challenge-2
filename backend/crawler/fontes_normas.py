@@ -16,9 +16,9 @@ from backend.crawler.normas_id import NormaId
 
 USER_AGENT = 'Mozilla/5.0 (compatible; acervo-pesquisa-bot/0.1)'
 _ROBOTS_AGENTE = 'acervo-pesquisa-bot'
-# docs/fontes-normas.md, "Atrasos e limites por host"; www2.camara conta como www.camara
+# docs/fontes-normas.md, "Atrasos e limites por host"; paginas /legin da www2: 2 por ~70 s medido em 2026-11-06
 ATRASOS = {
-    'www.planalto.gov.br': 0.25, 'www.camara.leg.br': 6.0, 'www.lexml.gov.br': 5.0,
+    'www.planalto.gov.br': 0.25, 'www.camara.leg.br': 6.0, 'www2.camara.leg.br': 40.0, 'www.lexml.gov.br': 5.0,
     'normas.receita.fazenda.gov.br': 1.5, 'normasinternet2.receita.fazenda.gov.br': 1.5,
     'www.sinj.df.gov.br': 2.0, 'www.confaz.fazenda.gov.br': 2.0,
 }
@@ -57,7 +57,7 @@ def texto(resp: httpx.Response) -> str:
 
 
 def _chave_host(host: str) -> str:
-    return 'www.camara.leg.br' if host == 'www2.camara.leg.br' else host
+    return host
 
 
 class Http:

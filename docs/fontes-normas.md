@@ -49,7 +49,7 @@ Atenção: na rodada inicial foram feitas 4 chamadas a `legis.senado.leg.br` (li
 | Host | Atraso mínimo | Motivo |
 |---|---|---|
 | www.planalto.gov.br | 0,25 s (4 req/s, decisão do usuário) | rampa em 2026-11-06: até 8 req/s por 30 s, sem erro nem lentidão; páginas grandes (até 1,8 MB) |
-| www2.camara.leg.br / www.camara.leg.br | **6 s** e recuo em 429 | com 1 a 2 s houve **429 Too Many Requests** (corpo nginx de 162 B) após 5 a 6 chamadas; com 6 a 8 s, nenhum. Em 429, esperar 60 s e dobrar o atraso. |
+| www.camara.leg.br: **6 s**; www2.camara.leg.br (páginas): **40 s**, medido em 2026-11-06: 2 páginas e 429 na 3ª, mesmo com URLs distintas | recuo em 429 | com 1 a 2 s houve **429 Too Many Requests** (corpo nginx de 162 B) após 5 a 6 chamadas; com 6 a 8 s, nenhum. Em 429, esperar 60 s e dobrar o atraso. |
 | www.lexml.gov.br | 5 s | `Crawl-delay: 5` |
 | normas*.receita.fazenda.gov.br | 1,5 s | sem limites observados |
 | www.sinj.df.gov.br | 2 s | sem limites observados |
