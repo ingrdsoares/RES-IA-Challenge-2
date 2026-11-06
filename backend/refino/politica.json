@@ -27,6 +27,12 @@
   ],
   "limiar_linhas_ausentes_versao_extra": 0.05,
   "limiar_bytes_preferida": 0.2,
+  "similaridade": {
+    "shingles": 5,
+    "permutacoes": 120,
+    "bandas": 20,
+    "limiar_jaccard": 0.6
+  },
   "familias_dados": [
     "cnpj",
     "cnpj-ampliado",

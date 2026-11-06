@@ -9,10 +9,11 @@ from pathlib import Path
 import re
 import tempfile
 import unicodedata
-from dataclasses import replace
+from dataclasses import asdict,replace
 from urllib.parse import urlsplit,urlunsplit,unquote_plus,parse_qs
 from backend.crawler.catalogo import frontmatter
 from backend.crawler.normas_id import identidade_titulo
+from backend.refino import similaridade
 
 BASE=Path(__file__).resolve().parent
 DATA=BASE.parent/'crawler'/'data'
@@ -214,12 +215,13 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         if any(manifest.get(k)!=v for k,v in expected.items()):raise ValueError('Saída refinada incompatível com a entrada')
         verify_output(target,manifest);return manifest
     output.mkdir(parents=True,exist_ok=True);stage=Path(tempfile.mkdtemp(prefix='.tmp-refino-',dir=output));(stage/'conteudos').mkdir()
-    contents={};versions={};docs={};datasets=[];occurrences=[]
+    contents={};versions={};docs={};datasets=[];occurrences=[];doc_por_conteudo=defaultdict(set)
     priority={'nucleo':0,'complementar':1,'historico':2,'revisao':3,'dados_estruturados':4,'evidencia':5}
     for row,text,dataset in loaded:
         occurrences.append(row)
         if dataset:datasets.append(dataset)
         cid=row['conteudo_id']
+        if cid:doc_por_conteudo[cid].add(row['documento_id'])
         if cid and cid not in contents:
             contents[cid]=dict(id=cid,arquivo='conteudos/'+cid+'.md',bytes=row['bytes_texto'],normalizacao='NFC+finais_de_linha+frontmatter_de_coleta')
             (stage/contents[cid]['arquivo']).write_bytes(text.encode())
@@ -267,6 +269,9 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
     for name,rows in [('documentos',docs.values()),('versoes',versions.values()),('ocorrencias',occurrences),('conteudos',contents.values()),('datasets',datasets),('relacoes',relations)]:
         write_jsonl(stage/(name+'.jsonl'),sorted(rows,key=lambda r:r.get('id') or encoded(r).decode()))
     for category,rows in indexes.items():write_jsonl(stage/('indice_'+category+'.jsonl' if category!='revisao' else 'fila_revisao.jsonl'),sorted(rows,key=lambda r:r['documento_id']))
+    # Similaridade é relatório: lê só os textos já escritos e não altera índice nem documentos. CNPJ/dados não têm texto aqui.
+    pares=similaridade.comparar({cid:stage/meta['arquivo'] for cid,meta in contents.items()},workers=workers,documentos=doc_por_conteudo,params=policy.get('similaridade'))
+    write_jsonl(stage/'similaridade.jsonl',[asdict(par) for par in pares]);write_jsonl(stage/'suspeitos.jsonl',[asdict(par) for par in similaridade.suspeitos(pares)])
     (stage/'politica.json').write_bytes(encoded(policy)+b'\n')
     counts=Counter(r['classificacao'] for r in occurrences);text_count=sum(r['conteudo_id'] is not None for r in occurrences)
     report=dict(run_id=run_id,pipeline_versao=VERSION,perfil=policy['perfil'],politica_sha256=policy_sha,entrada_fingerprint=fingerprint,catalogo_sha256=catalog_sha,pipeline_sha256=code_sha,
