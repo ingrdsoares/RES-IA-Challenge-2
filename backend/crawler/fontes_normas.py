@@ -19,10 +19,16 @@ ATRASOS = {
     'www.sinj.df.gov.br': 2.0, 'www.confaz.fazenda.gov.br': 2.0,
 }
 _RECUO_429 = 60.0
+_RETRY_AFTER_MAX = 300.0
+_MAX_SALTOS = 5
 
 
 class Bloqueada(Exception):
     """Fonte proibiu (robots.txt) ou recusou (401/403/429 persistente). Nao contornar."""
+
+
+class Indisponivel(Exception):
+    """5xx, falha de rede ou timeout apos uma nova tentativa. Nunca significa 'norma ausente'."""
 
 
 def decodificar(raw: bytes, charset_declarado: str | None) -> str:
@@ -50,48 +56,91 @@ def _chave_host(host: str) -> str:
 
 
 class Http:
-    """GET com atraso por host, robots.txt em cache por host e Bloqueada em recusa."""
+    """GET com atraso por host, robots.txt em cache por host, redirecionamento manual e erros tipados."""
 
     def __init__(self, client: httpx.Client, atraso: float = 2.0, atrasos: dict[str, float] | None = None,
                  relogio: Callable[[], float] = time.monotonic, dormir: Callable[[float], None] = time.sleep):
         self.client, self.atraso, self.relogio, self.dormir = client, atraso, relogio, dormir
         self.atrasos = {**ATRASOS, **(atrasos or {})}
         self._ultimo: dict[str, float] = {}
-        self._robots: dict[str, RobotFileParser] = {}
+        self._robots: dict[str, RobotFileParser | Bloqueada] = {}
 
     def _pedir(self, url: str) -> httpx.Response:
+        """Um salto, sem seguir redirecionamento. 429: recua e tenta de novo; 5xx/rede: tenta de novo."""
         host = _chave_host(urlsplit(url).netloc)
         for tentativa in (1, 2):
             espera = self._ultimo.get(host, -1e9) + self.atrasos.get(host, self.atraso) - self.relogio()
             if espera > 0:
                 self.dormir(espera)
-            resp = self.client.get(url, headers={'User-Agent': USER_AGENT}, follow_redirects=True)
+            try:
+                resp = self.client.get(url, headers={'User-Agent': USER_AGENT}, follow_redirects=False)
+            except httpx.TransportError as e:  # inclui timeouts
+                self._ultimo[host] = self.relogio()
+                if tentativa == 2:
+                    raise Indisponivel(f'{type(e).__name__} em {url}') from e
+                continue
             self._ultimo[host] = self.relogio()
             if resp.status_code == 429 and tentativa == 1:
                 self.atrasos[host] = 2 * self.atrasos.get(host, self.atraso)
-                self.dormir(_RECUO_429)
+                self.dormir(_espera_429(resp))
                 continue
             if resp.status_code in (401, 403, 429):
                 raise Bloqueada(f'{resp.status_code} em {url}')
+            if resp.status_code >= 500:
+                if tentativa == 2:
+                    raise Indisponivel(f'{resp.status_code} em {url}')
+                continue
             return resp
         raise AssertionError('inalcancavel')
+
+    def _seguir(self, url: str, checar_robots: bool) -> httpx.Response:
+        for _ in range(_MAX_SALTOS + 1):
+            if checar_robots and not self._permitido(url):
+                raise Bloqueada(f'robots.txt proibe {url}')
+            resp = self._pedir(url)
+            loc = resp.headers.get('location')
+            if resp.status_code in (301, 302, 303, 307, 308) and loc:
+                url = urljoin(url, loc)  # proximo salto repete robots e atraso do host de destino
+                continue
+            return resp
+        raise Indisponivel(f'mais de {_MAX_SALTOS} redirecionamentos')
 
     def _permitido(self, url: str) -> bool:
         p = urlsplit(url)
         base = f'{p.scheme}://{p.netloc}'
         if base not in self._robots:
+            try:
+                resp = self._seguir(base + '/robots.txt', checar_robots=False)
+            except Bloqueada as e:  # 401/403: guardado, sem nova requisicao
+                self._robots[base] = e
+                raise
+            # Indisponivel (5xx/rede) propaga sem cache: nega agora, tenta de novo depois
             rp = RobotFileParser()
-            resp = self._pedir(base + '/robots.txt')
-            # robots ausente (404) ou SPA devolvendo HTML: sem politica publicada, sem regras
+            # 404/outros 4xx ou SPA devolvendo HTML: sem politica publicada, sem regras
             rp.parse(texto(resp).splitlines() if resp.status_code == 200 else [])
             self._robots[base] = rp
+        rp = self._robots[base]
+        if isinstance(rp, Bloqueada):
+            raise rp
         # ponytail: robotparser da stdlib nao entende curingas (/*.pdf); nunca baixamos PDF
-        return self._robots[base].can_fetch(_ROBOTS_AGENTE, url)
+        return rp.can_fetch(_ROBOTS_AGENTE, url)
 
     def get(self, url: str) -> httpx.Response:
-        if not self._permitido(url):
-            raise Bloqueada(f'robots.txt proibe {url}')
-        return self._pedir(url)
+        return self._seguir(url, checar_robots=True)
+
+
+def _espera_429(resp: httpx.Response) -> float:
+    try:
+        return min(max(float(resp.headers['retry-after']), 0.0), _RETRY_AFTER_MAX)
+    except (KeyError, ValueError):  # ausente ou data HTTP
+        return _RECUO_429
+
+
+def exigir(resp: httpx.Response, *aceitos: int) -> httpx.Response:
+    """Status fora dos documentados nao prova ausencia: Indisponivel."""
+    if resp.status_code not in aceitos:
+        raise Indisponivel(f'status {resp.status_code} em {resp.url}')
+    return resp
 
 
 @dataclass(frozen=True)
@@ -174,7 +223,7 @@ class Planalto:
     def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
         for c in self.caminhos(norma):
             url = self._BASE + c
-            if http.get(url).status_code == 200:
+            if exigir(http.get(url), 200, 404).status_code == 200:
                 visao = 'compilada' if re.search(r'(compilad[oa]|cons)\.htm$', c) else 'unica'
                 return [Candidato(url, self.nome, visao)]
         return []
@@ -190,9 +239,9 @@ class Lexml:
 
     def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
         urn = f'urn:lex:br:federal:{self._TIPO[norma.tipo]}:{norma.ano};{norma.numero}'
-        resp = http.get('https://www.lexml.gov.br/urn/' + quote(urn, safe=':;.'))
+        resp = exigir(http.get('https://www.lexml.gov.br/urn/' + quote(urn, safe=':;.')), 200)
         html = texto(resp)
-        if resp.status_code != 200 or 'Nome Uniforme' not in html:  # 200 de ~1 KB e soft 404
+        if 'Nome Uniforme' not in html:  # 200 de ~1 KB e soft 404
             return []
         links = re.findall(r'href="(https?://www2\.camara\.gov\.br/legin/fed/[^"]+\.html)"', html)
         saida = []
@@ -218,7 +267,7 @@ class Camara:
 
     def localizar(self, norma: NormaId, http: Http) -> list[Candidato]:
         q = urlencode({'abrangencia': 'Legislação Federal', 'geral': f'{self._BUSCA[norma.tipo]} {norma.numero}'})
-        html = texto(http.get('https://www.camara.leg.br/legislacao/busca?' + q))
+        html = texto(exigir(http.get('https://www.camara.leg.br/legislacao/busca?' + q), 200))
         pasta = f'/legin/fed/{self._PASTA[norma.tipo]}/'
         achadas = []
         paginas = re.findall(r'href="(https://www2\.camara\.leg\.br/legin/fed/[^"]+-norma-p[le]\.html)"', html)
@@ -228,8 +277,8 @@ class Camara:
                 achadas.append(u)
         saida = []
         for u in achadas:
-            resp = http.get(u)
-            if resp.status_code != 200:
+            resp = exigir(http.get(u), 200, 404)
+            if resp.status_code == 404:
                 continue
             pag = texto(resp)
             sit = re.search(r'Situa\S*\s*:\s*</strong></span>\s*<span>([^<]+)</span>', pag)

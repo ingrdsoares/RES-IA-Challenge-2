@@ -4,7 +4,7 @@ import httpx
 import pytest
 
 from backend.crawler.fontes_normas import (
-    FONTES_FEDERAIS, USER_AGENT, Bloqueada, Camara, Http, Lexml, Planalto, decodificar,
+    FONTES_FEDERAIS, USER_AGENT, Bloqueada, Camara, Http, Indisponivel, Lexml, Planalto, decodificar,
 )
 from backend.crawler.normas_id import NormaId
 
@@ -118,7 +118,6 @@ def test_nao_encontrado_retorna_lista_vazia():
     n = NormaId('lei', 99999, 2003, 'federal')
     assert Planalto().localizar(n, http) == []  # tudo 404
     assert Lexml().localizar(n, http) == []  # 200 soft 404
-    assert Camara().localizar(NormaId('lei', 99999, 2003, 'federal'), http) == []  # busca 404
 
 
 def test_camara_busca_vazia_200():
@@ -227,3 +226,166 @@ def test_limite_por_host():
     http.get('https://www2.camara.leg.br/x')  # outro host: robots sem espera; www2 e www dividem relogio
     http.get('https://www.camara.leg.br/y')
     assert rel.pausas == [6.0, 6.0, 6.0]  # www2 e www dividem o mesmo relogio de host
+
+
+def _http_fn(h, atraso=0.0):
+    rel = Relogio()
+    return Http(httpx.Client(transport=httpx.MockTransport(h)), atraso=atraso, relogio=rel.agora, dormir=rel.dormir), rel
+
+
+def test_5xx_tenta_de_novo_e_depois_indisponivel():
+    n = {'c': 0}
+    def h(req):
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        n['c'] += 1
+        return httpx.Response(503)
+    http, _ = _http_fn(h)
+    with pytest.raises(Indisponivel):
+        http.get('https://x.test/a')
+    assert n['c'] == 2
+    # uma falha e sucesso na segunda: ok
+    k = {'c': 0}
+    def h2(req):
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        k['c'] += 1
+        return httpx.Response(500 if k['c'] == 1 else 200, content=b'ok')
+    http2, _ = _http_fn(h2)
+    assert http2.get('https://x.test/a').status_code == 200
+
+
+def test_erro_de_rede_e_timeout_viram_indisponivel():
+    def h(req):
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        raise httpx.ConnectTimeout('lento')
+    http, _ = _http_fn(h)
+    with pytest.raises(Indisponivel):
+        http.get('https://x.test/a')
+
+
+def test_localizar_propaga_indisponivel_e_nunca_devolve_vazio():
+    h = lambda req: httpx.Response(404 if req.url.path == '/robots.txt' else 502)
+    http, _ = _http_fn(h)
+    for f in (Planalto(), Lexml(), Camara()):
+        with pytest.raises(Indisponivel):
+            f.localizar(LEI, http)
+
+
+def test_camara_busca_com_status_inesperado_e_indisponivel():
+    busca = ('https://www.camara.leg.br/legislacao/busca?abrangencia=Legisla%C3%A7%C3%A3o+Federal&geral=lei+10833')
+    http, _, _ = montar({busca: (404, b'x', 'text/html')})
+    with pytest.raises(Indisponivel):
+        Camara().localizar(LEI, http)
+
+
+def test_lexml_status_inesperado_e_indisponivel():
+    http, _, _ = montar({'https://www.lexml.gov.br/urn/urn:lex:br:federal:lei:2003;10833': (500, b'', 'text/html')})
+    with pytest.raises(Indisponivel):
+        Lexml().localizar(LEI, http)
+
+
+def test_robots_5xx_nega_e_nao_guarda_cache():
+    n = {'robots': 0, 'x': 0}
+    def h(req):
+        if req.url.path == '/robots.txt':
+            n['robots'] += 1
+            return httpx.Response(500 if n['robots'] <= 2 else 404)
+        n['x'] += 1
+        return httpx.Response(200, content=b'ok')
+    http, _ = _http_fn(h)
+    with pytest.raises(Indisponivel):
+        http.get('https://x.test/a')
+    assert n['x'] == 0  # negado sem baixar
+    assert http.get('https://x.test/a').status_code == 200  # nao ficou em cache
+    assert n['robots'] == 3
+
+
+def test_robots_401_403_bloqueia_e_guarda_sem_nova_requisicao():
+    n = {'robots': 0, 'x': 0}
+    def h(req):
+        if req.url.path == '/robots.txt':
+            n['robots'] += 1
+            return httpx.Response(403)
+        n['x'] += 1
+        return httpx.Response(200)
+    http, _ = _http_fn(h)
+    for _ in range(3):
+        with pytest.raises(Bloqueada):
+            http.get('https://x.test/a')
+    assert n == {'robots': 1, 'x': 0}
+
+
+def test_robots_404_libera():
+    http, pedidos, _ = montar({PL + 'leis/l1.htm': (200, b'ok', 'text/html')})
+    assert http.get(PL + 'leis/l1.htm').status_code == 200
+
+
+def test_redirect_manual_segue_ate_5_saltos_com_atraso_e_robots_a_cada_um():
+    rel = Relogio()
+    visto = []
+    def h(req):
+        visto.append(req.url.path)
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        n = int(req.url.path[1:])
+        return httpx.Response(301, headers={'location': f'/{n + 1}'}) if n < 3 else httpx.Response(200, content=b'fim')
+    http = Http(httpx.Client(transport=httpx.MockTransport(h)), atraso=2.0, relogio=rel.agora, dormir=rel.dormir)
+    assert http.get('https://x.test/1').content == b'fim'
+    assert visto == ['/robots.txt', '/1', '/2', '/3']
+    assert rel.pausas == [2.0, 2.0, 2.0]  # atraso em cada salto (robots foi o primeiro pedido)
+
+
+def test_redirect_para_caminho_proibido_levanta_bloqueada_sem_requisicao():
+    visto = []
+    def h(req):
+        visto.append(req.url.path)
+        if req.url.path == '/robots.txt':
+            return httpx.Response(200, content=b'User-agent: *\nDisallow: /privado/\n')
+        return httpx.Response(302, headers={'location': '/privado/x'})
+    http, _ = _http_fn(h)
+    with pytest.raises(Bloqueada):
+        http.get('https://x.test/a')
+    assert '/privado/x' not in visto
+
+
+def test_redirect_para_outro_host_respeita_robots_do_destino():
+    visto = []
+    def h(req):
+        visto.append(str(req.url))
+        if req.url.path == '/robots.txt' and req.url.host == 'b.test':
+            return httpx.Response(200, content=b'User-agent: *\nDisallow: /\n')
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        return httpx.Response(301, headers={'location': 'https://b.test/z'})
+    http, _ = _http_fn(h)
+    with pytest.raises(Bloqueada):
+        http.get('https://a.test/a')
+    assert 'https://b.test/z' not in visto
+
+
+def test_redirect_excesso_de_saltos_e_indisponivel():
+    h = lambda req: httpx.Response(404) if req.url.path == '/robots.txt' else httpx.Response(301, headers={'location': '/loop'})
+    http, _ = _http_fn(h)
+    with pytest.raises(Indisponivel):
+        http.get('https://x.test/loop')
+
+
+def test_429_honra_retry_after_com_teto_300():
+    def mk(valor):
+        n = {'c': 0}
+        def h(req):
+            if req.url.path == '/robots.txt':
+                return httpx.Response(404)
+            n['c'] += 1
+            return httpx.Response(429, headers={'retry-after': valor}) if n['c'] == 1 else httpx.Response(200)
+        return h
+    http, rel = _http_fn(mk('7'))
+    assert http.get('https://x.test/a').status_code == 200 and 7.0 in rel.pausas and 60.0 not in rel.pausas
+    http, rel = _http_fn(mk('9999'))
+    http.get('https://x.test/a')
+    assert 300.0 in rel.pausas
+    http, rel = _http_fn(mk('Wed, 21 Oct 2026 07:28:00 GMT'))  # data HTTP: usa o recuo padrao
+    http.get('https://x.test/a')
+    assert 60.0 in rel.pausas
