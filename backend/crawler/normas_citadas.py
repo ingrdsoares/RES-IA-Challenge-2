@@ -403,7 +403,7 @@ def _fmt(cont: Counter) -> str:
     return ' '.join(f'{k}={v}' for k, v in sorted(cont.items())) or 'vazio'
 
 
-SIMULTANEAS = {'planalto': 4}  # teste em 2026-11-06: 8 req/s por 30 s sem erro; o limite por host segue em ATRASOS
+SIMULTANEAS = {'planalto': 8}  # teste em 2026-11-06: 8 req/s por 30 s sem erro; o limite por host segue em ATRASOS
 
 
 def coletar(inventario: Path, destino: Path, rodada: int, fontes: list, client=None, limite: int | None = None, *,
