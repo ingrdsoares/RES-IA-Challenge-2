@@ -13,12 +13,13 @@ from dataclasses import asdict,replace
 from urllib.parse import urlsplit,urlunsplit,unquote_plus,parse_qs
 from backend.crawler.catalogo import frontmatter
 from backend.crawler.normas_id import identidade_titulo
-from backend.refino import similaridade
+from backend.refino import ruido,similaridade
 
 BASE=Path(__file__).resolve().parent
 DATA=BASE.parent/'crawler'/'data'
 OUTPUT=BASE/'data'
 VERSION='1'
+METADADOS_INDICE={'vigencia','revisao_semantica'}  # o índice mantém estes campos; regra de ruido que cita um deles só sai do texto se o campo continuar no índice
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -96,6 +97,9 @@ def classify(meta,front,text,policy):
     if front in policy['familias_dados'] or kind in policy['tipos_dados'] or type(meta.get('arquivos_xsd')) is int:return 'dados_estruturados',['dataset_ou_schema_separado_do_corpus_textual']
     original=str(meta.get('original','')).lower()
     if original.endswith(('.csv','.xlsx','.xsd')):return 'dados_estruturados',['tabela_ou_schema_primario']
+    apoio=policy['apoio']
+    first=re.search(r'^#\s+(.+)$',text,re.M) if text else None
+    if (front in apoio['frentes'] or (kind.startswith(tuple(apoio['tipos_prefixo'])) and 'hist' not in kind)) or (first and searchable(first[1].strip()) in {searchable(t) for t in apoio['titulos_restritos']}):return 'apoio',['agenda_ou_calendario_de_apoio_ou_conteudo_restrito']
     if kind in policy['tipos_evidencia']:return 'evidencia',['indice_catalogo_ou_comparacao']
     if front=='casos-oficiais':return 'evidencia',['trecho_derivado_ja_rastreado_no_documento_fonte']
     if front=='historico-competencias' or 'historica' in kind or 'historico' in kind and 'agenda' in kind:return 'historico',['competencia_historica_explicita']
@@ -214,9 +218,9 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         expected={'run_id':run_id,'politica_sha256':policy_sha,'entrada_fingerprint':fingerprint,'catalogo_sha256':catalog_sha,'pipeline_sha256':code_sha,'ocorrencias':len(loaded)}
         if any(manifest.get(k)!=v for k,v in expected.items()):raise ValueError('Saída refinada incompatível com a entrada')
         verify_output(target,manifest);return manifest
-    output.mkdir(parents=True,exist_ok=True);stage=Path(tempfile.mkdtemp(prefix='.tmp-refino-',dir=output));(stage/'conteudos').mkdir()
+    output.mkdir(parents=True,exist_ok=True);stage=Path(tempfile.mkdtemp(prefix='.tmp-refino-',dir=output));(stage/'conteudos').mkdir();(stage/'busca').mkdir();regras_ruido=ruido.carregar_regras();ruido_removido=Counter()
     contents={};versions={};docs={};datasets=[];occurrences=[];doc_por_conteudo=defaultdict(set)
-    priority={'nucleo':0,'complementar':1,'historico':2,'revisao':3,'dados_estruturados':4,'evidencia':5}
+    priority={'nucleo':0,'complementar':1,'historico':2,'revisao':3,'dados_estruturados':4,'evidencia':5,'apoio':6}
     for row,text,dataset in loaded:
         occurrences.append(row)
         if dataset:datasets.append(dataset)
@@ -226,6 +230,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         if cid and cid not in contents:
             contents[cid]=dict(id=cid,arquivo='conteudos/'+cid+'.md',bytes=row['bytes_texto'],normalizacao='NFC+finais_de_linha+frontmatter_de_coleta')
             (stage/contents[cid]['arquivo']).write_bytes(text.encode())
+            limpo,removidas=ruido.limpar(text,ruido.aplicaveis(regras_ruido,METADADOS_INDICE));(stage/'busca'/(cid+'.md')).write_bytes(limpo.encode());ruido_removido.update(removidas)
         version=versions.setdefault(row['versao_id'],dict(id=row['versao_id'],visao=row['visao'],documento_id=row['documento_id'],conteudo_id=cid,ocorrencias=[],categorias=set(),hashes_originais=set(),qualidade=set(),revisao_semantica='pendente'))
         version['ocorrencias'].append(row['id']);version['categorias'].add(row['classificacao']);version['hashes_originais'].update(row['hashes_originais']);version['qualidade'].update(row['qualidade'])
         doc=docs.setdefault(row['documento_id'],dict(id=row['documento_id'],chave_origem=row['chave_origem'],titulos=set(),naturezas=set(),versoes=set(),ocorrencias=[],categorias=set()))
@@ -235,7 +240,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         v['classificacao']=min(v['categorias'],key=priority.get)
         v['indexavel_nucleo']=v['conteudo_id'] is not None and v['classificacao']=='nucleo'
     def lines(vid):return {l.strip() for l in (stage/contents[versions[vid]['conteudo_id']]['arquivo']).read_text(encoding='utf8').splitlines() if l.strip()}
-    rowmap={r['id']:r for r in occurrences};indexes={k:[] for k in ('nucleo','complementar','historico','revisao')};relations=[]
+    rowmap={r['id']:r for r in occurrences};indexes={k:[] for k in ('nucleo','complementar','historico','revisao','apoio')};relations=[]
     for doc in docs.values():
         for key in ('titulos','naturezas','versoes','categorias'):doc[key]=sorted(doc[key])
         def rank(vid):
@@ -272,6 +277,7 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
     for category,rows in indexes.items():write_jsonl(stage/('indice_'+category+'.jsonl' if category!='revisao' else 'fila_revisao.jsonl'),sorted(rows,key=lambda r:r['documento_id']))
     # Similaridade é relatório: lê só os textos já escritos e não altera índice nem documentos. CNPJ/dados não têm texto aqui.
     pares=similaridade.comparar({cid:stage/contents[cid]['arquivo'] for cid in doc_por_conteudo},workers=workers,documentos=doc_por_conteudo,params=similar_params)
+    ruido.sugerir({cid:stage/contents[cid]['arquivo'] for cid in contents},policy['ruido']['minimo_textos_sugestao'],stage/'ruido_sugerido.jsonl')  # só relatório para revisão; nada é aplicado
     write_jsonl(stage/'similaridade.jsonl',[asdict(par) for par in pares]);write_jsonl(stage/'suspeitos.jsonl',[asdict(par) for par in similaridade.suspeitos(pares)])
     (stage/'politica.json').write_bytes(encoded(policy)+b'\n')
     counts=Counter(r['classificacao'] for r in occurrences);text_count=sum(r['conteudo_id'] is not None for r in occurrences)
@@ -280,11 +286,11 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         ocorrencias_textuais=text_count,duplicacoes_textuais_eliminadas=text_count-len(contents),ocorrencias_agrupadas_por_identidade=len(occurrences)-len(docs),
         documentos_com_multiplas_versoes=sum(len(d['versoes'])>1 for d in docs.values()),datasets=len(datasets),categorias_ocorrencias=dict(counts),
         indices_documentos={k:len(v) for k,v in indexes.items()},ocorrencias_com_erros=sum(bool(r['erros']) for r in occurrences),
-        bytes_textuais_entrada=sum(r['bytes_texto'] for r in occurrences),bytes_conteudos_unicos=sum(c['bytes'] for c in contents.values()),
+        bytes_textuais_entrada=sum(r['bytes_texto'] for r in occurrences),bytes_busca=sum(f.stat().st_size for f in (stage/'busca').iterdir()),ruido_removido_por_regra=dict(sorted(ruido_removido.items())),bytes_conteudos_unicos=sum(c['bytes'] for c in contents.values()),
         limites='Classificação candidata; não certifica vigência ou aplicabilidade. Sem exclusão de originais, versões ou dados estruturados. Índice padrão: núcleo. Conteúdos diferentes permanecem como versões; dados são referenciados, não copiados.')
     lines=['# Refino do acervo','',report['limites'],'',f"Perfil: {report['perfil']}. Ocorrências: {report['ocorrencias']}; documentos lógicos: {report['documentos_logicos']}; versões: {report['versoes']}; conteúdos: {report['conteudos_unicos']}.",'', '| Categoria das ocorrências | Quantidade |','|---|---:|']
     lines+=['| '+k+' | '+str(v)+' |' for k,v in sorted(counts.items())]
-    lines+=['','## Consulta padrão','',f"Núcleo candidato: {len(indexes['nucleo'])} documentos, em indice_nucleo.jsonl. Complementares, histórico e revisão têm índices próprios. Todas as ocorrências e suas fontes permanecem em ocorrencias.jsonl.",'', 'A redução de entradas no índice não representa liberação de espaço na camada bruta nem validação jurídica.']
+    lines+=['','## Consulta padrão','',f"Núcleo candidato: {len(indexes['nucleo'])} documentos, em indice_nucleo.jsonl. Complementares, histórico e revisão têm índices próprios; apoio (agendas e conteúdo restrito) em indice_apoio.jsonl, fora do núcleo. Todas as ocorrências e suas fontes permanecem em ocorrencias.jsonl.",'', 'A redução de entradas no índice não representa liberação de espaço na camada bruta nem validação jurídica.']
     (stage/'indice.md').write_bytes(('\n'.join(lines)+'\n').encode())
     report['artefatos_sha256']={p.relative_to(stage).as_posix():file_sha(p) for p in stage.rglob('*') if p.is_file()}
     (stage/'manifesto.json').write_bytes(encoded(report)+b'\n')

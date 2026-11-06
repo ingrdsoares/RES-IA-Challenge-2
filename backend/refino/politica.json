@@ -71,7 +71,16 @@
     "historico",
     "revisao",
     "evidencia",
-    "dados_estruturados"
+    "dados_estruturados",
+    "apoio"
   ],
+  "apoio": {
+    "frentes": ["calendario-df"],
+    "tipos_prefixo": ["agenda"],
+    "titulos_restritos": ["Conteúdo Restrito"]
+  },
+  "ruido": {
+    "minimo_textos_sugestao": 50
+  },
   "limite": "Classificação candidata e explicável; não certifica vigência ou aplicabilidade. Não apagar originais nem deduplicar versões pelo hash primário."
 }
