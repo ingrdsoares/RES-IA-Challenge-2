@@ -736,3 +736,23 @@ def test_sinj_sem_ano_sem_total_de_registros_e_indisponivel():
     http, _, _ = montar({SINJ_SEM_ANO.format(t='Lei', n=1254): (200, json.dumps(d).encode(), JSON_CT)})
     with pytest.raises(Indisponivel):
         Sinj().localizar(NormaId('lei', 1254, None, 'df'), http)
+
+
+def test_429_tem_teto_e_o_atraso_volta_ao_normal():
+    """Bug real: cada 429 dobrava o atraso da Camara para sempre (6 s virou 384 s)."""
+    respostas = iter([429, 200] * 8 + [200] * 40)
+
+    def handler(req):
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        return httpx.Response(next(respostas), headers={'Retry-After': '1'})
+
+    rel = Relogio()
+    http = Http(httpx.Client(transport=httpx.MockTransport(handler)), atrasos={'x.gov.br': 6.0},
+                relogio=rel.agora, dormir=rel.dormir)
+    for i in range(8):
+        http.get(f'https://x.gov.br/{i}')
+        assert http.atrasos['x.gov.br'] <= 30.0
+    for i in range(40):
+        http.get(f'https://x.gov.br/ok{i}')
+    assert http.atrasos['x.gov.br'] == 6.0
