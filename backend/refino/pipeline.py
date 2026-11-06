@@ -59,6 +59,8 @@ def identity(url):
 
 _JURISDICAO_HOST={'planalto.gov.br':'federal','camara.leg.br':'federal','senado.leg.br':'federal','receita.fazenda.gov.br':'federal','sinj.df.gov.br':'df','confaz.fazenda.gov.br':'confaz'}
 _VISAO={'multivigente':'compilada','compilada':'compilada','original':'original'}
+_TIPOS_UNICOS=('lei','lc','decreto','ec')  # numeração única por jurisdição; portaria/IN/ADE/resolução variam por órgão
+_OMISSAO=re.compile(r'[(\[]?\s*(?:\.{3}|…|\*{3})\s*[)\]]?')
 _VISAO_ORDEM={'compilada':0,'unica':1,'original':2}
 
 
@@ -70,7 +72,7 @@ def chave_documento(meta,source,title):
     norma=identidade_titulo(str(title))
     host=(urlsplit(source).hostname or '').lower()
     jur=next((j for h,j in _JURISDICAO_HOST.items() if host==h or host.endswith('.'+h)),None)
-    if not norma or not jur or norma.ano is None or norma.jurisdicao not in ('indefinida',jur):return key
+    if not norma or not jur or norma.tipo not in _TIPOS_UNICOS or norma.ano is None or norma.jurisdicao not in ('indefinida',jur):return key
     return 'norma:'+replace(norma,jurisdicao=jur).chave
 
 
@@ -235,17 +237,27 @@ def run(root=DATA,catalog_path=None,output=OUTPUT,policy_path=None,profile=None,
         for key in ('titulos','naturezas','versoes','categorias'):doc[key]=sorted(doc[key])
         def rank(vid):
             v=versions[vid];candidates=[rowmap[oid] for oid in v['ocorrencias']]
-            return (priority[v['classificacao']],_VISAO_ORDEM[v['visao']],min(len(r['erros']) for r in candidates),len(v['qualidade']),-len(v['hashes_originais']),-max(r['bytes_texto'] for r in candidates),vid)
-        doc['representacao_preferida']=min(doc['versoes'],key=rank)
-        doc['criterio_representacao']='Preferência técnica de extração; não significa versão vigente. Todas as versões permanecem disponíveis.'
+            return (priority[v['classificacao']],min(len(r['erros']) for r in candidates),len(v['qualidade']),_VISAO_ORDEM[v['visao']],-len(v['hashes_originais']),-size(vid),vid)
+        def size(vid):return max(rowmap[oid]['bytes_texto'] for oid in versions[vid]['ocorrencias'])
+        def pick(vids):
+            # Candidata a preferida só se tiver porte comparável ao maior texto (um stub nunca vence).
+            big=max(size(v) for v in vids);return min([v for v in vids if size(v)>=policy['limiar_bytes_preferida']*big],key=rank)
+        doc['representacao_preferida']=pick(doc['versoes'])
+        doc['criterio_representacao']='Preferência técnica de extração; não significa versão vigente. Todas as versões permanecem em versoes.jsonl e ocorrencias.jsonl; o índice lista a preferida e as extras com conteúdo novo, e fora_do_indice registra o motivo das demais.'
         for category in indexes:
             vids=[vid for vid in doc['versoes'] if versions[vid]['classificacao']==category and (category=='revisao' or versions[vid]['conteudo_id'])]
             if not vids:continue
-            best=min(vids,key=rank);shown=vids
+            best=pick(vids);shown=vids;out=[]
             if category!='revisao':
-                # Original fica fora do índice; outra extração entra se trouxer conteúdo ausente na preferida.
-                ref=lines(best);shown=[best]+[v for v in sorted(vids) if v!=best and versions[v]['visao']!='original' and (lambda l:l and len(l-ref)/len(l)>policy['limiar_linhas_ausentes_versao_extra'])(lines(v))]
-            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],versoes=shown,representacao_preferida=best,revisao_semantica='pendente'))
+                # Original fica fora do índice; outra extração entra se tiver >5% de linhas ausentes na preferida ou linha ausente com dígito (valor alterado).
+                ref=lines(best);shown=[best]
+                for v in sorted(vids):
+                    if v==best:continue
+                    if versions[v]['visao']=='original':out.append(dict(versao=v,motivo='original_com_compilada'));continue
+                    mine=lines(v);new={l for l in mine-ref if not _OMISSAO.fullmatch(l)}
+                    if new and (len(new)/len(mine)>policy['limiar_linhas_ausentes_versao_extra'] or any(c.isdigit() for l in new for c in l)):shown.append(v)
+                    else:out.append(dict(versao=v,motivo='versao_sem_conteudo_novo'))
+            indexes[category].append(dict(documento_id=doc['id'],titulos=doc['titulos'],versoes=shown,fora_do_indice=out,representacao_preferida=best,revisao_semantica='pendente'))
         if doc['chave_origem'].startswith('rfb:anexo:'):
             parent=sha(('rfb:ato:'+doc['chave_origem'].split(':')[2]).encode())
             if parent in docs:relations.append(dict(documento_id=doc['id'],relacionado_id=parent,tipo='anexo_de',evidencia='identificadores_explicitos_na_url_rfb'))

@@ -135,7 +135,7 @@ def test_lei_federal_e_df_mesmo_numero_continuam_separadas(tmp_path):
     assert keys=={'norma:federal:lei:-:123:2006','norma:df:lei:-:123:2006'}
 
 
-def test_atos_com_texto_quase_igual_continuam_separados(tmp_path):
+def test_atos_rfb_com_texto_quase_igual_continuam_separados_por_ato(tmp_path):
     body='# Ineficácia\n'+'\n'.join('Linha %d do texto.'%i for i in range(50))
     folder,report=refine(tmp_path,[('a',RFB%'1',body+'\nfim 19','consultas-rfb',dict(titulo='Solução de Ineficácia nº 19/2019')),('b',RFB%'2',body+'\nfim 20','consultas-rfb',dict(titulo='Solução de Ineficácia nº 20/2019'))])
     assert report['documentos_logicos']==2 and len(read_rows(folder,'indice_nucleo.jsonl'))==2
@@ -147,8 +147,8 @@ def test_consulta_rfb_mantem_identidade_por_ato(tmp_path):
     assert read_rows(folder,'documentos.jsonl')[0]['chave_origem']=='rfb:ato:111'
 
 
-def citada(name,visao,text):
-    return (name,'https://x.gov.br/'+name,text,'normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte=visao,natureza_documental='legislacao',titulo='Lei nº 9/2000'))
+def citada(name,visao,text,**more):
+    return (name,'https://x.gov.br/'+name,text,'normas-citadas',dict(norma_chave='federal:lei:-:9:2000',visao_fonte=visao,natureza_documental='legislacao',titulo='Lei nº 9/2000',**more))
 
 
 def versions_by_visao(folder):return {v['visao']:v for v in read_rows(folder,'versoes.jsonl')}
@@ -181,3 +181,73 @@ def test_extracao_com_visao_extra_nao_perde_conteudo(tmp_path):
 
 def test_familia_normas_citadas_entra_no_nucleo():
     assert 'normas-citadas' in load_policy()['familias_nucleo']
+
+
+def test_leis_com_texto_quase_igual_e_numeros_diferentes_continuam_separadas(tmp_path):
+    body='# Lei\n'+'\n'.join('Linha %d do texto.'%i for i in range(50))
+    leg=lambda n:dict(natureza_documental='legislacao',titulo='Lei nº %d, de 1 de março de 2019'%n)
+    folder,report=refine(tmp_path,[('a','https://www.planalto.gov.br/l19.htm',body+'\nfim 19','legislacao',leg(19)),('b','https://www.planalto.gov.br/l20.htm',body+'\nfim 20','legislacao',leg(20))])
+    assert report['documentos_logicos']==2
+    assert {d['chave_origem'] for d in read_rows(folder,'documentos.jsonl')}=={'norma:federal:lei:-:19:2019','norma:federal:lei:-:20:2019'}
+
+
+def test_chave_legada_so_para_tipos_unicos_com_ano_e_host_conhecido(tmp_path):
+    leg=lambda t:dict(natureza_documental='legislacao',titulo=t)
+    folder,_=refine(tmp_path,[
+        ('p1','https://www.sinj.df.gov.br/sinj/Norma/1','# P\nA.','legislacao',leg('Portaria SEF nº 10, de 2 de maio de 2020')),
+        ('p2','https://www.sinj.df.gov.br/sinj/Norma/2','# P\nB.','legislacao',leg('Portaria SEEC nº 10, de 2 de maio de 2020')),
+        ('sa','https://www.planalto.gov.br/semano.htm','# L\nC.','legislacao',leg('Lei nº 77')),
+        ('hd','https://exemplo.org/lei','# L\nD.','legislacao',leg('Lei nº 78, de 1 de março de 2019'))])
+    keys={d['chave_origem'] for d in read_rows(folder,'documentos.jsonl')}
+    assert len(keys)==4 and all(k.startswith('url:') for k in keys)
+
+
+def test_stub_compilado_nao_vence_texto_integral_mas_fica_no_indice(tmp_path):
+    full='# Lei\n'+'\n'.join('Art. %d Texto integral.'%i for i in range(60))
+    folder,_=refine(tmp_path,[citada('s','multivigente','# Lei\nResumo sem números.'),citada('f','unica',full)])
+    vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['representacao_preferida']==vs['unica']['id']
+    assert set(row['versoes'])=={vs['unica']['id'],vs['compilada']['id']}
+    assert read_rows(folder,'documentos.jsonl')[0]['representacao_preferida']==vs['unica']['id']
+
+
+def test_forma_da_in_2119_original_integral_vence_stub_compilado(tmp_path):
+    big='# Instrução Normativa\n'+'\n'.join('Art. %d '%i+'texto '*20 for i in range(700))
+    assert len(big)>80000
+    folder,_=refine(tmp_path,[citada('s','multivigente','# IN\n(Republicação sem corpo)'),citada('o','original',big)])
+    vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['representacao_preferida']==vs['original']['id']
+    assert vs['compilada']['id'] in row['versoes']
+
+
+def test_toda_versao_esta_no_indice_ou_tem_motivo(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',base),citada('o','original',base+'\nRedação original'),citada('u','unica',base.rsplit('\n',1)[0])])
+    row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    motivos={f['versao']:f['motivo'] for f in row['fora_do_indice']}
+    assert set(motivos.values())=={'original_com_compilada','versao_sem_conteudo_novo'}
+    ids={v['id'] for v in read_rows(folder,'versoes.jsonl')}
+    assert ids==set(row['versoes'])|set(motivos) and not set(row['versoes'])&set(motivos)
+    assert 'permanecem em' in read_rows(folder,'documentos.jsonl')[0]['criterio_representacao']
+
+
+def test_valor_alterado_em_uma_linha_mantem_versao_no_indice(tmp_path):
+    lines=['Art. %d Texto.'%i for i in range(99)]
+    a='# Lei\n'+'\n'.join(lines+['Alíquota de 5%'])
+    b='# Lei\n'+'\n'.join(lines+['Alíquota de 7%'])
+    folder,_=refine(tmp_path,[citada('c','multivigente',a),citada('u','unica',b)])
+    assert len(read_rows(folder,'indice_nucleo.jsonl')[0]['versoes'])==2
+
+
+def test_marcador_de_omissao_nao_conta_como_conteudo_novo(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',base),citada('u','unica',base+'\n(...)\n[...]\n...\n(…)')])
+    assert len(read_rows(folder,'indice_nucleo.jsonl')[0]['versoes'])==1
+
+
+def test_original_limpo_vence_compilada_com_ressalva_e_compilada_vira_extra(tmp_path):
+    base='# Lei\n'+'\n'.join('Art. %d Texto.'%i for i in range(40))
+    folder,_=refine(tmp_path,[citada('c','multivigente',base+'\nNota um\nNota dois\nNota tres',status='parcial'),citada('o','original',base)])
+    vs=versions_by_visao(folder);row=read_rows(folder,'indice_nucleo.jsonl')[0]
+    assert row['representacao_preferida']==vs['original']['id']
+    assert vs['compilada']['id'] in row['versoes']

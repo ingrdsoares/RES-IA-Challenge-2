@@ -26,6 +26,7 @@
     "normas-citadas"
   ],
   "limiar_linhas_ausentes_versao_extra": 0.05,
+  "limiar_bytes_preferida": 0.2,
   "familias_dados": [
     "cnpj",
     "cnpj-ampliado",
