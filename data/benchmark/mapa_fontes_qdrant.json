@@ -82,10 +82,11 @@
     },
     "cal-portaria-11460": {
       "documento_id": null,
-      "nota": "O GT descreve 'Portaria RFB 11.460/2026, calendário de obrigações'. O documento de mesmo número (d7faa29ce4) é a Portaria MGI 11.460/2025, de feriados e ponto facultativo."
+      "nota": "O GT descreve 'Portaria RFB 11.460/2026, calendário de obrigações'. O documento de mesmo número (d7faa29ce4) é a Portaria MGI 11.460/2025, de feriados e ponto facultativo. O texto de data/raw/recorte_demo é de demonstração."
     },
     "df-comunicado-nfs": {
-      "documento_id": null
+      "documento_id": "76275b753a",
+      "nota": "Complemento oficial."
     },
     "df-decreto-25508": {
       "documento_id": "39235835ae",
@@ -93,25 +94,28 @@
       "titulo": "Decreto DF nº 25.508/2005"
     },
     "df-decreto-43982": {
-      "documento_id": null,
-      "nota": "Os 'Anexo recuperado — 43982-anexo-*' são anexos do ato 43982 da RFB, não deste decreto."
+      "documento_id": "0ac75e297f",
+      "nota": "Texto oficial do SINJ: trata do sistema de gestão do ISS, não do ICMS. Vem do complemento oficial, fora do recorte público."
     },
     "df-faq-iss": {
-      "documento_id": null
+      "documento_id": "8ffcf3a7e0",
+      "nota": "Complemento oficial."
     },
     "df-manual-retencao": {
-      "documento_id": null
+      "documento_id": "db40e91463",
+      "nota": "Complemento oficial."
     },
     "df-retencao-iss": {
-      "documento_id": null
+      "documento_id": "af733a9d88",
+      "nota": "Complemento oficial."
     },
     "jur-carf-pejotizacao": {
       "documento_id": null,
-      "nota": "A palavra 'pejotização' não aparece em nenhum dos 4.026 documentos."
+      "nota": "O texto de data/raw/recorte_demo é de demonstração e não comprova um acórdão real. Sem fonte oficial coletada."
     },
     "jur-stj-prescricao": {
       "documento_id": null,
-      "nota": "'Decadência/Prescrição' (a6ab10ebe4) reúne súmulas do CARF, não o acórdão do STJ."
+      "nota": "O texto de data/raw/recorte_demo é de demonstração e não comprova um acórdão real. Sem fonte oficial coletada; o Informativo 872 respondeu 403."
     },
     "man-perguntas-simples": {
       "documento_id": "8d4398a7d9",
@@ -127,6 +131,14 @@
       "documento_id": "74b712b843",
       "nota": "Liberado em 07/11/2026 após revisão do filtro; só em knowledge_base_v2.",
       "titulo": "ecf — manual/guia Leiaute 12"
+    },
+    "df-decreto-43521": {
+      "documento_id": "c73cd99fd1",
+      "nota": "Art. 1º: 20% para uma lista específica (energia, comunicação, combustíveis), não é a alíquota geral."
+    },
+    "df-sc-31-2024": {
+      "documento_id": "33bf4c66ed",
+      "nota": "Item 17: alíquota geral do DF de 20% a partir de 22/01/2024."
     }
   }
 }

@@ -402,6 +402,30 @@ def test_reexportacao_com_novo_versao_remove_pontos_antigos(run, tmp_path):
     assert {p.id for p in pontos_a} == novos
 
 
+def test_pagina_de_login_nao_sobe_e_sai_da_colecao(run, tmp_path):
+    saida = tmp_path / "recorte.csv"
+    gerar_recorte(run, saida)
+    settings = Settings()
+    client = _memoria(settings)
+    ingerir(saida, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO)
+    linhas = list(ler_csv(saida))
+    nova = tmp_path / "nova.csv"
+    with open(nova, "w", encoding="utf-8", newline="") as f:
+        escritor = csv.DictWriter(f, fieldnames=list(COLUNAS))
+        escritor.writeheader()
+        for linha in linhas:
+            if linha["documento_id"] == "doc-a":
+                linha = linha | {"titulo": "Conteúdo Restrito"}
+            escritor.writerow(linha)
+
+    stats = ingerir(
+        nova, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO, retomar=True
+    )
+
+    assert stats["paginas_login"] == 1
+    assert {p.payload["document_id"] for p in _pontos(client)} == {"doc-d"}
+
+
 def test_ler_csv_aceita_campo_grande(tmp_path):
     caminho = tmp_path / "grande.csv"
     with open(caminho, "w", encoding="utf-8", newline="") as f:

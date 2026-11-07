@@ -167,6 +167,7 @@ def test_contexto_de_12000_caracteres_cabe_em_8192_tokens():
 
 def test_ausencia_de_mencao_nao_e_negacao_no_prompt():
     assert "ausência de menção" in SYSTEM_PROMPT.lower()
+    assert "caso específico" in SYSTEM_PROMPT
 
 
 def test_unicode_context_is_trimmed_to_fit_prompt_budget():

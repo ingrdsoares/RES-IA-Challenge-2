@@ -50,6 +50,8 @@ ESPERAS_RETENTATIVA = (30, 60, 120, 120, 120)
 TIMEOUT_QDRANT_CARGA = 120
 NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "socio-digital/recorte-rag-v1")
 CHUNKER = LegalHierarchicalChunker()
+# Páginas de login do gov.br coletadas no lugar das súmulas do CARF; não têm conteúdo.
+TITULO_PAGINA_LOGIN = "Conteúdo Restrito"
 
 _RASURA = re.compile(r"~~.*?~~", re.DOTALL)
 _MARCA = r"(?![ \t]*(?:## |> Marcadores))"
@@ -71,6 +73,7 @@ def estatisticas_novas() -> dict[str, int]:
     return {
         "documentos": 0,
         "pulados": 0,
+        "paginas_login": 0,
         "chunks_base": 0,
         "riscados_integralmente": 0,
         "partes_vazias": 0,
@@ -300,6 +303,10 @@ def ingerir(
     for linha in itertools.islice(ler_csv(caminho_csv), limite):
         documento = linha["documento_id"]
         estatisticas["documentos"] += 1
+        if linha["titulo"].strip() == TITULO_PAGINA_LOGIN:
+            _apagar_documento(client, colecao, documento)
+            estatisticas["paginas_login"] += 1
+            continue
         itens = list(itens_do_documento(linha, estatisticas))
         if retomar and documento not in apagados:
             if _pontos_do_documento(client, colecao, documento) == len(itens):
@@ -421,6 +428,7 @@ def main(
     for chave in (
         "documentos",
         "pulados",
+        "paginas_login",
         "pontos",
         "gravados",
         "riscados_integralmente",
