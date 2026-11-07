@@ -143,6 +143,20 @@ def test_nonfinite_embedding_is_rejected():
         LocalModels(Settings(), InvalidClient()).embed_question("Pergunta")
 
 
+def test_embedding_da_pergunta_nao_ocupa_a_gpu():
+    corpos = []
+
+    def handler(request):
+        corpos.append(json.loads(request.content))
+        return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
+
+    models = make_models(handler)
+    models.embed_question("Pergunta")
+    models.close()
+
+    assert corpos[0]["options"]["num_gpu"] == 0
+
+
 def test_contexto_de_12000_caracteres_cabe_em_8192_tokens():
     fontes = [source("O contribuinte deve observar a legislação. " * 70) for _ in range(4)]
 

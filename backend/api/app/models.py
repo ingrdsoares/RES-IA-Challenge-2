@@ -145,6 +145,8 @@ class LocalModels:
                 model=self.settings.embedding_model,
                 input=QUERY_INSTRUCTION + question,
                 truncate=False,
+                # Uma pergunta leva 0,1 s na CPU; na GPU os 2 GB faltam à geração.
+                options={"num_gpu": 0},
             )
             vectors = response.embeddings
             if len(vectors) != 1:
