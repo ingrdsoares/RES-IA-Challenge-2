@@ -179,7 +179,8 @@ class LocalModels:
                 options={
                     "num_ctx": self.settings.num_ctx,
                     "num_predict": self.settings.num_predict,
-                    "temperature": 0.1,
+                    "temperature": 0,
+                    "seed": 42,
                 },
             )
             content = response.message.content

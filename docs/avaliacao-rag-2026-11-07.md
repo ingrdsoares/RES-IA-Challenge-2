@@ -97,6 +97,23 @@ A RTX 3080 Ti tem 12 GB. Com contexto de 16.384 tokens, a memória de vídeo est
 - **Referência a conferir:** q20 cita o art. 156-A, § 5º, e precisa de checagem fiscal.
 - **Referências antigas:** `data/benchmark/ground_truth_25_perguntas.json` ainda tem os textos anteriores; a versão corrigida está em `backend/evaluation/data/ground_truth_avaliacao.jsonl`.
 
+## Experimentos depois do teste novo
+
+Três mudanças foram testadas depois do teste novo, seguindo `docs/tool-calling-busca-rag.md` quando aplicável. Um terceiro conjunto, com 20 perguntas, tem 8 que citam norma e artigo, 5 que citam só a norma, 4 compostas e 3 que pedem dados ou recusa.
+
+| Experimento | Resultado | Decisão |
+|---|---|---|
+| Raciocínio do modelo ligado | Em 65 perguntas: ROUGE-L −0,067 e BERTScore −0,028, ambos com intervalo abaixo de zero; tempo 2,5 vezes maior; surgem novas invenções | Não adotado |
+| Busca direta pelo artigo citado | No terceiro conjunto: BERTScore +0,023 (+0,003 a +0,049); a03, a04 e a05 deixam de recusar sem motivo | Adotada |
+| Tool calling | Em cerca de 80 pares: ROUGE-L −0,004 e BERTScore −0,008, com intervalos que incluem zero; cerca de 2 s a mais; 17 de 170 chamadas rejeitadas; corrige c02, mas piora b05 | Não adotado; código em branch local |
+| Temperatura 0 e semente fixa | Em duas rodadas iguais: fontes iguais em 20 de 20 e respostas iguais em 15 de 20; as outras 5 mudam a redação | Adotada |
+
+**Variação entre rodadas:** com a temperatura anterior, 17 de 25 e 10 de 20 respostas mudavam sem nenhuma mudança de código. Por isso, diferenças de uma única rodada entre versões, inclusive neste relatório, podem ser em parte acaso. Isso vale para casos como n02, q07 e q13.
+
+**Terceiro conjunto com a configuração final, em leitura preliminar:** 16 corretas ou recusas adequadas, 1 parcial e 3 erradas (b02, c02 e c04). Perguntas compostas seguem sendo o principal ponto fraco.
+
+A API local ainda não recebeu essas duas mudanças, porque o plano de tool calling exige revisão humana antes de promover.
+
 ## Próximos passos
 
 1. **Revisão fiscal:** preencher `handoff/revisao-fiscal-rag-2026-11-07.xlsx`, começando pela aba Teste final.
