@@ -93,6 +93,9 @@ def test_servico_reordena_candidatos_e_mantem_norma_citada_primeiro():
         def search(self, vetor, pergunta):
             return [ruim, boa]
 
+        def search_articles(self, vetor, pares):
+            return []
+
         def close(self):
             pass
 

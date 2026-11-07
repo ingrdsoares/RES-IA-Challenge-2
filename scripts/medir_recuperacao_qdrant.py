@@ -107,7 +107,7 @@ def _verificar() -> None:
 def main() -> int:
     from app.config import Settings
     from app.models import LocalModels
-    from app.normas import chaves_normas
+    from app.normas import artigos_citados, chaves_normas
     from app.rag import combinar
     from app.reranker import Reranker
     from app.vector_store import VectorStore
@@ -140,6 +140,7 @@ def main() -> int:
         densos = store._fontes(store._densa(vetor, settings.candidate_k))
         hibridos = store.search(vetor, caso["question"])
         citados, _ = store.search_norms(vetor, chaves_normas(caso["question"]))
+        citados = store.search_articles(vetor, artigos_citados(caso["question"])) + citados
         listas = {
             "densa": combinar([], densos, maior),
             "hibrida": combinar([], hibridos, maior),

@@ -19,6 +19,7 @@ _APELIDOS = (
     (r"\blei kandir\b", "lc:87"),
     (r"\bctn\b|\bcodigo tributario nacional\b", "lei:5172"),
 )
+_ARTIGO = r"\bart(?:igo)?s?\.?\s*(\d+)\s*o?(?:\s*-\s*([a-z])\b)?"
 _NOMES = {
     "lc": "Lei Complementar",
     "dl": "Decreto-Lei",
@@ -31,6 +32,21 @@ _NOMES = {
 }
 
 
+def _forma_artigo(achado: re.Match) -> str:
+    numero, letra = achado.groups()
+    return f"{numero}-{letra}" if letra else numero
+
+
+def _posicoes_normas(dobrado: str) -> list[tuple[int, str]]:
+    achadas = []
+    for tipo, padrao in _PADROES:
+        for m in re.finditer(padrao, dobrado):
+            achadas.append((m.start(), f"{tipo}:{m.group(1).replace('.', '')}"))
+    for padrao, chave in _APELIDOS:
+        achadas += [(m.start(), chave) for m in re.finditer(padrao, dobrado)]
+    return achadas
+
+
 def chaves_normas(texto: str | None) -> list[str]:
     """Chaves citadas, na ordem de tipo, sem repetir. O mesmo código para título e pergunta."""
     dobrado = fold(texto or "")
@@ -40,6 +56,27 @@ def chaves_normas(texto: str | None) -> list[str]:
             chaves.append(f"{tipo}:{numero.replace('.', '')}")
     chaves += [chave for padrao, chave in _APELIDOS if re.search(padrao, dobrado)]
     return list(dict.fromkeys(chaves))
+
+
+def chave_artigo(rotulo: str | None) -> str | None:
+    """Forma comparável do artigo: "Art. 8º-A" vira "8-a"; rótulo sem artigo vira None."""
+    achado = re.search(_ARTIGO, fold(rotulo or ""))
+    return _forma_artigo(achado) if achado else None
+
+
+def artigos_citados(pergunta: str) -> list[tuple[str, str]]:
+    """Pares (norma, artigo) citados. Cada artigo fica com a primeira norma depois dele."""
+    # ponytail: em "arts. 3º e 5º" só o primeiro conta; ampliar se esse formato aparecer.
+    dobrado = fold(pergunta)
+    normas = sorted(_posicoes_normas(dobrado))
+    pares: list[tuple[str, str]] = []
+    for achado in re.finditer(_ARTIGO, dobrado):
+        seguintes = [chave for pos, chave in normas if pos >= achado.end()]
+        anteriores = [chave for pos, chave in normas if pos < achado.start()]
+        norma = seguintes[0] if seguintes else anteriores[-1] if anteriores else None
+        if norma:
+            pares.append((norma, _forma_artigo(achado)))
+    return list(dict.fromkeys(pares))
 
 
 def nome_norma(chave: str) -> str:

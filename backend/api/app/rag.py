@@ -4,7 +4,7 @@ from threading import Lock
 from app.config import Settings
 from app.errors import QueryBusy
 from app.models import LocalModels, citacoes_validas, prepare_sources
-from app.normas import chaves_normas
+from app.normas import artigos_citados, chaves_normas
 from app.reranker import Reranker
 from app.schemas import QueryResponse, Source
 from app.vector_store import VectorStore
@@ -51,6 +51,7 @@ class RagService:
                 )
             vector = self.models.embed_question(question)
             citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
+            citados = self.store.search_articles(vector, artigos_citados(question)) + citados
             candidatos = combinar([], citados + self.store.search(vector, question), 1000)
             sources = prepare_sources(
                 combinar(

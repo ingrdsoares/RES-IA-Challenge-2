@@ -33,7 +33,7 @@ if str(BACKEND_API) not in sys.path:
 from app.config import Settings  # noqa: E402
 from app.errors import DependencyUnavailable, dependency_errors  # noqa: E402
 from app.models import LocalModels  # noqa: E402
-from app.normas import chaves_normas  # noqa: E402
+from app.normas import chave_artigo, chaves_normas  # noqa: E402
 from app.sparse import vetor_documento  # noqa: E402
 from app.vector_store import DENSE, SPARSE, VectorStore  # noqa: E402
 from qdrant_client import QdrantClient  # noqa: E402
@@ -219,6 +219,7 @@ def itens_do_documento(
                 "document_id": linha["documento_id"],
                 "chunk_id": chunk.chunk_id if len(trechos) == 1 else f"{chunk.chunk_id}#{k}",
                 "norma": chaves_normas(linha["titulo"]),
+                "artigo": chave_artigo(chunk.artigo),
                 "frente": linha.get("frente") or None,
                 "natureza": linha.get("natureza") or None,
             }
@@ -294,7 +295,7 @@ def ingerir(
         settings.model_copy(update={"collection_name": colecao}), client
     ).ensure_collection()
     # Sem índice, cada exclusão por documento varre a coleção inteira.
-    for campo in ("document_id", "norma", "frente"):
+    for campo in ("document_id", "norma", "artigo", "frente"):
         client.create_payload_index(colecao, campo, qm.PayloadSchemaType.KEYWORD, wait=True)
     estatisticas = estatisticas_novas()
     gravados = 0

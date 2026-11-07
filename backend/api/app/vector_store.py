@@ -143,5 +143,21 @@ class VectorStore:
                 achados += self._fontes(h for h in hits if h.score >= limiar)
         return achados, ausentes
 
+    def search_articles(self, vector: list[float], pares: list[tuple[str, str]]) -> list[Source]:
+        """Trechos dos artigos citados, mesmo longe da pergunta; artigo ausente é ignorado."""
+        achados: list[Source] = []
+        with dependency_errors("Qdrant"):
+            for norma, artigo in pares:
+                filtro = models.Filter(
+                    must=[
+                        models.FieldCondition(key="norma", match=models.MatchValue(value=norma)),
+                        models.FieldCondition(key="artigo", match=models.MatchValue(value=artigo)),
+                    ]
+                )
+                achados += self._fontes(
+                    self._densa(vector, self.settings.citation_slots, filtro, limiar=False)
+                )
+        return achados
+
     def close(self) -> None:
         self.client.close()
