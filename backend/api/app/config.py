@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)
     ollama_timeout: float = Field(default=120, gt=0, le=600, allow_inf_nan=False)
-    num_ctx: int = Field(default=16384, ge=8192, le=32768)
+    num_ctx: int = Field(default=8192, ge=8192, le=32768)
     num_predict: int = Field(default=1024, ge=64, le=1024)
     max_context_chars: int = Field(default=12000, ge=1, le=24000)
     reranker_url: HttpUrl | None = None
