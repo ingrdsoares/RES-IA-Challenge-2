@@ -108,6 +108,18 @@ Quatro mudanças foram testadas depois do teste novo, seguindo `docs/tool-callin
 | Tool calling | Em cerca de 80 pares: ROUGE-L −0,004 e BERTScore −0,008, com intervalos que incluem zero; cerca de 2 s a mais; 17 de 170 chamadas rejeitadas; corrige c02, mas piora b05 | Não adotado; código em branch local |
 | Temperatura 0 e semente fixa | Em duas rodadas iguais: fontes iguais em 20 de 20 e respostas iguais em 15 de 20; as outras 5 mudam a redação | Adotada |
 
+### Perguntas compostas
+
+A pergunta é dividida por regra, sem o modelo, quando a segunda parte começa com palavra interrogativa ou há duas frases com interrogação. Cada parte busca os próprios trechos, e parte sem sigla ou norma herda as das partes anteriores. Os dois melhores trechos da pergunta inteira continuam no topo.
+
+| Conjunto | Resultado |
+|---|---|
+| 20 perguntas usadas nos ajustes (14 compostas) | Compostas totalmente corretas de 5 para 7; erradas ou recusadas sem motivo de 2 para 1; simples sem mudança |
+| Outros 85 pares já usados | Métricas iguais; melhoram c02, c03, q01, q03, q07 e q21, sem piora clara |
+| 10 compostas novas, rodadas uma vez | 1 melhora (f04 deixa de afirmar R$ 85 mil para o MEI) e nenhuma piora; métricas iguais |
+
+O custo é cerca de 1,3 s a mais por pergunta composta. A divisão não aciona quando a segunda parte não tem palavra interrogativa, como em "e ele pode emitir".
+
 **Variação entre rodadas:** com a temperatura anterior, 17 de 25 e 10 de 20 respostas mudavam sem nenhuma mudança de código. Por isso, diferenças de uma única rodada entre versões, inclusive neste relatório, podem ser em parte acaso. Isso vale para casos como n02, q07 e q13.
 
 **Terceiro conjunto com a configuração final, em leitura preliminar:** 16 corretas ou recusas adequadas, 1 parcial e 3 erradas (b02, c02 e c04). Perguntas compostas seguem sendo o principal ponto fraco.
