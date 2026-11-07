@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     max_context_chars: int = Field(default=12000, ge=1, le=24000)
     reranker_url: HttpUrl | None = None
     reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
+    tool_calling: bool = False
 
     @model_validator(mode="after")
     def validate_embedding_dimensions(self):

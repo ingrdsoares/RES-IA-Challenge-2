@@ -163,6 +163,22 @@ class LocalModels:
                 raise DependencyUnavailable("Embedding inválido retornado pelo Ollama.")
             return list(vector)
 
+    def planejar(self, mensagens: list[dict], ferramentas: list[dict]):
+        """Rodada de planejamento de buscas; a resposta final continua em answer()."""
+        with dependency_errors("Ollama"):
+            return self.client.chat(
+                model=self.settings.generation_model,
+                messages=mensagens,
+                tools=ferramentas,
+                stream=False,
+                think=False,
+                options={
+                    "num_ctx": self.settings.num_ctx,
+                    "num_predict": 256,
+                    "temperature": 0.1,
+                },
+            )
+
     def answer(self, question: str, sources: list[Source], ausentes: Sequence[str] = ()) -> str:
         if (
             not sources

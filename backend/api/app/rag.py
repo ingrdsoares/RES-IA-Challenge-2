@@ -1,13 +1,17 @@
+import logging
 import re
 from threading import Lock
 
 from app.config import Settings
 from app.errors import QueryBusy
+from app.ferramentas import PlanejadorBuscas, intercalar
 from app.models import LocalModels, citacoes_validas, prepare_sources
-from app.normas import artigos_citados, chaves_normas
+from app.normas import artigos_citados, chave_artigo, chaves_normas
 from app.reranker import Reranker
 from app.schemas import QueryResponse, Source
 from app.vector_store import VectorStore
+
+logger = logging.getLogger(__name__)
 
 
 def _corpo(fonte: Source) -> str:
@@ -52,13 +56,8 @@ class RagService:
             vector = self.models.embed_question(question)
             citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
             citados = self.store.search_articles(vector, artigos_citados(question)) + citados
-            candidatos = combinar([], citados + self.store.search(vector, question), 1000)
             sources = prepare_sources(
-                combinar(
-                    citados,
-                    self.reranker.reordenar(question, candidatos),
-                    self.settings.top_k,
-                ),
+                combinar(citados, self._recuperar(question, vector, citados), self.settings.top_k),
                 self.settings.max_context_chars,
                 question=question,
                 num_ctx=self.settings.num_ctx,
@@ -79,6 +78,33 @@ class RagService:
             return QueryResponse(status="answered", answer=answer, sources=sources)
         finally:
             self._query_lock.release()
+
+    def _recuperar(self, question: str, vector: list[float], citados: list[Source]) -> list[Source]:
+        if self.settings.tool_calling:
+            try:
+                planejador = PlanejadorBuscas(self.models.planejar, self._executar_ferramenta)
+                grupos = planejador.coletar(question).grupos
+            except Exception:
+                logger.warning("Planejamento de buscas falhou; usando a busca atual", exc_info=True)
+                grupos = []
+            if grupos:
+                return intercalar(grupos)
+        candidatos = combinar([], citados + self.store.search(vector, question), 1000)
+        return self.reranker.reordenar(question, candidatos)
+
+    def _executar_ferramenta(self, nome: str, args: dict) -> list[Source]:
+        consulta = args.get("consulta") or f"{args['norma']} art. {args.get('artigo', '')}"
+        vetor = self.models.embed_question(consulta)
+        if nome == "busca_geral":
+            achados = self.store.search(vetor, consulta)
+        else:
+            chaves = chaves_normas(args["norma"])
+            if nome == "buscar_artigo":
+                artigo = chave_artigo(f"art. {args['artigo'].removeprefix('art. ')}")
+                achados = self.store.search_articles(vetor, [(c, artigo) for c in chaves])
+            else:
+                achados = self.store.search_norms(vetor, chaves)[0]
+        return self.reranker.reordenar(consulta, combinar([], achados, 1000))
 
     def ready(self) -> None:
         self.store.ensure_collection()
