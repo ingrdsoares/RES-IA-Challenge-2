@@ -120,6 +120,12 @@ A pergunta é dividida por regra, sem o modelo, quando a segunda parte começa c
 
 O custo é cerca de 1,3 s a mais por pergunta composta. A divisão não aciona quando a segunda parte não tem palavra interrogativa, como em "e ele pode emitir".
 
+### Trecho cortado
+
+Cerca de 5% dos trechos do acervo terminam em dois-pontos, como "nos seguintes termos:", e a continuação fica no trecho seguinte. Cada ponto passou a guardar sua posição no documento (campo `ordem`, preenchido sem gerar embedding de novo). Quando um trecho entregue termina em dois-pontos, recebe o corpo do trecho seguinte do mesmo documento.
+
+Nos testes, 44 de 843 trechos entregues terminavam assim, em 33 perguntas. Em 115 pares, as métricas ficaram iguais. Na leitura, cerca de 5 respostas melhoraram (b02 passa a dizer qual é o fato gerador do ISS; t06, t07, k11 e q09 também melhoram) e 1 piorou (f07 afirma que o ICMS incide sobre jornais e depois cita a regra contrária, um erro de interpretação do modelo).
+
 **Variação entre rodadas:** com a temperatura anterior, 17 de 25 e 10 de 20 respostas mudavam sem nenhuma mudança de código. Por isso, diferenças de uma única rodada entre versões, inclusive neste relatório, podem ser em parte acaso. Isso vale para casos como n02, q07 e q13.
 
 **Terceiro conjunto com a configuração final, em leitura preliminar:** 16 corretas ou recusas adequadas, 1 parcial e 3 erradas (b02, c02 e c04). Perguntas compostas seguem sendo o principal ponto fraco.

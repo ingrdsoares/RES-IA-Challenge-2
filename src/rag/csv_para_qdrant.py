@@ -222,6 +222,7 @@ def itens_do_documento(
                 "artigo": chave_artigo(chunk.artigo),
                 "frente": linha.get("frente") or None,
                 "natureza": linha.get("natureza") or None,
+                "ordem": indice,
             }
             if original != trecho:
                 dados["texto_com_rasuras"] = cabecalho + original
@@ -297,6 +298,7 @@ def ingerir(
     # Sem índice, cada exclusão por documento varre a coleção inteira.
     for campo in ("document_id", "norma", "artigo", "frente"):
         client.create_payload_index(colecao, campo, qm.PayloadSchemaType.KEYWORD, wait=True)
+    client.create_payload_index(colecao, "ordem", qm.PayloadSchemaType.INTEGER, wait=True)
     estatisticas = estatisticas_novas()
     gravados = 0
     lote: list = []

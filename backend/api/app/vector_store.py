@@ -159,5 +159,40 @@ class VectorStore:
                 )
         return achados
 
+    def continuacoes(self, ids: list) -> dict:
+        """Para cada ponto, o trecho seguinte do mesmo documento, pelo campo ordem."""
+        seguintes: dict = {}
+        with dependency_errors("Qdrant"):
+            pontos = self.client.retrieve(
+                self.settings.collection_name, ids, with_payload=["document_id", "ordem"]
+            )
+            for p in pontos:
+                documento, ordem = (
+                    (p.payload or {}).get("document_id"),
+                    (p.payload or {}).get("ordem"),
+                )
+                if documento is None or ordem is None:
+                    continue
+                filtro = models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="document_id", match=models.MatchValue(value=documento)
+                        ),
+                        models.FieldCondition(
+                            key="ordem", match=models.MatchValue(value=ordem + 1)
+                        ),
+                    ]
+                )
+                achados, _ = self.client.scroll(
+                    self.settings.collection_name, filtro, limit=1, with_payload=True
+                )
+                fontes = self._fontes(
+                    models.ScoredPoint(id=a.id, version=0, score=0.0, payload=a.payload)
+                    for a in achados
+                )
+                if fontes:
+                    seguintes[p.id] = fontes[0]
+        return seguintes
+
     def close(self) -> None:
         self.client.close()

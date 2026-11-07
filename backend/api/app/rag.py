@@ -28,6 +28,22 @@ def combinar(citados: list[Source], candidatos: list[Source], top_k: int) -> lis
     return saida[:top_k]
 
 
+def juntar_continuacoes(fontes: list[Source], seguintes: dict) -> list[Source]:
+    """Trecho que termina em dois-pontos recebe o corpo do trecho seguinte do documento."""
+    saida = []
+    for fonte in fontes:
+        seguinte = seguintes.get(fonte.id)
+        if seguinte and fonte.text.rstrip().endswith(":"):
+            texto = fonte.text.rstrip() + "\n" + _corpo_bruto(seguinte)
+            fonte = fonte.model_copy(update={"text": texto})
+        saida.append(fonte)
+    return saida
+
+
+def _corpo_bruto(fonte: Source) -> str:
+    return re.sub(r"\A\[[^\]]*\]\n", "", fonte.text).strip()
+
+
 class RagService:
     def __init__(self, settings: Settings, store: VectorStore, models: LocalModels):
         self.settings = settings
@@ -55,10 +71,13 @@ class RagService:
             citados = self.store.search_articles(vector, artigos_citados(question)) + citados
             candidatos = combinar([], citados + self.store.search(vector, question), 1000)
             ordem = self.reranker.reordenar(question, candidatos)
+            escolhidos = combinar(
+                citados, ordem[:2] + self._por_parte(question) + ordem, self.settings.top_k
+            )
+            cortados = [f.id for f in escolhidos if f.text.rstrip().endswith(":")]
+            seguintes = self.store.continuacoes(cortados) if cortados else {}
             sources = prepare_sources(
-                combinar(
-                    citados, ordem[:2] + self._por_parte(question) + ordem, self.settings.top_k
-                ),
+                juntar_continuacoes(escolhidos, seguintes),
                 self.settings.max_context_chars,
                 question=question,
                 num_ctx=self.settings.num_ctx,
