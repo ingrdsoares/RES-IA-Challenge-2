@@ -30,6 +30,8 @@ services:
       NUM_CTX: ${NUM_CTX:-16384}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
       MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-http://reranker:8080}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
     depends_on:
       - qdrant
     healthcheck:
@@ -40,5 +42,14 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  reranker:
+    build:
+      context: ./reranker
+    gpus: all
+    volumes:
+      - reranker_modelos:/modelos
+    restart: unless-stopped
+
 volumes:
   qdrant_data:
+  reranker_modelos:

@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     num_ctx: int = Field(default=16384, ge=8192, le=32768)
     num_predict: int = Field(default=1024, ge=64, le=1024)
     max_context_chars: int = Field(default=12000, ge=1, le=24000)
+    reranker_url: HttpUrl | None = None
+    reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
 
     @model_validator(mode="after")
     def validate_embedding_dimensions(self):

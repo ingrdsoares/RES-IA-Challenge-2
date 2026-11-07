@@ -1,7 +1,8 @@
 """Recall@k e MRR da busca real no Qdrant, por camada da busca e por TOP_K.
 
-A pergunta é embeddada como na API (LocalModels.embed_question). Três camadas, cada uma
-com o limiar configurado e sem corpo repetido: densa, híbrida e híbrida + norma citada.
+A pergunta é embeddada como na API (LocalModels.embed_question). Quatro camadas, cada uma
+com o limiar configurado e sem corpo repetido: densa, híbrida, híbrida + norma citada e
+reranker + norma citada (igual à híbrida + norma quando RERANKER_URL não está definida).
 
 Duas leituras, porque parte das fontes esperadas não está no recorte (documento_id null
 em data/benchmark/mapa_fontes_qdrant.json):
@@ -108,6 +109,7 @@ def main() -> int:
     from app.models import LocalModels
     from app.normas import chaves_normas
     from app.rag import combinar
+    from app.reranker import Reranker
     from app.vector_store import VectorStore
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -126,7 +128,13 @@ def main() -> int:
     modelos = LocalModels(settings)
     store = VectorStore(settings)
     maior = max(TOP_KS)
-    por_camada: dict[str, list[dict]] = {"densa": [], "hibrida": [], "hibrida_norma": []}
+    reranker = Reranker(settings)
+    por_camada: dict[str, list[dict]] = {
+        "densa": [],
+        "hibrida": [],
+        "hibrida_norma": [],
+        "rerank_norma": [],
+    }
     for caso in casos:
         vetor = modelos.embed_question(caso["question"])
         densos = store._fontes(store._densa(vetor, settings.candidate_k))
@@ -136,6 +144,11 @@ def main() -> int:
             "densa": combinar([], densos, maior),
             "hibrida": combinar([], hibridos, maior),
             "hibrida_norma": combinar(citados, hibridos, maior),
+            "rerank_norma": combinar(
+                citados,
+                reranker.reordenar(caso["question"], combinar([], citados + hibridos, 1000)),
+                maior,
+            ),
         }
         for camada, fontes in listas.items():
             hits = [(f.document_id, f.score) for f in fontes]
@@ -165,7 +178,7 @@ def main() -> int:
                         "total_esperado": c["total_esperado"],
                         "hits": [[d[:10], round(v, 4)] for d, v in c["hits"]],
                     }
-                    for c in por_camada["hibrida_norma"]
+                    for c in por_camada["rerank_norma"]
                 ],
             },
             ensure_ascii=False,

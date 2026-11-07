@@ -5,6 +5,7 @@ from app.config import Settings
 from app.errors import QueryBusy
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import chaves_normas
+from app.reranker import Reranker
 from app.schemas import QueryResponse, Source
 from app.vector_store import VectorStore
 
@@ -31,6 +32,7 @@ class RagService:
         self.settings = settings
         self.store = store
         self.models = models
+        self.reranker = Reranker(settings)
         self._query_lock = Lock()
 
     def query(self, question: str) -> QueryResponse:
@@ -49,8 +51,13 @@ class RagService:
                 )
             vector = self.models.embed_question(question)
             citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
+            candidatos = combinar([], citados + self.store.search(vector, question), 1000)
             sources = prepare_sources(
-                combinar(citados, self.store.search(vector, question), self.settings.top_k),
+                combinar(
+                    citados,
+                    self.reranker.reordenar(question, candidatos),
+                    self.settings.top_k,
+                ),
                 self.settings.max_context_chars,
                 question=question,
                 num_ctx=self.settings.num_ctx,
@@ -80,4 +87,5 @@ class RagService:
         try:
             self.store.close()
         finally:
+            self.reranker.close()
             self.models.close()
