@@ -1,6 +1,7 @@
 import re
 from threading import Lock
 
+from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
 from app.models import LocalModels, citacoes_validas, prepare_sources
@@ -53,11 +54,10 @@ class RagService:
             citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
             citados = self.store.search_articles(vector, artigos_citados(question)) + citados
             candidatos = combinar([], citados + self.store.search(vector, question), 1000)
+            ordem = self.reranker.reordenar(question, candidatos)
             sources = prepare_sources(
                 combinar(
-                    citados,
-                    self.reranker.reordenar(question, candidatos),
-                    self.settings.top_k,
+                    citados, ordem[:2] + self._por_parte(question) + ordem, self.settings.top_k
                 ),
                 self.settings.max_context_chars,
                 question=question,
@@ -79,6 +79,20 @@ class RagService:
             return QueryResponse(status="answered", answer=answer, sources=sources)
         finally:
             self._query_lock.release()
+
+    def _por_parte(self, question: str) -> list[Source]:
+        """Em pergunta composta, os melhores trechos de cada parte, alternados."""
+        consultas = consultas_de_busca(partes_da_pergunta(question))
+        if len(consultas) < 2:
+            return []
+        grupos = []
+        for consulta in consultas:
+            achados = self.store.search(self.models.embed_question(consulta), consulta)
+            grupos.append(self.reranker.reordenar(consulta, combinar([], achados, 1000)))
+        alternados: list[Source] = []
+        for i in range(max(len(g) for g in grupos)):
+            alternados += [g[i] for g in grupos if i < len(g)]
+        return alternados
 
     def ready(self) -> None:
         self.store.ensure_collection()
