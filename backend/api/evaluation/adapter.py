@@ -35,12 +35,17 @@ class InternalRagClient:
             config[key] = urlunsplit(
                 (url.scheme, url.hostname + (f":{url.port}" if url.port else ""), url.path, "", "")
             )
-        git = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True)
+        try:
+            git_sha = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True, text=True
+            ).stdout.strip()
+        except OSError:  # a imagem de avaliação não traz git
+            git_sha = ""
         collection = self.service.store.client.get_collection(self.settings.collection_name)
         models = self.service.models.client.list()
         return {
             "settings": config,
-            "git_sha": git.stdout.strip() or "unavailable",
+            "git_sha": git_sha or "unavailable",
             "prompt_hash": hashlib.sha256(SYSTEM_PROMPT.encode()).hexdigest(),
             "collection": collection.config.model_dump(mode="json"),
             "points": self.service.store.count(),
