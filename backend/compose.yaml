@@ -21,15 +21,15 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
-      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
       TOP_K: ${TOP_K:-5}
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
       QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
       OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
-      NUM_CTX: ${NUM_CTX:-8192}
+      NUM_CTX: ${NUM_CTX:-16384}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
-      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-6000}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
     depends_on:
       - qdrant
     healthcheck:

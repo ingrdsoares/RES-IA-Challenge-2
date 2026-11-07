@@ -1,10 +1,29 @@
+import re
 from threading import Lock
 
 from app.config import Settings
 from app.errors import QueryBusy
-from app.models import LocalModels, prepare_sources
-from app.schemas import QueryResponse
+from app.models import LocalModels, citacoes_validas, prepare_sources
+from app.normas import chaves_normas
+from app.schemas import QueryResponse, Source
 from app.vector_store import VectorStore
+
+
+def _corpo(fonte: Source) -> str:
+    """Texto sem o cabeçalho do chunk, para reconhecer o mesmo trecho em pontos diferentes."""
+    return " ".join(re.sub(r"\A\[[^\]]*\]\n", "", fonte.text).split())
+
+
+def combinar(citados: list[Source], candidatos: list[Source], top_k: int) -> list[Source]:
+    """Norma citada primeiro, depois a busca; sem ponto ou corpo repetido."""
+    vistos: set[str] = set()
+    saida: list[Source] = []
+    for fonte in citados + candidatos:
+        corpo = _corpo(fonte)
+        if corpo not in vistos:
+            vistos.add(corpo)
+            saida.append(fonte)
+    return saida[:top_k]
 
 
 class RagService:
@@ -29,8 +48,9 @@ class RagService:
                     sources=[],
                 )
             vector = self.models.embed_question(question)
+            citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
             sources = prepare_sources(
-                self.store.search(vector),
+                combinar(citados, self.store.search(vector, question), self.settings.top_k),
                 self.settings.max_context_chars,
                 question=question,
                 num_ctx=self.settings.num_ctx,
@@ -45,11 +65,10 @@ class RagService:
                     ),
                     sources=[],
                 )
-            return QueryResponse(
-                status="answered",
-                answer=self.models.answer(question, sources),
-                sources=sources,
+            answer, _ = citacoes_validas(
+                self.models.answer(question, sources, ausentes), len(sources)
             )
+            return QueryResponse(status="answered", answer=answer, sources=sources)
         finally:
             self._query_lock.release()
 
