@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     generation_model: str = Field(default="qwen3:8b", min_length=1)
     collection_name: str = Field(default="knowledge_base", min_length=1, max_length=255)
     embedding_dimensions: int = Field(default=1024, ge=32, le=4096)
-    top_k: int = Field(default=5, ge=1, le=10)
+    top_k: int = Field(default=8, ge=1, le=10)
     candidate_k: int = Field(default=30, ge=1, le=200)
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
