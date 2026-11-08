@@ -1,0 +1,144 @@
+{
+  "descricao": "expected_sources do ground truth de 25 perguntas -> documento_id no Qdrant (prefixo de 10 caracteres). Conferido um a um por título, URL e início do texto em 2026-11-07. null: sem documento equivalente no recorte público.",
+  "fontes": {
+    "leg-lc123": {
+      "documento_id": "d71663a0cd",
+      "titulo": "Lei Complementar nº 123, de 14 de dezembro de 2006"
+    },
+    "leg-cgsn140": {
+      "documento_id": "9c3abc476e",
+      "titulo": "Resol. 140/2018 (ato 92278)",
+      "nota": "Os atos 114000 e 116138 têm o mesmo título, mas só 2-4 mil caracteres; o ato 92278 é o texto da resolução."
+    },
+    "leg-comp-lc155": {
+      "documento_id": "184293b40a",
+      "titulo": "Lei Complementar nº 155, de 27 de outubro de 2016"
+    },
+    "leg-comp-lc87": {
+      "documento_id": "010f7c42ad",
+      "titulo": "Lei Complementar nº 87, de 13 de setembro de 1996"
+    },
+    "leg-comp-lei12741": {
+      "documento_id": "5d94b1e8d4",
+      "titulo": "Lei nº 12.741, de 8 de dezembro de 2012"
+    },
+    "leg-ctn": {
+      "documento_id": "97ec5db500",
+      "titulo": "Lei nº 5.172, de 25 de outubro de 1966"
+    },
+    "leg-ec132": {
+      "documento_id": "51a26c2b2b",
+      "titulo": "ec132"
+    },
+    "leg-lc116": {
+      "documento_id": "1e21025194",
+      "titulo": "Lei Complementar nº 116, de 31 de julho de 2003"
+    },
+    "leg-lc214": {
+      "documento_id": "c0b28fe4c7",
+      "titulo": "lc214"
+    },
+    "lucro-in1700": {
+      "documento_id": "e0b5044dfa",
+      "titulo": "IN 1700/2017"
+    },
+    "lucro-lei9249": {
+      "documento_id": "6534b72296",
+      "titulo": "Lei nº 9.249, de 26 de dezembro de 1995"
+    },
+    "lucro-lei9430": {
+      "documento_id": "3a94bf5d71",
+      "titulo": "Lei nº 9.430, de 27 de dezembro de 1996"
+    },
+    "lucro-rir9580": {
+      "documento_id": "e9d484450a",
+      "titulo": "Decreto nº 9.580, de 22 de novembro de 2018"
+    },
+    "man-dasn-simei": {
+      "documento_id": "30272b7cf1",
+      "titulo": "Manual da DASN-SIMEI"
+    },
+    "man-perguntas-mei": {
+      "documento_id": "324686735a",
+      "titulo": "Perguntas e respostas — MEI",
+      "nota": "Manual da Receita; 'Perguntas frequentes MEI' (44dfbab041) é outro documento, do Portal do Empreendedor."
+    },
+    "man-pgdas-defis": {
+      "documento_id": "7b66db4e5a",
+      "titulo": "Manual do PGDAS-D e DEFIS"
+    },
+    "man-pgmei": {
+      "documento_id": "9bf7b52dae",
+      "titulo": "Manual do PGMEI"
+    },
+    "mei-antes-formalizar": {
+      "documento_id": "7fd56d4b01",
+      "titulo": "O que você precisa saber antes de se tornar um MEI"
+    },
+    "mei-ocupacoes": {
+      "documento_id": "c60a2972ca",
+      "titulo": "Ocupações permitidas ao MEI",
+      "nota": "Página curta do portal (1,5 mil caracteres); o GT descreve a tabela do Anexo XI da CGSN 140."
+    },
+    "cal-portaria-11460": {
+      "documento_id": null,
+      "nota": "O GT descreve 'Portaria RFB 11.460/2026, calendário de obrigações'. O documento de mesmo número (d7faa29ce4) é a Portaria MGI 11.460/2025, de feriados e ponto facultativo. O texto de data/raw/recorte_demo é de demonstração."
+    },
+    "df-comunicado-nfs": {
+      "documento_id": "76275b753a",
+      "nota": "Complemento oficial."
+    },
+    "df-decreto-25508": {
+      "documento_id": "39235835ae",
+      "nota": "Liberado em 07/11/2026 após revisão do filtro; só em knowledge_base_v2.",
+      "titulo": "Decreto DF nº 25.508/2005"
+    },
+    "df-decreto-43982": {
+      "documento_id": "0ac75e297f",
+      "nota": "Texto oficial do SINJ: trata do sistema de gestão do ISS, não do ICMS. Vem do complemento oficial, fora do recorte público."
+    },
+    "df-faq-iss": {
+      "documento_id": "8ffcf3a7e0",
+      "nota": "Complemento oficial."
+    },
+    "df-manual-retencao": {
+      "documento_id": "db40e91463",
+      "nota": "Complemento oficial."
+    },
+    "df-retencao-iss": {
+      "documento_id": "af733a9d88",
+      "nota": "Complemento oficial."
+    },
+    "jur-carf-pejotizacao": {
+      "documento_id": null,
+      "nota": "O texto de data/raw/recorte_demo é de demonstração e não comprova um acórdão real. Sem fonte oficial coletada."
+    },
+    "jur-stj-prescricao": {
+      "documento_id": null,
+      "nota": "O texto de data/raw/recorte_demo é de demonstração e não comprova um acórdão real. Sem fonte oficial coletada; o Informativo 872 respondeu 403."
+    },
+    "man-perguntas-simples": {
+      "documento_id": "8d4398a7d9",
+      "titulo": "Perguntas e respostas — Simples Nacional",
+      "nota": "Liberado em 07/11/2026 após revisão do filtro; só em knowledge_base_v2."
+    },
+    "sped-ecd-manual": {
+      "documento_id": "9fc18961ed",
+      "nota": "Liberado em 07/11/2026 após revisão do filtro; só em knowledge_base_v2.",
+      "titulo": "ecd — manual/guia Leiaute 9"
+    },
+    "sped-ecf-manual": {
+      "documento_id": "74b712b843",
+      "nota": "Liberado em 07/11/2026 após revisão do filtro; só em knowledge_base_v2.",
+      "titulo": "ecf — manual/guia Leiaute 12"
+    },
+    "df-decreto-43521": {
+      "documento_id": "c73cd99fd1",
+      "nota": "Art. 1º: 20% para uma lista específica (energia, comunicação, combustíveis), não é a alíquota geral."
+    },
+    "df-sc-31-2024": {
+      "documento_id": "33bf4c66ed",
+      "nota": "Item 17: alíquota geral do DF de 20% a partir de 22/01/2024."
+    }
+  }
+}

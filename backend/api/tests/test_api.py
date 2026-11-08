@@ -84,7 +84,7 @@ def test_http_response_includes_generated_answer_and_context_references(service)
         [
             models.PointStruct(
                 id=7,
-                vector=[1.0] + [0.0] * 1023,
+                vector={"dense": [1.0] + [0.0] * 1023},
                 payload={
                     "text": "Documento técnico de teste",
                     "source": "Manual",

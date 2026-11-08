@@ -21,15 +21,17 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
-      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
-      TOP_K: ${TOP_K:-5}
+      TOP_K: ${TOP_K:-8}
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
       QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
       OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
       NUM_CTX: ${NUM_CTX:-8192}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
-      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-6000}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-http://reranker:8080}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
     depends_on:
       - qdrant
     healthcheck:
@@ -40,5 +42,14 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  reranker:
+    build:
+      context: ./reranker
+    gpus: all
+    volumes:
+      - reranker_modelos:/modelos
+    restart: unless-stopped
+
 volumes:
   qdrant_data:
+  reranker_modelos:

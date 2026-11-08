@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Date: Thu, 05 Nov 2026 23:08:22 GMT
+Server: Zope/(2.13.22, python 2.7.3, linux2) ZServer/1.1
+X-Cache-Operation: plone.app.caching.moderateCaching
+Content-Language: pt-br
+Expires: Mon, 07 Nov 2016 22:08:22 GMT
+Vary: Accept-Encoding
+X-Ua-Compatible: IE=edge,chrome=1
+X-Cache-Rule: plone.content.itemView
+Content-Type: text/html;charset=utf-8
+Cache-Control: max-age=0, s-maxage=0, must-revalidate
+X-Varnish: 1348476949
+Via: 1.1 varnish
+X-Cache: MISS
+X-Varnish-Age: 0
+Age: 0
+Transfer-Encoding: chunked
+

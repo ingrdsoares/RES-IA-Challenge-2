@@ -1,0 +1,25 @@
+{
+ "tipoPesquisa": "formulario",
+ "termo": "",
+ "tipoData": "dataPublicacao",
+ "dataInicio": "",
+ "dataFim": "",
+ "anoAto": "2018",
+ "numeroAto": "1750",
+ "apenasAtosVigentes": false,
+ "apenasAtosInternos": false,
+ "publicado": true,
+ "internet": true,
+ "orgaosSelecionados": "",
+ "tiposAtosSelecionados": "57;65",
+ "refino": {
+  "tipoAtoFacet": "",
+  "siglaOrgaoFacet": "",
+  "anoAtoFacet": "",
+  "idTipoAtoFacet": ""
+ },
+ "ordenacaoColuna": "publicacao",
+ "ordenacaoDirecao": "desc",
+ "paginacaoPaginaAtual": 1,
+ "paginacaoQuantidadePorPagina": 5
+}

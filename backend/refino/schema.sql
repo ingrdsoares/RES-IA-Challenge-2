@@ -11,6 +11,7 @@ CREATE TABLE refino.documento (
     titulos jsonb NOT NULL,
     naturezas jsonb NOT NULL,
     representacao_preferida char(64),
+    etiquetas jsonb NOT NULL DEFAULT '[]',
     criterio_representacao text NOT NULL
 );
 CREATE TABLE refino.conteudo (
@@ -51,7 +52,7 @@ CREATE TABLE refino.classificacao (
     ocorrencia_id char(64) NOT NULL REFERENCES refino.ocorrencia(id),
     politica_sha256 char(64) NOT NULL REFERENCES refino.politica(sha256),
     categoria text NOT NULL CHECK (categoria IN (
-        'nucleo','complementar','historico','revisao','evidencia','dados_estruturados')),
+        'nucleo','complementar','historico','revisao','evidencia','dados_estruturados','apoio')),
     motivos jsonb NOT NULL,
     PRIMARY KEY (ocorrencia_id, politica_sha256)
 );

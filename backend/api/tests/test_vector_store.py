@@ -25,7 +25,7 @@ def test_collection_is_created_empty_and_preserved(client):
         [
             models.PointStruct(
                 id=1,
-                vector=[1.0] + [0.0] * 1023,
+                vector={"dense": [1.0] + [0.0] * 1023},
                 payload={"text": "Documento de teste", "source": "Manual de teste"},
             )
         ],
@@ -37,8 +37,10 @@ def test_collection_is_created_empty_and_preserved(client):
 @pytest.mark.parametrize(
     "vectors",
     [
-        models.VectorParams(size=512, distance=models.Distance.COSINE),
-        models.VectorParams(size=1024, distance=models.Distance.DOT),
+        models.VectorParams(size=1024, distance=models.Distance.COSINE),
+        {"dense": models.VectorParams(size=512, distance=models.Distance.COSINE)},
+        {"dense": models.VectorParams(size=1024, distance=models.Distance.DOT)},
+        {"dense": models.VectorParams(size=1024, distance=models.Distance.COSINE)},
         {"named": models.VectorParams(size=1024, distance=models.Distance.COSINE)},
     ],
 )
@@ -78,7 +80,7 @@ def test_search_discards_bad_payloads_and_applies_threshold_and_limit(client):
         [
             models.PointStruct(
                 id=i + 1,
-                vector=([1.0] + [0.0] * 1023 if i < 4 else [0.0, 1.0] + [0.0] * 1022),
+                vector={"dense": ([1.0] + [0.0] * 1023 if i < 4 else [0.0, 1.0] + [0.0] * 1022)},
                 payload=payload,
             )
             for i, payload in enumerate(payloads)
@@ -111,7 +113,7 @@ def test_non_iso_date_payload_is_discarded_before_generation(client, field, valu
         [
             models.PointStruct(
                 id=1,
-                vector=vector,
+                vector={"dense": vector},
                 payload={"text": "Trecho", "source": "Manual", field: value},
             )
         ],

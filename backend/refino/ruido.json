@@ -1,0 +1,97 @@
+{
+  "versao": 1,
+  "regra": "Só sai linha inteira igual ao texto (após strip). 'exige' lista metadados que o índice precisa manter para a remoção valer; 'medido' registra a contagem de conteúdos e um exemplo do levantamento sobre o corpus refinado.",
+  "regras": [
+    {
+      "id": "fotografia-visoes",
+      "texto": "> Fotografia das visões da fonte. Não inferir vigência nem datas de produção de efeitos. Revisão humana pendente.",
+      "motivo": "Fotografia das visões da fonte: aviso editorial da coleta. A visão continua no campo visao de ocorrencias.jsonl.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 1956, "linhas": 1956, "exemplo": "00047e64244535651b769a6f1dc565e7f2c73e8a31d74a63f49b1213d3f16bb4"}
+    },
+    {
+      "id": "revisao-tarf",
+      "texto": "> Revisão humana pendente. Vigência e aplicabilidade não verificadas. TARF: ementa e decisão disponibilizadas pelo catálogo; não equivale ao inteiro teor do voto.",
+      "motivo": "Revisão humana pendente: aviso editorial do catálogo TARF sobre o alcance do texto.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 1462, "linhas": 1462, "exemplo": "0000f595b9052c4644399ed4b5c8e774e7d7c48b0460c1593ac2d8caaafbb477"}
+    },
+    {
+      "id": "revisao-interpretacao",
+      "texto": "> Interpretação administrativa. Ementa e segmentos da fonte; o campo integro da API não comprova a disponibilidade do texto integral. Anexos, quando disponíveis, seguem abaixo. Revisão humana pendente.",
+      "motivo": "Revisão humana pendente: aviso da coleta sobre a integridade do campo da API.",
+      "exige": ["revisao_semantica"],
+      "medido": {"arquivos": 1781, "linhas": 1781, "exemplo": "0008a626196c82f0f145b24e1c76e106f688469e450808d57de1406dc40ca9c1"}
+    },
+    {
+      "id": "revisao-diarios",
+      "texto": "> Vigência e aplicabilidade não verificadas. Revisão humana pendente. Diários são páginas integrais, não pareceres individualizados.",
+      "motivo": "Revisão humana pendente: aviso editorial sobre diários oficiais.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 148, "linhas": 148, "exemplo": "01123c309703fc07c6d9436fcb445acbb42f15e820489b2c04286f3ffdf42551"}
+    },
+    {
+      "id": "derivado-original",
+      "texto": "> Derivado de original preservado. Conversão não certifica fidelidade, vigência ou aplicabilidade; revisão humana pendente.",
+      "motivo": "Derivado de original preservado: aviso de conversão. O original permanece na coleta e no hash da fonte.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 382, "linhas": 382, "exemplo": "0051c1b6a26fa984b7bd757102211d9f92f718a050afe92d149f11d04c05ab1b"}
+    },
+    {
+      "id": "vigencia-planilha",
+      "texto": "> Vigência não verificada; revisão humana pendente. Valores e coordenadas originais preservados; mesclagens não são preenchidas automaticamente. Fórmulas são preservadas sem recalcular; valores em cache podem estar vazios.",
+      "motivo": "Vigência não verificada: aviso de planilha convertida. Vigência segue em metadados do índice.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 13, "linhas": 13, "exemplo": "063459f6504406bd166ffc02c916b98e89e6700f474007ba1db1ef3adb711761"}
+    },
+    {
+      "id": "vigencia-coleta-pesquisa",
+      "texto": "> Coleta para pesquisa. Vigência não verificada; revisão humana pendente. Leis alteradoras não equivalem à LC 123 consolidada.",
+      "motivo": "Vigência não verificada: aviso editorial de coleta para pesquisa. Vigência segue em metadados do índice.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 9, "linhas": 9, "exemplo": "04801890af6d648b4bbaf6c5d9217add6e1e94a2488dbebb160af816ea52ac68"}
+    },
+    {
+      "id": "vigencia-distrito",
+      "texto": "> Distrito Federal. Vigência não verificada; revisão humana pendente. Texto histórico e tachados preservados; coleta não define qual versão se aplica. Manuais e páginas de serviço são orientação. PDF: tabelas, imagens e telas exigem conferência no original.",
+      "motivo": "Vigência não verificada: aviso editorial de página do DF. Vigência segue em metadados do índice; tachados do texto não são afetados.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 8, "linhas": 8, "exemplo": "0890dfd009618d618f6fc86a5b61b417e3beccca9d90a5985178887f2190e639"}
+    },
+    {
+      "id": "vigencia-fotografia",
+      "texto": "> Vigência não verificada; fotografia da página oficial.",
+      "motivo": "Vigência não verificada: aviso editorial de fotografia de página. Vigência segue em metadados do índice.",
+      "exige": ["vigencia"],
+      "medido": {"arquivos": 5, "linhas": 5, "exemplo": "1c6581365a2f1919380d830c59ff8cc3e63821997c3116273533a62ac43afb59"}
+    },
+    {
+      "id": "visao-publicada",
+      "texto": "> Visão publicada preservada. Vigência não verificada; revisão humana pendente.",
+      "motivo": "Vigência não verificada: aviso editorial de visão publicada. Vigência segue em metadados do índice.",
+      "exige": ["vigencia", "revisao_semantica"],
+      "medido": {"arquivos": 4, "linhas": 4, "exemplo": "3351136706fb623bb3899f05ccc9216a2d26df9a072154c3af9b10272b932314"}
+    },
+    {
+      "id": "menu-portal",
+      "texto": "Portal de Serviços da Receita - Secretaria de Estado de Economia do Distrito Federal",
+      "motivo": "Menu do portal da página de origem: navegação, não texto da norma.",
+      "exige": [],
+      "medido": {"arquivos": 475, "linhas": 475, "exemplo": "0000f595b9052c4644399ed4b5c8e774e7d7c48b0460c1593ac2d8caaafbb477"}
+    },
+    {
+      "id": "menu-entrar",
+      "texto": "[Entrar](https://ww1.receita.fazenda.df.gov.br/area-restrita)",
+      "motivo": "Menu de acesso da página de origem: link de navegação, não texto da norma.",
+      "exige": [],
+      "medido": {"arquivos": 475, "linhas": 475, "exemplo": "0000f595b9052c4644399ed4b5c8e774e7d7c48b0460c1593ac2d8caaafbb477"}
+    },
+    {
+      "id": "menu-cadastre-se",
+      "texto": "[Cadastre-se](https://ww1.receita.fazenda.df.gov.br/acesso/primeiro-acesso)",
+      "motivo": "Menu de cadastro da página de origem: link de navegação, não texto da norma.",
+      "exige": [],
+      "medido": {"arquivos": 475, "linhas": 475, "exemplo": "0000f595b9052c4644399ed4b5c8e774e7d7c48b0460c1593ac2d8caaafbb477"}
+    }
+  ]
+}

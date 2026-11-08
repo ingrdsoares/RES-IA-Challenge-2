@@ -34,6 +34,7 @@ Instale as dependências com `python -m pip install -r backend/crawler/requireme
 | [legislacao_complementar](legislacao_complementar.py) | coletor/comando | Textos oficiais complementares; coleta não comprova vigência. |
 | [manuais](manuais.py) | coletor/comando | Coleta manuais e perguntas e respostas oficiais do Simples Nacional/MEI. |
 | [mei](mei.py) | coletor/comando | Coleta orientações oficiais do Portal do Empreendedor em Markdown. |
+| [normas_citadas](normas_citadas.py) | coletor/comando | Coleta em até duas rodadas das normas citadas no acervo, com checkpoint, retomada e lista manual. |
 | [notas_cnae](notas_cnae.py) | coletor/comando | Notas explicativas integrais da CNAE-Subclasses 2.3, publicação IBGE 2020. |
 | [notas_tecnicas_fiscais](notas_tecnicas_fiscais.py) | coletor/comando | Recorte versionado de NT RTC e classificações oficiais NF-e/NFS-e/NBS. |
 | [obrigacoes](obrigacoes.py) | coletor/comando | Coleta mensal da agenda tributária federal e orientações declaratórias. |

@@ -1,100 +1,123 @@
 # Estratégia de Chunking Hierárquico Jurídico — Sócio Digital
 
-> **Frente:** Ciência de Dados  
-> **Responsável:** Jhessica  
-> **Projeto:** Sócio Digital — RES-IA Challenge 2  
-> **Versão:** 2.0 (Alinhada ao Plano de Entrega de 09/11/2026)  
-> **Status:** Implementada e Validada em `src/rag/chunker.py`
+> **Frente:** Ciência de Dados
+> **Responsável:** Jhessica
+> **Projeto:** Sócio Digital — RES-IA Challenge 2
+> **Versão:** 3.0 (base `knowledge_base_v2`, 07/11/2026)
+> **Status:** Implementada em `src/rag/chunker.py` e `src/rag/csv_para_qdrant.py`
 
 ---
 
 ## 1. Contexto e Motivação do Chunking Especializado
 
-Na área tributária e legislativa brasileira, o **"chunking ingênuo"** (divisão cega baseada puramente em contagem arbitrária de caracteres ou quebras de parágrafos simples) acarreta falhas severas na recuperação e fundamentação (RAG):
+Na área tributária e legislativa brasileira, o **"chunking ingênuo"** (divisão cega por contagem de caracteres ou quebras de parágrafo) acarreta falhas na recuperação e na fundamentação das respostas:
 
-1. **Fracionamento de Dispositivos Legais:** Um parágrafo (§) ou inciso (I, II, III) desvinculado do seu caput perde o sujeito jurídico, tornando a norma ininteligível para o modelo de linguagem (LLM).
-2. **Perda de Contexto Hierárquico:** Ao recuperar um trecho que menciona apenas *"na hipótese de não ter ultrapassado em mais de 20%"*, o sistema não sabe se a regra se refere ao MEI, ao Simples Nacional ou a outro tributo.
-3. **Cortes Abruptos de Tabelas e Fórmulas:** Disposições numéricas de alíquotas (ex.: faixas de faturamento e Fator R) precisam ser preservadas íntegras.
+1. **Fracionamento de dispositivos legais:** um parágrafo (§) ou inciso desvinculado do seu caput perde o sujeito jurídico.
+2. **Perda de contexto hierárquico:** um trecho que diz apenas *"na hipótese de não ter ultrapassado em mais de 20%"* não informa se a regra é do MEI, do Simples Nacional ou de outro tributo.
+3. **Cortes de tabelas e listas:** faixas de faturamento, alíquotas e listas de incisos precisam ficar íntegras sempre que possível.
 
-Para superar essas fragilidades, desenvolvemos o **LegalHierarchicalChunker**, uma abordagem de chunking com consciência normativa e injeção de contexto.
+Para isso, usamos o **LegalHierarchicalChunker**, que segmenta por artigo e injeta no início de cada trecho o contexto da norma.
 
 ---
 
-## 2. Parâmetros e Regras Oficiais de Segmentação
+## 2. Parâmetros de Segmentação
 
-Conforme homologado no Plano de Entrega de 09/11/2026, os parâmetros técnicos adotados são:
-
-| Parâmetro | Valor Oficial | Justificativa Técnica |
+| Parâmetro | Valor | Justificativa |
 |---|---|---|
-| **Tamanho Máximo por Chunk** | **2.000 caracteres** | Limite superior calibrado para acomodar o artigo completo com caput e parágrafos sem estourar a janela de contexto de 8.192 tokens do Qwen3 8B. |
-| **Sobreposição (Overlap)** | **200 caracteres** | Margem de continuidade semântica aplicada nas transições de artigos longos ou seções de manuais. |
-| **Tamanho Mínimo de Chunk** | **150 caracteres** | Descarte ou fusão de fragmentos excessivamente curtos que causariam ruído de indexação. |
-| **Injeção de Contexto (Context Injection)** | **Ativa (Obrigatória)** | Injeção sistemática de cabeçalho estruturado no início de cada chunk. |
-| **Enriquecimento com Tags Fiscais** | **Ativo (15 categorias)** | Detecção de termos tributários canônicos (MEI, Fator R, CPEN, DASN, ISS/DF). |
+| **Unidade principal** | Artigo, com seus parágrafos e incisos | Mantém caput, parágrafos e incisos juntos sempre que cabem no limite |
+| **Tamanho máximo do corpo** | **2.000 caracteres** | Cabe com folga no contexto do `qwen3:8b`, que recebe até 8 trechos e 12.000 caracteres por pergunta |
+| **Sobreposição** | **200 caracteres** | Continuidade entre fatias quando um artigo ou seção ultrapassa o limite |
+| **Cabeçalho de contexto** | Obrigatório | Norma, capítulo, artigo e tema no início de cada trecho |
+| **Documentos sem artigos** | Divisão por seções Markdown | Manuais, perguntas frequentes, consultas e acórdãos |
 
 ---
 
-## 3. Mecanismo de Injeção de Contexto (Context Injection)
+## 3. Limpeza antes da Segmentação
 
-Todo chunk gerado pelo pipeline recebe um cabeçalho explícito antes do corpo do texto. Esse cabeçalho ancora a representação vetorial gerada pelo modelo `qwen3-embedding:0.6b` (1024 dimensões) e fornece ao LLM `qwen3:8b` as coordenadas exatas da norma:
+Antes de fatiar, o texto coletado passa por limpezas que não alteram o conteúdo normativo:
+
+- **Cabeçalhos de segmento repetidos:** as marcas `## Segmento N — versão M` do refino e os segmentos idênticos repetidos no mesmo documento são removidos. Antes da limpeza, quase metade dos trechos tinha esses cabeçalhos.
+- **Texto riscado:** trechos tachados (revogados ou alterados na fonte) saem do texto usado para busca. O original com as marcas fica guardado no campo `texto_com_rasuras`. Trecho totalmente riscado, ou que sobra só com o número do artigo, não é indexado.
+- **Rótulo de artigo:** só conta como início de artigo a forma `Art.` ou `ART.` em início de linha. Uma citação como "art. 8º da LC 87" dentro do texto não abre artigo novo.
+- **Páginas sem conteúdo:** as 11 páginas de login do CARF coletadas no lugar de súmulas são descartadas na carga.
+
+---
+
+## 4. Cabeçalho de Contexto
+
+Todo trecho recebe um cabeçalho antes do corpo. Ele orienta o embedding e diz ao modelo de linguagem de onde o texto veio. Exemplo real da coleção:
 
 ```text
-[DOCUMENTO: leg-lc123 | FONTE: Lei Complementar nº 123/2006 | CAPÍTULO: DOS TRIBUTOS E CONTRIBUIÇÕES | ARTIGO: Art. 18 | PARÁGRAFO: § 5º-J | TEMA: Art. 18]
-Contexto do Artigo: O valor devido mensalmente pela microempresa e empresa de pequeno porte comercial, optante pelo Simples Nacional...
-As atividades de prestação de serviços de perícia, leilão, avaliação, medicina, odontologia, psicologia, fisioterapia, advocacia, engenharia, arquitetura, desenvolvimento de programas de computador e licenciamento, tecnologia da informação e comunicação serão tributadas na forma do Anexo III desta Lei Complementar caso a razão entre a folha de salários e a receita bruta da pessoa jurídica (Fator R) seja igual ou superior a 28%...
+[DOCUMENTO: lei_complementar_nº_116_de_31_de_julho_de_2003_iss_e_lista_de_serviços | FONTE: Lei Complementar nº 116, de 31 de julho de 2003 — ISS e lista de serviços | CAPÍTULO: Geral | ARTIGO: Art. 7º | TEMA: Art. 7º]
+Art.
+7º A base de cálculo do imposto é o preço do serviço.
+
+§
+1º Quando os serviços descritos pelo subitem 3.04 da lista anexa
+forem prestados no território de mais de um Município, a base de
+cálculo será proporcional [...]
 ```
 
-### Vantagens do Cabeçalho Contextual:
-- **Similaridade Semântica Aumentada:** Consultas contendo termos como *"Artigo 18 da Lei Complementar 123"* ou *"Fator R"* ativam diretamente os tokens do cabeçalho.
-- **Rastreabilidade Completa:** Permite ao backend devolver instantaneamente `source`, `document_id`, `artigo` e `chunk_id` na rota `/rag/query`.
-- **Eliminação de Alucinações:** O LLM cita com precisão o diploma e dispositivo, sem misturar leis distintas.
+### Vantagens do cabeçalho
+- **Busca por norma e artigo:** perguntas como *"o que diz o art. 7º da LC 116"* encontram o trecho pelos termos do cabeçalho.
+- **Rastreabilidade:** a rota `/rag/query` devolve `source`, `title`, `document_id`, `chunk_id` e `score` de cada trecho usado.
+- **Atribuição correta:** o modelo cita a norma pelo título do documento, e não por uma norma apenas mencionada no texto.
 
 ---
 
-## 4. Fluxo de Decisão do Chunker
+## 5. Fluxo de Decisão
 
 ```mermaid
 flowchart TD
-    A[Documento de Entrada Markdown/Texto] --> B{Possui estrutura de Artigos Art. X?}
-    
-    B -- Sim --> C[Segmentação por Blocos de Artigos]
-    C --> D{Tamanho <= 2.000 chars?}
-    D -- Sim --> E[Gera Chunk Único do Artigo com Injeção de Cabeçalho]
-    D -- Não --> F[Subdivide por Parágrafos preservando Caput como Âncora]
-    F --> G{Parágrafo <= 2.000 chars?}
-    G -- Sim --> H[Gera Sub-chunk do Parágrafo com Cabeçalho + Caput]
-    G -- Não --> I[Janela Deslizante de 2.000 chars com 200 de Overlap]
-    
-    B -- Não (Manuais/FAQs/Acórdãos) --> J[Segmentação por Cabeçalhos Markdown ## e ###]
-    J --> K{Seção <= 2.000 chars?}
-    K -- Sim --> L[Gera Chunk da Seção com Cabeçalho Temático]
-    K -- Não --> M[Janela Deslizante de 2.000 chars com 200 de Overlap]
-    
-    E --> N[Extração de Tags Fiscais & Formatação Source Qdrant]
-    H --> N
-    I --> N
-    L --> N
-    M --> N
+    A[Documento do recorte] --> L[Limpeza: segmentos repetidos e páginas de login]
+    L --> B{Tem artigos no formato Art. X?}
+    B -- Sim --> C[Um bloco por artigo, com parágrafos e incisos]
+    B -- Não --> J[Um bloco por seção Markdown]
+    C --> R[Remove texto riscado; guarda o original]
+    J --> R
+    R --> D{Corpo até 2.000 caracteres?}
+    D -- Sim --> E[Um trecho]
+    D -- Não --> F[Fatias de até 2.000 caracteres, com 200 de sobreposição]
+    E --> H[Cabeçalho de contexto + metadados]
+    F --> H
+    H --> Q[Ponto no Qdrant]
 ```
 
 ---
 
-## 5. Suporte a Documentos Estruturados Sem Artigos
+## 6. Metadados de Cada Trecho
 
-Para o acervo que não segue a técnica legislativa clássica (como os Manuais do PGDAS-D, Manuais do SPED, Perguntas Frequentes da SEFAZ-DF e Acórdãos do CARF/STJ):
+| Campo | Conteúdo | Uso |
+|---|---|---|
+| `text` | Cabeçalho e corpo do trecho | Texto entregue ao modelo |
+| `title`, `source` | Título e endereço de origem do documento | Citação da fonte |
+| `document_id`, `chunk_id` | Identificadores do documento e do trecho | Rastreabilidade |
+| `norma` | Chave da norma, como `lc:116` ou `decreto:43982` | Busca da norma citada na pergunta |
+| `artigo` | Número do artigo, como `7` ou `13-a` | Busca direta do artigo citado |
+| `ordem` | Posição do trecho no documento | Completar trecho cortado com o seguinte |
+| `frente`, `natureza` | Frente de coleta e tipo de documento | Análise e filtros |
+| `texto_com_rasuras` | Original com texto riscado, quando houver | Conferência |
 
-1. **Divisão por Seções:** A segmentação é guiada pelas marcações de nível markdown (`#`, `##`, `###`).
-2. **Contexto da Seção:** O título da seção é injetado como metadado de tema e cabeçalho (`[DOCUMENTO: ... | FONTE: ... | SEÇÃO: ...]`).
-3. **Janela Deslizante Segura:** Se a seção ultrapassar 2.000 caracteres, a divisão procura quebras naturais de parágrafo ou espaços para nunca cortar termos no meio, mantendo 200 caracteres de repetição entre fatias consecutivas.
+Quando um trecho escolhido termina em dois-pontos, como "nos seguintes termos:", a API acrescenta o trecho seguinte do mesmo documento, usando o campo `ordem`. Isso acontece em cerca de 5% dos trechos.
 
 ---
 
-## 6. Resultados Quantitativos no Recorte de 46 Documentos
+## 7. Resultados na Base Atual
 
-Na execução oficial sobre os 46 documentos centrais da demonstração:
-- **Total de Documentos Ingeridos:** 46
-- **Total de Chunks Gerados:** 132
-- **Tamanho Médio de Chunk:** 680 caracteres
-- **Maior Chunk:** 1.840 caracteres (dentro do limite estrito de 2.000 caracteres)
-- **Taxa de Integridade:** 100% dos chunks com `document_id`, `source`, `chunk_id` e tags fiscais mapeadas.
+Fatiamento de toda a base `knowledge_base_v2`:
 
+| Indicador | Valor |
+|---|---:|
+| Documentos | 4.026 |
+| Trechos indexados | 155.781 |
+| Trechos com artigo identificado | 112.711 (72%) |
+| Trechos em que texto riscado foi removido | 11.569 |
+| Trechos descartados por estarem totalmente riscados | 69 |
+| Tamanho médio, com cabeçalho | 1.263 caracteres |
+| Mediana | 1.295 caracteres |
+| 95% dos trechos até | 1.972 caracteres |
+| Maior trecho, com cabeçalho | 2.200 caracteres |
+
+O corpo nunca passa de 2.000 caracteres; os valores acima incluem o cabeçalho. A base anterior, `knowledge_base`, tinha 176.529 trechos; a diferença vem sobretudo da remoção de segmentos repetidos.
+
+O efeito na recuperação e nas respostas está em `docs/avaliacao-rag-2026-11-07.md`.

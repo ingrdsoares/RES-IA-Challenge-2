@@ -22,6 +22,8 @@
   * [Metodologia e Entregas](metodologia.md)
   * [Exploração de Dados](exploracao-dados.md)
   * [Arquitetura do Crawler](crawler-arquitetura.md)
+  * [Arquitetura de Refino](arquitetura-refino.md)
+  * [Sumarização do Acervo Tributário](sumarizacao-acervo-tributario.md)
 
 * **Entregáveis**
   * [Download: Entregas da Equipe (PDF)](status-entregas-equipe-grupo-08.pdf)

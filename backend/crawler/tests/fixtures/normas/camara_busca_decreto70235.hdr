@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+server: envoy
+date: Thu, 05 Nov 2026 22:59:50 GMT
+content-type: text/html; charset=utf-8
+referrer-policy: origin-when-cross-origin
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+vary: Accept-Encoding
+x-cache-status: MISS
+x-envoy-upstream-service-time: 101
+transfer-encoding: chunked
+

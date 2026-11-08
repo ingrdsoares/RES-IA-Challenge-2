@@ -12,7 +12,7 @@ def add_document(service, text="Texto de teste", vector=None):
         [
             models.PointStruct(
                 id=1,
-                vector=vector or [1.0] + [0.0] * 1023,
+                vector={"dense": vector or [1.0] + [0.0] * 1023},
                 payload={"text": text, "source": "Manual de teste"},
             )
         ],
@@ -49,7 +49,7 @@ def test_complete_rag_returns_only_bounded_context(service):
     assert response.status == "answered"
     assert response.answer == "Orientação [1]"
     assert response.sources[0].id == 1
-    assert 0 < len(response.sources[0].text) < 2000
+    assert 0 < len(response.sources[0].text) < 4000
 
 
 def test_query_failure_releases_lock(service, monkeypatch):

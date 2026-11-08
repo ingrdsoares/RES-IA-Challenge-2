@@ -26,7 +26,7 @@ def test_real_qdrant_search_survives_client_reconnect():
             [
                 models.PointStruct(
                     id=1,
-                    vector=vector,
+                    vector={"dense": vector},
                     payload={
                         "text": "Documento sintético de teste",
                         "source": "Teste de integração",

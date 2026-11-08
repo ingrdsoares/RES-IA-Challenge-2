@@ -1,0 +1,20 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 05 Nov 2026 22:53:38 GMT
+Content-Type: application/xml
+Content-Length: 945
+Connection: keep-alive
+access-control-allow-credentials: true
+access-control-allow-methods: GET,POST,OPTIONS,HEAD
+access-control-allow-headers: X-Requested-With, Authorization, Accept, Accept-Version, Content-MD5, CSRF-Token, Content-Type
+access-control-allow-origin: *
+vary: accept, accept-encoding, X-API-Key
+content-security-policy: default-src 'self' blob:; connect-src 'self' data: blob: *.senado.gov.br *.senado.leg.br esm.sh; script-src 'self' 'unsafe-inline' data: blob: *.senado.gov.br *.senado.leg.br esm.sh; style-src 'self' 'unsafe-inline' *.senado.gov.br *.senado.leg.br esm.sh; font-src 'self' data: *.senado.gov.br *.senado.leg.br esm.sh; img-src 'self' data: blob: *.senado.gov.br *.senado.leg.br; object-src 'none'; base-uri 'self'; form-action 'self' *.senado.gov.br *.senado.leg.br; frame-ancestors 'self' *.senado.gov.br *.senado.leg.br; block-all-mixed-content; upgrade-insecure-requests;
+cache-control: max-age=3600, s-maxage=3600
+Age: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Accept-Ranges: bytes
+

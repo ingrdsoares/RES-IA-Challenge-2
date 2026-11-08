@@ -1,0 +1,599 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="apple-itunes-app" content="app-id=1049343067" />
+    <meta name="google-play-app" content="app-id=br.leg.camara.infolegmovel" />
+    <script>
+      (function () {
+        let initialized = false;
+        let loading = false;
+
+        function ensureBody(callback) {
+          if (document.body) {
+            callback();
+          } else {
+            setTimeout(() => ensureBody(callback), 50);
+          }
+        }
+
+        function loadScript() {
+          if (loading || window.VLibras) return;
+          loading = true;
+
+          ensureBody(() => {
+            const s = document.createElement("script");
+            s.src = "https://vlibras.gov.br/app/vlibras-plugin.js";
+            s.onload = initVLibras;
+            document.body.appendChild(s);
+          });
+        }
+
+        function initVLibras() {
+          if (initialized || !window.VLibras) return;
+
+          ensureBody(() => {
+            if (!document.querySelector("[vw]")) {
+              const container = document.createElement("div");
+              container.innerHTML = `
+              <div vw class="enabled">
+                <div vw-access-button class="active"></div>
+                <div vw-plugin-wrapper>
+                  <div class="vw-plugin-top-wrapper"></div>
+                </div>
+              </div>
+            `;
+              document.body.appendChild(container);
+            }
+
+            (new window.VLibras.Widget(
+              "https://vlibras.gov.br/app",
+              "https://vlibras.gov.br/config/camara.json",
+            ),
+              $("body").append(
+                '<aside><div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div></aside>',
+              ));
+            initialized = true;
+
+            injectCSS();
+            if (!window.location.pathname.includes("/comissoes")) {
+              bindButton();
+            }
+          });
+        }
+
+        function injectCSS() {
+          if (document.getElementById("vlibras-style")) return;
+          const style = document.createElement("style");
+          style.id = "vlibras-style";
+          style.innerHTML = `
+          [vw-access-button] { display: none !important; }
+          div[vw] { z-index: 999999 !important; }
+        `;
+          document.head.appendChild(style);
+        }
+
+        function bindButton() {
+          const btn = document.getElementById("meu-botao-vlibras");
+          if (!btn) {
+            setTimeout(bindButton, 300);
+            return;
+          }
+
+          btn.onclick = function (e) {
+            e.preventDefault();
+            const original = document.querySelector("[vw-access-button]");
+            if (original) original.click();
+          };
+        }
+
+        // OBSERVA MUTA&#199;&#213;ES DO DOM (ESSENCIAL NO PLONE)
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector("[vw]") && !initialized) {
+            loadScript();
+          }
+        });
+
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+        });
+
+        window.addEventListener("load", loadScript);
+      })();
+    </script>
+
+    <title>Portal da Câmara dos Deputados</title>
+  <style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/member-cachekey-46bb2e0fc9968a457e63f356c0ff3900.css);</style><style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/portlets-cachekey-8a45f49b338591ae0c9c8a91f261dc78.css);</style><style type="text/css" media="screen">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/deprecated-cachekey-32595b622b36f2eee9478f07796d4f67.css);</style><style type="text/css" media="screen">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/resourceplone.app.discussion.stylesheetsdiscussion-cachekey-5b23f388acd88bdb65020b51a5a278fb.css);</style><style type="text/css">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/elements-cachekey-57e40a70bd8192a6f63782abff5c2748.css);</style><style type="text/css" media="all">@import url(https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/ploneCustom-cachekey-7fb44e17264e070fccf4e31d9f2ada1c.css);</style><link rel="stylesheet" type="text/css" href="https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/themecamara.leg.viradadigitalcsslibsbootstrap-datetimepicker.min-cachekey-ab2d257c1b49d2d194633e2ecb4564a2.css" /><link rel="stylesheet" type="text/css" href="https://www.camara.leg.br/tema/global/camara-custom.css" /><link rel="stylesheet" type="text/css" href="https://www2.camara.leg.br/portal_css/camara_leg_viradadigital/++theme++camara.leg.viradadigital/css/all.min.css" /><link rel="apple-touch-icon" sizes="180x180" href="https://www.camara.leg.br/tema/apple-touch-icon.png" /><link rel="icon" type="image/png" sizes="32x32" href="https://www.camara.leg.br/tema/favicon-32x32.png" /><link rel="icon" type="image/png" sizes="16x16" href="https://www.camara.leg.br/tema/favicon-16x16.png" /><link rel="manifest" href="https://www.camara.leg.br/tema/site.webmanifest" /><link rel="mask-icon" href="https://www.camara.leg.br/tema/safari-pinned-tab.svg" color="#009e49" /><link rel="search" href="http://www2.camara.leg.br/busca-geral" title="Buscar neste site" /><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/resourceplone.app.jquery-cachekey-3fa72abea58e1799bd3b0bc237335d45.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/styleswitcher-cachekey-9178d2d1bc80488214ac8d40a46c7bdf.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/impressaoIframes-cachekey-7de901cf3c737563606c12fa53b7a321.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/GoogleAnalyticsTracker.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/kss-bbb-cachekey-df10a37e7aa4176c3b122c2e3b0ee128.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/inline_validation-cachekey-35d4d75a94cdb17b403a636871dd92cb.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljsbootstrap.min-cachekey-c15df71e2ec454087fe4c4eab0ce9d3e.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsmoment.min-cachekey-860514b918ea422f7e82fa48125015c4.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsmoment-pt-br-cachekey-0aafba4fb000126f1ed0f6701186de00.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsbootstrap-datetimepicker.min-cachekey-fac2884b384d9c99236b26d0746facc4.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljslibsjquery.maskedinput.min-cachekey-e2f8b2523378532cc132594675b6dc6f.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljsacoes-tema-cachekey-a0084cf69f1785571a18f6a58a4986ac.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitaljscorrecoes-bootstrap-tema-cachekey-bd4c19550531506aa59d8b0aa7e8d6c5.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitalvendorjquery.mmenu.all-cachekey-f0e297313e30d6b2b2c2588ef23b5ef2.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsvd_correcoes-cachekey-52a3614631388ad9e07bf35264bc73d5.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsmmenu-correcoes-cachekey-8e45cc1e451978774afbfe2f5f1e95cf.js"></script><script type="text/javascript" src="https://www2.camara.leg.br/portal_javascripts/camara_leg_viradadigital/themecamara.leg.viradadigitalviradadigitaljsselecao-idioma-cachekey-998dbb210e1353a5d7f94011740ee16c.js"></script><meta name="msapplication-TileColor" content="#00a300" /><meta name="msapplication-TileImage" content="https://www.camara.leg.br/tema/mstile-144x144.png" /><meta name="theme-color" content="#009e49" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="canonical" href="" /><script type="text/javascript">
+          $("link[rel='canonical']").attr("href", window.location.href);
+        </script>
+
+
+
+
+
+
+
+<title>LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003 - Publicação Original - Portal Câmara dos Deputados</title>
+
+<meta name="description" content="Publicação de Lei Ordinária: Altera a Legislação Tributária Federal e dá outras providências. " />
+
+<!-- Coloque aqui sua referência ao CSS local -->
+<link rel="stylesheet" type="text/css" href="../../../_css/legislacao-v1.css" />
+
+<!-- Coloque aqui seu javascript -->
+<!-- script type="text/javascript" src="caminho-e-nome-do-arquivo.js"></script -->
+
+</head>
+<body>
+    <header class="l-cabecalho-portal" role="banner" id="portal-header">
+        <ul aria-label="Acesso direto" class="acesso-direto">
+          <!-- Links para saltar diretamente para &#225;reas importantes da p&#225;gina accesskey 2 = conte&#250;do e 3 = navega&#231;&#227;o -->
+          <li>
+            <a class="acesso-direto__link" href="#main-content" accesskey="2">Ir ao conteúdo</a>
+          </li>
+          <li>
+            <a class="acesso-direto__link" href="#main-nav" accesskey="3">Ir à navegação principal</a>
+          </li>
+        </ul>
+
+        <!--[if lte IE 9]>
+          <p class="browserupgrade">
+            Voc&#234; est&#225; usando um navegador <strong>defasado</strong>. Por favor,
+            <a href="https://browsehappy.com/">atualize seu navegador</a> para
+            melhorar sua experi&#234;ncia e sua seguran&#231;a.
+          </p>
+        <![endif]-->
+
+        <div class="nav-top">
+          <div class="container nav-top--container">
+            <a href="https://www2.camara.leg.br" class="logo-camara" accesskey="1"><span class="sr-only">Página inicial</span></a>
+
+            <div class="nav-top__palacio"></div>
+
+            <div class="nav-top__menu-superior">
+              <ul aria-label="Ferramentas de apoio" class="links-apoio">
+                <li class="links-apoio__item links-apoio__item--vlibras">
+                  <a id="meu-botao-vlibras" href="javascript:void(0);">
+                    <span>
+                      <img src="https://www.camara.leg.br/tema/assets/images/ico-vlibras-branco.png" alt="Ativar VLibras" width="28px" height="30px" />
+                    </span>
+                  </a>
+                </li>
+                <li class="links-apoio__item links-apoio__item--acessibilidade">
+                  <a href="https://www2.camara.leg.br/acessibilidade/recursos-de-acessibilidade" accesskey="0">Acessibilidade</a>
+                </li>
+                <li class="links-apoio__item links-apoio__item--faleconosco">
+                  <a href="https://www.camara.leg.br/fale-conosco" accesskey="9">Fale Conosco</a>
+                </li>
+              </ul>
+
+              <ul class="orgaos-parceiros" aria-label="Órgãos parceiros">
+                <li class="orgaos-parceiros__item orgaos-parceiros__item--congresso">
+                  <a href="http://www.congressonacional.leg.br"><span>Congresso</span></a>
+                </li>
+                <li class="orgaos-parceiros__item orgaos-parceiros__item--senado">
+                  <a href="http://www.senado.leg.br"><span>Senado</span></a>
+                </li>
+              </ul>
+
+              <div class="lista-idiomas">
+                <button class="botao-idioma-topo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="4,0">
+                  <span class="botao-idioma-topo__sigla">PT</span>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-right l-lista-idiomas" aria-label="Idioma">
+                  <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/english" class="idioma-topo">
+                      <span class="idioma-topo__bandeira idioma-topo__bandeira--ingles" aria-hidden="true"></span>
+                      <span class="idioma-topo__nome">English</span>
+                      <span class="idioma-topo__sigla">EN</span>
+                    </a>
+                  </li>
+                  <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/espanol" class="idioma-topo">
+                      <span class="idioma-topo__bandeira idioma-topo__bandeira--espanhol" aria-hidden="true"></span>
+                      <span class="idioma-topo__nome">Español</span>
+                      <span class="idioma-topo__sigla">ES</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="home-camara-menu">
+    <nav class="menu-global navbar navbar-expand-lg" role="navigation" aria-label="Navegação principal" id="menuglobal">
+      <div class="container menu-global--container">
+      
+
+        <a href="https://www.camara.leg.br" class="logo-camara" accesskey="1">
+          <span class="sr-only">Página inicial</span>
+        </a>
+
+      
+        
+        <!-- icone menu -->
+        <button class="menu-global--btnmenu navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarportal" aria-controls="navbarportal" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="menu-global--icon"></span>
+        </button>
+
+        <!-- icone busca -->
+        <button class="menu-global--btnsearch" type="button" data-toggle="collapse" data-target="#buscaportal" aria-controls="buscaportal" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="fa fa-search"></span>
+        </button>
+
+        <div class="navbar-collapse hidden-sm hidden-md hidden-xs" id="navbarportal">
+          <ul title="Navegação Principal" id="main-nav" class="navbar-nav">
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-temas nav-link dropdown-toggle" id="temas">Assuntos</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="temas">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/agropecuaria">Agropecuária</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/cidades-e-transportes">Cidades e transportes</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/ciencia-tecnologia-e-comunicacoes">Ciência, tecnologia e comunicações</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/consumidor">Consumidor</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/direitos-humanos">Direitos humanos</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/economia">Economia</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/educacao-cultura-e-esportes">Educação, cultura e esportes</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/meio-ambiente-e-energia">Meio ambiente e energia</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/politica-e-administracao-publica">Política e administração pública</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/relacoes-exteriores">Relações exteriores</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/saude">Saúde</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/seguranca">Segurança</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assuntos/trabalho-previdencia-e-assistencia">Trabalho, previdência e assistência</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-institucional nav-link dropdown-toggle" id="institucional">Institucional</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="institucional">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/agenda">Agenda</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/transparencia/servicos-ao-cidadao">Serviços</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/a-camara/estruturaadm/mesa/presidencia">Presidência</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/biblioteca-e-publicacoes/">Biblioteca e publicações</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/escola-da-camara/">Escola da Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/papel-e-estrutura/">Papel e estrutura</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/historia-e-arquivo/">História e arquivo</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/a-camara/visiteacamara">Visite</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-deputados nav-link dropdown-toggle" id="deputados">Deputados</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="deputados">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/deputados/quem-sao">Quem são</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/deputados/liderancas-e-bancadas-partidarias">Lideranças e bancadas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/deputados/frentes-e-grupos-parlamentares">Frentes e grupos parlamentares</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-atvlegislativa nav-link dropdown-toggle" id="atvlegislativa">Atividade Legislativa</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="atvlegislativa">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/busca-portal/proposicoes/pesquisa-simplificada">Propostas legislativas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/plenario">Plenário</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/comissoes">Comissões</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/sessoesereunioes">Sessões e reuniões</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/estudos-e-notas-tecnicas">Estudos legislativos</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/orcamento-da-uniao">Orçamento da União</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/legislacao">Legislação</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/entenda-o-processo-legislativo/">Entenda o processo legislativo</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/atividade-legislativa/participe">Participe</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-comunicacao nav-link dropdown-toggle" id="comunicacao">Comunicação</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="comunicacao">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/noticias">Agência Câmara de Notícias</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/radio">Rádio Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/tv">TV Câmara</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/banco-imagens">Banco de Imagens</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/assessoria-de-imprensa">Assessoria de Imprensa</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/comprove">Comprove uma notícia</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+            
+              
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="menu-global__item-transprestcontas nav-link dropdown-toggle" id="transprestcontas">Transparência e prestação de contas</a>
+
+                  
+                    <ul class="dropdown-menu" aria-labelledby="transprestcontas">
+                      <li class="dropdown-item">
+                        <a href="https://www.camara.leg.br/transparencia/">Transparência</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://www2.camara.leg.br/transparencia/prestacao-de-contas">Prestação de contas</a>
+                      </li>
+                      <li class="dropdown-item">
+                        <a href="https://dadosabertos.camara.leg.br/">Dados abertos</a>
+                      </li>
+                    </ul>
+                  
+                </li>
+              
+            
+          </ul>
+          <div class="outras-opcoes-menu-usuario hidden-md hidden-lg">
+            <ul aria-label="Ferramentas de apoio" class="links-apoio links-apoio--menu-mobile">
+              <li class="links-apoio__item links-apoio__item--acessibilidade">
+                <a href="https://www2.camara.leg.br/acessibilidade/recursos-de-acessibilidade" accesskey="0">Acessibilidade</a>
+              </li>
+              <li class="links-apoio__item links-apoio__item--faleconosco">
+                <a href="https://www.camara.leg.br/fale-conosco" accesskey="9">Fale Conosco</a>
+              </li>
+            </ul>
+          </div>
+          <div class="lista-idiomas hidden-md hidden-lg">
+            <button id="botao-idioma-topo" class="botao-idioma-topo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="4,0">
+                <span class="botao-idioma-topo__sigla">PT</span>
+            </button>
+        
+            <ul class="dropdown-menu-right l-lista-idiomas " aria-label="Idioma">
+                <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/english" class="idioma-topo">
+                        <span class="idioma-topo__bandeira idioma-topo__bandeira--ingles" aria-hidden="true"></span>
+                        <span class="idioma-topo__nome">English</span>
+                        <span class="idioma-topo__sigla">EN</span>
+                    </a>
+                </li>
+                <li class="l-lista-idiomas__item">
+                    <a href="https://www2.camara.leg.br/espanol" class="idioma-topo">
+                        <span class="idioma-topo__bandeira idioma-topo__bandeira--espanhol" aria-hidden="true"></span>
+                        <span class="idioma-topo__nome">Español</span>
+                        <span class="idioma-topo__sigla">ES</span>            
+                    </a>
+                </li>
+            </ul>
+        </div>
+        </div>
+
+
+        <div class="collapse box-search" id="buscaportal">
+          <form role="search" accesskey="4" class="box-search__busca form-inline" action="https://www.camara.leg.br/busca-geral">
+            <label for="termo" class="sr-only box-search__label">Pesquise no Portal da Câmara</label>
+            <input class="form-control box-search__campo" type="search" name="termo" id="termo" placeholder="Buscar" aria-label="Search" />
+          </form>
+        </div>
+      </div>
+    </nav>
+  </div>
+      </header>
+
+    <div class="breadcrumbs-marcacao">
+        <div class="container">
+            <nav aria-label="Onde estou">
+                <ol class="breadcrumb portal-breadcrumbs">
+                    <li class="breadcrumb-item"><a href="//www.camara.leg.br">Início</a></li>
+                    
+	<li class='breadcrumb-item'><a href='http://www2.camara.gov.br/atividade-legislativa'>Atividade Legislativa</a></li>
+    <li class='breadcrumb-item'><a href='http://www2.camara.gov.br/atividade-legislativa/legislacao'>Legislação</a></li>
+
+                    <li class="breadcrumb-item active" aria-current="page">Esta página</li>
+                </ol>
+            </nav>
+        </div>
+        
+        <div class="container-fluid p-0">
+            <div id="menu-secoes-internas" class="menu-secoes-internass">
+                <div id="portal-mainsection">
+                    <div class="l-identificacao-landing">
+                        <div class="container">
+                            <h1 class="titulo-landing">Legislação</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="marcacao-conteudo-portal" class="conteudo-portal container nopadding-right nopadding-left">
+        <div class="coluna-centro col-md-12">
+
+
+<div id="portal-column-content">
+	<div id="portal-content-wrapper">
+		<div class="documentContent">
+			<div id="content">
+	
+				<h2 class="documentFirstHeading">Legislação Informatizada - LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003 - Publicação Original</h2>
+				<div class="vejaTambem">
+			    	<p>Veja também:</p>
+			    	<ul>
+                                        <li>
+
+
+                                                <a href="lei-10833-29-dezembro-2003-497045-normaatualizada-pl.html" target="_blank">Texto Atualizado <span class="descricaoArquivo">(HTML)</span></a>&nbsp;
+                                                (<a href="lei-10833-29-dezembro-2003-497045-normaatualizada-pl.docx">formato docx</a>)
+                                                &nbsp;
+                                                    (<a href="lei-10833-29-dezembro-2003-497045-normaatualizada-pl.pdf">formato pdf</a>)
+
+                                            
+                                        </li>
+                                            <li>  	
+                                                <a href="lei-10833-29-dezembro-2003-497045-veto-13879-pl.html">Veto</a>
+                                            </li>
+                                        <li>
+                                            <a href="http://www.camara.gov.br/sileg/Prop_Detalhe.asp?id=150280">Proposição Originária</a>
+                                        </li>
+                                    <li>
+                                        <a href="lei-10833-29-dezembro-2003-497045-norma-pl.html">Dados da Norma</a>
+                                    </li>
+                                </ul>
+			    </div>	
+                                
+
+					<h1>LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003</h1>
+				
+				<div class="textoNorma">
+				
+						<p class="ementa">
+							Altera a Legislação Tributária Federal e dá outras providências. 
+						</p>
+				
+						<div class="texto">
+							&nbsp;&nbsp;&nbsp;&nbsp;<STRONG> O PRESIDENTE DA REPÚBLICA</STRONG> <BR>&nbsp;&nbsp;&nbsp;&nbsp; Faço saber que o Congresso Nacional decreta e eu sanciono a seguinte Lei: <BR><BR><BR>
+<CENTER>CAPÍTULO I <BR>DA COBRANÇA NÃO-CUMULATIVA DA COFINS </CENTER><BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 1º&nbsp;A Contribuição para o Financiamento da Seguridade Social - COFINS, com a incidência não-cumulativa, tem como fato gerador o faturamento mensal, assim entendido o total das receitas auferidas pela pessoa jurídica, independentemente de sua denominação ou classificação contábil. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º Para efeito do disposto neste artigo, o total das receitas compreende a receita bruta da venda de bens e serviços nas operações em conta própria ou alheia e todas as demais receitas auferidas pela pessoa jurídica. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º A base de cálculo da contribuição é o valor do faturamento, conforme definido no <I>caput</I>. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º Não integram a base de cálculo a que se refere este artigo as receitas: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - isentas ou não alcançadas pela incidência da contribuição ou sujeitas à alíquota 0 (zero); <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - não-operacionais, decorrentes da venda de ativo permanente; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - auferidas pela pessoa jurídica revendedora, na revenda de mercadorias em relação às quais a contribuição seja exigida da empresa vendedora, na condição de substituta tributária; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IV - de venda dos produtos de que tratam as Leis nºs 9.990, de 21 de julho de 2000, 10.147, de 21 de dezembro de 2000, 10.485, de 3 de julho de 2002, e 10.560, de 13 de novembro de 2002, ou quaisquer outras submetidas à incidência monofásica da contribuição; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V - referentes a: <BR><BR>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>a)</I></TD>
+<TD>vendas canceladas e aos descontos incondicionais concedidos; </TD></TR></TBODY></TABLE>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>b)</I></TD>
+<TD>reversões de provisões e recuperações de créditos baixados como perda que não representem ingresso de novas receitas, o resultado positivo da avaliação de investimentos pelo valor do patrimônio líquido e os lucros e dividendos derivados de investimentos avaliados pelo custo de aquisição que tenham sido computados como receita. </TD></TR></TBODY></TABLE><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 2º&nbsp;Para determinação do valor da COFINS aplicar-se-á, sobre a base de cálculo apurada conforme o disposto no art. 1º, a alíquota de 7,6% (sete inteiros e seis décimos por cento). <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 3º&nbsp;Do valor apurado na forma do art. 2º a pessoa jurídica poderá descontar créditos calculados em relação a: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - bens adquiridos para revenda, exceto em relação às mercadorias e aos produtos referidos nos incisos III e IV do § 3º do art. 1º; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - bens e serviços, utilizados como insumo na prestação de serviços e na produção ou fabricação de bens ou produtos destinados à venda, inclusive combustíveis e lubrificantes; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - energia elétrica consumida nos estabelecimentos da pessoa jurídica; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IV - aluguéis de prédios, máquinas e equipamentos, pagos a pessoa jurídica, utilizados nas atividades da empresa; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V - despesas financeiras decorrentes de empréstimos, financiamentos e o valor das contraprestações de operações de arrendamento mercantil de pessoa jurídica, exceto de optante pelo Sistema Integrado de Pagamento de Impostos e Contribuições das Microempresas e das Empresas de Pequeno Porte - SIMPLES; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VI - máquinas, equipamentos e outros bens incorporados ao ativo imobilizado adquiridos para utilização na produção de bens destinados à venda, ou na prestação de serviços; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VII - edificações e benfeitorias em imóveis próprios ou de terceiros, utilizados nas atividades da empresa; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VIII - bens recebidos em devolução cuja receita de venda tenha integrado faturamento do mês ou de mês anterior, e tributada conforme o disposto nesta Lei; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IX - armazenagem de mercadoria e frete na operação de venda, nos casos dos incisos I e II, quando o ônus for suportado pelo vendedor. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º O crédito será determinado mediante a aplicação da alíquota prevista no art. 2º sobre o valor: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - dos itens mencionados nos incisos I e II do <I>caput</I>, adquiridos no mês; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - dos itens mencionados nos incisos III a V e IX do <I>caput</I>, incorridos no mês; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - dos encargos de depreciação e amortização dos bens mencionados nos incisos VI e VII do <I>caput</I>, incorridos no mês; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IV - dos bens mencionados no inciso VIII do <I>caput</I>, devolvidos no mês. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º Não dará direito a crédito o valor de mão-de-obra paga a pessoa física. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º O direito ao crédito aplica-se, exclusivamente, em relação: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - aos bens e serviços adquiridos de pessoa jurídica domiciliada no País; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - aos custos e despesas incorridos, pagos ou creditados a pessoa jurídica domiciliada no País; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - aos bens e serviços adquiridos e aos custos e despesas incorridos a partir do mês em que se iniciar a aplicação do disposto nesta Lei. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 4º O crédito não aproveitado em determinado mês poderá sê-lo nos meses subseqüentes. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 5º Sem prejuízo do aproveitamento dos créditos apurados na forma deste artigo, as pessoas jurídicas que produzam mercadorias de origem animal ou vegetal, classificadas nos capítulos 2 a 4, 8 a 12 e 23, e nos códigos 01.03, 01.05, 0504.00, 0701.90.00, 0702.00.00, 0706.10.00, 07.08, 0709.90, 07.10, 07.12 a 07.14, 15.07 a 1514, 1515.2, 1516.20.00, 15.17, 1701.11.00, 1701.99.00, 1702.90.00, 18.03, 1804.00.00, 1805.00.00, 20.09, 2101.11.10 e 2209.00.00, todos da Nomenclatura Comum do Mercosul - NCM, destinados à alimentação humana ou animal, poderão deduzir da COFINS, devida em cada período de apuração, crédito presumido, calculado sobre o valor dos bens e serviços referidos no inciso II do <I>caput</I> deste artigo, adquiridos, no mesmo período, de pessoas físicas residentes no País. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 6º Relativamente ao crédito presumido referido no § 5º: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - seu montante será determinado mediante aplicação, sobre o valor das mencionadas aquisições, de alíquota correspondente a 80% (oitenta por cento) daquela constante do art. 2º; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - o valor das aquisições não poderá ser superior ao que vier a ser fixado, por espécie de bem ou serviço, pela Secretaria da Receita Federal - SRF, do Ministério da Fazenda. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 7º Na hipótese de a pessoa jurídica sujeitar-se à incidência não-cumulativa da COFINS, em relação apenas à parte de suas receitas, o crédito será apurado, exclusivamente, em relação aos custos, despesas e encargos vinculados a essas receitas. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 8º Observadas as normas a serem editadas pela Secretaria da Receita Federal, no caso de custos, despesas e encargos vinculados às receitas referidas no § 7º e àquelas submetidas ao regime de incidência cumulativa dessa contribuição, o crédito será determinado, a critério da pessoa jurídica, pelo método de: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - apropriação direta, inclusive em relação aos custos, por meio de sistema de contabilidade de custos integrada e coordenada com a escrituração; ou <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - rateio proporcional, aplicando-se aos custos, despesas e encargos comuns a relação percentual existente entre a receita bruta sujeita à incidência não-cumulativa e a receita bruta total, auferidas em cada mês. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 9º O método eleito pela pessoa jurídica para determinação do crédito, na forma do § 8º, será aplicado consistentemente por todo o ano-calendário e, igualmente, adotado na apuração do crédito relativo à contribuição para o PIS/PASEP não-cumulativa, observadas as normas a serem editadas pela Secretaria da Receita Federal. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 10. O valor dos créditos apurados de acordo com este artigo não constitui receita bruta da pessoa jurídica, servindo somente para dedução do valor devido da contribuição. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 11. Sem prejuízo do aproveitamento dos créditos apurados na forma deste artigo, as pessoas jurídicas que adquiram diretamente de pessoas físicas residentes no País produtos in natura de origem vegetal, classificados nas posições 10.01 a 10.08 e 12.01, todos da NCM, que exerçam cumulativamente as atividades de secar, limpar, padronizar, armazenar e comercializar tais produtos, poderão deduzir da COFINS devida, relativamente às vendas realizadas às pessoas jurídicas a que se refere o § 5º, em cada período de apuração, crédito presumido calculado à alíquota correspondente a 80% (oitenta por cento) daquela prevista no art. 2º sobre o valor de aquisição dos referidos produtos in natura. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 12. Relativamente ao crédito presumido referido no § 11: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - o valor das aquisições que servir de base para cálculo do crédito presumido não poderá ser superior ao que vier a ser fixado, por espécie de produto, pela Secretaria da Receita Federal - SRF; e <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - a Secretaria da Receita Federal expedirá os atos necessários para regulamentá-lo. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 4º&nbsp;A pessoa jurídica que adquirir imóvel para venda ou promover empreendimento de desmembramento ou loteamento de terrenos, incorporação imobiliária ou construção de prédio destinado a venda, utilizará o crédito referente aos custos vinculados à unidade construída ou em construção, a ser descontado na forma do art. 3º, somente a partir da efetivação da venda. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º Na hipótese de venda de unidade imobiliária não concluída, a pessoa jurídica poderá utilizar crédito presumido, em relação ao custo orçado de que trata a legislação do imposto de renda. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º O crédito presumido será calculado mediante a aplicação da alíquota de que trata o art. 2º sobre o valor do custo orçado para conclusão da obra ou melhoramento, ajustado pela exclusão dos valores a serem pagos a pessoa física, encargos trabalhistas, sociais e previdenciários, e dos bens e serviços, acrescidos dos tributos incidentes na importação, adquiridos de pessoa física ou jurídica residente ou domiciliada no exterior. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º O crédito a ser descontado na forma do <I>caput</I> e o crédito presumido apurado na forma do § 2º deverão ser utilizados na proporção da receita relativa à venda da unidade imobiliária, à medida do recebimento. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 4º Ocorrendo modificação do valor do custo orçado, antes do término da obra ou melhoramento, nas hipóteses previstas na legislação do imposto de renda, o novo valor orçado deverá ser considerado para efeito do disposto nos §§ 2º e 3º. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 5º A pessoa jurídica que utilizar o crédito presumido de que trata este artigo determinará, na data da conclusão da obra ou melhoramento, a diferença entre o custo orçado e o efetivamente realizado, apurados na forma da legislação do imposto de renda, com os ajustes previstos no § 2º: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - se o custo realizado for inferior ao custo orçado, em mais de 15% (quinze por cento) deste, considerar-se-á como postergada a contribuição incidente sobre a diferença; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - se o custo realizado for inferior ao custo orçado, em até 15% (quinze por cento) deste, a contribuição incidente sobre a diferença será devida a partir da data da conclusão, sem acréscimos legais; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - se o custo realizado for superior ao custo orçado, a pessoa jurídica terá direito ao crédito correspondente à diferença, no período de apuração em que ocorrer a conclusão, sem acréscimos. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 6º A diferença de custo a que se refere o § 5º será, no período de apuração em que ocorrer a conclusão da obra ou melhoramento, adicionada ou subtraída, conforme o caso, no cálculo do crédito a ser descontado na forma do art. 3º, devendo ainda, em relação à contribuição considerada postergada, de acordo com o inciso I, ser recolhidos os acréscimos referentes a juros de mora e multa, de mora ou de ofício, calculados na forma da legislação que rege a cobrança da contribuição não paga. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 7º Se a venda de unidade imobiliária não concluída ocorrer antes de iniciada a apuração da COFINS na forma do art. 2º, o custo orçado poderá ser calculado na data de início dessa apuração, para efeito do disposto nos §§ 2º e 3º, observado, quanto aos custos incorridos até essa data, o disposto no § 4º do art. 12. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 8º O disposto neste artigo não se aplica às vendas anteriores à vigência da Medida Provisória nº 2.221, de 4 de setembro de 2001. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 9º Os créditos referentes a unidades imobiliárias recebidas em devolução, calculados com observância do disposto neste artigo, serão estornados na data do desfazimento do negócio. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 5º&nbsp;O contribuinte da COFINS é a pessoa jurídica que auferir as receitas a que se refere o art. 1º. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 6º&nbsp;A COFINS não incidirá sobre as receitas decorrentes das operações de: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - exportação de mercadorias para o exterior; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - prestação de serviços para pessoa física ou jurídica domiciliada no exterior, com pagamento em moeda conversível; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - vendas a empresa comercial exportadora com o fim específico de exportação. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º Na hipótese deste artigo, a pessoa jurídica vendedora poderá utilizar o crédito apurado na forma do art. 3º, para fins de: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - dedução do valor da contribuição a recolher, decorrente das demais operações no mercado interno; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - compensação com débitos próprios, vencidos ou vincendos, relativos a tributos e contribuições administrados pela Secretaria da Receita Federal, observada a legislação específica aplicável à matéria. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º A pessoa jurídica que, até o final de cada trimestre do ano civil, não conseguir utilizar o crédito por qualquer das formas previstas no § 1º poderá solicitar o seu ressarcimento em dinheiro, observada a legislação específica aplicável à matéria. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º O disposto nos §§ 1º e 2º aplica-se somente aos créditos apurados em relação a custos, despesas e encargos vinculados à receita de exportação, observado o disposto nos §§ 8º e 9º do art. 3º. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 4º O direito de utilizar o crédito de acordo com o § 1º não beneficia a empresa comercial exportadora que tenha adquirido mercadorias com o fim previsto no inciso III do <I>caput</I>, ficando vedada, nesta hipótese, a apuração de créditos vinculados à receita de exportação. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 7º&nbsp;No caso de construção por empreitada ou de fornecimento a preço predeterminado de bens ou serviços, contratados por pessoa jurídica de direito público, empresa pública, sociedade de economia mista ou suas subsidiárias, a pessoa jurídica optante pelo regime previsto no art. 7º da Lei nº 9.718, de 27 de novembro de 1998, somente poderá utilizar o crédito a ser descontado na forma do art. 3º, na proporção das receitas efetivamente recebidas. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 8º&nbsp; A contribuição incidente na hipótese de contratos, com prazo de execução superior a 1 (um) ano, de construção por empreitada ou de fornecimento, a preço predeterminado, de bens ou serviços a serem produzidos, será calculada sobre a receita apurada de acordo com os critérios de reconhecimento adotados pela legislação do imposto de renda, previstos para a espécie de operação. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <I>Parágrafo único. </I>O crédito a ser descontado na forma do art. 3º somente poderá ser utilizado na proporção das receitas reconhecidas nos termos do <I>caput</I>. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 9º&nbsp;A empresa comercial exportadora que houver adquirido mercadorias de outra pessoa jurídica, com o fim específico de exportação para o exterior, que, no prazo de 180 (cento e oitenta) dias, contados da data da emissão da nota fiscal pela vendedora, não comprovar o seu embarque para o exterior, ficará sujeita ao pagamento de todos os impostos e contribuições que deixaram de ser pagos pela empresa vendedora, acrescidos de juros de mora e multa, de mora ou de ofício, calculados na forma da legislação que rege a cobrança do tributo não pago. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º Para efeito do disposto neste artigo, considera-se vencido o prazo para o pagamento na data em que a empresa vendedora deveria fazê-lo, caso a venda houvesse sido efetuada para o mercado interno. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º No pagamento dos referidos tributos, a empresa comercial exportadora não poderá deduzir, do montante devido, qualquer valor a título de crédito de Imposto sobre Produtos Industrializados - IPI, ou da COFINS, decorrente da aquisição das mercadorias e serviços objeto da incidência. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º A empresa deverá pagar, também, os impostos e contribuições devidos nas vendas para o mercado interno, caso, por qualquer forma, tenha alienado ou utilizado as mercadorias. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 10.&nbsp;Permanecem sujeitas às normas da legislação da COFINS, vigentes anteriormente a esta Lei, não se lhes aplicando as disposições dos arts. 1º a 8º: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - as pessoas jurídicas referidas nos §§ 6º, 8º e 9º do art. 3º da Lei nº 9.718, de 1998, e na Lei nº 7.102, de 20 de junho de 1983; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - as pessoas jurídicas tributadas pelo imposto de renda com base no lucro presumido ou arbitrado; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; III - as pessoas jurídicas optantes pelo SIMPLES; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IV - as pessoas jurídicas imunes a impostos; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V - os órgãos públicos, as autarquias e fundações públicas federais, estaduais e municipais, e as fundações cuja criação tenha sido autorizada por lei, referidas no art. 61 do Ato das Disposições Constitucionais Transitórias da Constituição; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VI - as sociedades cooperativas; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VII - as receitas decorrentes das operações: <BR><BR>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>a)</I></TD>
+<TD>referidas no inciso IV do § 3º do art. 1º; </TD></TR></TBODY></TABLE>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>b)</I></TD>
+<TD>sujeitas à substituição tributária da COFINS; </TD></TR></TBODY></TABLE>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>c)</I></TD>
+<TD>referidas no art. 5º da Lei nº 9.716, de 26 de novembro de 1998; </TD></TR></TBODY></TABLE><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VIII - as receitas decorrentes de prestação de serviços de telecomunicações; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IX - as receitas decorrentes de prestação de serviços das empresas jornalísticas e de radiodifusão sonora e de sons e imagens; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X - as receitas submetidas ao regime especial de tributação previsto no art. 47 da Lei nº 10.637, de 30 de dezembro de 2002; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XI - as receitas relativas a contratos firmados anteriormente a 31 de outubro de 2003: <BR><BR>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>a)</I></TD>
+<TD>com prazo superior a 1 (um) ano, de administradoras de planos de consórcios de bens móveis e imóveis, regularmente autorizadas a funcionar pelo Banco Central; </TD></TR></TBODY></TABLE>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>b)</I></TD>
+<TD>com prazo superior a 1 (um) ano, de construção por empreitada ou de fornecimento, a preço predeterminado, de bens ou serviços; </TD></TR></TBODY></TABLE>
+<TABLE>
+<TBODY>
+<TR>
+<TD width=20></TD>
+<TD vAlign=UP width=30 align=right><I>c)</I></TD>
+<TD>de construção por empreitada ou de fornecimento, a preço predeterminado, de bens ou serviços contratados com pessoa jurídica de direito público, empresa pública, sociedade de economia mista ou suas subsidiárias, bem como os contratos posteriormente firmados decorrentes de propostas apresentadas, em processo licitatório, até aquela data; </TD></TR></TBODY></TABLE><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XII - as receitas decorrentes de prestação de serviços de transporte coletivo rodoviário, metroviário, ferroviário e aquaviário de passageiros; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XIII - as receitas decorrentes do serviço prestado por hospital, pronto-socorro, casa de saúde e de recuperação sob orientação médica e por banco de sangue; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XIV - as receitas decorrentes de prestação de serviços de educação infantil, ensinos fundamental e médio e educação superior. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 11.&nbsp;A contribuição de que trata o art. 1º deverá ser paga até o último dia útil da 1ª (primeira) quinzena do mês subseqüente ao da ocorrência do fato gerador. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 12.&nbsp;A pessoa jurídica contribuinte da COFINS, submetida à apuração do valor devido na forma do art. 3º, terá direito a desconto correspondente ao estoque de abertura dos bens de que tratam os incisos I e II daquele mesmo artigo, adquiridos de pessoa jurídica domiciliada no País, existentes na data de início da incidência desta contribuição de acordo com esta Lei. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 1º O montante de crédito presumido será igual ao resultado da aplicação do percentual de 3% (três por cento) sobre o valor do estoque. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 2º O crédito presumido calculado segundo o § 1º será utilizado em 12 (doze) parcelas mensais, iguais e sucessivas, a partir da data a que se refere o <I>caput</I> deste artigo. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 3º O disposto no <I>caput</I> aplica-se também aos estoques de produtos acabados e em elaboração. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 4º A pessoa jurídica referida no art. 4º que, antes da data de início da vigência da incidência não-cumulativa da COFINS, tenha incorrido em custos com unidade imobiliária construída ou em construção poderá calcular crédito presumido, naquela data, observado: <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I - no cálculo do crédito será aplicado o percentual previsto no § 1º sobre o valor dos bens e dos serviços, inclusive combustíveis e lubrificantes, adquiridos de pessoas jurídicas domiciliadas no País, utilizados como insumo na construção; <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; II - o valor do crédito presumido apurado na forma deste parágrafo deverá ser utilizado na proporção da receita relativa à venda da unidade imobiliária, à medida do recebimento. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 5º A pessoa jurídica que, tributada com base no lucro presumido ou optante pelo SIMPLES, passar a ser tributada com base no lucro real, na hipótese de sujeitar-se à incidência não-cumulativa da COFINS, terá direito ao aproveitamento do crédito presumido na forma prevista neste artigo, calculado sobre o estoque de abertura, devidamente comprovado, na data da mudança do regime de tributação adotado para fins do imposto de renda. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; § 6º Os bens recebidos em devolução, tributados antes do início da aplicação desta Lei, ou da mudança do regime de tributação de que trata o § 5º, serão considerados como integrantes do estoque de abertura referido no <I>caput</I>, devendo o crédito ser utilizado na forma do § 2º a partir da data da devolução. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 13.&nbsp;O aproveitamento de crédito na forma do § 4º do art. 3º, do art. 4º e dos §§ 1º e 2º do art. 6º, bem como do § 2º e inciso II do § 4º e § 5º do art. 12, não ensejará atualização monetária ou incidência de juros sobre os respectivos valores. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 14.&nbsp;O disposto nas Leis nºs 9.363, de 13 de dezembro de 1996, e 10.276, de 10 de setembro de 2001, não se aplica à pessoa jurídica submetida à apuração do valor devido na forma dos arts. 2º e 3º desta Lei e dos arts. 2º e 3º da Lei nº 10.637, de 30 de dezembro de 2002. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 15.&nbsp;Aplica-se à contribuição para o PIS/PASEP não-cumulativa de que trata a Lei nº 10.637, de 30 de dezembro de 2002, o disposto nos incisos I e II do § 3º do art. 1º, nos incisos VI, VII e IX do <I>caput</I> e nos §§ 1º, incisos II e III, 10 e 11 do art. 3º, nos §§ 3º e 4º do art. 6º, e nos arts. 7º, 8º, 10, incisos XI a XIV, e 13. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 16.&nbsp;O disposto no art. 4º e no § 4º do art. 12 aplica-se, a partir de 1º de janeiro de 2003, à contribuição para o PIS/PASEP não-cumulativa, de que trata a Lei nº 10.637, de 30 de dezembro de 2002, com observância das alíquotas de 1,65% (um inteiro e sessenta e cinco centésimos por cento) e de 0,65% (sessenta e cinco centésimos por cento) em relação à apuração na forma dos referidos artigos, respectivamente. <BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <I>Parágrafo único. </I>O tratamento previsto no inciso II do <I>caput</I> do art. 3º e nos §§ 5º e 6º do art. 12 aplica-se também à contribuição para o PIS/PASEP não-cumulativa na forma e a partir da data prevista no <I>caput</I>. <BR><BR>
+<CENTER>CAPÍTULO II<BR>DAS OUTRAS DISPOSIÇÕES RELATIVAS À LEGISLAÇÃO TRIBUTÁRIA </CENTER><BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Art. 17.&nbsp;O art. 74 da Lei nº 9.430, de 27 de dezembro de 1996, alterado pelo art. 49 da Lei nº 10.637, de 30 de dezembro de 2002, passa a vigorar com a seguinte redação: <BR><BR>
+<!-- FIXTURE TRUNCADO: original 174615 bytes; mantidos primeiros 59969 bytes -->

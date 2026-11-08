@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ListaDocumento xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://legis.senado.leg.br/dadosabertos/dados/ListaDocumentov3.xsd'>
+    <Metadados>
+    <Versao>05/11/2026 19:53:52</Versao>
+    <VersaoServico>3</VersaoServico>
+    <DataVersaoServico>2017-02-01</DataVersaoServico>
+    <DescricaoDataSet>Obtém a lista de Legislação Federal com base nos parâmetros informados.</DescricaoDataSet>
+    
+</Metadados>
+
+    <documentos></documentos>
+</ListaDocumento>

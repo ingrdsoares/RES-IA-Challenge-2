@@ -5,12 +5,14 @@ from pathlib import Path
 
 import pytest
 from app.config import Settings
+from app.errors import DependencyUnavailable
 from app.schemas import Source
 from app.vector_store import VectorStore
 from qdrant_client import QdrantClient
 
 from src.rag.csv_para_qdrant import (
     LIMITE_CORPO,
+    com_retentativas,
     estatisticas_novas,
     ingerir,
     itens_do_documento,
@@ -400,6 +402,30 @@ def test_reexportacao_com_novo_versao_remove_pontos_antigos(run, tmp_path):
     assert {p.id for p in pontos_a} == novos
 
 
+def test_pagina_de_login_nao_sobe_e_sai_da_colecao(run, tmp_path):
+    saida = tmp_path / "recorte.csv"
+    gerar_recorte(run, saida)
+    settings = Settings()
+    client = _memoria(settings)
+    ingerir(saida, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO)
+    linhas = list(ler_csv(saida))
+    nova = tmp_path / "nova.csv"
+    with open(nova, "w", encoding="utf-8", newline="") as f:
+        escritor = csv.DictWriter(f, fieldnames=list(COLUNAS))
+        escritor.writeheader()
+        for linha in linhas:
+            if linha["documento_id"] == "doc-a":
+                linha = linha | {"titulo": "Conteúdo Restrito"}
+            escritor.writerow(linha)
+
+    stats = ingerir(
+        nova, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO, retomar=True
+    )
+
+    assert stats["paginas_login"] == 1
+    assert {p.payload["document_id"] for p in _pontos(client)} == {"doc-d"}
+
+
 def test_ler_csv_aceita_campo_grande(tmp_path):
     caminho = tmp_path / "grande.csv"
     with open(caminho, "w", encoding="utf-8", newline="") as f:
@@ -529,3 +555,54 @@ def test_falha_no_lote_informa_documento_e_chunk(run, tmp_path):
             colecao=COLECAO,
         )
     assert primeiro_chunk in str(exc.value)
+
+
+def test_retentativas_recuperam_falha_passageira_do_embed():
+    chamadas = []
+    esperas = []
+
+    def embed(textos):
+        chamadas.append(textos)
+        if len(chamadas) < 3:
+            raise DependencyUnavailable("Não foi possível consultar Ollama.")
+        return [[0.0]]
+
+    resultado = com_retentativas(embed, esperas=(1, 2, 3), dormir=esperas.append)(["a"])
+    assert resultado == [[0.0]]
+    assert esperas == [1, 2]
+
+
+def test_retentativas_desistem_e_repassam_o_erro():
+    esperas = []
+
+    def embed(textos):
+        raise DependencyUnavailable("fora do ar")
+
+    with pytest.raises(DependencyUnavailable):
+        com_retentativas(embed, esperas=(1, 2), dormir=esperas.append)(["a"])
+    assert esperas == [1, 2]
+
+
+def test_retomar_pula_documento_completo_e_refaz_o_incompleto(run, tmp_path):
+    saida = tmp_path / "recorte.csv"
+    gerar_recorte(run, saida)
+    settings = Settings()
+    client = _memoria(settings)
+    ingerir(saida, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO)
+    total = client.count(COLECAO, exact=True).count
+
+    def embed_proibido(textos):
+        raise AssertionError("documento completo não pode ser embeddado de novo")
+
+    r = ingerir(
+        saida, settings=settings, client=client, embed=embed_proibido, colecao=COLECAO, retomar=True
+    )
+    assert (r["gravados"], r["pulados"]) == (0, 2)
+
+    doc_a = [p.id for p in _pontos(client) if p.payload["document_id"] == "doc-a"]
+    client.delete(COLECAO, points_selector=doc_a[:1])
+    r = ingerir(
+        saida, settings=settings, client=client, embed=_EmbedFalso(), colecao=COLECAO, retomar=True
+    )
+    assert (r["gravados"], r["pulados"]) == (len(doc_a), 1)
+    assert client.count(COLECAO, exact=True).count == total

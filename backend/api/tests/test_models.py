@@ -5,7 +5,7 @@ import ollama
 import pytest
 from app.config import Settings
 from app.errors import DependencyTimeout, DependencyUnavailable
-from app.models import LocalModels, prepare_sources
+from app.models import SYSTEM_PROMPT, LocalModels, prepare_sources
 from app.schemas import Source
 
 
@@ -143,10 +143,54 @@ def test_nonfinite_embedding_is_rejected():
         LocalModels(Settings(), InvalidClient()).embed_question("Pergunta")
 
 
+def test_embedding_da_pergunta_nao_ocupa_a_gpu():
+    corpos = []
+
+    def handler(request):
+        corpos.append(json.loads(request.content))
+        return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
+
+    models = make_models(handler)
+    models.embed_question("Pergunta")
+    models.close()
+
+    assert corpos[0]["options"]["num_gpu"] == 0
+
+
+def test_resposta_e_reprodutivel():
+    corpos = []
+
+    def handler(request):
+        corpos.append(json.loads(request.content))
+        return httpx.Response(
+            200, json={"message": {"role": "assistant", "content": "Resposta [1]"}}
+        )
+
+    models = make_models(handler)
+    models.answer("Pergunta", [source("Texto")])
+    models.close()
+
+    assert corpos[0]["options"]["temperature"] == 0
+    assert corpos[0]["options"]["seed"] == 42
+
+
+def test_contexto_de_12000_caracteres_cabe_em_8192_tokens():
+    fontes = [source("O contribuinte deve observar a legislação. " * 70) for _ in range(4)]
+
+    selected = prepare_sources(fontes, 12000, question="Pergunta")
+
+    assert sum(len(f.text) for f in selected) >= 11000
+
+
+def test_ausencia_de_mencao_nao_e_negacao_no_prompt():
+    assert "ausência de menção" in SYSTEM_PROMPT.lower()
+    assert "caso específico" in SYSTEM_PROMPT
+
+
 def test_unicode_context_is_trimmed_to_fit_prompt_budget():
     selected = prepare_sources([source("🎉" * 6000)], 6000, question="Pergunta")
     assert len(selected) == 1
-    assert 0 < len(selected[0].text) < 2000
+    assert 0 < len(selected[0].text) < 4000
 
     models = make_models(
         lambda request: httpx.Response(

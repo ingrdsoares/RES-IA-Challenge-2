@@ -20,12 +20,15 @@ class FrentesTests(unittest.TestCase):
         declarados = {
             t["modulo"]
             for t in json.loads(FERRAMENTAS.read_text("utf8"))["ferramentas"]
-            if t["tipo"] != "biblioteca" and t["modulo"] != "painel"
+            # normas_citadas roda por rodadas, pela propria CLI; nao e frente do painel
+            if t["tipo"] != "biblioteca" and t["modulo"] not in ("painel", "normas_citadas")
         }
         self.assertEqual(
             declarados, {f.modulo for f in FRENTES} | set(ETAPAS_FINAIS) | {MODULO_CATALOGO}
         )
-        self.assertEqual(set(FRONTES.values()), {f.pasta for f in FRENTES} | {"catalogo"})
+        self.assertEqual(
+            set(FRONTES.values()), {f.pasta for f in FRENTES} | {"catalogo", "normas-citadas"}
+        )
 
     def test_dependencia_vem_antes(self):
         ordem = [f.modulo for f in FRENTES]

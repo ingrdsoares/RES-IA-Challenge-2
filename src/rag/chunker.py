@@ -80,9 +80,13 @@ class LegalHierarchicalChunker:
     Parâmetros oficiais: até 2.000 caracteres por chunk com sobreposição de 200 caracteres.
     """
 
+    # Sensível a maiúsculas e sem "da/do/,..." depois: "art. 8º da LC 87" em início de linha é citação.
+    # ponytail: citação entre aspas de outra norma ("Art. 8° Integra...") ainda vira rótulo;
+    # separar exige saber o que é transcrição.
     ARTICLE_REGEX = re.compile(
-        r"(?:^|\n)(?:###?\s*)?(Art\.\s*\d+[-A-Za-zºo\.]*(?:\s*,\s*§\s*[\d\wºo\.-]+)?(?:\s*\([^\)]+\))?)",
-        re.MULTILINE | re.IGNORECASE,
+        r"(?:^|\n)(?:###?\s*)?((?:Art|ART)\.\s*\d+[-A-Za-zºo°\.]*(?:\s*,\s*§\s*[\d\wºo\.-]+)?(?:\s*\([^\)]+\))?)"
+        r"(?!\w)(?!\s*,)(?!\s+(?:d[aeo]s?|dest[ae]|dess[ae]|e|ou|a|ao|à)\s)",
+        re.MULTILINE,
     )
     PARAGRAPH_REGEX = re.compile(
         r"(?:^|\n)(§\s*\d+[-A-Za-zºo\.]*|Parágrafo\s+único)",
@@ -330,7 +334,11 @@ class LegalHierarchicalChunker:
                     current_artigo = matched_raw
                     current_tema = matched_raw
 
-                clean_line = self.ARTICLE_REGEX.sub("", line).strip("# ").strip()
+                # O título markdown vira só rótulo; no corpo, o número do artigo fica.
+                if line.lstrip().startswith("#"):
+                    clean_line = self.ARTICLE_REGEX.sub("", line).strip("# ").strip()
+                else:
+                    clean_line = line.strip()
                 if clean_line:
                     current_lines.append(clean_line)
             else:
