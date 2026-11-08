@@ -130,11 +130,11 @@ Nos testes, 44 de 843 trechos entregues terminavam assim, em 33 perguntas. Em 11
 
 **Terceiro conjunto com a configuração final, em leitura preliminar:** 16 corretas ou recusas adequadas, 1 parcial e 3 erradas (b02, c02 e c04). Perguntas compostas seguem sendo o principal ponto fraco.
 
-A API local ainda não recebeu essas duas mudanças, porque o plano de tool calling exige revisão humana antes de promover.
+A API local recebeu essas duas mudanças no commit `27b8335`, por decisão do responsável, antes da revisão humana prevista no plano de tool calling.
 
 ## Próximos passos
 
-1. **Revisão fiscal:** preencher `handoff/revisao-fiscal-rag-2026-11-07.xlsx`, começando pela aba Teste final.
+1. **Revisão fiscal:** pedir a um especialista que confira as respostas classificadas nesta avaliação.
 2. **Perguntas independentes:** pedir a quem não conhece o acervo que escreva um novo conjunto, com casos que exijam raciocínio.
 3. **Fontes:** obter por canal oficial a jurisprudência de q11 e q12.
 4. **Modelo:** se q07, q13 e q20 forem confirmados, avaliar um modelo de geração maior em vez de novos ajustes de prompt.

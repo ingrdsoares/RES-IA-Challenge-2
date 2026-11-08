@@ -1,106 +1,131 @@
 # Pipeline de Ingestão de Dados Fiscais — Sócio Digital
 
-> **Frente:** Ciência de Dados & Engenharia de Dados  
-> **Responsáveis:** Jhessica & Lucas  
-> **Projeto:** Sócio Digital — RES-IA Challenge 2  
-> **Versão:** 2.0 (Alinhada ao Plano de Entrega de 09/11/2026)  
-> **Status:** Homologado
+> **Frente:** Ciência de Dados & Engenharia de Dados
+> **Responsáveis:** Jhessica & Lucas
+> **Projeto:** Sócio Digital — RES-IA Challenge 2
+> **Versão:** 3.0 (base `knowledge_base_v2`, 07/11/2026)
+> **Status:** Implementado; a base da demonstração foi carregada por este caminho
 
 ---
 
-## 1. Visão Geral da Arquitetura do Pipeline
+## 1. Visão Geral
 
-O pipeline de ingestão do **Sócio Digital** transforma o acervo bruto coletado de fontes governamentais e normativas em pontos vetoriais altamente estruturados, indexados e prontos para consulta na API FastAPI e no Qdrant.
-
-O fluxo de dados é estruturado em 6 macroetapas:
-
-$$\mathbf{Coleta} \longrightarrow \mathbf{Refino} \longrightarrow \mathbf{Recorte} \longrightarrow \mathbf{Chunks} \longrightarrow \mathbf{Embeddings} \longrightarrow \mathbf{Qdrant}$$
+O pipeline transforma o acervo coletado de fontes oficiais em trechos indexados no Qdrant, prontos para a rota `/rag/query` da API.
 
 ```mermaid
 flowchart LR
-    A["1. Coleta<br/>(backend/crawler)"] --> B["2. Refino<br/>(backend/refino)"]
-    B --> C["3. Recorte Demo<br/>(data/raw/recorte_demo)"]
-    C --> D["4. Chunks Hierárquicos<br/>(src/rag/chunker.py)"]
-    D --> E["5. Embeddings 1024d<br/>(qwen3-embedding)"]
-    E --> F["6. Carga no Qdrant<br/>(knowledge_base)"]
-    F --> G["FastAPI /rag/query<br/>(backend/api)"]
+    A[Coleta] --> B[Refino] --> C[Recorte] --> D[Trechos] --> E[Embeddings e BM25] --> F[(Qdrant)] --> G[API]
 ```
+
+## 2. Sistema Implementado
+
+O diagrama mostra só o que roda hoje. A arquitetura-alvo, com frontend, banco da empresa e integrações fiscais, está em `docs/arquitetura.md`.
+
+```mermaid
+flowchart TB
+    CR["Crawler"] --> RF["Refino"]
+    RF --> RC["Recorte CSV<br/>manifesto e SHA-256"]
+    RC --> CQ["Carga: csv_para_qdrant<br/>trechos, embeddings, BM25"]
+    CQ --> QD[("Qdrant 1.15 · contêiner<br/>knowledge_base_v2<br/>155.781 trechos")]
+    CQ --> OL["Ollama na máquina<br/>qwen3:8b · qwen3-embedding:0.6b"]
+    U["Usuário ou script"] -->|pergunta| API["API FastAPI · contêiner<br/>/rag/query"]
+    API -->|busca híbrida| QD
+    API -->|embedding da pergunta e geração| OL
+    API -->|reordenação| RR["Reranker · contêiner com GPU<br/>bge-reranker-v2-m3"]
+```
+
+A coluna da esquerda roda uma vez por versão da base; a da direita, a cada pergunta.
+
+| Componente | Onde roda | Papel |
+|---|---|---|
+| API FastAPI (`backend/api`) | Contêiner | Busca, monta o contexto, chama o gerador e devolve resposta com fontes |
+| Qdrant 1.15 | Contêiner, volume próprio | Guarda vetor denso, vetor esparso e metadados de cada trecho |
+| Reranker (`backend/reranker`) | Contêiner com GPU | Reordena os candidatos; se falhar, a busca segue sem ele |
+| Ollama | Máquina, fora do Docker | Gera embeddings e respostas |
+| `src/rag/csv_para_qdrant.py` | Linha de comando | Carga do recorte na coleção |
+
+Máquina usada: RTX 3080 Ti de 12 GB e 32 GB de RAM.
 
 ---
 
-## 2. Detalhamento de Cada Etapa
+## 3. Etapas
 
-### Etapa 1: Coleta Primária (`backend/crawler/`)
-- **Responsabilidade:** Rastreamento automatizado de portais oficiais (Receita Federal, Câmara dos Deputados, SEFAZ-DF, CONFAZ, SPED, CARF e STJ).
-- **Características:** Preservação estrita dos documentos originais, snapshots HTML/PDF e registro de URL canônica e carimbo de data/hora (`coletado_em`).
-- **Artefatos:** Armazenamento local particionado em `backend/crawler/data/`.
+### Etapa 1: Coleta (`backend/crawler/`)
+- Coleta de portais oficiais: Receita Federal, Câmara dos Deputados, Receita do DF, SINJ-DF, CONFAZ, SPED, CARF e STJ.
+- Guarda o documento original, a URL de origem e a data de coleta (`coletado_em`).
 
-### Etapa 2: Refino e Resolução de Identidade (`backend/refino/`)
-- **Responsabilidade:** Limpeza não destrutiva, normalização Unicode NFC e resolução de identidade lógica.
-- **Deduplicação Inteligente:** Atos normativos e soluções de consulta com conteúdos idênticos compartilham um mesmo hash SHA-256 de conteúdo, preservando suas diferentes ocorrências institucionais.
-- **Classificação por Política:** O arquivo `politica.json` classifica cada documento em `nucleo`, `complementar`, `historico`, `dados_estruturados` ou `revisao`.
-- **Artefatos:** JSONLs de governança (`documentos.jsonl`, `versoes.jsonl`, `conteudos.jsonl`, `indice_nucleo.jsonl`).
+### Etapa 2: Refino (`backend/refino/`)
+- Limpeza não destrutiva, normalização Unicode e resolução de identidade: conteúdos idênticos compartilham o mesmo hash SHA-256.
+- Classificação por natureza (legislação, consulta tributária, manual etc.) e escolha da versão preferida de cada documento.
 
-### Etapa 3: Recorte Curado da Demonstração (`data/raw/recorte_demo/`)
-- **Responsabilidade:** Seleção das 9 frentes centrais prioritárias do desafio, totalizando **46 documentos canônicos**:
-  1. *Legislação:* LC 123/2006, CGSN 140/2018, CTN, LC 116/2003, LGPD, EC 132/2023, LC 214/2025.
-  2. *Legislação Complementar:* LC 128, LC 147, LC 155, LC 188, LC 87, Dec 6.022, Lei 12.741, Ajustes SINIEF 07 e 19.
-  3. *Manuais Fiscais:* PGDAS-D/DEFIS, PGMEI, DASN-SIMEI, FAQs Oficiais Simples e MEI.
-  4. *Frente MEI:* Regras de formalização, impedimentos, ocupações permitidas e encerramento.
-  5. *SPED:* Manuais técnicos de ECD, ECF, EFD-Contribuições e EFD-ICMS/IPI.
-  6. *ISS e Tributos DF:* Decretos Distritais nº 25.508/2005 e nº 43.982/2022, NFS-e DF, guias de retenção e Web Service.
-  7. *Lucro Presumido:* Leis federais nº 9.249 e 9.430, RIR/2018 e IN RFB 1.700.
-  8. *Calendário DF:* Portaria RFB nº 11.460, Lei DF nº 963 e Decreto DF nº 48.117.
-  9. *Jurisprudência:* Acórdãos selecionados de pejotização (CARF) e prescrição de declarações (STJ).
-- **Contrato de Metadados:** Frontmatter padronizado com `document_id`, `title`, `jurisdicao`, `natureza_documental` e `coletado_em`.
+### Etapa 3: Recorte (`src/rag/recorte_csv.py`)
+- Exporta a versão preferida de cada documento do índice do refino para um CSV, com o texto sem alteração.
+- Com `--publico`, aplica regras de exclusão a documentos inteiros (por exemplo, dados pessoais ou identificação de partes) e grava um manifesto com contagens, SHA-256 e a lista dos excluídos.
+- Resultado: `data/recorte-rag-v1/recorte-publico.csv.gz`, com 4.026 documentos. Quatro documentos barrados pelo filtro foram liberados após conferência manual e sete documentos oficiais ficaram num complemento; os dois arquivos estão fora do repositório. Detalhes em `docs/lista-documentos-fonte.md`.
+- A vigência não é verificada: `vigencia_fonte` fica vazio.
 
-### Etapa 4: Segmentação Hierárquica Jurídica (`src/rag/chunker.py`)
-- **Responsabilidade:** Segmentar cada documento respeitando dispositivos normativos e seções estruturadas.
-- **Regras:**
-  - Janela máxima de **2.000 caracteres**.
-  - Sobreposição (**overlap**) de **200 caracteres**.
-  - **Injeção de Contexto:** Cabeçalho com Fonte, Document ID, Artigo, Parágrafo e Caput Anchor.
-  - **Classificação de Tags Fiscais:** Detecção automática de regimes e tópicos para roteamento.
+### Etapa 4: Trechos (`src/rag/chunker.py`)
+- Um trecho por artigo, com até 2.000 caracteres de corpo e 200 de sobreposição; documentos sem artigo são divididos por seção Markdown.
+- Cabeçalho de contexto com documento, fonte, capítulo e artigo no início de cada trecho.
+- Remove segmentos repetidos e texto riscado; o original com rasuras fica em `texto_com_rasuras`. As páginas de login do CARF são descartadas.
+- Detalhes em `docs/estrategia-chunking.md`.
 
-### Etapa 5: Geração de Embeddings (`qwen3-embedding:0.6b`)
-- **Responsabilidade:** Converter o texto do chunk em vetor de densidade semântica.
-- **Configuração:** 1024 dimensões, normalização vetorial L2 e distância de Cosseno.
-- **Ambiente:** Ollama na máquina com GPU RTX 3080 Ti de 32 GB.
+### Etapa 5: Embeddings e BM25
+- Vetor denso de 1024 dimensões com `qwen3-embedding:0.6b`, gerado pelo Ollama na placa de vídeo, em lotes de 64.
+- Vetor esparso BM25, calculado em Python (`backend/api/app/sparse.py`).
+- Detalhes em `docs/estrategia-embeddings.md`.
 
-### Etapa 6: Carga e Indexação no Qdrant (`scripts/ingest_qdrant.py`)
-- **Responsabilidade:** Persistir e indexar os pontos vetoriais com payload no Qdrant.
-- **Coleção:** `knowledge_base`.
-- **Payload Schema:** Estritamente compatível com o modelo Pydantic `backend/api/app/schemas.py:Source`.
+### Etapa 6: Carga no Qdrant (`src/rag/csv_para_qdrant.py`)
+- Coleção `knowledge_base_v2`, com vetores `dense` (cosseno) e `sparse` (IDF), e índices nos campos `document_id`, `norma`, `artigo`, `frente` e `ordem`.
+- Antes de gravar um documento, apaga os pontos antigos dele; repetir a carga não duplica.
+- A coleção anterior, `knowledge_base`, segue intacta para comparação.
 
 ---
 
-## 3. Comandos de Reprodução do Pipeline
+## 4. Comandos
 
-### 3.1 Gerar Recorte Curado das 46 Fontes Centrais:
+### 4.1 Conferir o recorte
+
 ```bash
-python scripts/build_recorte_demo.py
+sha256sum data/recorte-rag-v1/recorte-publico.csv.gz
+# 0815a880c65f3c2044f8f0bda1fb5a9fb7a0e21f2c13e46ca0652ad58ebf0511
 ```
 
-### 3.2 Executar Chunking Hierárquico e Exportar Pontos Qdrant:
-```bash
-python -c "from src.rag.ingest import IngestionPipeline; IngestionPipeline(raw_dir='data/raw/recorte_demo', manifest_path='data/processed/manifest_recorte_46.json').run()"
-```
-- Gera `data/processed/qdrant_points.jsonl` (132 pontos formatados).
-- Gera `data/processed/vector_index.db` (banco de apoio local).
-- Gera `data/processed/manifest_recorte_46.json` (auditoria MLOps).
+### 4.2 Subir Qdrant, reranker e API
 
-### 3.3 Carregar os Pontos no Qdrant (Máquina GPU):
 ```bash
-python scripts/ingest_qdrant.py --qdrant-url http://localhost:6333 --ollama-url http://localhost:11434
-```
-Ou em modo de validação dry-run:
-```bash
-python scripts/ingest_qdrant.py --dry-run
+docker compose -f backend/compose.yaml up -d
 ```
 
-### 3.4 Validar a Recuperação de Ponta a Ponta:
-```bash
-python scripts/avaliar_recuperacao_qdrant.py
-```
-- Executa as 20 rodadas de calibração de `top_k` e `score_threshold` contra o benchmark de 25 perguntas fiscais.
+O Ollama precisa estar rodando na máquina com `qwen3:8b` e `qwen3-embedding:0.6b`. Sem os modelos, `/ready` responde 503.
 
+### 4.3 Simular e gravar a carga
+
+```bash
+# conta trechos e pontos, sem modelo nem Qdrant
+python -m src.rag.csv_para_qdrant --csv data/recorte-rag-v1/recorte-publico.csv.gz --dry-run
+
+# grava; --colecao é obrigatório
+python -m src.rag.csv_para_qdrant --csv data/recorte-rag-v1/recorte-publico.csv.gz --colecao knowledge_base_v2
+```
+
+Os arquivos liberados após revisão e o complemento oficial são carregados com o mesmo comando, na mesma coleção.
+
+### 4.4 Consultar
+
+```bash
+curl -s http://localhost:8000/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Qual é o limite de faturamento anual do MEI?"}'
+```
+
+A resposta traz `status`, `answer` e `sources`, com `text`, `source`, `score`, `title`, `document_id` e `chunk_id` de cada trecho.
+
+### 4.5 Avaliar
+
+```bash
+cd backend/api
+python -m evaluation run --dataset ../evaluation/data/teste_final_v2_2026-11-07.jsonl --run-dir ../evaluation/runs/<nome> --all
+```
+
+Usa o mesmo serviço de busca e geração da API, com Qdrant e Ollama no ar. Instalação e imagem Docker em `backend/evaluation/README.md`. As métricas e os conjuntos de perguntas estão em `docs/metricas-avaliacao-rag.md`.
