@@ -2,7 +2,7 @@
 
 ## Conclusão
 
-A versão nova melhorou de forma clara no teste mais recente, mas ainda não tem aprovação fiscal. Em 20 perguntas novas, ela teve 17 respostas corretas ou recusas adequadas, contra 9 da versão antiga, e nenhuma resposta classificada como errada. Essa classificação é preliminar: foi feita pelo Claude, que também escreveu as perguntas.
+A versão nova melhorou de forma clara no teste mais recente, mas ainda não tem aprovação fiscal. Em 20 perguntas novas, ela teve 17 respostas corretas ou recusas adequadas, contra 9 da versão antiga, e nenhuma resposta classificada como errada. Essa classificação é preliminar: foi feita pela mesma equipe que escreveu as perguntas, sem revisão independente.
 
 Nas perguntas usadas nos ajustes, a nova ainda erra em casos importantes, como q07, q13 e q20. Por isso, recomenda-se apresentá-la como uma melhora medida, não como pronta para orientação fiscal sem revisão. A API local já usa a versão nova, e a coleção antiga segue intacta para voltar atrás.
 
@@ -89,7 +89,7 @@ A RTX 3080 Ti tem 12 GB. Com contexto de 16.384 tokens, a memória de vídeo est
 
 ## Limites desta avaliação
 
-- **Sem independência:** o Claude escreveu as perguntas e referências, implementou as mudanças e fez a leitura preliminar.
+- **Sem independência:** as perguntas, as referências, as mudanças e a leitura preliminar foram feitas pela mesma equipe.
 - **Vantagem de acervo:** as perguntas foram escritas a partir de documentos conhecidos, e cinco só têm resposta na coleção nova.
 - **Perguntas diretas:** o teste novo tem muitas perguntas objetivas; casos que exigem raciocínio aparecem mais no desenvolvimento, onde a nova ainda erra.
 - **Amostra pequena:** 20 perguntas não cobrem o domínio fiscal.

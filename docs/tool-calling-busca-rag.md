@@ -99,7 +99,7 @@ Antes de adotar, um revisor humano confere as referências e as respostas.
 
 ## Resultado
 
-Medição de 07/11/2026, com leitura preliminar das respostas feita pelo Claude e sem revisão humana.
+Medição de 07/11/2026, com leitura preliminar das respostas e sem revisão humana.
 
 | Etapa | Resultado | Decisão |
 |---|---|---|

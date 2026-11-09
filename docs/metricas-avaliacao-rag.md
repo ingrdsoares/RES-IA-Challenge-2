@@ -104,7 +104,7 @@ Cada resposta é comparada com uma referência conferida no texto oficial e rece
 | Desenvolvimento | ROUGE-L | 0,202 | 0,264 | +0,062 (+0,032 a +0,097) |
 | Desenvolvimento | BERTScore | 0,610 | 0,631 | +0,021 (−0,001 a +0,044) |
 
-A classificação é preliminar: foi feita pelo Claude, que também escreveu as perguntas. ROUGE-L e BERTScore medem semelhança de texto, não acerto fiscal.
+A classificação é preliminar: foi feita pela mesma equipe que escreveu as perguntas, sem revisão fiscal. ROUGE-L e BERTScore medem semelhança de texto, não acerto fiscal.
 
 ---
 
