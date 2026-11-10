@@ -426,3 +426,27 @@ OLLAMA_TEST_URL=http://localhost:11434 .venv/bin/python -m pytest backend/api/te
 
 Esse teste usa o PostgreSQL e Redis isolados dos demais testes MVP e não altera a
 coleção Qdrant da aplicação. Não é uma avaliação de corretude tributária.
+
+## Evidências, painel e tarefas
+
+Cadastre obrigações manualmente em POST `/empresas/{id}/obrigacoes` com `name`,
+`period` e `due_date` opcional. POST `/empresas/{id}/evidencias` recebe `kind`
+(guide/payment/declaration/certificate/registration/other), `scope`
+(registration/federal_certificate/obligations), competência, validade e vínculo de
+obrigação opcionais. Use `Idempotency-Key`, sessão e CSRF. A origem é sempre declarada.
+
+PUT `/evidencias/{id}/arquivo` recebe bytes PDF/PNG/JPEG até 10 MiB, com Content-Type.
+Valida assinatura, tamanho e propriedade antes de registrar o anexo; não extrai
+nem confirma o conteúdo. O anexo é imutável. GET na mesma rota emite URL temporária
+somente após autorização. O arquivo permanece fora do índice jurídico.
+
+GET `/empresas/{id}/situacao-fiscal` separa cadastro, certidão federal e obrigações,
+mostrando ausência, declaração ou evidência vencida. Verificação oficial permanece
+`unverified`, inclusive para pagamentos declarados. A cobertura é parcial.
+
+POST/GET `/empresas/{id}/tarefas`, GET/PATCH `/tarefas/{id}` e GET do histórico
+permitem organizar ações. PATCH recebe `completed` e chave idempotente; concluir ou
+reabrir não altera situação fiscal. Para transformar um próximo passo em tarefa,
+envie `source_message_id` e `source_step_index` (0–2) explicitamente. O backend
+valida a empresa da mensagem e evita duplicar a tarefa do mesmo passo.
+Listagens aceitam `limit` e `cursor`; tarefas também filtram por `completed`.

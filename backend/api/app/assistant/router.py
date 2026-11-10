@@ -1,8 +1,7 @@
-from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
-from sqlalchemy import select, tuple_
+from fastapi import APIRouter, Depends, Header, Query
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.access.models import Account
@@ -12,6 +11,7 @@ from app.assistant.service import require_conversation, submit_message
 from app.companies.service import require_company
 from app.db import get_db
 from app.dependencies import require_account
+from app.pagination import page
 
 router = APIRouter(tags=["Assistente"])
 
@@ -92,26 +92,4 @@ def send(
         "status": operation.status,
         "status_url": f"/operacoes/{operation.id}",
         "missing_fields": (operation.result or {}).get("missing_fields", []),
-    }
-
-
-def page(db, query, model, view, limit, cursor):
-    if cursor:
-        try:
-            value, identifier = cursor.split("|")
-            after = datetime.fromisoformat(value)
-            if after.tzinfo is None:
-                raise ValueError("timezone required")
-            query = query.where(
-                tuple_(model.created_at, model.id) > tuple_(after, UUID(identifier))
-            )
-        except ValueError:
-            raise HTTPException(422, "Cursor inválido") from None
-    rows = list(db.scalars(query.order_by(model.created_at, model.id).limit(limit + 1)))
-    selected = rows[:limit]
-    return {
-        "items": [view.model_validate(row) for row in selected],
-        "next_cursor": f"{selected[-1].created_at.isoformat()}|{selected[-1].id}"
-        if len(rows) > limit
-        else None,
     }

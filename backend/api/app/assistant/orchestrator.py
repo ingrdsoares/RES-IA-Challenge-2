@@ -12,6 +12,7 @@ from app.assistant.citations import validate_citations
 from app.assistant.models import Conversation, Message
 from app.assistant.tools import retrieve_legal
 from app.config import Settings
+from app.evidence.service import get_fiscal_status
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
 from app.models import LocalModels
@@ -64,6 +65,8 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
     )
     if existing:
         return {"message_id": str(existing.id), "state": existing.status}
+    facts = get_fiscal_status(db, operation.company_id, user.context.get("period"))
+    user.context = {**user.context, "fiscal_status": facts}
     settings = settings or Settings()
     own_index, own_models = index is None, embed is None
     index = (
@@ -85,7 +88,14 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
         citations, steps = [], []
         if not passages:
             answer = "Não encontrei contexto normativo publicado e vigente suficiente para responder. A situação fiscal da empresa permanece não verificada."
-            state = "insufficient_context"
+            if any(
+                facts[scope]["latest_evidence"]
+                for scope in ("registration", "federal_certificate", "obligations")
+            ):
+                answer = "Há evidências declaradas registradas para este contexto. Elas não comprovam pagamento nem regularidade fiscal. Verificação oficial: não realizada."
+                state = "answered"
+            else:
+                state = "insufficient_context"
         else:
             for citation_index, passage in enumerate(passages, start=1):
                 passage["citation_index"] = citation_index
