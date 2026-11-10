@@ -86,9 +86,9 @@ As datas indicam coleta, não vigência. CNAE sozinho não determina elegibilida
 ## Referências do projeto
 
 - [Base tributária e arquitetura](../../base_tributaria_ia_fontes_e_arquitetura.md)
-- [Exploração de dados](../../docs/exploracao-dados.md)
-- [Guia de APIs fiscais](../../docs/guia_de_apis_fiscais_e_documenta_o.md)
-- [Arquitetura do crawler](../../docs/crawler-arquitetura.md)
+- [Exploração de dados](../../docs/dados/exploracao-dados.md)
+- [Guia de APIs fiscais](../../docs/dados/guia_de_apis_fiscais_e_documenta_o.md)
+- [Arquitetura do crawler](../../docs/arquitetura/crawler-arquitetura.md)
 
 ## Coletar legislação (LC 123 e CGSN 140)
 

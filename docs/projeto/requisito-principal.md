@@ -3,7 +3,7 @@
 > **Projeto:** Sócio Digital — Copiloto de Gestão Fiscal para Pequenos Negócios  
 > **Programa:** Residência em Inteligência Artificial (RES-IA) — Challenge 2 (Grupo 08)  
 > **Integrantes:** Clara, Ingrid, Jhessica, Lucas, Nasser  
-> **Download do PDF Consolidado:** [requisito-principal-socio-digital.pdf](requisito-principal-socio-digital.pdf)
+> **Download do PDF Consolidado:** [requisito-principal-socio-digital.pdf](../entrega/requisito-principal-socio-digital.pdf)
 
 ---
 

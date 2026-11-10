@@ -4,7 +4,7 @@
 > Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Inteligência Artificial (RES-IA)**.
 
 **Documentação Oficial (GitHub Pages):** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)  
-**Download do Entregável da Semana (PDF):** [docs/entregaveis-challenge-2-grupo-08-final.pdf](docs/entregaveis-challenge-2-grupo-08-final.pdf)
+**Download do Entregável da Semana (PDF):** [docs/entrega/entregaveis-challenge-2-grupo-08-final.pdf](docs/entrega/entregaveis-challenge-2-grupo-08-final.pdf)
 
 ---
 
@@ -49,12 +49,12 @@ API: http://localhost:8000/docs. Qdrant: http://localhost:6333/dashboard.
 A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):
 
 - [`docs/README.md`](docs/README.md): Visão geral do projeto e apresentação do time.
-- [`docs/definicao-projeto.md`](docs/definicao-projeto.md): Pacote completo de definição do projeto (cenário, problema, personas, requisitos, riscos e métricas).
-- [`docs/guiding-questions.md`](docs/guiding-questions.md): Guiding questions, fundamentação de qualidade de vida e fluxo consultivo sem exercício ilegal da contabilidade.
-- [`docs/arquitetura.md`](docs/arquitetura.md): Diretrizes arquiteturais e frentes de dados/engenharia.
-- [`docs/devops-mlops.md`](docs/devops-mlops.md): Infraestrutura, esteiras e práticas de MLOps.
-- [`docs/equipe.md`](docs/equipe.md): Matriz detalhada de responsabilidades e atribuições.
-- [`docs/metodologia.md`](docs/metodologia.md): Scrum adaptado, git flow e critérios de aceitação.
+- [`docs/projeto/definicao-projeto.md`](docs/projeto/definicao-projeto.md): Pacote completo de definição do projeto (cenário, problema, personas, requisitos, riscos e métricas).
+- [`docs/projeto/guiding-questions.md`](docs/projeto/guiding-questions.md): Guiding questions, fundamentação de qualidade de vida e fluxo consultivo sem exercício ilegal da contabilidade.
+- [`docs/arquitetura/arquitetura.md`](docs/arquitetura/arquitetura.md): Diretrizes arquiteturais e frentes de dados/engenharia.
+- [`docs/arquitetura/devops-mlops.md`](docs/arquitetura/devops-mlops.md): Infraestrutura, esteiras e práticas de MLOps.
+- [`docs/projeto/equipe.md`](docs/projeto/equipe.md): Matriz detalhada de responsabilidades e atribuições.
+- [`docs/projeto/metodologia.md`](docs/projeto/metodologia.md): Scrum adaptado, git flow e critérios de aceitação.
 
 ---
 
@@ -94,7 +94,7 @@ A expansão inclui ICMS/consultas DF, reforma tributária, histórico CGSN, CNPJ
 
 Consulte a [sumarização integral do acervo tributário](docs/sumarizacao-acervo-tributario.md), com descrição de todas as frentes, cobertura e referências de cada versão coletada. O [inventário integral de referências](docs/referencias-acervo/inventario-integral.json) permite processamento automatizado.
 
-O refino tem [arquitetura própria](docs/arquitetura-refino.md), [pipeline reproduzível](backend/refino/README.md) e [instruções de continuidade para outros agentes](handoff/refino/CONTINUAR.md). Gere um pacote portátil com python -m backend.refino.exportar.
+O refino tem [arquitetura própria](docs/arquitetura/arquitetura-refino.md), [pipeline reproduzível](backend/refino/README.md) e [instruções de continuidade para outros agentes](handoff/refino/CONTINUAR.md). Gere um pacote portátil com python -m backend.refino.exportar.
 
 ## Avaliação do RAG
 

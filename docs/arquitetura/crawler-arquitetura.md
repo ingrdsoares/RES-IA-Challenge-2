@@ -1,6 +1,6 @@
 # Crawler de Coleta: Estrutura e Arquitetura Base
 
-Esboço da arquitetura de um coletor (crawler) para obter, organizar e versionar as informações úteis das fontes listadas em [Exploração de Dados](exploracao-dados.md). A arquitetura completa abaixo é uma proposta de evolução. A primeira etapa implementada está em [backend/crawler](../backend/crawler/README.md): coleta manual de CNAEs do IBGE para Markdown estruturado e JSON original, sem banco de dados nesta fase.
+Esboço da arquitetura de um coletor (crawler) para obter, organizar e versionar as informações úteis das fontes listadas em [Exploração de Dados](../dados/exploracao-dados.md). A arquitetura completa abaixo é uma proposta de evolução. A primeira etapa implementada está em [backend/crawler](../../backend/crawler/README.md): coleta manual de CNAEs do IBGE para Markdown estruturado e JSON original, sem banco de dados nesta fase.
 
 > **Premissa central:** isto **não é um crawler genérico** que varre a web. É um conjunto de **conectores por fonte**, dirigidos por um catálogo, que coleta só o que foi aprovado na pesquisa. Poucas fontes, alta qualidade, rastreabilidade total.
 
@@ -75,7 +75,7 @@ Esboço da arquitetura de um coletor (crawler) para obter, organizar e versionar
 
 ### 3.1 Catálogo de fontes
 
-Um arquivo por fonte, espelhando os campos da seção 6 de [Exploração de Dados](exploracao-dados.md). O catálogo é a **única entrada** do crawler: sem entrada no catálogo, sem coleta.
+Um arquivo por fonte, espelhando os campos da seção 6 de [Exploração de Dados](../dados/exploracao-dados.md). O catálogo é a **única entrada** do crawler: sem entrada no catálogo, sem coleta.
 
 ```yaml
 # sources/planalto-lc123.yaml

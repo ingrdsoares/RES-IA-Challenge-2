@@ -120,4 +120,4 @@ Fatiamento de toda a base `knowledge_base_v2`:
 
 O corpo nunca passa de 2.000 caracteres; os valores acima incluem o cabeçalho. A base anterior, `knowledge_base`, tinha 176.529 trechos; a diferença vem sobretudo da remoção de segmentos repetidos.
 
-O efeito na recuperação e nas respostas está em `docs/avaliacao-rag-2026-11-07.md`.
+O efeito na recuperação e nas respostas está em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.

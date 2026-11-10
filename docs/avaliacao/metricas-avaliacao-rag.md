@@ -10,7 +10,7 @@
 
 ## 1. Contexto e Diferenciação das Métricas
 
-No início do projeto, o arquivo `docs/benchmark-rag-mlops.md` reportava 100% de aprovação. Conforme expressamente pontuado na **Seção 6 (Cuidados)** do Plano de Entrega:
+No início do projeto, o arquivo `docs/avaliacao/benchmark-rag-mlops.md` reportava 100% de aprovação. Conforme expressamente pontuado na **Seção 6 (Cuidados)** do Plano de Entrega:
 
 > *"Os 100% de benchmark-rag-mlops.md mediam o RAG primitivo por template e classificação por regras léxicas em src/rag; não devem ser tomados como medida de desempenho do sistema vetorial real."*
 
@@ -120,4 +120,4 @@ Em `backend/evaluation/data/`, no formato de `backend/evaluation/dataset.schema.
 | `teste_compostas_2026-11-07.jsonl` | 20 perguntas usadas nos ajustes das compostas, 14 delas compostas |
 | `teste_compostas_confirmacao_2026-11-07.jsonl` | 10 perguntas compostas novas |
 
-`data/benchmark/ground_truth_25_perguntas.json` ainda tem as referências anteriores, algumas tiradas de textos de demonstração; não deve ser usado. Detalhes dos testes em `docs/avaliacao-rag-2026-11-07.md`.
+`data/benchmark/ground_truth_25_perguntas.json` ainda tem as referências anteriores, algumas tiradas de textos de demonstração; não deve ser usado. Detalhes dos testes em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.

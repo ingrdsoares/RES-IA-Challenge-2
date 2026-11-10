@@ -19,7 +19,7 @@ flowchart LR
 
 ## 2. Sistema Implementado
 
-O diagrama mostra só o que roda hoje. A arquitetura-alvo, com frontend, banco da empresa e integrações fiscais, está em `docs/arquitetura.md`.
+O diagrama mostra só o que roda hoje. A arquitetura-alvo, com frontend, banco da empresa e integrações fiscais, está em `docs/arquitetura/arquitetura.md`.
 
 ```mermaid
 flowchart TB
@@ -61,19 +61,19 @@ Máquina usada: RTX 3080 Ti de 12 GB e 32 GB de RAM.
 ### Etapa 3: Recorte (`src/rag/recorte_csv.py`)
 - Exporta a versão preferida de cada documento do índice do refino para um CSV, com o texto sem alteração.
 - Com `--publico`, aplica regras de exclusão a documentos inteiros (por exemplo, dados pessoais ou identificação de partes) e grava um manifesto com contagens, SHA-256 e a lista dos excluídos.
-- Resultado: `data/recorte-rag-v1/recorte-publico.csv.gz`, com 4.026 documentos. Quatro documentos barrados pelo filtro foram liberados após conferência manual e sete documentos oficiais ficaram num complemento; os dois arquivos estão fora do repositório. Detalhes em `docs/lista-documentos-fonte.md`.
+- Resultado: `data/recorte-rag-v1/recorte-publico.csv.gz`, com 4.026 documentos. Quatro documentos barrados pelo filtro foram liberados após conferência manual e sete documentos oficiais ficaram num complemento; os dois arquivos estão fora do repositório. Detalhes em `docs/dados/lista-documentos-fonte.md`.
 - A vigência não é verificada: `vigencia_fonte` fica vazio.
 
 ### Etapa 4: Trechos (`src/rag/chunker.py`)
 - Um trecho por artigo, com até 2.000 caracteres de corpo e 200 de sobreposição; documentos sem artigo são divididos por seção Markdown.
 - Cabeçalho de contexto com documento, fonte, capítulo e artigo no início de cada trecho.
 - Remove segmentos repetidos e texto riscado; o original com rasuras fica em `texto_com_rasuras`. As páginas de login do CARF são descartadas.
-- Detalhes em `docs/estrategia-chunking.md`.
+- Detalhes em `docs/arquitetura/estrategia-chunking.md`.
 
 ### Etapa 5: Embeddings e BM25
 - Vetor denso de 1024 dimensões com `qwen3-embedding:0.6b`, gerado pelo Ollama na placa de vídeo, em lotes de 64.
 - Vetor esparso BM25, calculado em Python (`backend/api/app/sparse.py`).
-- Detalhes em `docs/estrategia-embeddings.md`.
+- Detalhes em `docs/arquitetura/estrategia-embeddings.md`.
 
 ### Etapa 6: Carga no Qdrant (`src/rag/csv_para_qdrant.py`)
 - Coleção `knowledge_base_v2`, com vetores `dense` (cosseno) e `sparse` (IDF), e índices nos campos `document_id`, `norma`, `artigo`, `frente` e `ordem`.
@@ -128,4 +128,4 @@ cd backend/api
 python -m evaluation run --dataset ../evaluation/data/teste_final_v2_2026-11-07.jsonl --run-dir ../evaluation/runs/<nome> --all
 ```
 
-Usa o mesmo serviço de busca e geração da API, com Qdrant e Ollama no ar. Instalação e imagem Docker em `backend/evaluation/README.md`. As métricas e os conjuntos de perguntas estão em `docs/metricas-avaliacao-rag.md`.
+Usa o mesmo serviço de busca e geração da API, com Qdrant e Ollama no ar. Instalação e imagem Docker em `backend/evaluation/README.md`. As métricas e os conjuntos de perguntas estão em `docs/avaliacao/metricas-avaliacao-rag.md`.

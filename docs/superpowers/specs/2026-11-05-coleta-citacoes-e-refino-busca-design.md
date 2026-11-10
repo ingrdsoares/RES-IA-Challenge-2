@@ -74,7 +74,7 @@ Os scripts exploratórios ficam fora do repositório e são descartáveis; podem
 - Descoberta federal: a API de dados abertos do Senado (`legis.senado.leg.br/dadosabertos/legislacao/lista?tipo=&numero=&ano=`) e URNs do LexML (`/urn/...`) podem localizar a norma por tipo, número e ano. As URLs da Câmara têm ID opaco e não dão para derivar.
 - Teste feito em 2026-11-05, com poucas requisições desta máquina: Planalto respondeu 200 em duas leis (Lei 10.833 e Lei 10.865) e seu robots.txt retorna 404, mas `backend/crawler/README.md` registra bloqueio e timeout anteriores. A API do Senado respondeu com a Lei 10.833, porém o robots.txt do Senado retornou 403, então sua política não ficou confirmada. O LexML proíbe `/busca/`, `/doc/` e `/linker/` no robots.txt. Reconfirmar tudo isso antes da coleta. Se uma fonte falhar em lote, passar para a próxima e deixar para `manual` só o que nenhuma fonte entregar. Headless é último recurso, como na arquitetura.
 - Só aceitar o documento após verificar no texto que tipo, número e ano correspondem à norma procurada. Na dúvida, fica ambígua.
-- Seguir a arquitetura do crawler (`docs/crawler-arquitetura.md`): respeitar robots.txt e termos de uso e usar limite de requisições. O que não puder ser baixado vai para a lista de download manual.
+- Seguir a arquitetura do crawler (`docs/arquitetura/crawler-arquitetura.md`): respeitar robots.txt e termos de uso e usar limite de requisições. O que não puder ser baixado vai para a lista de download manual.
 - Guardar checkpoint para retomar sem repetir downloads.
 
 **1.3 Rodadas.**

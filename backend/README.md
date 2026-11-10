@@ -290,4 +290,4 @@ python -m backend.crawler.legislacao --source lc116
 
 ## Refino da base
 
-A camada [refino](refino/README.md) organiza documentos/versões/conteúdos, mantém proveniência e separa datasets. O perfil padrão cobre todos os regimes com foco DF. Consulte a [arquitetura](../docs/arquitetura-refino.md) e o [handoff para outros agentes](../handoff/refino/CONTINUAR.md). Originais preservados; PostgreSQL ainda não importado.
+A camada [refino](refino/README.md) organiza documentos/versões/conteúdos, mantém proveniência e separa datasets. O perfil padrão cobre todos os regimes com foco DF. Consulte a [arquitetura](../docs/arquitetura/arquitetura-refino.md) e o [handoff para outros agentes](../handoff/refino/CONTINUAR.md). Originais preservados; PostgreSQL ainda não importado.

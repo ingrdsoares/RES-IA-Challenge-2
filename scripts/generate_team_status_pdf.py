@@ -381,7 +381,7 @@ class DocumentBuilder:
 
 
 def generate_document():
-    pdf_path = Path("/Users/aluno2/RES-IA-Challenge-2/docs/status-entregas-equipe-grupo-08.pdf")
+    pdf_path = Path("/Users/aluno2/RES-IA-Challenge-2/docs/entrega/status-entregas-equipe-grupo-08.pdf")
     doc = DocumentBuilder(str(pdf_path))
 
     # ========================================================
@@ -503,7 +503,7 @@ def generate_document():
         "Implementação da fórmula oficial da alíquota efetiva, cálculo exato do Fator R (>= 28%), comparativo de economia e validação de excesso de faturamento no MEI (> 20%).",
     )
     doc.draw_bullet(
-        "Pesquisa de Fontes e Crawler (docs/crawler-arquitetura.md, exploracao-dados.md):",
+        "Pesquisa de Fontes e Crawler (docs/arquitetura/crawler-arquitetura.md, exploracao-dados.md):",
         "Mapeamento das fontes governamentais e desenho arquitetural do coletor por fonte.",
     )
     doc.draw_bullet(
@@ -536,7 +536,7 @@ def generate_document():
     )
 
     doc.draw_bullet(
-        "Topologia em Três Camadas (docs/arquitetura.md):",
+        "Topologia em Três Camadas (docs/arquitetura/arquitetura.md):",
         "Desacoplamento estrito entre Camada de Dados (Lucas), Camada de Inteligência/RAG (Jhessica) e Camada de Serviços/Backend.",
     )
     doc.draw_bullet(
@@ -570,15 +570,15 @@ def generate_document():
         "Deploy contínuo e automático da documentação no padrão Docs-as-Code via Docsify com suporte nativo a diagramas Mermaid.",
     )
     doc.draw_bullet(
-        "Pacote de Definição do Projeto (docs/definicao-projeto.md):",
+        "Pacote de Definição do Projeto (docs/projeto/definicao-projeto.md):",
         "Formalização do problema, Essential Question, mapa de stakeholders, personas (Carlos, Mariana, Rafael), riscos e catálogo de 12 RFs e 10 RNFs.",
     )
     doc.draw_bullet(
-        "Fundamentação de Qualidade de Vida (docs/guiding-questions.md):",
+        "Fundamentação de Qualidade de Vida (docs/projeto/guiding-questions.md):",
         "Vínculo do terror fiscal e sobrecarga administrativa ao estresse crônico dos pequenos empreendedores.",
     )
     doc.draw_bullet(
-        "Planejamento MLOps (docs/devops-mlops.md):",
+        "Planejamento MLOps (docs/arquitetura/devops-mlops.md):",
         "Arquitetura da esteira de integração contínua para validação de fidelidade (Ragas/MLflow) e versionamento de dados via DVC.",
     )
     doc.draw_bullet(

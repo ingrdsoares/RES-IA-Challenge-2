@@ -839,7 +839,7 @@ def build_pdf(filename: str):
 
 
 if __name__ == "__main__":
-    out_pdf = "docs/relatorio-socio-digital-rag-mlops.pdf"
+    out_pdf = "docs/entrega/relatorio-socio-digital-rag-mlops.pdf"
     if len(sys.argv) > 1:
         out_pdf = sys.argv[1]
     build_pdf(out_pdf)

@@ -99,7 +99,7 @@ A RTX 3080 Ti tem 12 GB. Com contexto de 16.384 tokens, a memória de vídeo est
 
 ## Experimentos depois do teste novo
 
-Quatro mudanças foram testadas depois do teste novo, seguindo `docs/tool-calling-busca-rag.md` quando aplicável. Um terceiro conjunto, com 20 perguntas, tem 8 que citam norma e artigo, 5 que citam só a norma, 4 compostas e 3 que pedem dados ou recusa.
+Quatro mudanças foram testadas depois do teste novo, seguindo `docs/arquitetura/tool-calling-busca-rag.md` quando aplicável. Um terceiro conjunto, com 20 perguntas, tem 8 que citam norma e artigo, 5 que citam só a norma, 4 compostas e 3 que pedem dados ou recusa.
 
 | Experimento | Resultado | Decisão |
 |---|---|---|
