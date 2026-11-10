@@ -1,4 +1,5 @@
 import pytest
+from app.legal import models as legal_models  # noqa: F401
 from app.main import create_app
 from fastapi.testclient import TestClient
 

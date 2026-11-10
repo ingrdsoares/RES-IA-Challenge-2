@@ -13,3 +13,5 @@ argon2-cffi==25.1.0
 redis==8.1.0
 boto3==1.43.127
 rq==3.0.0
+beautifulsoup4==4.15.0
+pypdf==7.0.1

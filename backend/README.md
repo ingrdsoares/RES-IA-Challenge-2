@@ -343,3 +343,30 @@ Referências de implementação: [sessões SQLAlchemy](https://docs.sqlalchemy.o
 [RQ](https://python-rq.org/docs/),
 [URLs S3 assinadas](https://docs.aws.amazon.com/boto3/latest/guide/s3-presigned-urls.html)
 e [SeaweedFS S3](https://github.com/seaweedfs/seaweedfs/wiki/Amazon-S3-API).
+
+## Ingestão administrativa de normas versionadas
+
+Aplique as migrações e inicie storage, dispatcher e worker. Na pasta `backend/api`,
+com as variáveis de ambiente configuradas:
+
+```bash
+python -m app.legal.cli ingest --file /caminho/norma.md --metadata /caminho/metadata.json --key lei123-v1
+```
+
+Metadados mínimos (exemplo de teste, não uma norma fiscal):
+
+```json
+{"document_key":"lei-teste","title":"Lei de teste","official_url":"https://example.org/lei","version_label":"v1","authority":"Teste","norm_type":"lei","subjects":["MEI"]}
+```
+
+`effective_from` e `effective_to` são datas ISO opcionais. Vigência desconhecida
+não equivale a vigência atual. O comando imprime o UUID da versão e agenda o job.
+Recebe HTML, Markdown ou PDF textual até 20 MiB. PDFs sem texto exigem tratamento
+manual. Original e JSON permanecem no bucket; o catálogo fica no PostgreSQL e os
+vetores em `legal_versions_v1`, separada da coleção RAG existente.
+
+O worker usa o embedding configurado, sem baixar modelos. Repetir chave e conteúdo
+não duplica a operação. Alterar conteúdo ou metadados de uma versão existente gera
+conflito; forneça nova identificação de versão. Publicação ocorre apenas após
+normalização, escrita do JSON e indexação. Falhas após três tentativas marcam a
+versão como falha. O comando idempotente com nova chave pode agendar uma recuperação.

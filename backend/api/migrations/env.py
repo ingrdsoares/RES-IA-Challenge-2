@@ -4,6 +4,7 @@ from app.companies import models as company_models  # noqa: F401
 from app.config import Settings
 from app.db import Base
 from app.jobs import models as job_models  # noqa: F401
+from app.legal import models as legal_models  # noqa: F401
 from sqlalchemy import create_engine
 
 url = Settings().database_url

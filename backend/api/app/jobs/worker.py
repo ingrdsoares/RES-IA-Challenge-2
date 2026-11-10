@@ -33,9 +33,20 @@ def execute(factory, operation_id: UUID, handlers: dict):
             operation.error = "operation_failed"
             operation.status = "failed" if operation.attempts >= 3 else "queued"
             operation.dispatched_at = None
+            if operation.kind == "legal.ingest" and operation.status == "failed":
+                from app.legal.models import NormVersion
+
+                version = db.get(NormVersion, UUID(operation.payload["version_id"]))
+                if version and version.status != "ready":
+                    version.status = "failed"
 
 
 def run_operation(operation_id: str) -> None:
+    from app.companies import models as company_models  # noqa: F401
+    from app.legal import models as legal_models  # noqa: F401
+    from app.legal.ingest import handle_ingestion
+
+    HANDLERS["legal.ingest"] = handle_ingestion
     settings = Settings()
     factory = session_factory(settings.database_url)
     try:
