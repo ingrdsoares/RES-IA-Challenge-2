@@ -9,6 +9,11 @@
   * [Equipe e Responsabilidades](projeto/equipe.md)
   * [Mapeamento de Entregas da Equipe](projeto/status-entregas-equipe.md)
   * [Metodologia e Entregas](projeto/metodologia.md)
+  * Planejamento de Etapas
+    * [Etapa 1: Unificar o núcleo (PDF)](projeto/planejamento-etapas/planejamento-de-etapas-1-unificar-o-nucleo.pdf)
+    * [Etapa 2: Confiabilidade do RAG (PDF)](projeto/planejamento-etapas/planejamento-de-etapas-2-confiabilidade-do-rag.pdf)
+    * [Etapa 3: Aplicação e frontend (PDF)](projeto/planejamento-etapas/planejamento-de-etapas-3-aplicacao-frontend.pdf)
+    * [Etapa 4: Produção (PDF)](projeto/planejamento-etapas/planejamento-de-etapas-4-producao.pdf)
 
 * **Arquitetura**
   * [Arquitetura e Engenharia](arquitetura/arquitetura.md)
