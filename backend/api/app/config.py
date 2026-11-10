@@ -5,6 +5,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=None, extra="ignore")
 
+    s3_endpoint: str = 'http://localhost:9000'
+    s3_public_endpoint: str = 'http://localhost:9000'
+    s3_access_key: str = 'sd_local_user'
+    s3_secret_key: str = 'sd_local_password'
+
     database_url: str = 'postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital'
     redis_url: str = 'redis://localhost:6379/0'
     cookie_secure: bool = True

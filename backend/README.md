@@ -295,7 +295,7 @@ A camada [refino](refino/README.md) organiza documentos/versões/conteúdos, man
 ## Contas e sessões do MVP
 
 O RAG agora exige sessão. Execute PostgreSQL e Redis e aplique a migração antes
- de cadastrar contas:
+de cadastrar contas:
 
 ```bash
 docker compose -f backend/compose.yaml up -d postgres redis
@@ -319,3 +319,27 @@ confirmação de e-mail ou recuperação de senha nesta etapa.
 Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
 na porta 16379, em containers separados. Essa base é recriada por teste;
 nunca aponte esse ambiente para dados da aplicação.
+
+## Jobs e armazenamento S3 local
+
+O serviço `storage` usa SeaweedFS 4.53 (compatível com S3). A proposta inicial
+MinIO foi substituída porque as imagens oficiais não estão disponíveis publicamente.
+O contrato da aplicação continua usando boto3 e pode apontar para outro S3.
+
+Depois das migrações, inicie `storage`, `worker` e `dispatcher`. Inicialize os buckets
+privados uma vez com `ObjectStorage.initialize()`; a rotina administrativa de ingestão
+será responsável por isso no fluxo seguinte. Originais jurídicos e anexos usam buckets
+separados. URLs assinadas duram cinco minutos, e sua emissão deve ocorrer depois da
+autorização do recurso.
+
+`GET /operacoes/{id}` permite acompanhar somente operações da própria conta.
+A operação no PostgreSQL é a outbox: o dispatcher encaminha apenas seu UUID ao RQ.
+Após falha, até três tentativas são permitidas. Operações pendentes despachadas há mais
+de quinze minutos podem ser reenfileiradas; handlers devem manter efeitos transacionais
+no banco e usar chaves imutáveis/idempotentes para efeitos em S3 e Qdrant.
+
+Referências de implementação: [sessões SQLAlchemy](https://docs.sqlalchemy.org/en/21/orm/session_basics.html),
+[Argon2](https://argon2-cffi.readthedocs.io/en/stable/howto.html),
+[RQ](https://python-rq.org/docs/),
+[URLs S3 assinadas](https://docs.aws.amazon.com/boto3/latest/guide/s3-presigned-urls.html)
+e [SeaweedFS S3](https://github.com/seaweedfs/seaweedfs/wiki/Amazon-S3-API).

@@ -138,3 +138,12 @@ def test_secure_cookie_in_production(client):
     response = register(client)
     assert response.status_code == 201
     assert "secure" in response.headers["set-cookie"].lower()
+
+
+def test_validation_never_echoes_password(client):
+    response = client.post(
+        "/auth/register", json={"email": "bad", "password": "my-secret"}, headers=csrf(client)
+    )
+    assert response.status_code == 422
+    assert "my-secret" not in response.text
+    assert response.json()["error"]["code"] == "validation_error"
