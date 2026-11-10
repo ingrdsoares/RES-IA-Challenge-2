@@ -118,8 +118,10 @@ jobs:
       - name: Instalar Dependencias
         run: |
           python -m pip install --upgrade pip
+          pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
           pip install -r backend/api/requirements.txt
-          pip install mlflow
+          pip install -r backend/api/requirements-eval.txt
+          pip install sentence-transformers scikit-learn mlflow
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Ingestao do Acervo e Bases Fiscais

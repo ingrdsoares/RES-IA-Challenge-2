@@ -8,8 +8,8 @@
   "guardrail_robustness": 1.0,
   "conformidade_3_passos": 1.0,
   "conformidade_crc": 1.0,
-  "tempo_medio_ms": 69.22,
-  "tempo_total_ms": 1038.47,
+  "tempo_medio_ms": 69.89,
+  "tempo_total_ms": 1048.41,
   "todos_aprovados": true,
   "metadados_versao": {
     "frente": "Ciência de Dados (Jhessica)",
@@ -45,7 +45,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 485.04,
+      "tempo_execucao_ms": 482.92,
       "detalhes": {
         "diagnostico_trecho": "A regra de faturamento do MEI (LC 123/2006, Art. 18-A) divide-se em dois cenários: 1) Excesso de até 20% (até R$ 97.200,...",
         "calculo_detalhado": null,
@@ -74,7 +74,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 78.63,
+      "tempo_execucao_ms": 83.57,
       "detalhes": {
         "diagnostico_trecho": "Alerta de Desenquadramento Fiscal do MEI: Faturamento anual (R$ 105,000.00) excedeu em mais de 20% o limite do MEI (R$ 8...",
         "calculo_detalhado": {
@@ -119,7 +119,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 205.66,
+      "tempo_execucao_ms": 217.76,
       "detalhes": {
         "diagnostico_trecho": "Ótima notícia! Pelos dados apurados, seu Fator R atingiu 30.0% (superior ao mínimo legal de 28%). A sua empresa tributa ...",
         "calculo_detalhado": {
@@ -164,7 +164,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 194.89,
+      "tempo_execucao_ms": 195.85,
       "detalhes": {
         "diagnostico_trecho": "Atenção ao seu enquadramento: seu Fator R calculado é de 10.0% (abaixo do patamar de 28%). Dessa forma, a atividade é te...",
         "calculo_detalhado": {
@@ -209,7 +209,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 15.78,
+      "tempo_execucao_ms": 13.08,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 106 da Resolução CGSN nº 140/2018, os tributos apurados no DAS vencem no dia 20 do mês subsequente ao da...",
         "calculo_detalhado": null,
@@ -238,7 +238,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.63,
+      "tempo_execucao_ms": 8.38,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,
@@ -267,7 +267,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.95,
+      "tempo_execucao_ms": 8.86,
       "detalhes": {
         "diagnostico_trecho": "Para a atividade de Comércio varejista de artigos do vestuário e acessórios (CNAE 4781-0/00) com faturamento anual infor...",
         "calculo_detalhado": {
@@ -363,7 +363,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.21,
+      "tempo_execucao_ms": 8.22,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,
@@ -392,7 +392,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.68,
+      "tempo_execucao_ms": 7.1,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 18-A, § 4º da LC 123/2006, o Microempreendedor Individual (MEI) pode contratar no máximo 1 (um) único em...",
         "calculo_detalhado": null,
@@ -421,7 +421,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.79,
+      "tempo_execucao_ms": 8.17,
       "detalhes": {
         "diagnostico_trecho": "Atenção ao seu enquadramento: seu Fator R calculado é de 25.0% (abaixo do patamar de 28%). Dessa forma, a atividade é te...",
         "calculo_detalhado": {
@@ -464,7 +464,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 9.27,
+      "tempo_execucao_ms": 6.97,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 40 da Resolução CGSN nº 140/2018, os tributos apurados no DAS vencem no dia 20 do mês subsequente ao da ...",
         "calculo_detalhado": null,
@@ -493,7 +493,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.82,
+      "tempo_execucao_ms": 7.42,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 131 da Resolução CGSN nº 140/2018, os débitos do Simples Nacional e do SIMEI podem ser parcelados em até...",
         "calculo_detalhado": null,
