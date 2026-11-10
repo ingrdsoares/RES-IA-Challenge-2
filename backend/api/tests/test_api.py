@@ -1,8 +1,17 @@
 import pytest
+from app.dependencies import require_account
 from app.errors import CollectionIncompatible, DependencyTimeout, DependencyUnavailable, QueryBusy
-from app.main import app, create_app
+from app.main import app
+from app.main import create_app as original_create_app
 from fastapi.testclient import TestClient
 from qdrant_client import models
+
+
+def create_app(**kwargs):
+    application = original_create_app(**kwargs)
+    application.dependency_overrides[require_account] = lambda: object()
+    return application
+
 
 client = TestClient(app)
 

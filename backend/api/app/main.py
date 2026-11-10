@@ -1,11 +1,15 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from redis import Redis
 from starlette.concurrency import run_in_threadpool
 
+from app.access.router import router as access_router
 from app.config import Settings
+from app.db import session_factory
+from app.dependencies import require_account
 from app.errors import CollectionIncompatible, DependencyTimeout, DependencyUnavailable, QueryBusy
 from app.models import LocalModels
 from app.rag import RagService
@@ -24,6 +28,9 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             if service is not None
             else RagService(config, VectorStore(config), LocalModels(config))
         )
+        app.state.settings = config
+        app.state.db_factory = session_factory(config.database_url)
+        app.state.redis = Redis.from_url(config.redis_url, socket_timeout=3)
         app.state.rag = rag
         try:
             try:
@@ -33,6 +40,8 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             yield
         finally:
             await run_in_threadpool(rag.close)
+            app.state.redis.close()
+            app.state.db_factory.kw["bind"].dispose()
 
     app = FastAPI(
         title="Sócio Digital - Copiloto de Gestão Fiscal",
@@ -45,6 +54,8 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
         version="0.1.0",
         lifespan=lifespan,
     )
+
+    app.include_router(access_router)
 
     @app.exception_handler(DependencyUnavailable)
     async def dependency_error(request: Request, exc: DependencyUnavailable):
@@ -75,7 +86,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             ) from None
         return {"status": "ready"}
 
-    @app.post("/rag/query", response_model=QueryResponse)
+    @app.post("/rag/query", response_model=QueryResponse, dependencies=[Depends(require_account)])
     def query(payload: QueryRequest, request: Request):
         return request.app.state.rag.query(payload.question)
 

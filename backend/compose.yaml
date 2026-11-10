@@ -1,6 +1,25 @@
 name: socio-digital
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: socio_digital
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sd_local}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    command: [redis-server, --appendonly, "yes"]
+
   qdrant:
     image: qdrant/qdrant:v1.15.1
     ports:
@@ -17,6 +36,10 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-sd_local}@postgres:5432/socio_digital
+      REDIS_URL: redis://redis:6379/0
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000"]}'
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
@@ -34,6 +57,8 @@ services:
       RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
     depends_on:
       - qdrant
+      - postgres
+      - redis
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
       interval: 10s
@@ -51,5 +76,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  postgres_data:
+  redis_data:
   qdrant_data:
   reranker_modelos:

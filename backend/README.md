@@ -291,3 +291,31 @@ python -m backend.crawler.legislacao --source lc116
 ## Refino da base
 
 A camada [refino](refino/README.md) organiza documentos/versões/conteúdos, mantém proveniência e separa datasets. O perfil padrão cobre todos os regimes com foco DF. Consulte a [arquitetura](../docs/arquitetura-refino.md) e o [handoff para outros agentes](../handoff/refino/CONTINUAR.md). Originais preservados; PostgreSQL ainda não importado.
+
+## Contas e sessões do MVP
+
+O RAG agora exige sessão. Execute PostgreSQL e Redis e aplique a migração antes
+ de cadastrar contas:
+
+```bash
+docker compose -f backend/compose.yaml up -d postgres redis
+docker compose -f backend/compose.yaml run --rm api alembic upgrade head
+```
+
+Faça rebuild da imagem após atualizar o código. Na execução nativa:
+`python -m alembic -c backend/api/alembic.ini upgrade head`.
+
+Obtenha `GET /auth/csrf`, preserve os cookies e envie `Origin` e
+`X-CSRF-Token` nas requisições mutáveis, inclusive cadastro e login.
+`POST /auth/register` e `/auth/login` recebem `email` e `password` (12–128
+caracteres); cadastro cria sessão imediatamente. Após login/cadastro, obtenha
+novamente o token CSRF, pois a sessão o rotaciona. `GET /auth/session` retorna
+identidade; `POST /auth/logout` revoga a sessão. Cookies expiram em 24 horas.
+
+HTTPS e `COOKIE_SECURE=true` são necessários fora do ambiente local.
+`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. Não existem
+confirmação de e-mail ou recuperação de senha nesta etapa.
+
+Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
+na porta 16379, em containers separados. Essa base é recriada por teste;
+nunca aponte esse ambiente para dados da aplicação.

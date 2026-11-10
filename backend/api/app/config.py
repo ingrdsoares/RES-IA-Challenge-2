@@ -5,6 +5,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=None, extra="ignore")
 
+    database_url: str = 'postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital'
+    redis_url: str = 'redis://localhost:6379/0'
+    cookie_secure: bool = True
+    allowed_origins: list[str] = ['http://localhost:8000']
+
     qdrant_url: HttpUrl = "http://localhost:6333"
     ollama_url: HttpUrl = "http://localhost:11434"
     embedding_model: str = Field(default="qwen3-embedding:0.6b", min_length=1)
