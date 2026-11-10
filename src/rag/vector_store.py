@@ -71,6 +71,7 @@ class LegalVectorStore:
         if self.use_dense and not self._fallback_to_python:
             try:
                 from sentence_transformers import SentenceTransformer
+
                 local_name = (
                     self.model_name
                     if "MiniLM" in self.model_name
@@ -80,7 +81,9 @@ class LegalVectorStore:
                     self.model = SentenceTransformer(local_name, local_files_only=True)
                 except Exception:
                     self.model = SentenceTransformer(local_name)
-                print(f"[VectorStore] Fallback local: modelo SentenceTransformer carregado ({local_name}).")
+                print(
+                    f"[VectorStore] Fallback local: modelo SentenceTransformer carregado ({local_name})."
+                )
             except Exception as e:
                 print(f"[VectorStore] Aviso: fallback para embedding TF-IDF/Count devido a: {e}")
                 self.use_dense = False
