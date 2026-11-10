@@ -78,6 +78,11 @@ class BertMetric:
             )
         self.scorer = scorer
         self.tokenizer = scorer._tokenizer
+        # Garante que model_max_length nunca excede o que o tokenizador fast consegue
+        # converter para int C (evita OverflowError em bert_score.utils.collate_idf).
+        _SAFE_MAX = 512
+        if getattr(self.tokenizer, "model_max_length", 0) > 10**9:
+            self.tokenizer.model_max_length = _SAFE_MAX
 
     def metadata(self):
         data = self.prepared | {

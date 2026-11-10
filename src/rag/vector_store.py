@@ -72,10 +72,18 @@ class LegalVectorStore:
             try:
                 from sentence_transformers import SentenceTransformer
 
-                self.model = SentenceTransformer(
-                    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                local_name = (
+                    self.model_name
+                    if "MiniLM" in self.model_name
+                    else "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
                 )
-                print("[VectorStore] Fallback local: modelo SentenceTransformer carregado.")
+                try:
+                    self.model = SentenceTransformer(local_name, local_files_only=True)
+                except Exception:
+                    self.model = SentenceTransformer(local_name)
+                print(
+                    f"[VectorStore] Fallback local: modelo SentenceTransformer carregado ({local_name})."
+                )
             except Exception as e:
                 print(f"[VectorStore] Aviso: fallback para embedding TF-IDF/Count devido a: {e}")
                 self.use_dense = False

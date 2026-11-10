@@ -311,10 +311,18 @@ class TaxEntityExtractor:
             expansions.append("Fator R folha de salários 28% Anexo III Anexo V Art. 18")
         elif tag_foco == "desenquadramento" or "desenquadr" in t_lower or "ultrapass" in t_lower:
             expansions.append("desenquadramento MEI excesso de receita 20% Art. 18-A")
-        elif tag_foco == "obrigacoes_acessorias" or "dasn" in t_lower:
-            expansions.append("DASN-SIMEI declaração anual 31 de maio prazo Art. 106")
+        elif any(w in t_lower for w in ["vencimento", "dia 20"]):
+            expansions.append(
+                "vencimento mensal tributos DAS dia 20 primeiro dia útil prorrogado Art. 40"
+            )
         elif tag_foco == "certidoes" or "cpen" in t_lower or "cnd" in t_lower:
             expansions.append("Certidão Negativa CND CPEN regularidade fiscal parcelamento Art. 1º")
+        elif "parcela" in t_lower:
+            expansions.append(
+                "parcelamento ordinário 60 parcelas débitos Simples Nacional SIMEI Art. 131"
+            )
+        elif tag_foco == "obrigacoes_acessorias" or "dasn" in t_lower:
+            expansions.append("DASN-SIMEI declaração anual 31 de maio prazo Art. 106")
         elif (
             intencao == "calculo_simples"
             or tag_foco == "simples_nacional"

@@ -21,7 +21,7 @@ def run_rag_evaluation():
     service = RAGService(base_dir=BASE_DIR)
 
     sucessos = 0
-    total_testes = 5
+    total_testes = 7
 
     # -----------------------------------------------------------------
     # CASO 1: Consulta Tributária com Cálculo de Fator R (CNAE 6201-5/01)
@@ -149,13 +149,67 @@ def run_rag_evaluation():
         print("  [FALHA] Falha no Guardrail de Abstenção.")
 
     # -----------------------------------------------------------------
+    # CASO 6: Contratação de Empregado pelo MEI (Art. 18-A § 4º)
+    # -----------------------------------------------------------------
+    print("\n[Caso 6] Regra de Admissão de Empregado pelo MEI:")
+    print("  Pergunta: 'O MEI pode contratar funcionário e qual o limite salarial?'")
+    resp6 = service.consultar(
+        "O MEI pode contratar funcionário e qual o limite salarial permitido pela lei?"
+    )
+    tem_3_passos6 = len(resp6.plano_3_passos) == 3
+    tem_art18a = any("Art. 18-A" in f["artigo"] for f in resp6.fontes_citadas if f.get("artigo"))
+    tem_1_empregado = "1 (um)" in resp6.diagnostico or "único empregado" in resp6.diagnostico
+
+    print(f"  -> Diagnóstico: {resp6.diagnostico[:160]}...")
+    print(f"  -> Passos Gerados: {len(resp6.plano_3_passos)} etapas acionáveis")
+    print(f"  -> Citações: {[f['artigo'] for f in resp6.fontes_citadas]}")
+
+    if tem_3_passos6 and tem_art18a and tem_1_empregado:
+        print("  [OK] Caso 6 validou regra de 1 empregado no MEI e citação do Art. 18-A!")
+        sucessos += 1
+    else:
+        print("  [FALHA] Falha no Caso 6.")
+
+    # -----------------------------------------------------------------
+    # CASO 7: Simulação de Atividade no Anexo IV (Serviços Advocatícios)
+    # -----------------------------------------------------------------
+    print("\n[Caso 7] Simulação de Atividade no Anexo IV (Advocacia CNAE 6911-7/01):")
+    print("  Pergunta: 'Advocacia CNAE 6911-7/01 com faturamento de 200 mil no ano'")
+    resp7 = service.consultar(
+        pergunta="Minha empresa de advocacia tem CNAE 6911-7/01 e fatura R$ 200.000,00 no ano. Qual anexo do Simples Nacional se aplica?",
+        cnae="6911-7/01",
+        faturamento_anual=200000.0,
+        folha_anual=50000.0,
+    )
+    tem_3_passos7 = len(resp7.plano_3_passos) == 3
+    tem_anexo_iv = resp7.calculo_detalhado and resp7.calculo_detalhado.get("anexo_aplicado") == "IV"
+    aliq_iv = (
+        resp7.calculo_detalhado.get("aliquota_efetiva", 0.0) if resp7.calculo_detalhado else 0.0
+    )
+    aliq_ok = 0.049 <= aliq_iv <= 0.050
+
+    print(f"  -> Diagnóstico: {resp7.diagnostico[:160]}...")
+    print(
+        f"  -> Anexo Determinístico: {resp7.calculo_detalhado.get('anexo_aplicado') if resp7.calculo_detalhado else 'N/A'}"
+    )
+    print(
+        f"  -> Alíquota Efetiva: {aliq_iv * 100:.2f}% | DAS Mensal: R$ {resp7.calculo_detalhado.get('das_mensal', 0):,.2f}"
+    )
+
+    if tem_3_passos7 and tem_anexo_iv and aliq_ok:
+        print("  [OK] Caso 7 validou cálculo exato do Anexo IV (4,95%) para CNAE 6911-7/01!")
+        sucessos += 1
+    else:
+        print("  [FALHA] Falha no Caso 7.")
+
+    # -----------------------------------------------------------------
     # CASO 5: Validação Global de Fidelidade e Disclaimer Legal do CRC
     # -----------------------------------------------------------------
     print("\n[Caso 5] Auditoria de Governança de Todas as Respostas (MLOps/CRC):")
-    respostas = [resp1, resp2, resp3, resp4]
+    respostas = [resp1, resp2, resp3, resp4, resp6, resp7]
     todas_tem_crc = all("CRC" in r.disclaimer_crc for r in respostas)
     todas_tem_passos = all(len(r.plano_3_passos) == 3 for r in respostas)
-    todas_tem_fontes = all(len(r.fontes_citadas) > 0 for r in [resp1, resp2, resp3])
+    todas_tem_fontes = all(len(r.fontes_citadas) > 0 for r in [resp1, resp2, resp3, resp6, resp7])
 
     print(f"  -> 100% das respostas contêm disclaimer do CRC: {todas_tem_crc}")
     print(f"  -> 100% das respostas possuem exatamente 3 passos: {todas_tem_passos}")
