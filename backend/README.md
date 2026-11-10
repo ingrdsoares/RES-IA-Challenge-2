@@ -401,3 +401,28 @@ Para confirmar a competência solicitada, envie uma nova chave idempotente e
 `{"text":"Confirmo outubro de 2026","confirmation_for":"UUID_DA_OPERACAO","confirmation":{"period":"2026-10"}}`.
 A confirmação retoma a operação original e preserva o perfil cadastrado. O histórico
 mantém as mensagens de confirmação e o snapshot utilizado em cada solicitação.
+
+## Respostas do assistente
+
+O worker recupera trechos em `legal_versions_v1`, aplica limiar de similaridade e
+vigência e confere novamente documento, versão publicada e âncora no catálogo.
+A competência informada usa seu primeiro dia como referência de recuperação;
+sem competência, usa a data atual. `reference_date` identifica essa escolha em
+cada citação. Isso não define critérios de apuração do motor fiscal.
+
+As respostas persistem citações estruturadas e até três próximos passos. Eles não
+criam tarefas automaticamente. Sem contexto suficiente, o worker registra abstenção
+sem chamar o gerador. Falha de geração ou citação inválida não publica resposta parcial.
+Mensagens da mesma conversa aguardam processamento das anteriores; espera não
+consome as três tentativas reservadas para falhas.
+
+O formato enviado ao modelo usa gramática JSON simplificada para compatibilidade
+com o servidor local; o backend valida integralmente os limites de resposta depois.
+Para testar a geração real com documento sintético e índice em memória:
+
+```bash
+OLLAMA_TEST_URL=http://localhost:11434 .venv/bin/python -m pytest backend/api/tests/mvp/test_assistant.py::test_real_ollama_structured_response -q
+```
+
+Esse teste usa o PostgreSQL e Redis isolados dos demais testes MVP e não altera a
+coleção Qdrant da aplicação. Não é uma avaliação de corretude tributária.

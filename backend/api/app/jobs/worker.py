@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from app.config import Settings
 from app.db import session_factory
+from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
 
 # Only trusted application code registers handlers, never request payloads.
@@ -17,7 +18,7 @@ def execute(factory, operation_id: UUID, handlers: dict):
         operation = db.scalar(
             select(Operation).where(Operation.id == operation_id).with_for_update()
         )
-        if operation is None or operation.status in ("succeeded", "failed"):
+        if operation is None or operation.status != "queued":
             return
         operation.attempts += 1
         operation.status = "running"
@@ -28,11 +29,25 @@ def execute(factory, operation_id: UUID, handlers: dict):
                 db.flush()
             operation.status = "succeeded"
             operation.error = None
+        except JobDeferred:
+            operation.attempts -= 1
+            operation.status = "queued"
+            operation.dispatched_at = None
         except Exception:
             # No exception contents: they may contain private data.
             operation.error = "operation_failed"
             operation.status = "failed" if operation.attempts >= 3 else "queued"
             operation.dispatched_at = None
+            if operation.kind == "assistant.answer" and operation.status == "failed":
+                from app.assistant.models import Message
+
+                message = db.scalar(
+                    select(Message).where(
+                        Message.operation_id == operation.id, Message.role == "user"
+                    )
+                )
+                if message:
+                    message.status = "failed"
             if operation.kind == "legal.ingest" and operation.status == "failed":
                 from app.legal.models import NormVersion
 
@@ -42,10 +57,12 @@ def execute(factory, operation_id: UUID, handlers: dict):
 
 
 def run_operation(operation_id: str) -> None:
+    from app.assistant.orchestrator import answer_message
     from app.companies import models as company_models  # noqa: F401
     from app.legal import models as legal_models  # noqa: F401
     from app.legal.ingest import handle_ingestion
 
+    HANDLERS["assistant.answer"] = answer_message
     HANDLERS["legal.ingest"] = handle_ingestion
     settings = Settings()
     factory = session_factory(settings.database_url)
