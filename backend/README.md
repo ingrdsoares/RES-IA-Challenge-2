@@ -450,3 +450,16 @@ reabrir não altera situação fiscal. Para transformar um próximo passo em tar
 envie `source_message_id` e `source_step_index` (0–2) explicitamente. O backend
 valida a empresa da mensagem e evita duplicar a tarefa do mesmo passo.
 Listagens aceitam `limit` e `cursor`; tarefas também filtram por `completed`.
+
+## Registro de regras fiscais
+
+POST `/empresas/{id}/calculos` recebe `kind` (`mei`/`simples`) e `period` (`YYYY-MM`).
+Valores monetários são strings decimais. O cálculo fica auditável em GET `/calculos/{id}`,
+com regra, referências, entradas e snapshot da empresa. Sem regra revisada, retorna
+`rule_unavailable` e nenhum valor calculado.
+
+A administração ocorre por CLI, na pasta backend/api: `python -m app.fiscal.cli import --file regra.json`.
+Importação sempre cria draft; não transforma tabelas legadas em regras aprovadas.
+Uma revisão humana registrada usa `python -m app.fiscal.cli review --id UUID --reviewer NOME --evidence REFERENCIA_DA_REVISAO`.
+Nenhuma regra tributária real revisada acompanha a aplicação. Testes usam parâmetros
+sintéticos, que não devem ser usados para orientação ou apuração tributária.
