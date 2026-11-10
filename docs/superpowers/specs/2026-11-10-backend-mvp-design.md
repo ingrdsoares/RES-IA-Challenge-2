@@ -1,6 +1,6 @@
 # Backend do MVP — Sócio Digital
 
-Status: proposta consolidada para aprovação. Não autoriza implementação até aprovação deste documento.
+Status: aprovado pelo usuário em 2026-11-10. Execução por fluxos completos; plano de implementação é a próxima etapa.
 
 ## Intenção e fontes de decisão
 
