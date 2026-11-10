@@ -15,6 +15,7 @@ def metadata(version):
         "title": version.title,
         "version_label": version.version_label,
         "authority": version.authority,
+        "jurisdiction": version.jurisdiction,
         "norm_type": version.norm_type,
         "subjects": version.subjects,
         "official_url": version.official_url,

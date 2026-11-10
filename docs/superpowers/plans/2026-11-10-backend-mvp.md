@@ -175,3 +175,8 @@ Comandos desta documentação partem da raiz. Resolver primeiro eventual erro de
 Cobertura conferida: acesso/empresas (1–2), dados assíncronos e bucket (3), ingestão/biblioteca/leitor (4–5), chat e citações (6–7), evidências/tarefas/painel (8), motor fiscal (9–10), operação e integração (11). Contratos entre tarefas usam os nomes definidos acima. Cada item do Review Focus possui teste na tarefa proprietária.
 
 Antes da implementação: revisar este plano com o usuário e escolher execução nativa ou por subagentes. Na execução, criar isolamento com using-git-worktrees; aplicar TDD, revisão e verification-before-completion. Ao final, relatar o que roda, comandos efetivamente verificados, limitações de regras fiscais e instruções de integração da branch. Não publicar ou fazer merge sem autorização correspondente.
+
+
+## Execução registrada
+
+Os onze blocos foram implementados na branch `feat/backend-mvp`, de forma nativa e sem subagentes. Evidências, limites e decisões estão em `docs/superpowers/reviews/2026-11-10-backend-mvp-verification.md`.

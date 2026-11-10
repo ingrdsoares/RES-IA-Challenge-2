@@ -43,6 +43,7 @@ def index_version(
                     "anchor_id": section.anchor_id,
                     "text": section.text,
                     "title": version.title,
+                    "jurisdiction": version.jurisdiction,
                     "effective_from_day": version.effective_from.toordinal()
                     if version.effective_from
                     else None,

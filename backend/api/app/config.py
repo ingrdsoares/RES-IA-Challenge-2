@@ -1,19 +1,19 @@
-from pydantic import Field, HttpUrl, model_validator
+from pydantic import Field, HttpUrl, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=None, extra="ignore")
 
-    s3_endpoint: str = 'http://localhost:9000'
-    s3_public_endpoint: str = 'http://localhost:9000'
-    s3_access_key: str = 'sd_local_user'
-    s3_secret_key: str = 'sd_local_password'
+    s3_endpoint: str = "http://localhost:9000"
+    s3_public_endpoint: str = "http://localhost:9000"
+    s3_access_key: str = "sd_local_user"
+    s3_secret_key: str = "sd_local_password"
 
-    database_url: str = 'postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital'
-    redis_url: str = 'redis://localhost:6379/0'
+    database_url: str = "postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital"
+    redis_url: str = "redis://localhost:6379/0"
     cookie_secure: bool = True
-    allowed_origins: list[str] = ['http://localhost:8000']
+    allowed_origins: list[str] = ["http://localhost:8000"]
 
     qdrant_url: HttpUrl = "http://localhost:6333"
     ollama_url: HttpUrl = "http://localhost:11434"
@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     max_context_chars: int = Field(default=12000, ge=1, le=24000)
     reranker_url: HttpUrl | None = None
     reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
+
+    @field_validator("reranker_url", mode="before")
+    @classmethod
+    def optional_reranker(cls, value):
+        return value or None
 
     @model_validator(mode="after")
     def validate_embedding_dimensions(self):

@@ -33,3 +33,7 @@ def test_question_is_trimmed():
 def test_rejects_incompatible_configuration(values):
     with pytest.raises(ValidationError):
         Settings(_env_file=None, **values)
+
+
+def test_empty_reranker_url_disables_optional_gpu_service():
+    assert Settings(reranker_url="").reranker_url is None

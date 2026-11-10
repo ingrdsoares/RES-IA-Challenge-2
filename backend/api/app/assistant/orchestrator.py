@@ -1,5 +1,4 @@
 import json
-import re
 from typing import Annotated
 from uuid import UUID
 
@@ -8,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from qdrant_client import QdrantClient
 from sqlalchemy import select, tuple_
 
-from app.assistant.citations import validate_citations
+from app.assistant.citations import validate_answer_citations
 from app.assistant.models import Conversation, Message
 from app.assistant.tools import retrieve_legal
 from app.config import Settings
@@ -197,16 +196,7 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
                 finally:
                     if model is None:
                         client.close()
-            inline = {int(number) for number in re.findall(r"\[(\d+)\]", draft.answer)}
-            if (
-                not inline
-                or inline != set(draft.cited_indices)
-                or any(i < 1 or i > len(passages) for i in inline)
-            ):
-                raise ValueError(
-                    f"Citações inválidas: inline={sorted(inline)}, structured={draft.cited_indices}, available={len(passages)}"
-                )
-            citations = validate_citations([passages[i - 1] for i in sorted(inline)], passages)
+            citations = validate_answer_citations(draft.answer, draft.cited_indices, passages)
             answer, steps, state = draft.answer, draft.next_steps, "answered"
         message = Message(
             conversation_id=conversation.id,

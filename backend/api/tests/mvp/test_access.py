@@ -147,3 +147,16 @@ def test_validation_never_echoes_password(client):
     assert response.status_code == 422
     assert "my-secret" not in response.text
     assert response.json()["error"]["code"] == "validation_error"
+
+
+def test_successful_logins_do_not_consume_failure_budget(client):
+    assert register(client).status_code == 201
+    for _ in range(6):
+        assert (
+            client.post(
+                "/auth/login",
+                json={"email": "person@example.com", "password": PASSWORD},
+                headers=csrf(client),
+            ).status_code
+            == 200
+        )

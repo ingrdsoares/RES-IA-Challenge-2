@@ -23,6 +23,7 @@ class IngestMetadata(BaseModel):
     official_url: HttpUrl
     version_label: Text
     authority: Text
+    jurisdiction: Annotated[str, StringConstraints(pattern=r"^BR(?:-[A-Z]{2})?$")] | None = None
     norm_type: Text
     subjects: list[Text] = Field(default_factory=list, max_length=30)
     effective_from: date | None = None

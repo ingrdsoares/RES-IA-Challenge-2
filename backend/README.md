@@ -1,8 +1,10 @@
 # Backend — Sócio Digital
 
-API FastAPI de consulta RAG com Qdrant persistente e Qwen servido pelo Ollama local.
-A coleção nasce vazia. A alimentação será feita posteriormente pelo responsável pelos dados;
-esta entrega não contém ingestão, seed ou endpoint de escrita de documentos.
+Backend modular FastAPI com autenticação própria, perfis de empresa, chat persistido,
+biblioteca de normas, evidências privadas, tarefas e motor fiscal versionado.
+PostgreSQL, Redis, armazenamento S3 e Qdrant rodam no Compose; Qwen é servido pelo
+Ollama local. Normas entram por CLI administrativa, sem seed automático. Regras
+tributárias reais precisam de revisão humana registrada antes de serem habilitadas.
 
 ## Execução no Mac
 
@@ -25,8 +27,11 @@ Na raiz do repositório:
 
 ```bash
 cp backend/.env.example backend/.env
-docker compose -f backend/compose.yaml up -d --build
-docker compose -f backend/compose.yaml logs -f api
+docker compose --env-file backend/.env -f backend/compose.yaml build api worker dispatcher
+docker compose --env-file backend/.env -f backend/compose.yaml up -d postgres redis storage qdrant
+docker compose --env-file backend/.env -f backend/compose.yaml run --rm api alembic upgrade head
+docker compose --env-file backend/.env -f backend/compose.yaml up -d api worker dispatcher
+docker compose --env-file backend/.env -f backend/compose.yaml logs -f api
 ```
 
 Serviços:
@@ -35,6 +40,7 @@ Serviços:
 | --- | --- |
 | API / Swagger | http://localhost:8000/docs |
 | Qdrant / dashboard | http://localhost:6333/dashboard |
+| S3 local | http://localhost:9000 |
 | Ollama no host | http://localhost:11434 |
 
 Dentro do container a API acessa Ollama em `host.docker.internal:11434`.
@@ -76,7 +82,12 @@ Ollama em `localhost:11434`. Para carregar um arquivo, passe `--env-file ../.env
 ao Uvicorn e altere `OLLAMA_URL` desse arquivo para `http://localhost:11434`.
 O arquivo `.env` não é carregado implicitamente pelo código da aplicação.
 
-## Endpoints
+## Endpoints legados de RAG
+
+`/rag/query` exige sessão e CSRF. Os exemplos de consulta abaixo devem receber
+os cookies e `Origin`/`X-CSRF-Token` obtidos pelo fluxo de autenticação descrito
+em Contas e sessões; `/health` e `/ready` permanecem públicos.
+
 
 ```bash
 curl http://localhost:8000/health
@@ -356,7 +367,7 @@ python -m app.legal.cli ingest --file /caminho/norma.md --metadata /caminho/meta
 Metadados mínimos (exemplo de teste, não uma norma fiscal):
 
 ```json
-{"document_key":"lei-teste","title":"Lei de teste","official_url":"https://example.org/lei","version_label":"v1","authority":"Teste","norm_type":"lei","subjects":["MEI"]}
+{"document_key":"lei-teste","title":"Lei de teste","official_url":"https://example.org/lei","version_label":"v1","authority":"Teste","norm_type":"lei","jurisdiction":"BR","subjects":["MEI"]}
 ```
 
 `effective_from` e `effective_to` são datas ISO opcionais. Vigência desconhecida
@@ -477,3 +488,22 @@ solicitação e não depende de o LLM fazer contas. Dados ausentes retornam `mis
 casos fora da cobertura retornam `unsupported_case`. Nenhuma tabela sintética é seed
 ou regra habilitada por padrão. Uma revisão identificada é condição para habilitar
 parâmetros reais, e o mecanismo não certifica a qualificação do revisor.
+
+
+## Escopo territorial e execução
+
+Metadados de ingestão aceitam `jurisdiction: "BR"` para norma nacional ou `"BR-DF"`
+(padrão BR-UF) para norma estadual/distrital. Escopo desconhecido permanece legível
+na biblioteca, mas não é usado pelo assistente. A recuperação filtra o estado do
+perfil e revalida escopo e vigência no catálogo. Normas municipais sem mapeamento
+territorial ficam fora da recuperação automática nesta versão.
+
+O reranker NVIDIA é opcional: habilite o profile `gpu` e configure `RERANKER_URL`
+explicitamente para utilizá-lo. Com URL vazia, API e worker operam sem esse serviço.
+Em execução nativa por HTTP, configure `COOKIE_SECURE=false` e origens permitidas;
+as CLIs leem variáveis exportadas, sem carregar `.env` implicitamente.
+
+Os testes de ponta a ponta são opt-in: `MVP_TEST_URL`, `MVP_DATABASE_URL` e
+`MVP_S3_URL` devem apontar para uma stack **isolada de teste**. Eles criam somente
+contas e documentos sintéticos. A avaliação fiscal profissional e o deploy público
+não fazem parte dessa validação.

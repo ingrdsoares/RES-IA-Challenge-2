@@ -24,7 +24,9 @@ def test_draft_rejects_more_than_three_steps():
         AssistantDraft(answer="Test", cited_indices=[1], next_steps=["one", "two", "three", "four"])
 
 
-@pytest.mark.parametrize("mode", ["valid", "invented", "timeout", "too_many_steps"])
+@pytest.mark.parametrize(
+    "mode", ["valid", "invented", "timeout", "too_many_steps", "other_jurisdiction"]
+)
 def test_assistant_persists_sources_once(client, mode):
     from app.assistant.orchestrator import answer_message
     from app.jobs.worker import execute
@@ -51,6 +53,7 @@ def test_assistant_persists_sources_once(client, mode):
             version_label="v1",
             title="Teste",
             authority="Teste",
+            jurisdiction="BR-SP" if mode == "other_jurisdiction" else "BR",
             norm_type="lei",
             subjects=[],
             official_url="https://example.org/law",
@@ -93,7 +96,12 @@ def test_assistant_persists_sources_once(client, mode):
         execute(client.app.state.db_factory, operation_id, {"assistant.answer": handler})
     messages = client.get("/conversas/" + chat["id"] + "/mensagens").json()["items"]
     operation = client.get("/operacoes/" + str(operation_id)).json()
-    if mode == "valid":
+    if mode == "other_jurisdiction":
+        assert len(messages) == 2
+        assert messages[-1]["status"] == "insufficient_context"
+        assert messages[-1]["citations"] == []
+        assert operation["status"] == "succeeded"
+    elif mode == "valid":
         assert len(messages) == 2
         assert messages[1]["role"] == "assistant"
         assert messages[1]["citations"][0]["version_id"] == str(version.id)
@@ -214,6 +222,7 @@ def test_real_ollama_structured_response(client):
                 version_label="v1",
                 title="Documento demonstrativo",
                 authority="Teste",
+                jurisdiction="BR",
                 norm_type="demonstracao",
                 subjects=[],
                 official_url="https://example.org/test",
@@ -256,3 +265,20 @@ def test_real_ollama_structured_response(client):
     finally:
         model.close()
         index.close()
+
+
+@pytest.mark.parametrize("answer,expected", [("Texto [1]", 1), ("Texto [1, 2]", 2)])
+def test_valid_unused_reference_does_not_reject_grounded_answer(answer, expected):
+    from app.assistant.citations import validate_answer_citations
+
+    passages = [{"document_id": "doc", "version_id": "v1", "anchor_id": str(i)} for i in (1, 2)]
+    assert len(validate_answer_citations(answer, [1, 2], passages)) == expected
+
+
+def test_unused_invented_reference_is_rejected():
+    from app.assistant.citations import validate_answer_citations
+
+    with pytest.raises(ValueError):
+        validate_answer_citations(
+            "Texto [1]", [1, 99], [{"document_id": "d", "version_id": "v", "anchor_id": "a"}]
+        )

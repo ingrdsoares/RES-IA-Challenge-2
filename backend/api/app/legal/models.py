@@ -22,6 +22,7 @@ class NormVersion(Base):
     version_label: Mapped[str] = mapped_column(String(256))
     title: Mapped[str] = mapped_column(String(256))
     authority: Mapped[str] = mapped_column(String(256))
+    jurisdiction: Mapped[str | None] = mapped_column(String(5))
     norm_type: Mapped[str] = mapped_column(String(256))
     subjects: Mapped[list] = mapped_column(JSON)
     official_url: Mapped[str] = mapped_column(String(2048))

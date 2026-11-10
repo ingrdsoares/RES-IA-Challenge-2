@@ -49,13 +49,33 @@ def throttle(request: Request, email: str):
         "login:ip:" + digest(request.client.host if request.client else "unknown"),
         "login:email:" + digest(email),
     ]
-    script = """local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]) end; return n"""
+    script = """
+    for _,key in ipairs(KEYS) do
+      if tonumber(redis.call('GET',key) or '0') >= 5 then return 0 end
+    end
+    for _,key in ipairs(KEYS) do
+      local n=redis.call('INCR',key)
+      if n==1 then redis.call('EXPIRE',key,ARGV[1]) end
+    end
+    return 1
+    """
     try:
-        counts = [redis.eval(script, 1, key, 900) for key in keys]
+        allowed = redis.eval(script, len(keys), *keys, 900)
     except RedisError:
         raise HTTPException(503, "Acesso temporariamente indisponível") from None
-    if max(counts) > 5:
+    if not allowed:
         raise HTTPException(429, "Limite de tentativas excedido", headers={"Retry-After": "900"})
+    return keys
+
+
+def release_success(request, keys):
+    script = "if redis.call('EXISTS',KEYS[1])==1 then local n=redis.call('DECR',KEYS[1]); if n<=0 then redis.call('DEL',KEYS[1]) end end; return 1"
+    try:
+        for key in keys:
+            request.app.state.redis.eval(script, 1, key)
+    except RedisError:
+        # A reserved attempt can expire normally; never invalidate a committed session.
+        pass
 
 
 def grant_response(grant: service.SessionGrant, request: Request, response: Response):
@@ -71,15 +91,19 @@ def grant_response(grant: service.SessionGrant, request: Request, response: Resp
 def register(
     data: Credentials, request: Request, response: Response, db: Session = Depends(get_db)
 ):
-    throttle(request, data.email)
+    keys = throttle(request, data.email)
     account = service.register(data.email, data.password, db)
-    return grant_response(service.issue_session(account, db), request, response)
+    grant = service.issue_session(account, db)
+    release_success(request, keys)
+    return grant_response(grant, request, response)
 
 
 @router.post("/login", response_model=AccountView, dependencies=[Depends(require_csrf)])
 def login(data: Credentials, request: Request, response: Response, db: Session = Depends(get_db)):
-    throttle(request, data.email)
-    return grant_response(service.login(data.email, data.password, db), request, response)
+    keys = throttle(request, data.email)
+    grant = service.login(data.email, data.password, db)
+    release_success(request, keys)
+    return grant_response(grant, request, response)
 
 
 @router.get("/session", response_model=AccountView)

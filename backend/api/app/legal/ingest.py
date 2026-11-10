@@ -82,6 +82,7 @@ def ingest_file(
             version_label=metadata.version_label,
             title=metadata.title,
             authority=metadata.authority,
+            jurisdiction=metadata.jurisdiction,
             norm_type=metadata.norm_type,
             subjects=metadata.subjects,
             official_url=str(metadata.official_url),

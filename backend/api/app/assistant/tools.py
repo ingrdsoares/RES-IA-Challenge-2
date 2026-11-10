@@ -14,11 +14,13 @@ def retrieve_legal(db, index, question, context, embed, limit=5, score_threshold
         date.fromisoformat(context["period"] + "-01") if context.get("period") else date.today()
     )
     # Use index dates as prefilter, and verify catalog again before any generation.
+    jurisdictions = ["BR", "BR-" + context["company"]["state"]]
     query_filter = models.Filter(
         must=[
+            models.FieldCondition(key="jurisdiction", match=models.MatchAny(any=jurisdictions)),
             models.FieldCondition(
                 key="effective_from_day", range=models.Range(lte=reference.toordinal())
-            )
+            ),
         ],
         must_not=[
             models.FieldCondition(
@@ -43,6 +45,7 @@ def retrieve_legal(db, index, question, context, embed, limit=5, score_threshold
         if (
             version is None
             or version.status != "ready"
+            or version.jurisdiction not in jurisdictions
             or not version.effective_from
             or version.effective_from > reference
             or (version.effective_to and version.effective_to < reference)
