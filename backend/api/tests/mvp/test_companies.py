@@ -82,3 +82,12 @@ def test_company_pagination(client):
     second = client.get("/empresas", params={"limit": 1, "cursor": first["next_cursor"]}).json()
     assert first["items"][0]["id"] != second["items"][0]["id"]
     assert second["next_cursor"] is None
+
+
+def test_oversized_profile_fields_rejected(client):
+    register(client)
+    for field, length in (("size", 31), ("regime", 41)):
+        response = client.post(
+            "/empresas", json={**DATA, field: "x" * length}, headers=csrf(client)
+        )
+        assert response.status_code == 422

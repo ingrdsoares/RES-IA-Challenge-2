@@ -12,8 +12,8 @@ class CompanyInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     cnpj: str
     cnae: Annotated[str, StringConstraints(pattern=r"^\d{7}$")]
-    size: Text
-    regime: Text
+    size: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=30)]
+    regime: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)]
     municipality: Text
     state: Annotated[str, StringConstraints(pattern=r"^[A-Z]{2}$")]
 
@@ -36,8 +36,12 @@ class CompanyInput(BaseModel):
 class CompanyPatch(BaseModel):
     model_config = ConfigDict(extra="forbid")
     cnae: Annotated[str, StringConstraints(pattern=r"^\d{7}$")] | None = None
-    size: Text | None = None
-    regime: Text | None = None
+    size: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=30)] | None
+    ) = None
+    regime: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)] | None
+    ) = None
     municipality: Text | None = None
     state: Annotated[str, StringConstraints(pattern=r"^[A-Z]{2}$")] | None = None
 
