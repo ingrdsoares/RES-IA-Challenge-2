@@ -12,7 +12,8 @@
 - **Integração Contínua (CI):** GitHub Actions para linters, testes unitários (`pytest`) e verificação de tipos
 - **Versionamento de Dados Fiscais:** DVC (Data Version Control) para rastrear tabelas de CNAEs, bases da Receita e documentos legais
 - **Registro e Governança de Modelos / RAG:** MLflow para rastreamento de experimentos, prompts, embeddings e métricas de fidelidade (Ragas / TruLens)
-- **Conteinerização:** Docker para o servidor de inferência FastAPI e serviços de banco vetorial
+- **Conteinerização:** Docker para a API FastAPI, worker assíncrono, serviços de banco vetorial e frontend Nginx
+- **Interface Web:** React 18, TypeScript, Vite e TailwindCSS com arquitetura SPA e proxy reverso
 
 ---
 
@@ -53,6 +54,7 @@ A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/
    - Arquivamento automático do laudo de auditoria (`data/benchmark/benchmark_results.json`) como artefato de execução do GitHub Actions.
 4. **Governança de Dados com DVC (`dvc-validation`):** Checagem de integridade do catálogo DVC e validação dos ponteiros `.dvc`.
 5. **Smoke Test de Container Docker (`docker-smoke-test`):** Build da imagem da API para validação de empacotamento.
+6. **Qualidade, Testes e Build do Frontend (`frontend-ci`):** Validação estática de tipos com TypeScript, testes unitários com Vitest, build de produção React/Vite e compilação da imagem Docker baseada em Nginx.
 
 ---
 
