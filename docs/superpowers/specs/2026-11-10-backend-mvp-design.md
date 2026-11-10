@@ -6,7 +6,7 @@ Status: aprovado pelo usuário em 2026-11-10. Execução por fluxos completos; p
 
 Construir o backend que atende às nove telas do MVP, evoluindo a API RAG existente para um produto com contexto empresarial, histórico, fontes verificáveis, cálculos e organização fiscal.
 
-Fontes prioritárias: decisões do usuário nesta conversa; `docs/diagramas/socio-digital-design-backend-2.excalidraw`; `docs/diagramas/socio-digital-telas-mvp-2.excalidraw`; escolhas de Nasser registradas nos commits `29c97ee`, `c15cf01`, `a8e0df9`, `5a4c191`, `ad08db8`, `3792de8` e `0ee0dad`. O desenho novo do backend está presente no workspace, ainda sem commit.
+Fontes prioritárias: decisões do usuário nesta conversa; `docs/arquitetura/diagramas/socio-digital-design-backend-2.excalidraw`; `docs/arquitetura/diagramas/socio-digital-telas-mvp-2.excalidraw`; escolhas de Nasser registradas nos commits `29c97ee`, `c15cf01`, `a8e0df9`, `5a4c191`, `ad08db8`, `3792de8` e `0ee0dad`. O desenho do backend foi versionado no commit `931c661`; os diagramas seguem a organização temática da documentação na `main`.
 
 Por orientação expressa do usuário, a documentação de requisitos da Ingrid não será usada como autoridade de decisões. Em particular, concluir uma tarefa não comprova regularidade nem pagamento.
 

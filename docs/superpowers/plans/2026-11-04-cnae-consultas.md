@@ -2,7 +2,7 @@
 
 **Objetivo:** executar os tópicos 1 e 2 autorizados pelo usuário, mantendo Markdown e originais locais, sem banco nesta etapa.
 
-**Arquitetura:** dois conectores por fonte reaproveitam os extratores existentes; o catálogo agrega as novas pastas. Python/httpx/BeautifulSoup/pdfplumber/pytest já instalados. Referências de escopo: base_tributaria_ia_fontes_e_arquitetura.md, seções 4 e 6; docs/exploracao-dados.md, seções 2 e 3.
+**Arquitetura:** dois conectores por fonte reaproveitam os extratores existentes; o catálogo agrega as novas pastas. Python/httpx/BeautifulSoup/pdfplumber/pytest já instalados. Referências de escopo: base_tributaria_ia_fontes_e_arquitetura.md, seções 4 e 6; docs/dados/exploracao-dados.md, seções 2 e 3.
 
 ## Tarefas e aceitação
 

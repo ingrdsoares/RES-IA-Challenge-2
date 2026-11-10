@@ -107,7 +107,7 @@ Medição de 07/11/2026, com leitura preliminar das respostas e sem revisão hum
 | 2. Tool calling com `busca_geral`, `buscar_norma` e `buscar_artigo` | Em cerca de 80 pares, ROUGE-L −0,004 e BERTScore −0,008, com intervalos que incluem zero; cerca de 2 s a mais; 17 de 170 chamadas rejeitadas; o modelo não dividiu as perguntas compostas | Não adotada; código na branch local `experimento/tool-calling` |
 | 3. `ler_vizinhos` | Feita sem o modelo decidir: trecho que termina em dois-pontos recebe o trecho seguinte do documento. Em 115 perguntas, cerca de 5 respostas melhoram e 1 piora | Adotada |
 
-A divisão de perguntas compostas, que a etapa 2 deveria resolver, foi feita por regra, sem o modelo. Detalhes em `docs/avaliacao-rag-2026-11-07.md`.
+A divisão de perguntas compostas, que a etapa 2 deveria resolver, foi feita por regra, sem o modelo. Detalhes em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.
 
 A API local foi promovida com as etapas adotadas por decisão do usuário, antes da revisão humana prevista abaixo em [Medição](#medição).
 

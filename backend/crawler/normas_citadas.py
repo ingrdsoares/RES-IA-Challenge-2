@@ -281,7 +281,7 @@ def _decidir(norma: NormaId, fontes: dict) -> tuple[str, str | None, bool]:
     if any(v["resultado"] == "bloqueada" for v in fontes.values()):
         return "bloqueada", motivos("bloqueada"), False
     if norma.tipo == "mp" and norma.jurisdicao == "federal":
-        return "manual", "MP sem texto em nenhuma fonte (docs/fontes-normas.md)", False
+        return "manual", "MP sem texto em nenhuma fonte (docs/dados/fontes-normas.md)", False
     return "nao_encontrada", None, False
 
 

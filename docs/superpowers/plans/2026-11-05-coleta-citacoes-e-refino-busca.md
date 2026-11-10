@@ -147,11 +147,11 @@ def test_toda_linha_tem_situacao(run): ...                             # nenhuma
 ### Task 4 (**rede**): Reconfirmar fontes e capturar fixtures
 
 **Files:**
-- Create: `backend/crawler/tests/fixtures/normas/` (uma resposta real por fonte, reduzida quando grande), `docs/fontes-normas.md`
+- Create: `backend/crawler/tests/fixtures/normas/` (uma resposta real por fonte, reduzida quando grande), `docs/dados/fontes-normas.md`
 
 - [ ] **Step 1: Verificar cada fonte, com pausa de ao menos 1 s entre requisições** — Planalto, Câmara, SINJ-DF, Receita, CONFAZ, API do Senado e LexML: robots.txt, termos publicados e código de resposta. O robots.txt do Senado retornou 403 em 2026-11-05: se a política seguir indefinida, sua API não é usada sem aval do usuário, e a descoberta federal segue por LexML ou derivação de URL.
 - [ ] **Step 2: Capturar fixtures** para: Lei 10.833 (Planalto, Câmara, LexML, Senado), Decreto 70.235, uma portaria RFB na Receita, uma lei do SINJ, um convênio ICMS no CONFAZ e uma resposta "não encontrado" de cada busca.
-- [ ] **Step 3: Registrar em `docs/fontes-normas.md`** a regra de URL ou busca de cada fonte, limite de requisições e ressalvas. **Se Planalto ou a descoberta federal estiverem indisponíveis, parar e avisar o usuário antes da Task 5.**
+- [ ] **Step 3: Registrar em `docs/dados/fontes-normas.md`** a regra de URL ou busca de cada fonte, limite de requisições e ressalvas. **Se Planalto ou a descoberta federal estiverem indisponíveis, parar e avisar o usuário antes da Task 5.**
 - [ ] **Step 4: Commit** — `docs(crawler): fontes oficiais de normas e fixtures`.
 
 ### Task 5: Estratégias federais
@@ -181,7 +181,7 @@ def test_limite_por_host(): ...                          # relógio falso: pausa
 ```
 
 - [ ] **Step 2: Rodar e confirmar falha.**
-- [ ] **Step 3: Implementar** `Http`, `decodificar` e as estratégias federais conforme `docs/fontes-normas.md`. `situacao_fonte` só é preenchida se a fonte informar expressamente.
+- [ ] **Step 3: Implementar** `Http`, `decodificar` e as estratégias federais conforme `docs/dados/fontes-normas.md`. `situacao_fonte` só é preenchida se a fonte informar expressamente.
 - [ ] **Step 4: Rodar e confirmar sucesso.**
 - [ ] **Step 5: Commit** — `feat(crawler): estratégias federais de localização`.
 
@@ -372,7 +372,7 @@ def test_problema_vai_para_fila_e_nao_sai_do_indice(tmp_path): ...
 ### Task 13: Etiquetas, relatório e execução final
 
 **Files:**
-- Modify: `backend/refino/pipeline.py`, `backend/refino/politica.json`, `backend/refino/README.md`, `backend/refino/schema.sql`, `docs/arquitetura-refino.md`, `handoff/refino/CONTINUAR.md`, `handoff/refino/estado.json`
+- Modify: `backend/refino/pipeline.py`, `backend/refino/politica.json`, `backend/refino/README.md`, `backend/refino/schema.sql`, `docs/arquitetura/arquitetura-refino.md`, `handoff/refino/CONTINUAR.md`, `handoff/refino/estado.json`
 - Test: `backend/refino/tests/test_pipeline.py`
 
 **Interfaces:**
@@ -391,7 +391,7 @@ def test_toda_saida_do_indice_tem_motivo(tmp_path): ...
 - [ ] **Step 3: Implementar**. Regra de `relacionada` em `politica.json`: norma coletada sem termo tributário no título e na ementa. Etiqueta nunca remove do índice.
 - [ ] **Step 4: Rodar todos os testes** — `.venv/Scripts/python -m pytest backend/refino/tests backend/crawler/tests -q`; esperado: tudo passa.
 - [ ] **Step 5 (execução real): Rodar o pipeline** — `.venv/Scripts/python -m backend.refino.pipeline --perfil tributario_df --workers 8`. Conferir artefatos pelo manifesto.
-- [ ] **Step 6: Conferir aceitação no acervo real** e registrar em `docs/refino-validacao.json`:
+- [ ] **Step 6: Conferir aceitação no acervo real** e registrar em `docs/dados/refino-validacao.json`:
   - Toda norma do inventário tem situação.
   - 100% das ocorrências anteriores são rastreáveis.
   - Lei 10.833, Lei 10.637, Lei 9.718 e Lei 10.865 estão no índice, ou têm situação explicada.

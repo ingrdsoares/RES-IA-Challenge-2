@@ -17,7 +17,7 @@ from backend.crawler.normas_id import NormaId
 
 USER_AGENT = "Mozilla/5.0 (compatible; acervo-pesquisa-bot/0.1)"
 _ROBOTS_AGENTE = "acervo-pesquisa-bot"
-# docs/fontes-normas.md, "Atrasos e limites por host"; paginas /legin da www2: 2 por ~70 s medido em 2026-11-06
+# docs/dados/fontes-normas.md, "Atrasos e limites por host"; paginas /legin da www2: 2 por ~70 s medido em 2026-11-06
 ATRASOS = {
     "www.planalto.gov.br": 0.25,
     "www.camara.leg.br": 6.0,
@@ -380,7 +380,7 @@ class Camara:
     _ARQ = re.compile(r"-(\d+)-\d{1,2}-[a-zç]+-(\d{4})-\d+-norma-p[le]\.html$")
 
     def aceita(self, norma: NormaId) -> bool:
-        # sem ano so a numeracao continua (docs/fontes-normas.md, "Normas sem ano")
+        # sem ano so a numeracao continua (docs/dados/fontes-normas.md, "Normas sem ano")
         return (
             norma.jurisdicao == "federal"
             and norma.tipo in self._PASTA
@@ -448,7 +448,7 @@ FONTES_FEDERAIS: list[Fonte] = [Planalto(), Lexml(), Camara()]
 
 
 class Sinj:
-    """Datatable JSON do SINJ-DF; so o texto compilado (docs/fontes-normas.md, SINJ-DF)."""
+    """Datatable JSON do SINJ-DF; so o texto compilado (docs/dados/fontes-normas.md, SINJ-DF)."""
 
     nome = "sinj"
     _BUSCA = (
@@ -561,7 +561,7 @@ class Confaz:
 
 
 class Receita:
-    """Pesquisa por numero e ano (sem tipo) e filtra a resposta por tipo e orgao (docs/fontes-normas.md, Receita)."""
+    """Pesquisa por numero e ano (sem tipo) e filtra a resposta por tipo e orgao (docs/dados/fontes-normas.md, Receita)."""
 
     nome = "receita"
     _BUSCA = "https://normas.receita.fazenda.gov.br/api/indexacao/ato/pesquisar"

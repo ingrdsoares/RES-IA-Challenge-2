@@ -1,6 +1,6 @@
 # Retomada na máquina da RTX 3080 Ti
 
-Estado em 06/11/2026. Entrega: 09/11/2026, às 8h ([plano](plano-entrega-2026-11-09.pdf)).
+Estado em 06/11/2026. Entrega: 09/11/2026, às 8h ([plano](../entrega/plano-entrega-2026-11-09.pdf)).
 
 ## O que está onde
 

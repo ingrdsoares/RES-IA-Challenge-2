@@ -12,7 +12,7 @@
 
 No contexto do **RES-IA Challenge 2**, o copiloto fiscal **Sócio Digital** tem a missão crítica de prestar orientações contábeis e tributárias para Microempreendedores Individuais (MEI) e Microempresas (ME). Por lidar diretamente com obrigações tributárias, multas e risco fiscal real, a solução não pode operar sob premissas probabilísticas inseguras ou alucinações.
 
-Conforme estabelecido no documento de [Definição do Projeto](definicao-projeto.md) e na matriz de metas da equipe:
+Conforme estabelecido no documento de [Definição do Projeto](../projeto/definicao-projeto.md) e na matriz de metas da equipe:
 - **Exatidão Global de Resposta:** $\ge 85\%$
 - **Erros Críticos de Enquadramento:** $0\%$ (tolerância zero)
 - **Ancoragem em Fontes Oficiais:** $\ge 95\%$ dos fatos jurídicos referenciados na legislação

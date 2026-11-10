@@ -4,7 +4,7 @@
 > **Projeto:** Sócio Digital: Copiloto de Gestão Fiscal para Pequenos Negócios  
 > **Subtítulo:** Desmistificando a contabilidade e a regularização de MEIs e MEs com IA  
 > **Integrantes:** Clara, Ingrid, Jhessica, Lucas, Nasser  
-> **Entregável Oficial em PDF:** [Download do Documento de Entregáveis da Semana](entregaveis-challenge-2-grupo-08-final.pdf)
+> **Entregável Oficial em PDF:** [Download do Documento de Entregáveis da Semana](../entrega/entregaveis-challenge-2-grupo-08-final.pdf)
 
 ---
 

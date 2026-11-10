@@ -89,7 +89,7 @@ O vetor esparso resolve o que o denso faz mal: números de norma, artigos e sigl
 }
 ```
 
-Os demais campos estão em `docs/estrategia-chunking.md`.
+Os demais campos estão em `docs/arquitetura/estrategia-chunking.md`.
 
 ---
 
@@ -130,7 +130,7 @@ Em 20 perguntas de desenvolvimento com fonte no acervo atual:
 | Híbrida com norma citada | 0,375 | 0,323 |
 | Reranker com norma citada | 0,400 | 0,473 |
 
-A híbrida sozinha não supera a densa neste conjunto; o ganho vem da norma citada e do reranker. Testes completos em `docs/avaliacao-rag-2026-11-07.md`.
+A híbrida sozinha não supera a densa neste conjunto; o ganho vem da norma citada e do reranker. Testes completos em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.
 
 ---
 

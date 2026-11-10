@@ -7,7 +7,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=flat&logo=github)](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
 [![GitHub Repo](https://img.shields.io/badge/Repositório-ingrdsoares%2FRES--IA--Challenge--2-blue?style=flat&logo=github)](https://github.com/ingrdsoares/RES-IA-Challenge-2)
 [![Grupo](https://img.shields.io/badge/Grupo-08-orange?style=flat)](#divisao-da-equipe)
-[![Entregável PDF](https://img.shields.io/badge/Entregável-PDF%20da%20Semana-red?style=flat)](entregaveis-challenge-2-grupo-08-final.pdf)
+[![Entregável PDF](https://img.shields.io/badge/Entregável-PDF%20da%20Semana-red?style=flat)](entrega/entregaveis-challenge-2-grupo-08-final.pdf)
 
 ---
 
@@ -51,13 +51,13 @@ flowchart LR
 
 ## Navegação da Documentação
 
-- **[Pacote de Definição do Projeto](definicao-projeto.md)**: Cenário, definição do problema, stakeholders, personas, requisitos funcionais/não funcionais, riscos e métricas.
-- **[Guiding Questions e Conceito](guiding-questions.md)**: Fundamentação conceitual de qualidade de vida, análise das questões norteadoras e fluxo consultivo sem diagnóstico clínico/contábil.
-- **[Arquitetura e Engenharia](arquitetura.md)**: Diretrizes de arquitetura (Clara e Nasser) e engenharia de dados/backend (Lucas).
-- **[DevOps e MLOps](devops-mlops.md)**: Práticas de governança, automação de CI/CD e infraestrutura (Ingrid).
-- **[Equipe e Atribuições](equipe.md)**: Detalhamento de cada papel e modelo de colaboração.
-- **[Metodologia e Entregas](metodologia.md)**: Scrum adaptado, git flow e critérios de aceitação.
-- **[Baixar Entregável em PDF](entregaveis-challenge-2-grupo-08-final.pdf)**: Documento consolidado da semana (4 páginas) com o nome de todos os integrantes.
+- **[Pacote de Definição do Projeto](projeto/definicao-projeto.md)**: Cenário, definição do problema, stakeholders, personas, requisitos funcionais/não funcionais, riscos e métricas.
+- **[Guiding Questions e Conceito](projeto/guiding-questions.md)**: Fundamentação conceitual de qualidade de vida, análise das questões norteadoras e fluxo consultivo sem diagnóstico clínico/contábil.
+- **[Arquitetura e Engenharia](arquitetura/arquitetura.md)**: Diretrizes de arquitetura (Clara e Nasser) e engenharia de dados/backend (Lucas).
+- **[DevOps e MLOps](arquitetura/devops-mlops.md)**: Práticas de governança, automação de CI/CD e infraestrutura (Ingrid).
+- **[Equipe e Atribuições](projeto/equipe.md)**: Detalhamento de cada papel e modelo de colaboração.
+- **[Metodologia e Entregas](projeto/metodologia.md)**: Scrum adaptado, git flow e critérios de aceitação.
+- **[Baixar Entregável em PDF](entrega/entregaveis-challenge-2-grupo-08-final.pdf)**: Documento consolidado da semana (4 páginas) com o nome de todos os integrantes.
 
 ---
 

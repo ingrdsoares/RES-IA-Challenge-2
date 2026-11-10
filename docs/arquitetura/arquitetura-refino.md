@@ -28,7 +28,7 @@ flowchart TD
     F --> J
 ~~~
 
-A coleta permanece em backend/crawler/data. O novo pipeline fica em [backend/refino](../backend/refino/README.md), com saídas isoladas em backend/refino/data. Não há exclusão dos originais nem limpeza destrutiva nesta etapa.
+A coleta permanece em backend/crawler/data. O novo pipeline fica em [backend/refino](../../backend/refino/README.md), com saídas isoladas em backend/refino/data. Não há exclusão dos originais nem limpeza destrutiva nesta etapa.
 
 ## Modelo de dados
 
@@ -71,7 +71,7 @@ O manifesto registra hashes do catálogo, do código e da política, além da id
 
 As saídas são publicadas em diretório próprio somente após geração completa. Reexecução valida todos os hashes antes de reutilizar resultados. Caminhos de entrada e saída são delimitados; uma saída não pode sobrescrever a camada coletada.
 
-O [contrato SQL](../backend/refino/schema.sql) prepara PostgreSQL com integridade entre documento, versão, ocorrência e dataset. Ele não foi aplicado a um servidor nesta etapa. O [README do refino](../backend/refino/README.md) descreve os JSONL e a reprodução.
+O [contrato SQL](../../backend/refino/schema.sql) prepara PostgreSQL com integridade entre documento, versão, ocorrência e dataset. Ele não foi aplicado a um servidor nesta etapa. O [README do refino](../../backend/refino/README.md) descreve os JSONL e a reprodução.
 
 ## Etiquetas, exclusões e auditoria
 
@@ -106,4 +106,4 @@ O núcleo reduz ruído e repetição na consulta, mas não substitui revisão ju
 | Documentos no núcleo candidato | 5.024 |
 | Registros de datasets | 37 |
 
-A [validação real](refino-validacao.json) conferiu 6.889 artefatos e todas as ocorrências, sem erros. O [handoff independente de modelo](../handoff/refino/CONTINUAR.md) reúne decisões, código, estado e próximos passos. A instrução de parada ao atingir o limite da sessão também está registrada.
+A [validação real](../dados/refino-validacao.json) conferiu 6.889 artefatos e todas as ocorrências, sem erros. O [handoff independente de modelo](../../handoff/refino/CONTINUAR.md) reúne decisões, código, estado e próximos passos. A instrução de parada ao atingir o limite da sessão também está registrada.
