@@ -7,6 +7,7 @@ from redis import Redis
 from starlette.concurrency import run_in_threadpool
 
 from app.access.router import router as access_router
+from app.companies.router import router as companies_router
 from app.config import Settings
 from app.db import session_factory
 from app.dependencies import require_account
@@ -56,6 +57,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     )
 
     app.include_router(access_router)
+    app.include_router(companies_router)
 
     @app.exception_handler(DependencyUnavailable)
     async def dependency_error(request: Request, exc: DependencyUnavailable):

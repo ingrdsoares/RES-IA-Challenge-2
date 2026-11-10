@@ -1,5 +1,6 @@
 from alembic import context
 from app.access import models  # noqa: F401
+from app.companies import models as company_models  # noqa: F401
 from app.config import Settings
 from app.db import Base
 from sqlalchemy import create_engine
