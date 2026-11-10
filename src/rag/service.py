@@ -46,12 +46,19 @@ class RAGService:
         "esconder receita",
         "nota calçada",
         "fraudar",
+        "fraude",
         "lavagem de dinheiro",
         "crime fiscal",
         "lucro real complexo",
         "holding offshore",
+        "offshore",
+        "paraíso fiscal",
         "inventário judicial",
         "processo penal",
+        "laranja",
+        "laranjas",
+        "vários meis",
+        "interposição de pessoas",
     ]
 
     def __init__(
@@ -272,6 +279,63 @@ class RAGService:
                         "Passo 3 (Adequação da Folha): Registrar o ajuste contábil no eSocial para refletir a nova média nos meses subsequentes.",
                     ]
                 return diag, plano
+
+        # CENÁRIO B1: MEI e Contratação de Empregado
+        if "mei" in p_lower and any(
+            w in p_lower for w in ["empregado", "funcionário", "funcionario", "contrat"]
+        ):
+            diag = (
+                f"Conforme o {top_artigo}, § 4º da LC 123/2006, o Microempreendedor Individual (MEI) pode contratar "
+                f"no máximo 1 (um) único empregado que receba exclusivamente 1 (um) salário mínimo vigente ou o piso salarial "
+                f"da categoria profissional. É vedada a contratação de múltiplos funcionários mantendo o enquadramento no SIMEI."
+            )
+            plano = [
+                "Passo 1 (Registro no eSocial): Cadastrar o empregado no portal do eSocial Simplificado do MEI até a véspera do início das atividades laborais.",
+                "Passo 2 (Apuração e Guia DAE): Emitir mensalmente a guia única DAE do eSocial (composta por 3% de contribuição previdenciária patronal e 8% de FGTS).",
+                "Passo 3 (Conformidade Trabalhista): Providenciar o exame médico admissional (PCMSO) e colher mensalmente a assinatura nos recibos de pagamento de salário.",
+            ]
+            return diag, plano
+
+        # CENÁRIO B2: Vencimento Mensal da Guia DAS
+        if any(w in p_lower for w in ["vencimento", "data limite"]) and any(
+            w in p_lower for w in ["das", "guia", "mensal", "dia 20"]
+        ):
+            diag = (
+                f"Conforme o {top_artigo} da Resolução CGSN nº 140/2018, os tributos apurados no DAS vencem no dia 20 "
+                f"do mês subsequente ao da ocorrência do fato gerador. Se o dia 20 recair em sábado, domingo ou feriado bancário, "
+                f"o vencimento é automaticamente prorrogado para o primeiro dia útil imediatamente posterior."
+            )
+            plano = [
+                "Passo 1 (Geração Atualizada): Acessar o Portal do Simples Nacional ou PGMEI para emitir a guia DAS da competência com o valor e código de barras atualizados.",
+                "Passo 2 (Quitação Tempestiva): Realizar o pagamento por Pix (QR Code dinâmico) ou rede bancária autorizada até a data limite para evitar multa de mora diária (0,33%).",
+                "Passo 3 (Conciliação Fiscal): Guardar o comprovante bancário de quitação e checar a baixa do débito no extrato do PGDAS-D após 48 horas.",
+            ]
+            return diag, plano
+
+        # CENÁRIO B3: Parcelamento Ordinário em até 60 Parcelas
+        if "parcela" in p_lower and any(
+            w in p_lower
+            for w in [
+                "60",
+                "quantas",
+                "limite de parcela",
+                "ordinário",
+                "ordinario",
+                "como funciona",
+            ]
+        ):
+            diag = (
+                f"Conforme o {top_artigo} da Resolução CGSN nº 140/2018, os débitos do Simples Nacional e do SIMEI "
+                f"podem ser parcelados em até 60 (sessenta) parcelas mensais e sucessivas. O valor mínimo de cada prestação "
+                f"é de R$ 300,00 para Microempresas (ME) e EPP, e de R$ 50,00 para MEI. "
+                f"O deferimento suspende a exigibilidade do crédito tributário e autoriza a emissão de CPEN."
+            )
+            plano = [
+                "Passo 1 (Acesso e Consolidação): Acessar o Portal do Simples Nacional (Serviços > Parcelamento) ou o Portal e-CAC da Receita Federal.",
+                "Passo 2 (Formalização do Pedido): Confirmar a consolidação dos débitos em aberto, selecionar o parcelamento ordinário e emitir a primeira guia DAS de entrada.",
+                "Passo 3 (Manutenção da Regularidade): Pagar a primeira parcela impreterivelmente até o vencimento para confirmar a adesão e emitir a Certidão Positiva com Efeitos de Negativa (CPEN).",
+            ]
+            return diag, plano
 
         # CENÁRIO B: MEI e Desenquadramento por Excesso de Faturamento
         if "mei" in p_lower and (

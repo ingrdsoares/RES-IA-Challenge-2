@@ -81,6 +81,22 @@ def run_tests():
                 "intencao": "calculo_simples",
             },
         },
+        {
+            "id": "CASO 6: CNAE Advocacia e Anexo IV",
+            "texto": "Empresa de serviços jurídicos CNAE 6911-7/01 enquadrada no Anexo IV do Simples Nacional com faturamento anual de R$ 200.000,00 para calcular o imposto.",
+            "validacoes": {
+                "cnae_codigo": "6911-7/01",
+                "anexo_presente": "IV",
+                "intencao": "calculo_simples",
+            },
+        },
+        {
+            "id": "CASO 7: Vencimento da Guia DAS e Prazo",
+            "texto": "Qual a data limite de vencimento mensal da guia DAS no dia 20 de cada mês?",
+            "validacoes": {
+                "intencao": "obrigacoes_acessorias",
+            },
+        },
     ]
 
     sucessos = 0

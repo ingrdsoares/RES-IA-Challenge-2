@@ -58,11 +58,13 @@ class IngestionPipeline:
         max_chunk_chars: int = 2000,
         overlap_chars: int = 200,
         use_dense: bool = True,
+        include_subdirs: bool = False,
     ):
         self.raw_dir = Path(raw_dir)
         self.db_path = Path(db_path)
         self.manifest_path = Path(manifest_path)
         self.qdrant_points_path = Path(qdrant_points_path)
+        self.include_subdirs = include_subdirs
         self.max_chunk_chars = max_chunk_chars
         self.overlap_chars = overlap_chars
         self.chunker = LegalHierarchicalChunker(
@@ -133,11 +135,10 @@ class IngestionPipeline:
         if not self.raw_dir.exists():
             raise FileNotFoundError(f"Diretório de dados brutos não encontrado: {self.raw_dir}")
 
-        files = sorted(
-            list(self.raw_dir.glob("*.md"))
-            + list(self.raw_dir.glob("*.txt"))
-            + list(self.raw_dir.glob("*/*.md"))
-        )
+        files = list(self.raw_dir.glob("*.md")) + list(self.raw_dir.glob("*.txt"))
+        if self.include_subdirs:
+            files += list(self.raw_dir.glob("*/*.md"))
+        files = sorted(files)
         if not files:
             print(f"[IngestionPipeline] Nenhum arquivo encontrado em {self.raw_dir}.")
             return {}
