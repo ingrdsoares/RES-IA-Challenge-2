@@ -70,7 +70,7 @@ def run_pipeline_validation():
 
     sucessos = 0
     for idx, t in enumerate(test_queries, 1):
-        print(f"\n[Caso {idx}] Pergunta: \"{t['pergunta']}\"")
+        print(f'\n[Caso {idx}] Pergunta: "{t["pergunta"]}"')
         results = vector_store.search(t["pergunta"], top_k=2)
 
         if not results:
@@ -82,7 +82,9 @@ def run_pipeline_validation():
         print(f"  -> Artigo Recuperado: {top_hit['artigo']}")
         print(f"  -> Documento: {top_hit['source_doc']}")
         print(f"  -> Tags: {top_hit['metadata'].get('tags')}")
-        print(f"  -> Trecho do Conteúdo:\n     " + top_hit['raw_text'][:220].replace('\n', ' ') + "...")
+        print(
+            "  -> Trecho do Conteúdo:\n     " + top_hit["raw_text"][:220].replace("\n", " ") + "..."
+        )
 
         # Validação
         if t["artigo_esperado"] in top_hit["artigo"]:

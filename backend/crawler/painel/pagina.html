@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de coleta</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  color-scheme: light dark;
+  --fundo: #f4f2ec; --painel: #fffefb; --tinta: #1d2127; --suave: #59626e; --linha: #d9d5ca;
+  --trilho: #e6e2d8; --sobre-falha: #fff; --em-curso: #1b5fb0; --ok: #1c7a4f; --atencao: #8a5a00; --falha: #b3261e;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #14171c; --painel: #1c2027; --tinta: #e8eaed; --suave: #9aa3ae; --linha: #323843;
+    --trilho: #2b313a; --sobre-falha: #1c2027; --em-curso: #6aa9f0; --ok: #55c08e; --atencao: #e3b04b; --falha: #ff8a80;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--tinta); font: 14px/1.4 system-ui, "Segoe UI", sans-serif; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--em-curso); outline-offset: 2px; }
+.suave { color: var(--suave); }
+.mono { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+
+.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; max-width: 1200px; margin: 0 auto; padding: 16px; align-items: start; }
+@media (max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+.caixa { background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; }
+
+/* coluna de seleção */
+.selecao { position: sticky; top: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100vh - 32px); }
+@media (max-width: 760px) { .selecao { position: static; max-height: none; } }
+.selecao h2 { margin: 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+.lista { margin: 0; padding: 0; list-style: none; overflow-y: auto; min-height: 0; border-block: 1px solid var(--linha); }
+.lista li { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+.lista li > label:first-child { flex: 1; min-width: 0; display: flex; gap: 8px; align-items: center; }
+.lista .nome { line-height: 1.25; }
+.refazer { font-size: 12px; color: var(--suave); display: flex; gap: 4px; align-items: center; white-space: nowrap; }
+.finais { display: flex; flex-direction: column; gap: 2px; }
+.todas { font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.acao { padding: 9px 12px; border-radius: 6px; border: 1px solid var(--tinta); background: var(--tinta); color: var(--painel); font-weight: 600; cursor: pointer; }
+.acao.parar { background: var(--falha); border-color: var(--falha); color: var(--sobre-falha); }
+.acao:disabled { opacity: .55; cursor: default; }
+.sec { padding: 7px 12px; border-radius: 6px; border: 1px solid var(--linha); background: transparent; cursor: pointer; }
+
+/* topo */
+.topo { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.topo h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.situacao { margin: 0; color: var(--suave); }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+.kpi { padding: 10px 12px; }
+.kpi b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.kpi span { color: var(--suave); font-size: 12px; }
+.aviso { margin: 0; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--atencao); color: var(--atencao); background: var(--painel); font-weight: 500; }
+.aviso.falha { border-color: var(--falha); color: var(--falha); }
+.aviso.etapa { border-color: var(--em-curso); color: var(--em-curso); }
+[hidden] { display: none !important; }
+
+/* linhas */
+.frentes { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.frentes h2 { margin: 8px 0 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+.linha { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--linha); }
+.linha[data-estado="coletando"], .linha[data-estado="verificando"], .linha[data-estado="parando"] { border-left-color: var(--em-curso); }
+.linha[data-estado="concluida"], .linha[data-estado="ja_coletada"], .linha[data-estado="pulada"] { border-left-color: var(--ok); }
+.linha[data-estado="parcial"] { border-left-color: var(--atencao); }
+.linha[data-estado="erro"] { border-left-color: var(--falha); }
+.cabeca, .par { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.cabeca b { font-size: 15px; }
+.selo { font-size: 12px; padding: 1px 9px; border-radius: 10px; border: 1px solid currentColor; color: var(--suave); white-space: nowrap; }
+.selo[data-estado="coletando"], .selo[data-estado="verificando"], .selo[data-estado="parando"] { color: var(--em-curso); }
+.selo[data-estado="coletando"]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: currentColor; animation: pulsa 1.2s ease-in-out infinite; }
+.selo[data-estado="concluida"], .selo[data-estado="ja_coletada"], .selo[data-estado="pulada"] { color: var(--ok); }
+.selo[data-estado="parcial"], .selo[data-estado="interrompida"] { color: var(--atencao); }
+.selo[data-estado="erro"] { color: var(--falha); }
+.barra { height: 8px; border-radius: 4px; background: var(--trilho); overflow: hidden; position: relative; }
+.barra i { display: block; height: 100%; width: 0; background: var(--em-curso); border-radius: 4px; transition: width .4s ease; }
+.barra.feita i { background: var(--ok); }
+.barra.parcial i { background: var(--atencao); }
+.barra.parada i { background: var(--suave); }
+.barra.indeterminada i { width: 30%; position: absolute; animation: desliza 1.4s ease-in-out infinite; transition: none; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.etiqueta { font-size: 11px; padding: 0 7px; border-radius: 4px; border: 1px solid var(--linha); color: var(--suave); }
+.etiqueta.pesada, .etiqueta.pendencias { border-color: var(--atencao); color: var(--atencao); }
+.forcada { margin: 0; color: var(--atencao); font-weight: 500; }
+details summary { cursor: pointer; color: var(--falha); }
+details pre { margin: 6px 0 0; padding: 8px; max-height: 240px; overflow: auto; background: var(--fundo); border-radius: 6px; font: 12px/1.4 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* diálogo */
+dialog { max-width: 560px; width: calc(100% - 32px); padding: 18px; border: 1px solid var(--linha); border-radius: 10px; background: var(--painel); color: var(--tinta); }
+dialog::backdrop { background: rgba(0, 0, 0, .5); }
+dialog h2 { margin: 0 0 8px; font-size: 18px; }
+dialog h3 { margin: 12px 0 4px; font-size: 13px; }
+dialog ul { margin: 0; padding-left: 18px; max-height: 30vh; overflow: auto; }
+dialog li { margin: 2px 0; }
+dialog .botoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+@keyframes pulsa { 50% { opacity: .25; } }
+@keyframes desliza { from { left: -30%; } to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  .barra.indeterminada i { left: 0; width: 100%; opacity: .45; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="selecao caixa" aria-label="Seleção de frentes">
+    <h2>Frentes</h2>
+    <label class="todas"><input type="checkbox" id="todas"> Marcar todas</label>
+    <ul class="lista" id="lista"></ul>
+    <h2>Etapas finais</h2>
+    <div class="finais" id="finais-sel"></div>
+    <button type="button" class="acao" id="acao">Iniciar</button>
+  </aside>
+
+  <main class="topo">
+    <h1>Painel de coleta</h1>
+    <p class="situacao" id="situacao">Conectando ao painel…</p>
+    <p class="aviso falha" id="desconectado" role="alert" hidden>Sem conexão com o painel</p>
+    <p class="aviso falha" id="erro" role="alert" hidden></p>
+    <p class="aviso etapa" id="etapa" role="status" hidden></p>
+    <p class="aviso" id="aviso" role="status" hidden></p>
+    <p class="aviso" id="sem-catalogo" role="status" hidden>Catálogo não encontrado ou ilegível: as contagens abaixo não refletem o acervo.</p>
+    <div class="kpis">
+      <div class="kpi caixa"><b id="k-restante">—</b><span>tempo restante</span></div>
+      <div class="kpi caixa"><b id="k-feitas">—</b><span>frentes feitas</span></div>
+      <div class="kpi caixa"><b id="k-itens">—</b><span>itens coletados</span></div>
+    </div>
+    <section class="frentes" id="frentes" aria-label="Progresso por frente"></section>
+    <section class="frentes" id="finais" aria-label="Etapas finais" hidden><h2>Etapas finais</h2></section>
+  </main>
+</div>
+
+<dialog id="previa" aria-labelledby="previa-titulo">
+  <form method="dialog">
+    <h2 id="previa-titulo">Confirmar coleta</h2>
+    <div id="previa-corpo"></div>
+    <div class="botoes">
+      <button type="submit" class="sec" value="cancelar" autofocus>Cancelar</button>
+      <button type="submit" class="acao" value="ok" id="confirmar">Confirmar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+'use strict';
+const ROTULOS = {
+  sem_dados: 'sem dados', ja_coletada: 'já coletada', parcial: 'parcial', na_fila: 'na fila',
+  coletando: 'coletando', parando: 'parando…', verificando: 'verificando', concluida: 'concluída',
+  pulada: 'já coletada · pulada', erro: 'erro', interrompida: 'interrompida', nao_iniciada: 'não iniciada',
+};
+const ATIVOS = ['coletando', 'parando', 'verificando'];
+const NOMES_FINAIS = { estatisticas: 'Estatísticas', sumarizacao: 'Sumarização' };
+const $ = (id) => document.getElementById(id);
+const nf = new Intl.NumberFormat('pt-BR');
+
+// ---- formatação
+const fmtNum = (n) => nf.format(n);
+function fmtBytes(b) {
+  const un = ['B', 'KB', 'MB', 'GB'];
+  let i = 0;
+  while (b >= 1024 && i < un.length - 1) { b /= 1024; i++; }
+  return `${i ? b.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : b} ${un[i]}`;
+}
+function fmtDur(s) {
+  if (s < 60) return 'menos de 1 min';
+  const min = Math.round(s / 60);
+  return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60} min`;
+}
+function fmtHora(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return String(iso);
+  const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return d.toDateString() === new Date().toDateString() ? hora : `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} ${hora}`;
+}
+
+// ---- DOM (sempre textContent; nada de innerHTML)
+function el(tag, classe, texto) {
+  const e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (texto != null) e.textContent = texto;
+  return e;
+}
+function por(e, texto) { if (e.textContent !== texto) e.textContent = texto; }
+function mostrar(e, texto) { e.hidden = !texto; if (texto) por(e, texto); }
+function ligar(e, atributo, valor) { if (e.getAttribute(atributo) !== valor) e.setAttribute(atributo, valor); }
+
+// ---- seleção: os checkboxes são criados uma vez e guardam o que a pessoa marcou
+const selecao = {};   // modulo -> { marcar, refazer }
+const finaisSel = {}; // modulo -> checkbox
+const linhas = {};    // modulo -> { raiz, partes }
+let ultimo = null;
+
+function criarSelecao(frentes, finais) {
+  for (const f of frentes) {
+    const marcar = el('input'); marcar.type = 'checkbox';
+    const refazer = el('input'); refazer.type = 'checkbox';
+    marcar.addEventListener('change', atualizarTodas);
+    selecao[f.modulo] = { marcar, refazer };
+    const li = el('li');
+    const rotulo = el('label');
+    rotulo.append(marcar, el('span', 'nome', f.nome));
+    rotulo.title = f.nome;
+    const outro = el('label', 'refazer');
+    outro.title = 'Coletar de novo mesmo que já tenha dados';
+    refazer.setAttribute('aria-label', `Rodar de novo: ${f.nome}`);
+    outro.append(refazer, 'rodar de novo');
+    li.append(rotulo, outro);
+    $('lista').append(li);
+  }
+  for (const f of finais) {
+    const caixa = el('input'); caixa.type = 'checkbox';
+    finaisSel[f.modulo] = caixa;
+    const rotulo = el('label', 'todas');
+    rotulo.style.fontWeight = 'normal';
+    rotulo.append(caixa, NOMES_FINAIS[f.modulo] || f.modulo);
+    $('finais-sel').append(rotulo);
+  }
+}
+function atualizarTodas() {
+  const caixas = Object.values(selecao).map((s) => s.marcar);
+  const n = caixas.filter((c) => c.checked).length;
+  $('todas').checked = n > 0 && n === caixas.length;
+  $('todas').indeterminate = n > 0 && n < caixas.length;
+}
+$('todas').addEventListener('change', (ev) => {
+  for (const s of Object.values(selecao)) s.marcar.checked = ev.target.checked;
+});
+function corpoSelecao() {
+  const marcadas = Object.keys(selecao).filter((m) => selecao[m].marcar.checked);
+  return {
+    frentes: marcadas,
+    refazer: marcadas.filter((m) => selecao[m].refazer.checked),
+    finais: Object.keys(finaisSel).filter((m) => finaisSel[m].checked),
+  };
+}
+
+// ---- linhas de progresso: criadas uma vez, atualizadas no lugar
+function criarLinha(modulo, nome, completa) {
+  const raiz = el('article', 'linha caixa');
+  const p = { nome: el('b', null, nome), selo: el('span', 'selo') };
+  const cabeca = el('div', 'cabeca'); cabeca.append(p.nome, p.selo);
+  raiz.append(cabeca);
+  if (completa) {
+    p.barra = el('div', 'barra'); p.barra.append(el('i'));
+    p.barra.setAttribute('role', 'progressbar');
+    p.barra.setAttribute('aria-label', `Progresso de ${nome}`);
+    p.feitos = el('span', 'suave'); p.restante = el('span', 'suave');
+    p.meta = el('div', 'par'); p.meta.append(p.feitos, p.restante);
+    p.item = el('div', 'mono suave');
+    p.etiquetas = el('div', 'etiquetas');
+    raiz.append(p.barra, p.meta, p.item, p.etiquetas);
+  }
+  p.horas = el('div', 'suave');
+  p.nota = el('p', 'suave', 'Falhas registradas por esta parada ficam no manifesto até a frente rodar de novo.');
+  p.forcada = el('p', 'forcada', 'Encerrada à força; pode haver arquivo de cache sem recibo');
+  p.log = el('details'); p.log.append(el('summary', null, 'Ver log do erro'));
+  p.logTexto = el('pre'); p.log.append(p.logTexto);
+  p.log.addEventListener('toggle', () => { if (p.log.open) carregarLog(modulo, p.logTexto); });
+  raiz.append(p.horas, p.nota, p.forcada, p.log);
+  return { raiz, p };
+}
+async function carregarLog(modulo, destino) {
+  por(destino, 'Carregando…');
+  try {
+    const r = await fetch('/log?modulo=' + encodeURIComponent(modulo));
+    por(destino, r.ok ? ((await r.text()) || '(log vazio)') : 'Não foi possível ler o log.');
+  } catch { por(destino, 'Sem conexão com o painel.'); }
+}
+
+const fmtItens = (n) => `${fmtNum(n)} ${n === 1 ? 'item' : 'itens'}`;
+function textoFeitos(f, ativa) {
+  const fonte = f.fonte ? ` · ${f.fonte}` : '';
+  if (ativa && f.total != null) return `${fmtNum(f.feitos)} de ${fmtNum(f.total)}${fonte}`;
+  if (ativa) return `total desconhecido · ${fmtNum(f.requisicoes)} requisições · ${fmtBytes(f.bytes)}${fonte}`;
+  if (f.coletados != null && f.fim) return fmtItens(f.coletados) + fonte;  // o que a rodada coletou, não o catálogo
+  if (f.itens > 0) return fmtItens(f.itens) + fonte;
+  return `sem dados coletados${fonte}`;
+}
+function textoRestante(f) {
+  if (f.estado !== 'na_fila' && f.estado !== 'coletando') return '';
+  if (f.restante_s == null) return 'sem estimativa';
+  return (f.estado === 'na_fila' ? '~' : 'falta ') + fmtDur(f.restante_s);
+}
+function textoHoras(f) {
+  const partes = [];
+  if (f.ultima_coleta && ['pulada', 'ja_coletada', 'parcial', 'concluida'].includes(f.estado)) partes.push(`última coleta ${fmtHora(f.ultima_coleta)}`);
+  if (f.estado !== 'pulada' && f.inicio) partes.push(`início ${fmtHora(f.inicio)}`);
+  if (f.estado !== 'pulada' && f.fim) partes.push(`fim ${fmtHora(f.fim)}`);
+  return partes.join(' · ');
+}
+function atualizarBarra(p, f, ativa) {
+  const cheia = ['concluida', 'parcial', 'ja_coletada', 'pulada'].includes(f.estado); // `fracao` para em 0,99
+  const indeterminada = ativa && f.fracao == null;
+  const pct = cheia ? 100 : f.fracao == null ? 0 : Math.round(f.fracao * 100);
+  p.barra.className = 'barra' + (indeterminada ? ' indeterminada' : '') + (cheia ? (f.estado === 'parcial' ? ' parcial' : ' feita') : '')
+    + (['erro', 'interrompida'].includes(f.estado) ? ' parada' : '');
+  p.barra.firstChild.style.width = indeterminada ? '' : pct + '%';
+  if (indeterminada) p.barra.removeAttribute('aria-valuenow');
+  else ligar(p.barra, 'aria-valuenow', String(pct));
+  ligar(p.barra, 'aria-valuemin', '0'); ligar(p.barra, 'aria-valuemax', '100');
+}
+function atualizarEtiquetas(p, f) {
+  const textos = [];
+  if (f.pesada) textos.push(['pesada', 'pesada', f.pesada]);
+  for (const m of f.marcas || []) textos.push(['', m, '']);
+  if (f.estado === 'parcial') textos.push(['pendencias', `${fmtNum(f.pendencias)} pendências`, '']);
+  const chave = JSON.stringify(textos);
+  if (p.etiquetas.dataset.chave === chave) return;
+  p.etiquetas.dataset.chave = chave;
+  p.etiquetas.replaceChildren(...textos.map(([c, t, dica]) => { const e = el('span', 'etiqueta ' + c, t); if (dica) e.title = dica; return e; }));
+}
+function atualizarLinha({ raiz, p }, f, completa) {
+  const ativa = ATIVOS.includes(f.estado);
+  ligar(raiz, 'data-estado', f.estado);
+  ligar(p.selo, 'data-estado', f.estado);
+  por(p.selo, ROTULOS[f.estado] || f.estado);
+  if (completa) {
+    atualizarBarra(p, f, ativa);
+    por(p.feitos, textoFeitos(f, ativa));
+    por(p.restante, textoRestante(f));
+    por(p.item, ativa && f.item_atual ? '→ ' + f.item_atual + (f.bytes_item != null ? ` · arquivo atual: ${fmtBytes(f.bytes_item)}` : '') : '');
+    p.item.hidden = !(ativa && f.item_atual);
+    atualizarEtiquetas(p, f);
+  }
+  por(p.horas, textoHoras(f));
+  p.horas.hidden = !p.horas.textContent;
+  p.forcada.hidden = !f.forcada;
+  p.nota.hidden = !(completa && f.estado === 'interrompida');
+  const comErro = f.estado === 'erro';
+  if (!comErro && p.log.open) p.log.open = false;
+  p.log.hidden = !comErro;
+}
+
+// ---- topo
+function textoRestanteGeral(d) {
+  const sem = d.sem_estimativa || 0;
+  if (d.restante_s == null) return sem ? 'sem estimativa' : '—';
+  const base = '~' + fmtDur(d.restante_s);
+  return sem ? `${base} + ${sem} ${sem === 1 ? 'frente sem estimativa' : 'frentes sem estimativa'}` : base;
+}
+function textoEtapa(d) {
+  if (d.etapa === 'catalogo') return 'Atualizando o catálogo com o que foi coletado. Pode levar alguns minutos; o painel segue funcionando.';
+  if (d.etapa === 'parando') return 'Parando: até 1 min; depois disso a frente é encerrada à força.';
+  if (d.etapa === 'finais') return 'Rodando as etapas finais…';
+  return '';
+}
+function textoSituacao(d) {
+  if (d.rodando) return `Rodada em andamento desde ${fmtHora(d.inicio)}.`;
+  if (d.fim) return `Última rodada encerrada às ${fmtHora(d.fim)}.`;
+  return 'Nenhuma rodada em andamento. Marque as frentes e inicie.';
+}
+
+function render(d) {
+  ultimo = d;
+  if (!Object.keys(selecao).length) {
+    criarSelecao(d.frentes, d.finais);
+    for (const f of d.frentes) {
+      linhas[f.modulo] = criarLinha(f.modulo, f.nome, true);
+      $('frentes').append(linhas[f.modulo].raiz);
+    }
+    for (const f of d.finais) {
+      linhas[f.modulo] = criarLinha(f.modulo, NOMES_FINAIS[f.modulo] || f.modulo, false);
+      $('finais').append(linhas[f.modulo].raiz);
+    }
+  }
+  por($('situacao'), textoSituacao(d));
+  mostrar($('etapa'), textoEtapa(d));
+  mostrar($('aviso'), d.aviso);
+  $('sem-catalogo').hidden = d.catalogo_lido !== false;
+  por($('k-restante'), d.rodando ? textoRestanteGeral(d) : '—');
+  por($('k-feitas'), d.total ? `${fmtNum(d.feitas)} de ${fmtNum(d.total)}` : '—');
+  por($('k-itens'), d.total ? fmtNum(d.itens) : '—');
+  const acao = $('acao');
+  por(acao, d.rodando ? 'Parar' : 'Iniciar');
+  acao.classList.toggle('parar', d.rodando);
+  acao.disabled = d.etapa === 'parando';
+  for (const f of d.frentes) atualizarLinha(linhas[f.modulo], f, true);
+  for (const f of d.finais) atualizarLinha(linhas[f.modulo], f, false);
+  $('finais').hidden = d.finais.every((f) => f.estado === 'nao_iniciada');
+}
+
+// ---- comandos
+async function enviar(rota, corpo) {
+  let r;
+  try {
+    r = await fetch(rota, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+  } catch { throw new Error('Sem conexão com o painel'); }
+  const dados = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(dados.erro || `Falha ${r.status}`);
+  return dados;
+}
+function falha(e) { mostrar($('erro'), e ? e.message : ''); }
+
+function listar(titulo, itens, montar) {
+  const dest = $('previa-corpo');
+  if (!itens.length) return;
+  dest.append(el('h3', null, titulo));
+  const ul = el('ul');
+  for (const i of itens) ul.append(montar(i));
+  dest.append(ul);
+}
+function itemPrevia(i) {
+  const f = (ultimo.frentes.find((x) => x.modulo === i.modulo)) || { nome: i.modulo, marcas: [] };
+  const li = el('li');
+  li.append(el('b', null, f.nome), ` — ${i.motivo}`);
+  if (i.acao === 'pular' && i.motivo === 'já tem dados') li.append(' (use "rodar de novo" para refazer)');
+  if (i.acao === 'rodar' && f.pesada) li.append(el('div', 'forcada', `Atenção, coleta pesada: ${f.pesada}`));
+  if (i.acao === 'rodar' && f.marcas && f.marcas.length) li.append(el('div', 'suave', f.marcas.join(' · ')));
+  return li;
+}
+async function iniciar() {
+  falha(null);
+  const corpo = corpoSelecao();
+  if (!corpo.frentes.length && !corpo.finais.length) return falha(new Error('Marque ao menos uma frente ou etapa final.'));
+  let plano;
+  try { plano = await enviar('/previa', corpo); } catch (e) { return falha(e); }
+  const dest = $('previa-corpo');
+  dest.replaceChildren();
+  if (ultimo.catalogo_lido === false) dest.append(el('p', 'forcada', $('sem-catalogo').textContent));
+  const rodar = plano.filter((i) => i.acao === 'rodar');
+  listar(`Vai rodar (${rodar.length})`, rodar, itemPrevia);
+  const pular = plano.filter((i) => i.acao === 'pular');
+  listar(`Será pulada (${pular.length})`, pular, itemPrevia);
+  listar('Etapas finais', corpo.finais, (m) => el('li', null, NOMES_FINAIS[m] || m));
+  const nada = !rodar.length && !corpo.finais.length;
+  if (nada) dest.append(el('p', 'forcada', 'Nada a rodar: tudo o que foi marcado já tem dados.'));
+  $('confirmar').disabled = nada;
+  const dialogo = $('previa');
+  dialogo.returnValue = '';
+  dialogo.onclose = async () => {
+    if (dialogo.returnValue !== 'ok') return;
+    try { await enviar('/iniciar', corpo); } catch (e) { falha(e); }
+  };
+  dialogo.showModal();
+}
+$('acao').addEventListener('click', async () => {
+  if (ultimo && ultimo.rodando) {
+    falha(null);
+    try { await enviar('/parar', {}); } catch (e) { falha(e); }
+  } else {
+    iniciar();
+  }
+});
+
+// ---- dados ao vivo (o EventSource reconecta sozinho)
+const fonte = new EventSource('/eventos');
+fonte.onmessage = (ev) => { $('desconectado').hidden = true; render(JSON.parse(ev.data)); };
+fonte.onerror = () => { $('desconectado').hidden = false; };
+</script>
+</body>
+</html>

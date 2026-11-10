@@ -11,6 +11,12 @@
 
 * **Frentes Técnicas**
   * [Arquitetura e Engenharia](arquitetura.md)
+  * [Arquitetura de Refino do Acervo](arquitetura-refino.md)
+  * [Pipeline de Ingestão de Dados](pipeline-ingestao.md)
+  * [Estratégia de Chunking Hierárquico](estrategia-chunking.md)
+  * [Estratégia de Embeddings e Qdrant](estrategia-embeddings.md)
+  * [Métricas de Avaliação RAG](metricas-avaliacao-rag.md)
+  * [Relação de Documentos-Fonte](lista-documentos-fonte.md)
   * [DevOps e MLOps](devops-mlops.md)
   * [Benchmark RAG e Governança MLOps](benchmark-rag-mlops.md)
   * [Metodologia e Entregas](metodologia.md)

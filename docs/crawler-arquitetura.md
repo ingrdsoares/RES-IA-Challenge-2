@@ -1,6 +1,6 @@
 # Crawler de Coleta: Estrutura e Arquitetura Base
 
-Esboço da arquitetura de um coletor (crawler) para obter, organizar e versionar as informações úteis das fontes listadas em [Exploração de Dados](exploracao-dados.md). É um desenho inicial para discussão: nada aqui está implementado ainda.
+Esboço da arquitetura de um coletor (crawler) para obter, organizar e versionar as informações úteis das fontes listadas em [Exploração de Dados](exploracao-dados.md). A arquitetura completa abaixo é uma proposta de evolução. A primeira etapa implementada está em [backend/crawler](../backend/crawler/README.md): coleta manual de CNAEs do IBGE para Markdown estruturado e JSON original, sem banco de dados nesta fase.
 
 > **Premissa central:** isto **não é um crawler genérico** que varre a web. É um conjunto de **conectores por fonte**, dirigidos por um catálogo, que coleta só o que foi aprovado na pesquisa. Poucas fontes, alta qualidade, rastreabilidade total.
 
@@ -247,10 +247,10 @@ Alinhado às práticas de DVC/MLflow já previstas em [DevOps e MLOps](devops-ml
 ## 5. Estrutura Proposta do Repositório
 
 ```
-crawler/
+backend/crawler/
 ├── pyproject.toml
 ├── sources/                  # catálogo: um YAML por fonte
-├── src/sociodigital_crawler/
+├── src/sociodigital_backend/crawler/
 │   ├── core/                 # interface Artefato, config, logging, hashing
 │   ├── connectors/           # api.py, bulk.py, html.py, pdf.py, xml_schema.py, headless.py
 │   ├── policies/             # robots, rate_limit, retry, cache

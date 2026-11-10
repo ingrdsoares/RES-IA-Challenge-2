@@ -1,0 +1,158 @@
+"""Linha de comando do painel: abre a página local ou roda uma rodada direto no terminal."""
+
+import argparse
+import sys
+import threading
+import time
+import webbrowser
+from datetime import datetime
+from pathlib import Path
+
+from .executor import Executor, RodadaAtiva
+from .frentes import ETAPAS_FINAIS, POR_MODULO
+from .servidor import criar_servidor
+
+AVISO_CATALOGO = "Catálogo não encontrado ou ilegível: as contagens não refletem o acervo."
+CRAWLER = Path(__file__).resolve().parents[1]
+
+
+def _lista(texto: str) -> list[str]:
+    return [t for t in texto.split(",") if t]
+
+
+def _argumentos(argv) -> argparse.Namespace:
+    p = argparse.ArgumentParser(
+        prog="python -m backend.crawler.painel", description="Painel de coleta de dados"
+    )
+    p.add_argument("--porta", type=int, default=8765)
+    p.add_argument("--sem-navegador", action="store_true", help="não abre o navegador")
+    p.add_argument("--sem-pagina", action="store_true", help="roda no terminal, sem servidor")
+    p.add_argument("--frentes", type=_lista, default=[], help="frentes separadas por vírgula")
+    p.add_argument("--rodar-de-novo", action="store_true", help="refaz as frentes que já têm dados")
+    p.add_argument(
+        "--finais", type=_lista, default=[], help=f"etapas finais: {','.join(ETAPAS_FINAIS)}"
+    )
+    args = p.parse_args(argv)
+    if not args.sem_pagina and (args.frentes or args.finais or args.rodar_de_novo):
+        p.error("--frentes, --finais e --rodar-de-novo exigem --sem-pagina")
+    if args.sem_pagina and not args.frentes and not args.finais:
+        p.error("--sem-pagina exige --frentes ou --finais")
+    for nome, validos in (("frentes", POR_MODULO), ("finais", ETAPAS_FINAIS)):
+        desconhecidos = sorted(set(getattr(args, nome)) - set(validos))
+        if desconhecidos:
+            p.error(f"módulo desconhecido em --{nome}: {', '.join(desconhecidos)}")
+    return args
+
+
+def main(argv=None, executor=None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(errors="replace")  # consoles cp1252 não podem derrubar o painel
+        except (OSError, ValueError):
+            pass
+    try:
+        args = _argumentos(argv)
+    except SystemExit as e:
+        return e.code if isinstance(e.code, int) else 2
+    executor = executor or Executor(CRAWLER / ".painel", CRAWLER / "data")
+    return _terminal(args, executor) if args.sem_pagina else _pagina(args, executor)
+
+
+def _pagina(args, executor) -> int:
+    try:
+        servidor = criar_servidor(executor, args.porta)
+    except OSError:
+        print(
+            f"Porta {args.porta} em uso. O painel já pode estar aberto em http://127.0.0.1:{args.porta}"
+        )
+        return 1
+    url = f"http://127.0.0.1:{servidor.server_address[1]}"
+    print(f"Painel em {url} (Ctrl+C para encerrar)")
+    if not args.sem_navegador:
+        threading.Thread(target=webbrowser.open, args=(url,), daemon=True).start()
+    try:
+        servidor.serve_forever()
+    except KeyboardInterrupt:
+        _parar(executor)
+    finally:
+        servidor.server_close()
+    return 0
+
+
+def _parar(executor) -> None:
+    print("Encerrando: parando a rodada em andamento (Ctrl+C de novo para forçar)")
+    try:
+        executor.parar()
+        while executor.estado()[
+            "rodando"
+        ]:  # espera curta em laço: join sem prazo não é interrompível no Windows
+            executor.aguardar(0.25)
+    except KeyboardInterrupt:  # segundo Ctrl+C: mata o coletor e sai
+        for _ in range(5):  # novos Ctrl+C não podem impedir o encerramento do coletor
+            try:
+                executor.forcar()
+                break
+            except KeyboardInterrupt:
+                continue
+        try:
+            executor.aguardar(5)
+        except KeyboardInterrupt:
+            pass
+
+
+def _imprimir_previa(plano, estado) -> None:
+    if not estado.get("catalogo_lido", True):
+        print(f"Aviso: {AVISO_CATALOGO}")
+    por_modulo = {linha["modulo"]: linha for linha in estado.get("frentes", [])}
+    for i in plano:
+        linha = por_modulo.get(i["modulo"]) or {}
+        if i["acao"] == "pular":
+            print(
+                f"{i['modulo']} pulada ({i['motivo']}): {linha.get('itens', 0)} itens, última coleta {linha.get('ultima_coleta') or '—'}"
+            )
+        elif linha.get("pesada"):
+            print(f"{i['modulo']}: coleta pesada. {linha['pesada']}")
+
+
+def _terminal(args, executor) -> int:
+    selecionadas, finais = set(args.frentes), set(args.finais)
+    refazer = selecionadas if args.rodar_de_novo else set()
+    # inclui dependências que o plano acrescentar e exclui as que ele pular
+    plano = executor.previa(selecionadas, refazer) if selecionadas else []
+    rodar = {i["modulo"] for i in plano if i["acao"] == "rodar"}
+    _imprimir_previa(plano, executor.estado())
+    try:
+        executor.iniciar(selecionadas, refazer, finais)
+    except RodadaAtiva as e:
+        print(e, file=sys.stderr)
+        return 1
+    vistos: dict[str, str] = {}
+    falhou = False
+    try:
+        while True:
+            estado = executor.estado()
+            linhas = [linha for linha in estado["frentes"] if linha["modulo"] in rodar] + [
+                linha for linha in estado["finais"] if linha["modulo"] in finais
+            ]
+            for linha in linhas:
+                if vistos.get(linha["modulo"]) != linha["estado"]:
+                    vistos[linha["modulo"]] = linha["estado"]
+                    detalhe = f" saída {linha['saida']}" if linha.get("saida") is not None else ""
+                    print(
+                        f"{datetime.now():%H:%M:%S} {linha['modulo']} {linha['estado']}{detalhe}",
+                        flush=True,
+                    )
+            if not estado["rodando"]:
+                falhou = any(linha["estado"] in ("erro", "interrompida") for linha in linhas)
+                break
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        _parar(executor)
+        return 1
+    if estado.get("aviso"):
+        print(f"Aviso: {estado['aviso']}")
+    return 1 if falhou else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

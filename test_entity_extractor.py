@@ -88,11 +88,13 @@ def run_tests():
 
     for c in casos_de_teste:
         print(f"\n[{c['id']}]")
-        print(f"  Texto: \"{c['texto'][:90]}...\"")
+        print(f'  Texto: "{c["texto"][:90]}..."')
 
         res = extractor.extract(c["texto"])
 
-        print(f"  -> Intenção Primária: {res.intencao_primaria} (Confiança: {res.confianca_intencao:.2f})")
+        print(
+            f"  -> Intenção Primária: {res.intencao_primaria} (Confiança: {res.confianca_intencao:.2f})"
+        )
         print(f"  -> CNAEs Detectados: {[x['codigo'] for x in res.cnaes]}")
         print(f"  -> CNPJs Detectados: {res.cnpjs}")
         print(f"  -> Regimes: {res.regimes} | Anexos: {res.anexos}")
@@ -106,7 +108,9 @@ def run_tests():
         passou = True
 
         if "intencao" in v and res.intencao_primaria != v["intencao"]:
-            print(f"  [FALHA] Esperava intenção '{v['intencao']}', obteve '{res.intencao_primaria}'")
+            print(
+                f"  [FALHA] Esperava intenção '{v['intencao']}', obteve '{res.intencao_primaria}'"
+            )
             passou = False
 
         if "cnae_codigo" in v:
@@ -128,7 +132,9 @@ def run_tests():
         if "fator_r_calculado" in v:
             calculado = res.parametros_calculo.get("fator_r_calculado")
             if calculado != v["fator_r_calculado"]:
-                print(f"  [FALHA] Fator R calculado {calculado} != esperado {v['fator_r_calculado']}")
+                print(
+                    f"  [FALHA] Fator R calculado {calculado} != esperado {v['fator_r_calculado']}"
+                )
                 passou = False
 
         if passou:
@@ -160,15 +166,23 @@ def run_tests():
         filter_tags = [extracao.tag_foco] if extracao.tag_foco else extracao.tags_rag
         rag_hits = vector_store.search(extracao.query_expandida, top_k=1, filter_tags=filter_tags)
 
-        print(f"  -> Pergunta do Usuário: \"{pergunta}\"")
-        print(f"  -> Query Expandida (RAG): \"{extracao.query_expandida}\"")
+        print(f'  -> Pergunta do Usuário: "{pergunta}"')
+        print(f'  -> Query Expandida (RAG): "{extracao.query_expandida}"')
         print(f"  -> Tag de Foco: {extracao.tag_foco} | Tags RAG: {extracao.tags_rag}")
-        print(f"  -> Parâmetros Extraídos: RBT12 = R$ {params['rbt12']:,.2f} | Folha = R$ {params['folha_12m']:,.2f}")
-        print(f"  -> Fator R Calculado pelo Motor: {fator_r * 100:.1f}% -> Anexo {anexo} (Migrou: {migrou})")
-        print(f"  -> Alíquota Efetiva: {calculo.aliquota_efetiva * 100:.2f}% | Imposto Mensal: R$ {calculo.imposto_mes:,.2f}")
-        print(f"  -> Artigo Legal Recuperado pelo RAG: {rag_hits[0]['artigo']} ({rag_hits[0]['source_doc']})")
+        print(
+            f"  -> Parâmetros Extraídos: RBT12 = R$ {params['rbt12']:,.2f} | Folha = R$ {params['folha_12m']:,.2f}"
+        )
+        print(
+            f"  -> Fator R Calculado pelo Motor: {fator_r * 100:.1f}% -> Anexo {anexo} (Migrou: {migrou})"
+        )
+        print(
+            f"  -> Alíquota Efetiva: {calculo.aliquota_efetiva * 100:.2f}% | Imposto Mensal: R$ {calculo.imposto_mes:,.2f}"
+        )
+        print(
+            f"  -> Artigo Legal Recuperado pelo RAG: {rag_hits[0]['artigo']} ({rag_hits[0]['source_doc']})"
+        )
 
-        integracao_ok = (anexo == "III" and "Art. 18" in rag_hits[0]["artigo"])
+        integracao_ok = anexo == "III" and "Art. 18" in rag_hits[0]["artigo"]
         if integracao_ok:
             print("  [OK] Integração Tripla validada com 100% de sucesso e consistência!")
         else:

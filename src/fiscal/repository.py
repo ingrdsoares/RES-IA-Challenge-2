@@ -15,7 +15,9 @@ class FiscalRepository:
     def __init__(self, db_path: str):
         self.db_path = Path(db_path)
         if not self.db_path.exists():
-            raise FileNotFoundError(f"Banco fiscal não encontrado em: {db_path}. Execute a ingestão antes.")
+            raise FileNotFoundError(
+                f"Banco fiscal não encontrado em: {db_path}. Execute a ingestão antes."
+            )
 
     def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -193,9 +195,13 @@ class FiscalRepository:
     def get_parametro(self, chave: str) -> Any:
         with self._get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT valor_texto, valor_numerico FROM parametros_fiscais WHERE chave = ?", (chave,))
+            cur.execute(
+                "SELECT valor_texto, valor_numerico FROM parametros_fiscais WHERE chave = ?",
+                (chave,),
+            )
             row = cur.fetchone()
             if not row:
                 return None
-            return row["valor_numerico"] if row["valor_numerico"] is not None else row["valor_texto"]
-
+            return (
+                row["valor_numerico"] if row["valor_numerico"] is not None else row["valor_texto"]
+            )

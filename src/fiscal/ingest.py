@@ -72,13 +72,48 @@ class FiscalIngestionPipeline:
             """,
             [
                 ("versao_legal", tabelas_data["versao_legal"], None, "Fundamentação legal"),
-                ("limite_anual_simples", None, tabelas_data["limite_anual_simples"], "Teto anual do Simples Nacional (R$)"),
-                ("limite_anual_mei", None, tabelas_data["limite_anual_mei"], "Teto anual do MEI (R$)"),
-                ("tolerancia_limite_mei", None, tabelas_data["tolerancia_limite_mei_percentual"], "Tolerância de 20% do MEI"),
-                ("salario_minimo_referencia", None, tabelas_data["salario_minimo_referencia"], "Salário Mínimo de Referência"),
-                ("mei_inss_percentual", None, tabelas_data["mei_taxas"]["inss_percentual"], "Alíquota INSS sobre Salário Mínimo"),
-                ("mei_icms_fixo", None, tabelas_data["mei_taxas"]["icms_fixo"], "Taxa fixa mensal ICMS"),
-                ("mei_iss_fixo", None, tabelas_data["mei_taxas"]["iss_fixo"], "Taxa fixa mensal ISS"),
+                (
+                    "limite_anual_simples",
+                    None,
+                    tabelas_data["limite_anual_simples"],
+                    "Teto anual do Simples Nacional (R$)",
+                ),
+                (
+                    "limite_anual_mei",
+                    None,
+                    tabelas_data["limite_anual_mei"],
+                    "Teto anual do MEI (R$)",
+                ),
+                (
+                    "tolerancia_limite_mei",
+                    None,
+                    tabelas_data["tolerancia_limite_mei_percentual"],
+                    "Tolerância de 20% do MEI",
+                ),
+                (
+                    "salario_minimo_referencia",
+                    None,
+                    tabelas_data["salario_minimo_referencia"],
+                    "Salário Mínimo de Referência",
+                ),
+                (
+                    "mei_inss_percentual",
+                    None,
+                    tabelas_data["mei_taxas"]["inss_percentual"],
+                    "Alíquota INSS sobre Salário Mínimo",
+                ),
+                (
+                    "mei_icms_fixo",
+                    None,
+                    tabelas_data["mei_taxas"]["icms_fixo"],
+                    "Taxa fixa mensal ICMS",
+                ),
+                (
+                    "mei_iss_fixo",
+                    None,
+                    tabelas_data["mei_taxas"]["iss_fixo"],
+                    "Taxa fixa mensal ISS",
+                ),
             ],
         )
 
@@ -251,6 +286,7 @@ class FiscalIngestionPipeline:
             json.dump(manifest, f, indent=2, ensure_ascii=False)
 
         print(f"[FiscalIngestion] Sucesso! Banco gerado em {self.db_path}")
-        print(f"[FiscalIngestion] {total_faixas} faixas indexadas e {total_cnaes} CNAEs catalogados.")
+        print(
+            f"[FiscalIngestion] {total_faixas} faixas indexadas e {total_cnaes} CNAEs catalogados."
+        )
         return manifest
-

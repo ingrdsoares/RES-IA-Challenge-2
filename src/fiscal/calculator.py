@@ -9,8 +9,8 @@ Diretriz: Cálculos matemáticos são 100% determinísticos e auditáveis.
 from typing import Optional
 
 from src.fiscal.models import (
-    CNAEItem,
     CalculoSimplesResultado,
+    CNAEItem,
     SimulacaoComparativaResultado,
 )
 from src.fiscal.repository import FiscalRepository
@@ -104,8 +104,16 @@ class FiscalCalculator:
     def calcular_custo_mensal_mei(self, cnae: CNAEItem) -> float:
         """Calcula o valor fixo da guia DAS-MEI mensal com base na atividade do CNAE."""
         inss = self.salario_minimo * self.mei_inss_perc
-        icms = self.mei_icms_fixo if ("ICMS" in cnae.tributos or cnae.anexo_padrao in ["I", "II"]) else 0.0
-        iss = self.mei_iss_fixo if ("ISS" in cnae.tributos or cnae.anexo_padrao in ["III", "IV", "V"]) else 0.0
+        icms = (
+            self.mei_icms_fixo
+            if ("ICMS" in cnae.tributos or cnae.anexo_padrao in ["I", "II"])
+            else 0.0
+        )
+        iss = (
+            self.mei_iss_fixo
+            if ("ISS" in cnae.tributos or cnae.anexo_padrao in ["III", "IV", "V"])
+            else 0.0
+        )
         return round(inss + icms + iss, 2)
 
     def simular(
@@ -220,4 +228,3 @@ class FiscalCalculator:
             economia_mensal_mei=economia_mensal,
             alertas=alertas,
         )
-

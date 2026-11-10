@@ -38,7 +38,9 @@ def run_fiscal_validation():
     manifest = pipeline.run()
 
     stats = manifest.get("stats", {})
-    print(f" -> Anexos Indexados: {stats.get('total_anexos')} ({', '.join(stats.get('anexos_disponiveis', []))})")
+    print(
+        f" -> Anexos Indexados: {stats.get('total_anexos')} ({', '.join(stats.get('anexos_disponiveis', []))})"
+    )
     print(f" -> Total de Faixas Fiscais: {stats.get('total_faixas')}")
     print(f" -> Total de CNAEs Catalogados: {stats.get('total_cnaes')}")
     print(f" -> CNAEs Permitidos no MEI: {stats.get('total_cnaes_permitidos_mei')}")
@@ -61,8 +63,15 @@ def run_fiscal_validation():
 
     total_testes += 1
     cnae_ti = repo.get_cnae_by_codigo("6201-5/01")
-    if cnae_ti and cnae_ti.anexo_padrao == "V" and cnae_ti.sujeito_fator_r and not cnae_ti.permitido_mei:
-        print("  [OK] CNAE 6201-5/01 (Software): Resolvido corretamente (Anexo V, Fator R=Sim, MEI=Não)")
+    if (
+        cnae_ti
+        and cnae_ti.anexo_padrao == "V"
+        and cnae_ti.sujeito_fator_r
+        and not cnae_ti.permitido_mei
+    ):
+        print(
+            "  [OK] CNAE 6201-5/01 (Software): Resolvido corretamente (Anexo V, Fator R=Sim, MEI=Não)"
+        )
         sucessos += 1
     else:
         print("  [FALHA] Falha na resolução do CNAE 6201-5/01")
@@ -70,7 +79,9 @@ def run_fiscal_validation():
     total_testes += 1
     busca_texto = repo.search_cnaes("eletricista", limit=1)
     if busca_texto and "4321-5/00" in busca_texto[0].codigo and busca_texto[0].permitido_mei:
-        print(f"  [OK] Busca FTS5 por 'eletricista': Encontrou {busca_texto[0].codigo} ({busca_texto[0].ocupacao_mei})")
+        print(
+            f"  [OK] Busca FTS5 por 'eletricista': Encontrou {busca_texto[0].codigo} ({busca_texto[0].ocupacao_mei})"
+        )
         sucessos += 1
     else:
         print("  [FALHA] Busca FTS5 por 'eletricista' falhou")
@@ -89,10 +100,14 @@ def run_fiscal_validation():
 
     # Alíquota efetiva esperada: ((240.000 * 0.073) - 5.940) / 240.000 = 11.580 / 240.000 = 4.825% (0.0483 ou 0.0482)
     print(f"  -> Anexo: {res_com.anexo_aplicado} (Faixa {res_com.faixa})")
-    print(f"  -> Alíquota Nominal: {res_com.aliquota_nominal * 100:.2f}% | Parcela a Deduzir: R$ {res_com.parcela_deduzir:,.2f}")
+    print(
+        f"  -> Alíquota Nominal: {res_com.aliquota_nominal * 100:.2f}% | Parcela a Deduzir: R$ {res_com.parcela_deduzir:,.2f}"
+    )
     print(f"  -> Alíquota Efetiva: {res_com.aliquota_efetiva * 100:.2f}%")
     print(f"  -> DAS Mensal Estimado: R$ {res_com.imposto_mes:,.2f}")
-    print(f"  -> Decomposição: ICMS: R$ {res_com.decomposicao_tributos.get('ICMS', 0):,.2f} | CPP: R$ {res_com.decomposicao_tributos.get('CPP', 0):,.2f}")
+    print(
+        f"  -> Decomposição: ICMS: R$ {res_com.decomposicao_tributos.get('ICMS', 0):,.2f} | CPP: R$ {res_com.decomposicao_tributos.get('CPP', 0):,.2f}"
+    )
 
     if res_com.faixa == 2 and 0.0480 <= res_com.aliquota_efetiva <= 0.0485:
         print("  [OK] Cálculo determinístico do Anexo I executado com 100% de exatidão!")
@@ -112,7 +127,9 @@ def run_fiscal_validation():
     # Fator R = 90k / 300k = 30% >= 28% -> Deve migrar para Anexo III!
     # Anexo III Faixa 2: ((300000 * 0.112) - 9360) / 300000 = (33600 - 9360) / 300000 = 24240 / 300000 = 8.08%
     print(f"  -> Fator R Calculado: {sim_ti_com_folha.fator_r * 100:.1f}%")
-    print(f"  -> Anexo Aplicado: {res_ti_folha.anexo_aplicado} (Migrou por Fator R: {res_ti_folha.migrou_anexo_por_fator_r})")
+    print(
+        f"  -> Anexo Aplicado: {res_ti_folha.anexo_aplicado} (Migrou por Fator R: {res_ti_folha.migrou_anexo_por_fator_r})"
+    )
     print(f"  -> Alíquota Efetiva: {res_ti_folha.aliquota_efetiva * 100:.2f}%")
     print(f"  -> DAS Mensal: R$ {res_ti_folha.imposto_mes:,.2f}")
 
@@ -120,11 +137,21 @@ def run_fiscal_validation():
     sim_ti_sem_folha = calc.simular("6201-5/01", faturamento_anual=300000.00, folha_anual=30000.00)
     res_ti_sem = sim_ti_sem_folha.simples_resultado
     economia_fator_r = res_ti_sem.imposto_mes - res_ti_folha.imposto_mes
-    print(f"  -> Se estivesse no Anexo V (folha 10%): DAS seria R$ {res_ti_sem.imposto_mes:,.2f} ({res_ti_sem.aliquota_efetiva * 100:.2f}%)")
-    print(f"  -> Economia gerada pela aplicação do Fator R: R$ {economia_fator_r:,.2f}/mês (R$ {economia_fator_r * 12:,.2f}/ano)")
+    print(
+        f"  -> Se estivesse no Anexo V (folha 10%): DAS seria R$ {res_ti_sem.imposto_mes:,.2f} ({res_ti_sem.aliquota_efetiva * 100:.2f}%)"
+    )
+    print(
+        f"  -> Economia gerada pela aplicação do Fator R: R$ {economia_fator_r:,.2f}/mês (R$ {economia_fator_r * 12:,.2f}/ano)"
+    )
 
-    if res_ti_folha.anexo_aplicado == "III" and res_ti_folha.migrou_anexo_por_fator_r and 0.0805 <= res_ti_folha.aliquota_efetiva <= 0.0810:
-        print("  [OK] Regra do Fator R aplicada com perfeição: migração de Anexo V para Anexo III comprovada!")
+    if (
+        res_ti_folha.anexo_aplicado == "III"
+        and res_ti_folha.migrou_anexo_por_fator_r
+        and 0.0805 <= res_ti_folha.aliquota_efetiva <= 0.0810
+    ):
+        print(
+            "  [OK] Regra do Fator R aplicada com perfeição: migração de Anexo V para Anexo III comprovada!"
+        )
         sucessos += 1
     else:
         print(f"  [FALHA] Falha na migração do Fator R: {res_ti_folha.anexo_aplicado}")
@@ -143,17 +170,25 @@ def run_fiscal_validation():
     print(f"  -> Recomendação: {sim_mei.recomendacao_regime}")
     print(f"  -> Economia Mensal no MEI: R$ {sim_mei.economia_mensal_mei:,.2f}/mês")
 
-    if sim_mei.mei_elegivel and sim_mei.mei_custo_mensal == 75.60 and sim_mei.recomendacao_regime.startswith("MEI"):
+    if (
+        sim_mei.mei_elegivel
+        and sim_mei.mei_custo_mensal == 75.60
+        and sim_mei.recomendacao_regime.startswith("MEI")
+    ):
         print("  [OK] Diagnóstico MEI e cálculo da guia fixa (INSS + ISS) validados!")
         sucessos += 1
     else:
-        print(f"  [FALHA] Diagnóstico MEI incorreto: elegível={sim_mei.mei_elegivel}, custo={sim_mei.mei_custo_mensal}")
+        print(
+            f"  [FALHA] Diagnóstico MEI incorreto: elegível={sim_mei.mei_elegivel}, custo={sim_mei.mei_custo_mensal}"
+        )
 
     # -------------------------------------------------------------
     # 7. Caso Canônico 4: Desenquadramento de MEI por Excesso de Faturamento (> 20%)
     # -------------------------------------------------------------
     print("\n[Caso 4] Desenquadramento de MEI por Excesso de Faturamento")
-    print("  Atividade: Cabeleireiro (CNAE 9602-5/01) com Faturamento R$ 105.000,00 (> R$ 97.200,00)")
+    print(
+        "  Atividade: Cabeleireiro (CNAE 9602-5/01) com Faturamento R$ 105.000,00 (> R$ 97.200,00)"
+    )
     total_testes += 1
     sim_desenquadra = calc.simular("9602-5/01", faturamento_anual=105000.00)
 
@@ -161,17 +196,23 @@ def run_fiscal_validation():
     print(f"  -> Motivo: {sim_desenquadra.mei_motivo_inelegibilidade}")
     print(f"  -> Recomendação: {sim_desenquadra.recomendacao_regime}")
 
-    if not sim_desenquadra.mei_elegivel and "mais de 20%" in sim_desenquadra.mei_motivo_inelegibilidade:
-        print("  [OK] Regra de excesso de faturamento > 20% com desenquadramento retroativo validada!")
+    if (
+        not sim_desenquadra.mei_elegivel
+        and "mais de 20%" in sim_desenquadra.mei_motivo_inelegibilidade
+    ):
+        print(
+            "  [OK] Regra de excesso de faturamento > 20% com desenquadramento retroativo validada!"
+        )
         sucessos += 1
     else:
-        print(f"  [FALHA] Validação de excesso de faturamento MEI falhou.")
+        print("  [FALHA] Validação de excesso de faturamento MEI falhou.")
 
     print("\n" + "=" * 75)
-    print(f" RESULTADO FINAL DO MOTOR FISCAL: {sucessos}/{total_testes} testes passaram com sucesso!")
+    print(
+        f" RESULTADO FINAL DO MOTOR FISCAL: {sucessos}/{total_testes} testes passaram com sucesso!"
+    )
     print("=" * 75)
 
 
 if __name__ == "__main__":
     run_fiscal_validation()
-

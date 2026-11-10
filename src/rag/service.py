@@ -4,7 +4,7 @@ Frente: Ciência de Dados (Jhessica).
 Integração: RAG (Legislação) + Motor Determinístico (Lucas) + Guardrails (Clara e Nasser).
 """
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -119,13 +119,15 @@ class RAGService:
                 plano_3_passos=[
                     "Passo 1 (Paralisação): Interromper qualquer ação sem fundamentação formal expressa.",
                     "Passo 2 (Consulta Presencial): Agendar atendimento técnico imediato com escritório contábil habilitado (CRC).",
-                    "Passo 3 (Auditoria Jurídica): Se envolver passivo contencioso, buscar assessoria jurídica especializada em Direito Tributário."
+                    "Passo 3 (Auditoria Jurídica): Se envolver passivo contencioso, buscar assessoria jurídica especializada em Direito Tributário.",
                 ],
-                fontes_citadas=[{
-                    "norma": "Código de Ética Profissional do Contador e Resolução CFC nº 803/1996",
-                    "artigo": "Diretriz Geral",
-                    "trecho": "Prerrogativa privativa de atendimento contábil pericial e conformidade estrita com a lei."
-                }],
+                fontes_citadas=[
+                    {
+                        "norma": "Código de Ética Profissional do Contador e Resolução CFC nº 803/1996",
+                        "artigo": "Diretriz Geral",
+                        "trecho": "Prerrogativa privativa de atendimento contábil pericial e conformidade estrita com a lei.",
+                    }
+                ],
                 se_absteve=True,
                 motivo_abstencao=motivo_abstencao,
                 score_confianca=1.0,
@@ -153,7 +155,7 @@ class RAGService:
                 plano_3_passos=[
                     "Passo 1 (Refinamento): Reformule a pergunta fornecendo a atividade (CNAE) ou o regime tributário da empresa.",
                     "Passo 2 (Consulta Oficial): Verifique o portal do Simples Nacional ou manuais de perguntas frequentes da Receita Federal.",
-                    "Passo 3 (Validação Contábil): Submeta a dúvida ao seu contador para análise das particularidades do seu município."
+                    "Passo 3 (Validação Contábil): Submeta a dúvida ao seu contador para análise das particularidades do seu município.",
                 ],
                 fontes_citadas=[],
                 se_absteve=True,
@@ -183,8 +185,11 @@ class RAGService:
                     "mei_elegivel": sim_res.mei_elegivel,
                     "mei_motivo": sim_res.mei_motivo_inelegibilidade,
                     "recomendacao_regime": sim_res.recomendacao_regime,
-                    "economia_mensal": sim_res.economia_mensal_mei or (
-                        sim_res.simples_resultado.imposto_mes if sim_res.simples_resultado.migrou_anexo_por_fator_r else 0.0
+                    "economia_mensal": sim_res.economia_mensal_mei
+                    or (
+                        sim_res.simples_resultado.imposto_mes
+                        if sim_res.simples_resultado.migrou_anexo_por_fator_r
+                        else 0.0
                     ),
                     "alertas": sim_res.alertas,
                 }
@@ -194,14 +199,16 @@ class RAGService:
         # 4. Formatação de Citações Oficiais
         fontes_formatadas = []
         for ch in retrieved_chunks:
-            fontes_formatadas.append({
-                "artigo": ch.get("artigo"),
-                "paragrafo": ch.get("paragrafo"),
-                "norma": ch.get("source_doc"),
-                "tema": ch.get("tema"),
-                "trecho": ch.get("raw_text")[:240].strip() + "...",
-                "score": ch.get("score"),
-            })
+            fontes_formatadas.append(
+                {
+                    "artigo": ch.get("artigo"),
+                    "paragrafo": ch.get("paragrafo"),
+                    "norma": ch.get("source_doc"),
+                    "tema": ch.get("tema"),
+                    "trecho": ch.get("raw_text")[:240].strip() + "...",
+                    "score": ch.get("score"),
+                }
+            )
 
         # 5. Síntese do Diagnóstico e do Plano de 3 Passos
         diagnostico, plano = self._sintetizar_resposta(
@@ -234,7 +241,9 @@ class RAGService:
         top_artigo = retrieved[0]["artigo"] if retrieved else "Legislação Tributária"
 
         # CENÁRIO A: Fator R e Anexo III vs V
-        if "fator r" in p_lower or (calc and calc.get("fator_r") is not None and calc.get("fator_r") > 0):
+        if "fator r" in p_lower or (
+            calc and calc.get("fator_r") is not None and calc.get("fator_r") > 0
+        ):
             if calc and "anexo_aplicado" in calc:
                 fator_perc = calc["fator_r"] * 100
                 anexo = calc["anexo_aplicado"]
@@ -250,7 +259,7 @@ class RAGService:
                     plano = [
                         "Passo 1 (Parametrização): Informar ao escritório de contabilidade o fechamento exato da folha de salários e pró-labore até o dia 05 para cômputo dos 12 meses anteriores.",
                         "Passo 2 (Apuração PGDAS-D): No momento da emissão no portal da Receita Federal, certificar-se de que as receitas foram segregadas no campo 'Serviços sujeitos ao Fator R tributados no Anexo III'.",
-                        "Passo 3 (Comprovação): Arquivar o Extrato do Simples Nacional demonstrando a alíquota de 8,08% e a memória de cálculo para resguardo em caso de fiscalização."
+                        "Passo 3 (Comprovação): Arquivar o Extrato do Simples Nacional demonstrando a alíquota de 8,08% e a memória de cálculo para resguardo em caso de fiscalização.",
                     ]
                 else:
                     diag = (
@@ -260,12 +269,17 @@ class RAGService:
                     plano = [
                         "Passo 1 (Análise de Viabilidade): Avaliar junto ao seu contador o aumento do pró-labore dos sócios para elevar a razão da folha acima de 28%.",
                         "Passo 2 (Simulação de Encargos): Comparar se o custo previdenciário do pró-labore (INSS de 11%) é inferior à economia gerada no DAS ao migrar para o Anexo III.",
-                        "Passo 3 (Adequação da Folha): Registrar o ajuste contábil no eSocial para refletir a nova média nos meses subsequentes."
+                        "Passo 3 (Adequação da Folha): Registrar o ajuste contábil no eSocial para refletir a nova média nos meses subsequentes.",
                     ]
                 return diag, plano
 
         # CENÁRIO B: MEI e Desenquadramento por Excesso de Faturamento
-        if "mei" in p_lower and ("desenquadr" in p_lower or "20%" in p_lower or "limite" in p_lower or "faturei" in p_lower):
+        if "mei" in p_lower and (
+            "desenquadr" in p_lower
+            or "20%" in p_lower
+            or "limite" in p_lower
+            or "faturei" in p_lower
+        ):
             if calc and not calc.get("mei_elegivel"):
                 motivo = calc.get("mei_motivo", "")
                 diag = f"Alerta de Desenquadramento Fiscal do MEI: {motivo} Conforme o {top_artigo} da LC 123/2006, o limite anual do MEI é de R$ 81.000,00."
@@ -279,12 +293,18 @@ class RAGService:
             plano = [
                 "Passo 1 (Diagnóstico do Excesso): Somar todas as notas fiscais emitidas no ano e o faturamento sem nota para identificar se o excesso superou ou não os 20% de tolerância.",
                 "Passo 2 (Comunicação Obrigatória): Acessar o Portal do Simples Nacional (Serviços SIMEI) e registrar a 'Comunicação de Desenquadramento Obrigatório'.",
-                "Passo 3 (Migração para Microempresa): Contratar um profissional contábil para elaborar o contrato social, adequar os livros fiscais e apurar os tributos como ME."
+                "Passo 3 (Migração para Microempresa): Contratar um profissional contábil para elaborar o contrato social, adequar os livros fiscais e apurar os tributos como ME.",
             ]
             return diag, plano
 
         # CENÁRIO C: Regularidade Fiscal e Certidões (CND / CPEN)
-        if "certidão" in p_lower or "cnd" in p_lower or "cpen" in p_lower or "débito" in p_lower or "parcela" in p_lower:
+        if (
+            "certidão" in p_lower
+            or "cnd" in p_lower
+            or "cpen" in p_lower
+            or "débito" in p_lower
+            or "parcela" in p_lower
+        ):
             diag = (
                 f"A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela "
                 f"Certidão Positiva com Efeitos de Negativa (CPEN). Conforme a Receita Federal ({top_artigo}), "
@@ -293,7 +313,7 @@ class RAGService:
             plano = [
                 "Passo 1 (Consulta de Pendências): Acessar o Portal e-CAC da Receita Federal com certificado digital ou conta Gov.br (Prata/Ouro) e emitir a 'Situação Fiscal'.",
                 "Passo 2 (Negociação e Parcelamento): Optar pelo Programa de Parcelamento Ordinário do Simples Nacional ou Transação Tributária na PGFN (Regularize), efetuando o pagamento da primeira parcela.",
-                "Passo 3 (Emissão da CPEN): Aguardar a compensação bancária (24 a 48h) e emitir a Certidão Positiva com Efeitos de Negativa no site da Receita Federal."
+                "Passo 3 (Emissão da CPEN): Aguardar a compensação bancária (24 a 48h) e emitir a Certidão Positiva com Efeitos de Negativa no site da Receita Federal.",
             ]
             return diag, plano
 
@@ -312,7 +332,7 @@ class RAGService:
             plano = [
                 f"Passo 1 (Apuração da Receita): Segregar as receitas brutas da competência corrente correspondentes ao Anexo {anexo} a partir das notas fiscais emitidas.",
                 f"Passo 2 (Emissão do DAS no PGDAS-D): Acessar o Portal do Simples Nacional até o dia 20 do mês subsequente, preenchendo a apuração para emissão da guia única com alíquota de {aliq:.2f}%.",
-                "Passo 3 (Conciliação Contábil): Acompanhar o acumulado dos 12 meses anteriores (RBT12) para monitorar eventuais mudanças de faixa de tributação e arquivar o extrato oficial."
+                "Passo 3 (Conciliação Contábil): Acompanhar o acumulado dos 12 meses anteriores (RBT12) para monitorar eventuais mudanças de faixa de tributação e arquivar o extrato oficial.",
             ]
             return diag, plano
 
@@ -324,6 +344,6 @@ class RAGService:
         plano = [
             f"Passo 1 (Conferência Legal): Revisar os requisitos expressos no {top_artigo} e confrontá-los com o histórico contábil da sua empresa.",
             "Passo 2 (Organização Documental): Reunir notas fiscais, extratos bancários e guias pagas pertinentes à operação.",
-            "Passo 3 (Validação Técnica): Alinhar o procedimento adotado junto ao seu profissional contábil habilitado (CRC)."
+            "Passo 3 (Validação Técnica): Alinhar o procedimento adotado junto ao seu profissional contábil habilitado (CRC).",
         ]
         return diag, plano

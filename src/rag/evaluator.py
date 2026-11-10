@@ -110,7 +110,7 @@ class RAGEvaluator:
         tempo_ms = round((time.perf_counter() - inicio) * 1000, 2)
 
         # 1. Guardrail e Abstenção
-        guardrail_correto = (resposta.se_absteve == deve_abster)
+        guardrail_correto = resposta.se_absteve == deve_abster
 
         # 2. Recuperação Vetorial (Context Recall & Context Precision)
         artigos_retornados = [f["artigo"] for f in resposta.fontes_citadas if f.get("artigo")]
@@ -124,8 +124,7 @@ class RAGEvaluator:
         else:
             # Recall: todos os artigos esperados foram recuperados em algum chunk do Top K?
             encontrados = sum(
-                1 for exp in artigos_esperados
-                if any(exp in ret for ret in artigos_retornados)
+                1 for exp in artigos_esperados if any(exp in ret for ret in artigos_retornados)
             )
             context_recall = round(encontrados / len(artigos_esperados), 4)
 
@@ -152,14 +151,18 @@ class RAGEvaluator:
                 anexo_obtido = (resposta.calculo_detalhado or {}).get("anexo_aplicado")
                 if anexo_obtido != anexo_esperado:
                     faithfulness = 0.0
-                    erros_faithfulness.append(f"Anexo divergente: esperado {anexo_esperado}, obtido {anexo_obtido}")
+                    erros_faithfulness.append(
+                        f"Anexo divergente: esperado {anexo_esperado}, obtido {anexo_obtido}"
+                    )
 
             # Validação da Alíquota Efetiva
             if aliq_min is not None and aliq_max is not None:
                 aliq_obtida = (resposta.calculo_detalhado or {}).get("aliquota_efetiva")
                 if aliq_obtida is None or not (aliq_min <= aliq_obtida <= aliq_max):
                     faithfulness = 0.0
-                    erros_faithfulness.append(f"Alíquota {aliq_obtida} fora da faixa [{aliq_min}, {aliq_max}]")
+                    erros_faithfulness.append(
+                        f"Alíquota {aliq_obtida} fora da faixa [{aliq_min}, {aliq_max}]"
+                    )
 
         # 4. Conformidade Estrutural (3 passos e disclaimer CRC)
         plano_3_passos_ok = len(resposta.plano_3_passos) == 3 if exige_3_passos else True
@@ -248,7 +251,7 @@ class RAGEvaluator:
                     "LegalVectorStore (SQLite)",
                     "FiscalCalculator (LC 123/2006)",
                     "TaxEntityExtractor (Regex + Semantics)",
-                    "Guardrails Éticos e de Abstenção"
+                    "Guardrails Éticos e de Abstenção",
                 ],
             },
             cenarios=resultados,

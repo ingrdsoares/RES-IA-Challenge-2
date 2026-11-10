@@ -7,7 +7,6 @@ from pathlib import Path
 
 
 class PDFCanvas:
-
     def __init__(self, filename):
         self.filename = filename
         self.pages = []
@@ -43,11 +42,13 @@ class PDFCanvas:
 
         obj_catalog = f"<< /Type /Catalog /Pages {pages_id} 0 R >>"
         kids_str = " ".join([f"{pid} 0 R" for pid in page_obj_ids])
-        obj_pages = (
-            f"<< /Type /Pages /Kids [{kids_str}] /Count {total_pages} >>"
+        obj_pages = f"<< /Type /Pages /Kids [{kids_str}] /Count {total_pages} >>"
+        obj_font_reg = (
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"
         )
-        obj_font_reg = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"
-        obj_font_bold = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"
+        obj_font_bold = (
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"
+        )
         obj_font_italic = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>"
 
         objs = [
@@ -59,24 +60,19 @@ class PDFCanvas:
         ]
 
         for p_idx in range(total_pages):
-            p_obj_id = page_obj_ids[p_idx]
             c_obj_id = content_obj_ids[p_idx]
 
             page_ops = list(self.pages[p_idx])
 
             # Running footer line and text
-            page_ops.append(
-                "q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q"
-            )
+            page_ops.append("q 0.85 0.88 0.92 RG 0.75 w 45 40 m 550.28 40 l S Q")
             page_ops.append(
                 "BT /F1 8 Tf 0.45 0.52 0.60 rg 45 28 Td (S\xf3cio Digital \x97"
                 " Relat\xf3rio de Entregas da Equipe | RES-IA Challenge 2"
                 " \x97 Grupo 08) Tj ET"
             )
             p_num_str = f"P\xe1gina {p_idx + 1} de {total_pages}"
-            page_ops.append(
-                f"BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td ({p_num_str}) Tj ET"
-            )
+            page_ops.append(f"BT /F2 8 Tf 0.45 0.52 0.60 rg 495 28 Td ({p_num_str}) Tj ET")
 
             stream_content = "\n".join(page_ops)
             stream_bytes = stream_content.encode("latin1")
@@ -146,7 +142,6 @@ def wrap_text(text, max_chars):
 
 
 class DocumentBuilder:
-
     def __init__(self, filename):
         self.canvas = PDFCanvas(filename)
         self.canvas.new_page()
@@ -169,8 +164,7 @@ class DocumentBuilder:
             " MAPEAMENTO DE ENTREGAS DA EQUIPE) Tj ET"
         )
         ops.append(
-            "BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2"
-            " \x97 Grupo 08) Tj ET"
+            "BT /F1 8 Tf 0.45 0.52 0.60 rg 440 814 Td (RES-IA | Challenge 2 \x97 Grupo 08) Tj ET"
         )
         self.y = 788
 
@@ -197,13 +191,15 @@ class DocumentBuilder:
         self.check_space(42)
         ops = self.canvas.current_page_ops
         ops.append(f"q 0.10 0.28 0.65 rg 45 {self.y - 13} 4 15 re f Q")
-        
+
         escaped_title = escape_pdf_text(title)
         ops.append(f"BT /F2 11 Tf 0.08 0.14 0.25 rg 55 {self.y - 11} Td ({escaped_title}) Tj ET")
 
         if badge:
             e_badge = escape_pdf_text(badge)
-            ops.append(f"q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 {self.y - 14} 130 14 re B Q")
+            ops.append(
+                f"q 0.92 0.95 1.0 rg 0.70 0.80 0.95 RG 0.5 w 420 {self.y - 14} 130 14 re B Q"
+            )
             ops.append(f"BT /F2 7.5 Tf 0.10 0.30 0.70 rg 428 {self.y - 10} Td ({e_badge}) Tj ET")
 
         self.y -= 17
@@ -221,7 +217,7 @@ class DocumentBuilder:
             if not prefix and not text:
                 rendered_lines.append(("", "", False, True))
                 continue
-            
+
             prefix_len = len(prefix)
             avail_chars = max_chars - (prefix_len if prefix else 0) - (4 if is_bullet else 0)
             sub_lines = wrap_text(text, avail_chars)
@@ -242,12 +238,16 @@ class DocumentBuilder:
         r_bg, g_bg, b_bg = bg_rgb
         r_bd, g_bd, b_bd = border_rgb
         card_y = self.y - total_h
-        ops.append(f"q {r_bg:.2f} {g_bg:.2f} {b_bg:.2f} rg {r_bd:.2f} {g_bd:.2f} {b_bd:.2f} RG 0.8 w 45 {card_y} 505.28 {total_h} re B Q")
+        ops.append(
+            f"q {r_bg:.2f} {g_bg:.2f} {b_bg:.2f} rg {r_bd:.2f} {g_bd:.2f} {b_bd:.2f} RG 0.8 w 45 {card_y} 505.28 {total_h} re B Q"
+        )
 
         cur_text_y = self.y - 14
         if title:
             escaped_title = escape_pdf_text(title)
-            ops.append(f"BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 {cur_text_y} Td ({escaped_title}) Tj ET")
+            ops.append(
+                f"BT /F2 9.5 Tf 0.08 0.18 0.40 rg 57 {cur_text_y} Td ({escaped_title}) Tj ET"
+            )
             cur_text_y -= 13
 
         for prefix, line_text, is_bullet, is_blank in rendered_lines:
@@ -265,10 +265,14 @@ class DocumentBuilder:
             if prefix:
                 e_p = escape_pdf_text(prefix)
                 e_t = escape_pdf_text(" " + line_text if line_text else "")
-                ops.append(f"BT /F2 8.5 Tf 0.10 0.15 0.25 rg {indent_x} {cur_text_y} Td ({e_p}) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ({e_t}) Tj ET")
+                ops.append(
+                    f"BT /F2 8.5 Tf 0.10 0.15 0.25 rg {indent_x} {cur_text_y} Td ({e_p}) Tj /F1 8.5 Tf 0.20 0.25 0.35 rg ({e_t}) Tj ET"
+                )
             else:
                 e_t = escape_pdf_text(line_text)
-                ops.append(f"BT /F1 8.5 Tf 0.20 0.25 0.35 rg {indent_x} {cur_text_y} Td ({e_t}) Tj ET")
+                ops.append(
+                    f"BT /F1 8.5 Tf 0.20 0.25 0.35 rg {indent_x} {cur_text_y} Td ({e_t}) Tj ET"
+                )
 
             cur_text_y -= 12
 
@@ -285,7 +289,9 @@ class DocumentBuilder:
         r, g, b = color
         for line in lines:
             escaped = escape_pdf_text(line)
-            ops.append(f"BT /{font} {size} Tf {r:.2f} {g:.2f} {b:.2f} rg {self.left} {self.y - size} Td ({escaped}) Tj ET")
+            ops.append(
+                f"BT /{font} {size} Tf {r:.2f} {g:.2f} {b:.2f} rg {self.left} {self.y - size} Td ({escaped}) Tj ET"
+            )
             self.y -= leading
         self.y -= 3
 
@@ -303,12 +309,16 @@ class DocumentBuilder:
         e_bp = escape_pdf_text(bold_prefix)
         first_content = sub_lines[0] if sub_lines else ""
         e_rem = escape_pdf_text(" " + first_content if first_content else "")
-        ops.append(f"BT /F2 {size} Tf 0.10 0.15 0.25 rg {self.left + 12} {self.y - size} Td ({e_bp}) Tj /F1 {size} Tf 0.20 0.25 0.35 rg ({e_rem}) Tj ET")
+        ops.append(
+            f"BT /F2 {size} Tf 0.10 0.15 0.25 rg {self.left + 12} {self.y - size} Td ({e_bp}) Tj /F1 {size} Tf 0.20 0.25 0.35 rg ({e_rem}) Tj ET"
+        )
         self.y -= leading
 
-        for l in sub_lines[1:]:
-            e_l = escape_pdf_text(l)
-            ops.append(f"BT /F1 {size} Tf 0.20 0.25 0.35 rg {self.left + 12} {self.y - size} Td ({e_l}) Tj ET")
+        for sub_line in sub_lines[1:]:
+            e_l = escape_pdf_text(sub_line)
+            ops.append(
+                f"BT /F1 {size} Tf 0.20 0.25 0.35 rg {self.left + 12} {self.y - size} Td ({e_l}) Tj ET"
+            )
             self.y -= leading
         self.y -= 2
 
@@ -349,15 +359,17 @@ class DocumentBuilder:
         for r_idx, (wrapped_cells, row_h) in enumerate(table_rows_data):
             bg = "0.96 0.97 1.0" if r_idx % 2 == 0 else "1 1 1"
             ops.append(f"q {bg} rg 45 {row_y - row_h} 505.28 {row_h} re f Q")
-            ops.append(f"q 0.85 0.88 0.94 RG 0.5 w 45 {row_y - row_h} m 550.28 {row_y - row_h} l S Q")
+            ops.append(
+                f"q 0.85 0.88 0.94 RG 0.5 w 45 {row_y - row_h} m 550.28 {row_y - row_h} l S Q"
+            )
 
             cur_x = 45
             for c_idx, (lines, w) in enumerate(zip(wrapped_cells, col_widths)):
                 font = "/F2" if c_idx == 0 else "/F1"
                 color = "0.08 0.14 0.28 rg" if c_idx == 0 else "0.18 0.22 0.30 rg"
                 cell_y = row_y - 9.5
-                for l in lines:
-                    el = escape_pdf_text(l)
+                for text_line in lines:
+                    el = escape_pdf_text(text_line)
                     ops.append(f"BT {font} 7.5 Tf {color} {cur_x + 5} {cell_y} Td ({el}) Tj ET")
                     cell_y -= 9.5
                 cur_x += w
@@ -380,19 +392,35 @@ def generate_document():
     doc.draw_card(
         "Quadro Sinóptico de Atuação do Grupo 08",
         [
-            ("Jhessica (Ciência de Dados):", "RAG factual, Chunking hierárquico, NER fiscal, Guardrails anti-alucinação e RAGService.", True),
-            ("Lucas (Engenharia de Dados & Dev):", "Ingestão estruturada de CNAEs/LC 123, Motor determinístico em Python e base FastAPI.", True),
-            ("Clara e Nasser (Arquitetura):", "Topologia em camadas, desacoplamento cálculo/LLM, LGPD e fronteira ética com o CRC.", True),
-            ("Ingrid (DevOps & MLOps):", "CI/CD no GitHub Actions, portal no GitHub Pages, governança de modelos e relatórios PDF.", True),
+            (
+                "Jhessica (Ciência de Dados):",
+                "RAG factual, Chunking hierárquico, NER fiscal, Guardrails anti-alucinação e RAGService.",
+                True,
+            ),
+            (
+                "Lucas (Engenharia de Dados & Dev):",
+                "Ingestão estruturada de CNAEs/LC 123, Motor determinístico em Python e base FastAPI.",
+                True,
+            ),
+            (
+                "Clara e Nasser (Arquitetura):",
+                "Topologia em camadas, desacoplamento cálculo/LLM, LGPD e fronteira ética com o CRC.",
+                True,
+            ),
+            (
+                "Ingrid (DevOps & MLOps):",
+                "CI/CD no GitHub Actions, portal no GitHub Pages, governança de modelos e relatórios PDF.",
+                True,
+            ),
         ],
         bg_rgb=(0.95, 0.98, 1.0),
-        border_rgb=(0.60, 0.75, 0.95)
+        border_rgb=(0.60, 0.75, 0.95),
     )
 
     doc.draw_section_title(
         "1. Jhessica — Ciência de Dados e Inteligência Artificial",
         "Modelagem de RAG factual, extração de entidades fiscais, engenharia de prompts e avaliação.",
-        badge="CIÊNCIA DE DADOS"
+        badge="CIÊNCIA DE DADOS",
     )
 
     doc.draw_paragraph(
@@ -400,20 +428,44 @@ def generate_document():
         "jurídica de ponta a ponta, projetado para garantir zero alucinação em matérias contábeis."
     )
 
-    doc.draw_bullet("Chunking Hierárquico Jurídico (src/rag/chunker.py):", "Particionamento de normas (LC 123/2006, CGSN 140/2018) respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (Context Injection) para eliminar chunks descontextualizados.")
-    doc.draw_bullet("Vector Store Híbrido com Fallback (src/rag/vector_store.py):", "Persistência em banco SQLite combinando busca por similaridade de cosseno (embeddings densos MiniLM) com 30% de correspondência léxica e suporte a fallback offline.")
-    doc.draw_bullet("Extrator de Entidades Fiscais - NER (src/rag/entity_extractor.py):", "Classificação de intenções tributárias, extração automatizada de CNAEs, CNPJs, valores monetários (R$) e expansão de queries com sinônimos legais da Receita Federal.")
-    doc.draw_bullet("RAGService com Guardrails (src/rag/service.py, prompts.py):", "Orquestrador central que une o RAG ao motor determinístico de cálculo, impondo formatação mandatória em planos de 3 passos, citações oficiais e abstenção contra fraudes.")
+    doc.draw_bullet(
+        "Chunking Hierárquico Jurídico (src/rag/chunker.py):",
+        "Particionamento de normas (LC 123/2006, CGSN 140/2018) respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (Context Injection) para eliminar chunks descontextualizados.",
+    )
+    doc.draw_bullet(
+        "Vector Store Híbrido com Fallback (src/rag/vector_store.py):",
+        "Persistência em banco SQLite combinando busca por similaridade de cosseno (embeddings densos MiniLM) com 30% de correspondência léxica e suporte a fallback offline.",
+    )
+    doc.draw_bullet(
+        "Extrator de Entidades Fiscais - NER (src/rag/entity_extractor.py):",
+        "Classificação de intenções tributárias, extração automatizada de CNAEs, CNPJs, valores monetários (R$) e expansão de queries com sinônimos legais da Receita Federal.",
+    )
+    doc.draw_bullet(
+        "RAGService com Guardrails (src/rag/service.py, prompts.py):",
+        "Orquestrador central que une o RAG ao motor determinístico de cálculo, impondo formatação mandatória em planos de 3 passos, citações oficiais e abstenção contra fraudes.",
+    )
 
     doc.draw_card(
         "Suítes de Testes e Validação Entregues por Jhessica",
         [
-            ("test_pipeline.py:", "4/4 casos de recuperação canônica aprovados com 100% de precisão de contexto.", True),
-            ("test_entity_extractor.py:", "5/5 casos de extração NER e teste de integração tripla aprovados.", True),
-            ("test_rag_service.py:", "5/5 casos de governança, fidelidade factual (faithfulness) e abstenção ética aprovados.", True),
+            (
+                "test_pipeline.py:",
+                "4/4 casos de recuperação canônica aprovados com 100% de precisão de contexto.",
+                True,
+            ),
+            (
+                "test_entity_extractor.py:",
+                "5/5 casos de extração NER e teste de integração tripla aprovados.",
+                True,
+            ),
+            (
+                "test_rag_service.py:",
+                "5/5 casos de governança, fidelidade factual (faithfulness) e abstenção ética aprovados.",
+                True,
+            ),
         ],
         bg_rgb=(0.96, 0.98, 0.96),
-        border_rgb=(0.70, 0.88, 0.70)
+        border_rgb=(0.70, 0.88, 0.70),
     )
 
     # ========================================================
@@ -426,7 +478,7 @@ def generate_document():
     doc.draw_section_title(
         "2. Lucas — Engenharia de Dados & Desenvolvimento (Dev)",
         "Ingestão estruturada da LC 123/2006, base de CNAEs, motor determinístico e API FastAPI.",
-        badge="DADOS & BACKEND"
+        badge="DADOS & BACKEND",
     )
 
     doc.draw_paragraph(
@@ -434,33 +486,71 @@ def generate_document():
         "com total exatidão e forneça consultas ágeis de atividades econômicas."
     )
 
-    doc.draw_bullet("Ingestão de Tabelas da LC 123/2006 (data/raw/tabelas_simples_nacional.json):", "Estruturação das 30 faixas fiscais dos Anexos I, II, III, IV e V, incluindo alíquotas nominais e parcelas a deduzir oficiais.")
-    doc.draw_bullet("Base de CNAEs do IBGE (data/raw/cnaes_base.json):", "Catalogação saneada de 46 subclasses de CNAEs com marcações de elegibilidade ao MEI e sujeição ao Fator R.")
-    doc.draw_bullet("Repositório com Busca FTS5 (src/fiscal/repository.py):", "Banco relacional SQLite (fiscal.db) com índice de texto completo (Full-Text Search) para localização instantânea de CNAEs por palavras-chave.")
-    doc.draw_bullet("Motor Fiscal Determinístico (src/fiscal/calculator.py):", "Implementação da fórmula oficial da alíquota efetiva, cálculo exato do Fator R (>= 28%), comparativo de economia e validação de excesso de faturamento no MEI (> 20%).")
-    doc.draw_bullet("Pesquisa de Fontes e Crawler (docs/crawler-arquitetura.md, exploracao-dados.md):", "Mapeamento das fontes governamentais e desenho arquitetural do coletor por fonte.")
-    doc.draw_bullet("API REST FastAPI (api/app/main.py):", "Construção do template de backend em FastAPI e conteinerização Docker.")
+    doc.draw_bullet(
+        "Ingestão de Tabelas da LC 123/2006 (data/raw/tabelas_simples_nacional.json):",
+        "Estruturação das 30 faixas fiscais dos Anexos I, II, III, IV e V, incluindo alíquotas nominais e parcelas a deduzir oficiais.",
+    )
+    doc.draw_bullet(
+        "Base de CNAEs do IBGE (data/raw/cnaes_base.json):",
+        "Catalogação saneada de 46 subclasses de CNAEs com marcações de elegibilidade ao MEI e sujeição ao Fator R.",
+    )
+    doc.draw_bullet(
+        "Repositório com Busca FTS5 (src/fiscal/repository.py):",
+        "Banco relacional SQLite (fiscal.db) com índice de texto completo (Full-Text Search) para localização instantânea de CNAEs por palavras-chave.",
+    )
+    doc.draw_bullet(
+        "Motor Fiscal Determinístico (src/fiscal/calculator.py):",
+        "Implementação da fórmula oficial da alíquota efetiva, cálculo exato do Fator R (>= 28%), comparativo de economia e validação de excesso de faturamento no MEI (> 20%).",
+    )
+    doc.draw_bullet(
+        "Pesquisa de Fontes e Crawler (docs/crawler-arquitetura.md, exploracao-dados.md):",
+        "Mapeamento das fontes governamentais e desenho arquitetural do coletor por fonte.",
+    )
+    doc.draw_bullet(
+        "API REST FastAPI (api/app/main.py):",
+        "Construção do template de backend em FastAPI e conteinerização Docker.",
+    )
 
     doc.draw_card(
         "Validação do Motor Determinístico Fiscal (Lucas)",
         [
-            ("test_fiscal.py:", "6/6 casos canônicos de simulação fiscal aprovados com 100% de exatidão matemática.", True),
-            ("Integração:", "O RAGService consome diretamente o FiscalCalculator, sem risco de alucinação numérica.", True)
+            (
+                "test_fiscal.py:",
+                "6/6 casos canônicos de simulação fiscal aprovados com 100% de exatidão matemática.",
+                True,
+            ),
+            (
+                "Integração:",
+                "O RAGService consome diretamente o FiscalCalculator, sem risco de alucinação numérica.",
+                True,
+            ),
         ],
         bg_rgb=(0.95, 0.98, 1.0),
-        border_rgb=(0.60, 0.75, 0.95)
+        border_rgb=(0.60, 0.75, 0.95),
     )
 
     doc.draw_section_title(
         "3. Clara e Nasser — Arquitetura de Soluções",
         "Topologia desacoplada, contratos de dados, modelo de segurança e fronteira ética com o CRC.",
-        badge="ARQUITETURA"
+        badge="ARQUITETURA",
     )
 
-    doc.draw_bullet("Topologia em Três Camadas (docs/arquitetura.md):", "Desacoplamento estrito entre Camada de Dados (Lucas), Camada de Inteligência/RAG (Jhessica) e Camada de Serviços/Backend.")
-    doc.draw_bullet("Diretriz de Ouro do Sistema:", "O LLM é expressamente proibido de calcular alíquotas de cabeça; toda conta matemática é delegada ao motor determinístico em Python.")
-    doc.draw_bullet("Fronteira Ética com o CRC (Decreto-Lei nº 9.295/1946):", "Definição dos limites de atuação consultiva, garantindo que o copiloto atue no letramento sem usurpar prerrogativas exclusivas de contadores habilitados.")
-    doc.draw_bullet("Requisitos Não Funcionais (RNFs):", "Especificação de segurança multi-tenant (RNF01), conformidade estrita com LGPD (RNF02) e tratamento de incertezas (RNF04).")
+    doc.draw_bullet(
+        "Topologia em Três Camadas (docs/arquitetura.md):",
+        "Desacoplamento estrito entre Camada de Dados (Lucas), Camada de Inteligência/RAG (Jhessica) e Camada de Serviços/Backend.",
+    )
+    doc.draw_bullet(
+        "Diretriz de Ouro do Sistema:",
+        "O LLM é expressamente proibido de calcular alíquotas de cabeça; toda conta matemática é delegada ao motor determinístico em Python.",
+    )
+    doc.draw_bullet(
+        "Fronteira Ética com o CRC (Decreto-Lei nº 9.295/1946):",
+        "Definição dos limites de atuação consultiva, garantindo que o copiloto atue no letramento sem usurpar prerrogativas exclusivas de contadores habilitados.",
+    )
+    doc.draw_bullet(
+        "Requisitos Não Funcionais (RNFs):",
+        "Especificação de segurança multi-tenant (RNF01), conformidade estrita com LGPD (RNF02) e tratamento de incertezas (RNF04).",
+    )
 
     # ========================================================
     # PÁGINA 3: DEVOPS/MLOPS (INGRID) & MATRIZ DE INTEGRAÇÃO
@@ -472,47 +562,109 @@ def generate_document():
     doc.draw_section_title(
         "4. Ingrid — Ops (DevOps & MLOps)",
         "Esteiras de CI/CD, governança de modelos/dados, GitHub Pages e consolidação de entregáveis.",
-        badge="DEVOPS & MLOPS"
+        badge="DEVOPS & MLOPS",
     )
 
-    doc.draw_bullet("Automação de GitHub Pages (.github/workflows/pages.yml):", "Deploy contínuo e automático da documentação no padrão Docs-as-Code via Docsify com suporte nativo a diagramas Mermaid.")
-    doc.draw_bullet("Pacote de Definição do Projeto (docs/definicao-projeto.md):", "Formalização do problema, Essential Question, mapa de stakeholders, personas (Carlos, Mariana, Rafael), riscos e catálogo de 12 RFs e 10 RNFs.")
-    doc.draw_bullet("Fundamentação de Qualidade de Vida (docs/guiding-questions.md):", "Vínculo do terror fiscal e sobrecarga administrativa ao estresse crônico dos pequenos empreendedores.")
-    doc.draw_bullet("Planejamento MLOps (docs/devops-mlops.md):", "Arquitetura da esteira de integração contínua para validação de fidelidade (Ragas/MLflow) e versionamento de dados via DVC.")
-    doc.draw_bullet("Consolidação dos Entregáveis em PDF:", "Diagramação e publicação oficial dos relatórios formais da Residência em IA.")
+    doc.draw_bullet(
+        "Automação de GitHub Pages (.github/workflows/pages.yml):",
+        "Deploy contínuo e automático da documentação no padrão Docs-as-Code via Docsify com suporte nativo a diagramas Mermaid.",
+    )
+    doc.draw_bullet(
+        "Pacote de Definição do Projeto (docs/definicao-projeto.md):",
+        "Formalização do problema, Essential Question, mapa de stakeholders, personas (Carlos, Mariana, Rafael), riscos e catálogo de 12 RFs e 10 RNFs.",
+    )
+    doc.draw_bullet(
+        "Fundamentação de Qualidade de Vida (docs/guiding-questions.md):",
+        "Vínculo do terror fiscal e sobrecarga administrativa ao estresse crônico dos pequenos empreendedores.",
+    )
+    doc.draw_bullet(
+        "Planejamento MLOps (docs/devops-mlops.md):",
+        "Arquitetura da esteira de integração contínua para validação de fidelidade (Ragas/MLflow) e versionamento de dados via DVC.",
+    )
+    doc.draw_bullet(
+        "Consolidação dos Entregáveis em PDF:",
+        "Diagramação e publicação oficial dos relatórios formais da Residência em IA.",
+    )
 
     doc.draw_section_title(
         "5. Matriz de Integração dos Componentes do Grupo 08",
-        "Como as frentes se conectam operacionalmente no repositório."
+        "Como as frentes se conectam operacionalmente no repositório.",
     )
 
     headers = ["Componente", "Responsável", "Integração no Sistema", "Status"]
     widths = [115, 95, 205, 90.28]
     rows = [
-        ["Tabelas Simples e CNAEs", "Lucas", "Base de dados consultada por FTS5 e cálculos.", "100% Concluído"],
-        ["Motor Determinístico", "Lucas", "Executa alíquotas efetivas e regra do Fator R.", "100% Concluído"],
-        ["Chunking e Vector Store", "Jhessica", "Indexação hierárquica e busca híbrida de leis.", "100% Concluído"],
-        ["NER Fiscal e Guardrails", "Jhessica", "Extração de parâmetros e filtro anti-alucinação.", "100% Concluído"],
-        ["RAGService", "Jhessica", "Une Vector Store ao Motor Fiscal e gera 3 passos.", "100% Concluído"],
-        ["Topologia Desacoplada", "Clara / Nasser", "Garante respeito aos contratos e fronteira CRC.", "100% Aderente"],
-        ["Docsify e GitHub Pages", "Ingrid", "Publicação contínua da documentação e relatórios.", "Ativo no Pages"],
+        [
+            "Tabelas Simples e CNAEs",
+            "Lucas",
+            "Base de dados consultada por FTS5 e cálculos.",
+            "100% Concluído",
+        ],
+        [
+            "Motor Determinístico",
+            "Lucas",
+            "Executa alíquotas efetivas e regra do Fator R.",
+            "100% Concluído",
+        ],
+        [
+            "Chunking e Vector Store",
+            "Jhessica",
+            "Indexação hierárquica e busca híbrida de leis.",
+            "100% Concluído",
+        ],
+        [
+            "NER Fiscal e Guardrails",
+            "Jhessica",
+            "Extração de parâmetros e filtro anti-alucinação.",
+            "100% Concluído",
+        ],
+        [
+            "RAGService",
+            "Jhessica",
+            "Une Vector Store ao Motor Fiscal e gera 3 passos.",
+            "100% Concluído",
+        ],
+        [
+            "Topologia Desacoplada",
+            "Clara / Nasser",
+            "Garante respeito aos contratos e fronteira CRC.",
+            "100% Aderente",
+        ],
+        [
+            "Docsify e GitHub Pages",
+            "Ingrid",
+            "Publicação contínua da documentação e relatórios.",
+            "Ativo no Pages",
+        ],
     ]
     doc.draw_table(headers, rows, widths)
 
     doc.draw_section_title(
         "6. Conclusão e Prontidão para a Próxima Fase",
-        "Status de prontidão para unificação e deploy."
+        "Status de prontidão para unificação e deploy.",
     )
 
     doc.draw_card(
         "Declaração de Alinhamento e Prontidão Técnica",
         [
-            ("Integração Total:", "O repositório possui 100% de cobertura nos testes fiscais, de extração e de RAG.", False),
-            ("Fase 2 (Dados e Modelagem):", "Concluída com êxito pleno em conformidade com as diretrizes do Challenge 2.", True),
-            ("Próximo Passo Conjunto:", "Lucas expor o RAGService na API FastAPI e Ingrid plugar o CI no GitHub Actions.", True),
+            (
+                "Integração Total:",
+                "O repositório possui 100% de cobertura nos testes fiscais, de extração e de RAG.",
+                False,
+            ),
+            (
+                "Fase 2 (Dados e Modelagem):",
+                "Concluída com êxito pleno em conformidade com as diretrizes do Challenge 2.",
+                True,
+            ),
+            (
+                "Próximo Passo Conjunto:",
+                "Lucas expor o RAGService na API FastAPI e Ingrid plugar o CI no GitHub Actions.",
+                True,
+            ),
         ],
         bg_rgb=(0.95, 0.98, 1.0),
-        border_rgb=(0.10, 0.28, 0.65)
+        border_rgb=(0.10, 0.28, 0.65),
     )
 
     doc.canvas.save()
