@@ -8,8 +8,8 @@
   "guardrail_robustness": 1.0,
   "conformidade_3_passos": 1.0,
   "conformidade_crc": 1.0,
-  "tempo_medio_ms": 0.68,
-  "tempo_total_ms": 6.88,
+  "tempo_medio_ms": 98.5,
+  "tempo_total_ms": 985.1,
   "todos_aprovados": true,
   "metadados_versao": {
     "frente": "Ciência de Dados (Jhessica)",
@@ -36,8 +36,8 @@
       ],
       "artigos_retornados": [
         "Art. 18-A",
-        "Art. 40",
-        "Art. 106"
+        "Art. 106",
+        "Art. 18-A"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -45,7 +45,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 1.44,
+      "tempo_execucao_ms": 473.08,
       "detalhes": {
         "diagnostico_trecho": "A regra de faturamento do MEI (LC 123/2006, Art. 18-A) divide-se em dois cenários: 1) Excesso de até 20% (até R$ 97.200,...",
         "calculo_detalhado": null,
@@ -65,8 +65,8 @@
       ],
       "artigos_retornados": [
         "Art. 18-A",
-        "Art. 106",
-        "Art. 40"
+        "Art. 18",
+        "Art. 18-A"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -74,7 +74,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.95,
+      "tempo_execucao_ms": 79.9,
       "detalhes": {
         "diagnostico_trecho": "Alerta de Desenquadramento Fiscal do MEI: Faturamento anual (R$ 105,000.00) excedeu em mais de 20% o limite do MEI (R$ 8...",
         "calculo_detalhado": {
@@ -109,9 +109,9 @@
         "Art. 18"
       ],
       "artigos_retornados": [
-        "Art. 18, § 5º-J",
         "Art. 18",
-        "Art. 13"
+        "Art. 18, § 5º-J",
+        "Art. 18-A"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -119,7 +119,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.85,
+      "tempo_execucao_ms": 203.32,
       "detalhes": {
         "diagnostico_trecho": "Ótima notícia! Pelos dados apurados, seu Fator R atingiu 30.0% (superior ao mínimo legal de 28%). A sua empresa tributa ...",
         "calculo_detalhado": {
@@ -155,8 +155,8 @@
       ],
       "artigos_retornados": [
         "Art. 18",
-        "Art. 3º",
-        "Art. 18, § 5º-J"
+        "Art. 131",
+        "Art. 40"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -164,7 +164,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.86,
+      "tempo_execucao_ms": 190.74,
       "detalhes": {
         "diagnostico_trecho": "Atenção ao seu enquadramento: seu Fator R calculado é de 10.0% (abaixo do patamar de 28%). Dessa forma, a atividade é te...",
         "calculo_detalhado": {
@@ -200,8 +200,8 @@
       ],
       "artigos_retornados": [
         "Art. 106",
-        "Art. 2º",
-        "Art. 3º"
+        "Art. 40",
+        "Art. 18-A"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -209,7 +209,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.49,
+      "tempo_execucao_ms": 13.15,
       "detalhes": {
         "diagnostico_trecho": "A regra de faturamento do MEI (LC 123/2006, Art. 106) divide-se em dois cenários: 1) Excesso de até 20% (até R$ 97.200,0...",
         "calculo_detalhado": null,
@@ -230,7 +230,7 @@
       "artigos_retornados": [
         "Art. 1º",
         "Art. 131",
-        "Art. 3º"
+        "Art. 2º"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -238,7 +238,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.64,
+      "tempo_execucao_ms": 8.23,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,
@@ -258,7 +258,7 @@
       ],
       "artigos_retornados": [
         "Art. 18",
-        "Art. 106",
+        "Art. 18-A",
         "Art. 18-A"
       ],
       "context_recall": 1.0,
@@ -267,7 +267,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 1.0,
+      "tempo_execucao_ms": 8.42,
       "detalhes": {
         "diagnostico_trecho": "Para a atividade de Comércio varejista de artigos do vestuário e acessórios (CNAE 4781-0/00) com faturamento anual infor...",
         "calculo_detalhado": {
@@ -353,8 +353,8 @@
         "Art. 3º"
       ],
       "artigos_retornados": [
-        "Art. 2º",
         "Art. 3º",
+        "Art. 2º",
         "Art. 1º"
       ],
       "context_recall": 1.0,
@@ -363,7 +363,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.59,
+      "tempo_execucao_ms": 8.17,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,

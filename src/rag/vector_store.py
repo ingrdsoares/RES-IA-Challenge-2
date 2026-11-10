@@ -51,7 +51,10 @@ class LegalVectorStore:
         if self.use_dense and not self._fallback_to_python:
             try:
                 from sentence_transformers import SentenceTransformer
-                self.model = SentenceTransformer(self.model_name)
+                try:
+                    self.model = SentenceTransformer(self.model_name, local_files_only=True)
+                except Exception:
+                    self.model = SentenceTransformer(self.model_name)
                 print(f"[VectorStore] Modelo de embeddings denso carregado: {self.model_name}")
             except Exception as e:
                 print(f"[VectorStore] Aviso: fallback para embedding TF-IDF/Count devido a: {e}")
