@@ -385,3 +385,19 @@ a migração não baixa nem reprocessa objetos automaticamente.
 A resposta contém metadados, URLs temporárias e estado `exact`, `anchor_unavailable`
 ou `version_unavailable`. Nunca substitui automaticamente uma versão histórica pela
 atual. O CORS do bucket jurídico permite GET/HEAD somente para `ALLOWED_ORIGINS`.
+
+## Conversas por empresa
+
+`POST /empresas/{id}/conversas` cria uma conversa; GET na mesma rota lista as
+conversas da empresa. `GET /conversas/{id}` recupera o cabeçalho e GET
+`/conversas/{id}/mensagens` recupera o histórico. A empresa da conversa é fixa.
+
+Envie `POST /conversas/{id}/mensagens` com `Idempotency-Key`, cookies e CSRF:
+`{"text":"Como funciona o MEI?"}`. HTTP 202 retorna `operation_id`, `status_url`
+e estado. Reenvio idêntico com a mesma chave recupera a operação; conteúdo diferente
+retorna 409. Contexto ambíguo retorna `awaiting_data` com `missing_fields`.
+
+Para confirmar a competência solicitada, envie uma nova chave idempotente e
+`{"text":"Confirmo outubro de 2026","confirmation_for":"UUID_DA_OPERACAO","confirmation":{"period":"2026-10"}}`.
+A confirmação retoma a operação original e preserva o perfil cadastrado. O histórico
+mantém as mensagens de confirmação e o snapshot utilizado em cada solicitação.
