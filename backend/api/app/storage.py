@@ -6,7 +6,15 @@ from botocore.exceptions import ClientError
 
 
 class ObjectStorage:
-    def __init__(self, endpoint: str, public_endpoint: str, access_key: str, secret_key: str):
+    def __init__(
+        self,
+        endpoint: str,
+        public_endpoint: str,
+        access_key: str,
+        secret_key: str,
+        allowed_origins: list[str] | None = None,
+    ):
+        self.allowed_origins = allowed_origins
         options = dict(
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
@@ -32,6 +40,22 @@ class ObjectStorage:
                     "BucketAlreadyExists",
                 ):
                     raise
+
+        if self.allowed_origins:
+            self.client.put_bucket_cors(
+                Bucket="legal",
+                CORSConfiguration={
+                    "CORSRules": [
+                        {
+                            "AllowedOrigins": self.allowed_origins,
+                            "AllowedMethods": ["GET", "HEAD"],
+                            "AllowedHeaders": ["Accept", "Range"],
+                            "ExposeHeaders": ["ETag"],
+                            "MaxAgeSeconds": 300,
+                        }
+                    ]
+                },
+            )
 
     @staticmethod
     def validate_key(key):

@@ -370,3 +370,18 @@ não duplica a operação. Alterar conteúdo ou metadados de uma versão existen
 conflito; forneça nova identificação de versão. Publicação ocorre apenas após
 normalização, escrita do JSON e indexação. Falhas após três tentativas marcam a
 versão como falha. O comando idempotente com nova chave pode agendar uma recuperação.
+
+## Biblioteca e leitor
+
+Com sessão válida, `GET /normas` retorna catálogo paginado sem baixar documentos.
+Filtros: `q`, `subject` (assunto exato), `norm_type`, `authority`, `effective_on`,
+`limit` e `cursor`. A busca textual usa título, identificador e índice de termos
+no PostgreSQL. Após atualizar instalações com versões já publicadas sem índice
+textual, prepare reindexação administrativa antes de esperar busca pelo corpo;
+a migração não baixa nem reprocessa objetos automaticamente.
+
+`GET /normas/{document_id}/versoes/{version_id}` abre o leitor.
+`GET /citacoes/resolver?document_id=...&version_id=...&anchor_id=...` resolve citações.
+A resposta contém metadados, URLs temporárias e estado `exact`, `anchor_unavailable`
+ou `version_unavailable`. Nunca substitui automaticamente uma versão histórica pela
+atual. O CORS do bucket jurídico permite GET/HEAD somente para `ALLOWED_ORIGINS`.

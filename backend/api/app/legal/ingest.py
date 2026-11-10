@@ -5,7 +5,7 @@ from uuid import UUID
 import ollama
 from fastapi import HTTPException
 from qdrant_client import QdrantClient
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.config import Settings
@@ -25,6 +25,7 @@ def storage_from_settings(settings: Settings) -> ObjectStorage:
         settings.s3_public_endpoint,
         settings.s3_access_key,
         settings.s3_secret_key,
+        allowed_origins=settings.allowed_origins,
     )
 
 
@@ -126,6 +127,9 @@ def process_version(db, version, storage, index, embed, dimensions=1024):
     )
     saved = LegalDocument.model_validate_json(storage.get(version.json_key, private=False))
     index_version(index, version, saved, embed, dimensions)
+    version.search_vector = func.to_tsvector(
+        "simple", "\n".join(section.text for section in saved.sections)
+    )
     version.anchors = [section.anchor_id for section in saved.sections]
     publish_version(db, version.id)
 

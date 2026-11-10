@@ -16,6 +16,7 @@ from app.db import session_factory
 from app.dependencies import require_account
 from app.errors import CollectionIncompatible, DependencyTimeout, DependencyUnavailable, QueryBusy
 from app.jobs.router import router as jobs_router
+from app.legal.router import router as legal_router
 from app.models import LocalModels
 from app.rag import RagService
 from app.schemas import QueryRequest, QueryResponse
@@ -63,6 +64,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     app.include_router(access_router)
     app.include_router(companies_router)
     app.include_router(jobs_router)
+    app.include_router(legal_router)
 
     legacy_paths = {"/health", "/ready", "/rag/query"}
 

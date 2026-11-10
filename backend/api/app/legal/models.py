@@ -2,6 +2,7 @@ from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -26,6 +27,7 @@ class NormVersion(Base):
     official_url: Mapped[str] = mapped_column(String(2048))
     effective_from: Mapped[date | None] = mapped_column(Date)
     effective_to: Mapped[date | None] = mapped_column(Date)
+    search_vector: Mapped[str | None] = mapped_column(TSVECTOR)
     checksum: Mapped[str] = mapped_column(String(64))
     metadata_hash: Mapped[str] = mapped_column(String(64))
     original_key: Mapped[str] = mapped_column(String(512))
