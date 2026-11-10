@@ -21,6 +21,14 @@ sys.path.insert(0, str(BASE_DIR))
 from src.rag.vector_store import LegalVectorStore
 
 
+def _normalize_id(doc_id: str) -> str:
+    """Normaliza identificadores como 'lc123' <-> 'leg-lc123'."""
+    clean = doc_id.lower().replace("_", "-").replace("leg-", "")
+    if clean.startswith("man-"):
+        clean = clean[4:]
+    return clean
+
+
 def calculate_metrics_for_query(
     expected_sources: List[str],
     retrieved_doc_ids: List[str],
@@ -33,18 +41,21 @@ def calculate_metrics_for_query(
     if not expected_sources:
         return 1.0, 1.0, 1.0
 
-    retrieved_at_k = retrieved_doc_ids[:k]
-    matched = set(expected_sources).intersection(set(retrieved_at_k))
+    expected_norm = {_normalize_id(s) for s in expected_sources}
+    retrieved_at_k = [_normalize_id(d) for d in retrieved_doc_ids[:k]]
 
-    recall_at_k = len(matched) / len(expected_sources)
+    matched = expected_norm.intersection(set(retrieved_at_k))
+    recall_at_k = len(matched) / len(expected_norm)
     precision_at_k = len(matched) / max(len(retrieved_at_k), 1)
 
     # Reciprocal Rank: posição do primeiro documento relevante (1 / rank)
     rr = 0.0
     for rank, doc_id in enumerate(retrieved_at_k, 1):
-        if doc_id in expected_sources:
+        if doc_id in expected_norm:
             rr = 1.0 / rank
             break
+
+    return recall_at_k, precision_at_k, rr
 
     return recall_at_k, precision_at_k, rr
 
