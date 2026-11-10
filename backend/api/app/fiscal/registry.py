@@ -5,10 +5,12 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from app.fiscal.models import FiscalRule
+from app.fiscal.parameters import validate_parameters
 from app.security import digest
 
 
 def import_rule(db, data):
+    db.execute(select(func.pg_advisory_xact_lock(func.hashtextextended(data.kind, 0))))
     payload = data.model_dump(mode="json")
     checksum = digest(json.dumps(payload, sort_keys=True))
     existing = db.scalar(
@@ -57,6 +59,7 @@ def review_rule(db, rule_id, reviewer: str, evidence: str):
     )
     if overlap:
         raise ValueError("Vigência sobrepõe uma regra revisada")
+    validate_parameters(rule.kind, rule.parameters)
     rule.status, rule.reviewed_by = "reviewed", reviewer.strip()
     rule.reviewed_at, rule.review_evidence = datetime.now(UTC), evidence.strip()
     db.flush()

@@ -46,6 +46,7 @@ def test_reviewed_rule_versions_cannot_overlap(client):
     from app.fiscal.registry import import_rule, review_rule
     from app.fiscal.schemas import RuleInput
     from fastapi import HTTPException
+    from test_fiscal_calculations import MEI
 
     with client.app.state.db_factory() as db:
         data = RuleInput(
@@ -53,7 +54,7 @@ def test_reviewed_rule_versions_cannot_overlap(client):
             version="first",
             valid_from="2026-01",
             valid_to="2026-12",
-            parameters={},
+            parameters=MEI,
             references=["https://example.org/synthetic"],
         )
         one = import_rule(db, data)

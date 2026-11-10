@@ -463,3 +463,17 @@ Importação sempre cria draft; não transforma tabelas legadas em regras aprova
 Uma revisão humana registrada usa `python -m app.fiscal.cli review --id UUID --reviewer NOME --evidence REFERENCIA_DA_REVISAO`.
 Nenhuma regra tributária real revisada acompanha a aplicação. Testes usam parâmetros
 sintéticos, que não devem ser usados para orientação ou apuração tributária.
+
+Os simuladores usam Decimal, parâmetros explícitos e arredondamento HALF_UP registrado
+na regra. O Fator R é comparado sem arredondamento prévio; alíquota efetiva usa a
+precisão explícita da regra. Repartições preservam a soma em centavos, alocando resíduo
+na maior participação (desempate pelo nome). Cenários especiais e RBT12 zero exigem
+regra específica e retornam limitação, sem extrapolar faixas.
+
+No chat, cálculos usam o campo estruturado `calculation` da mensagem, por exemplo:
+`{"text":"Simular","calculation":{"kind":"mei","period":"2026-10","activity":"services","conditions_confirmed":true}}`.
+O resultado é produzido e explicado deterministicamente, preserva o snapshot da
+solicitação e não depende de o LLM fazer contas. Dados ausentes retornam `missing_inputs`;
+casos fora da cobertura retornam `unsupported_case`. Nenhuma tabela sintética é seed
+ou regra habilitada por padrão. Uma revisão identificada é condição para habilitar
+parâmetros reais, e o mecanismo não certifica a qualificação do revisor.

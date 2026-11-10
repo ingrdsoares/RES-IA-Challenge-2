@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from app.fiscal.schemas import CalculationInput
+
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
 Period = Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-(0[1-9]|1[0-2])$")]
 
@@ -26,6 +28,7 @@ class ContextConfirmation(BaseModel):
 class MessageInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     text: Text
+    calculation: CalculationInput | None = None
     confirmation_for: UUID | None = None
     confirmation: ContextConfirmation | None = None
 

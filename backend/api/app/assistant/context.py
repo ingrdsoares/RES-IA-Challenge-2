@@ -1,5 +1,7 @@
 import re
 
+from fastapi import HTTPException
+
 from app.assistant.schemas import ContextDecision, MessageInput
 from app.companies.schemas import CompanySnapshot
 
@@ -13,6 +15,10 @@ def resolve_context(snapshot: CompanySnapshot, message: MessageInput) -> Context
         context["period"] = period.group(0)
     elif reverse:
         context["period"] = f"{reverse[2]}-{reverse[1]}"
+    if message.calculation:
+        if context.get("period") and context["period"] != message.calculation.period:
+            raise HTTPException(422, "Competência do cálculo diverge da mensagem")
+        context["period"] = message.calculation.period
     if (
         re.search(r"paguei|pagamento|quanto|calcul|apur|venc|compet[eê]ncia", message.text, re.I)
         and "period" not in context
