@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="aui ltr" dir="ltr" lang="pt-BR" $container_height>
+<head><title>Legislação Federal - Senado Federal</title>
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://www25.senado.leg.br/senado-theme/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="https://www25.senado.leg.br/senado-theme/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://www25.senado.leg.br/senado-theme/images/favicon/favicon-16x16.png">
+    <link rel="mask-icon" href="https://www25.senado.leg.br/senado-theme/images/favicon/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="https://www25.senado.leg.br/senado-theme/images/favicon/favicon.ico">
+    <link rel="manifest" href="https://www25.senado.leg.br/senado-theme/images/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-TileImage"
+          content="https://www25.senado.leg.br/senado-theme/images/favicon/mstile-144x144.png">
+    <meta content="initial-scale=1.0, width=device-width" name="viewport"/>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <link href="https://www25.senado.leg.br/senado-theme/images/favicon.ico" rel="Shortcut Icon"/>
+    <link href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;legislacao&#x2f;legislacao-federal"
+          rel="canonical"/>
+    <link href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;legislacao&#x2f;legislacao-federal"
+          hreflang="x-default" rel="alternate"/>
+    <link href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;legislacao&#x2f;legislacao-federal"
+          hreflang="pt-BR" rel="alternate"/>
+    <link href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;en&#x2f;web&#x2f;atividade&#x2f;legislacao&#x2f;legislacao-federal"
+          hreflang="en-US" rel="alternate"/>
+    <link class="lfr-css-file"
+          href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;senado-theme&#x2f;css&#x2f;aui&#x2e;css&#x3f;browserId&#x3d;other&#x26;themeId&#x3d;senado_WAR_senadotheme&#x26;minifierType&#x3d;css&#x26;languageId&#x3d;pt_BR&#x26;b&#x3d;6205&#x26;t&#x3d;1649081669000"
+          rel="stylesheet" type="text/css"/>
+    <link href="&#x2f;html&#x2f;css&#x2f;main&#x2e;css&#x3f;browserId&#x3d;other&#x26;themeId&#x3d;senado_WAR_senadotheme&#x26;minifierType&#x3d;css&#x26;languageId&#x3d;pt_BR&#x26;b&#x3d;6205&#x26;t&#x3d;1586405536000"
+          rel="stylesheet" type="text/css"/>
+    <link href="https://www25.senado.leg.br/html/portlet/journal_content/css/main.css?browserId=other&amp;themeId=senado_WAR_senadotheme&amp;minifierType=css&amp;languageId=pt_BR&amp;b=6205&amp;t=1649081662000"
+          rel="stylesheet" type="text/css"/>
+    <link href="https://www25.senado.leg.br/notifications-portlet/notifications/css/main.css?browserId=other&amp;themeId=senado_WAR_senadotheme&amp;minifierType=css&amp;languageId=pt_BR&amp;b=6205&amp;t=1649081658000"
+          rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="/norma/css/estilos.css" />
+    <script type="text/javascript">var Liferay = {
+        Browser: {
+            acceptsGzip: function () {
+                return true
+            }, getMajorVersion: function () {
+                return 100
+            }, getRevision: function () {
+                return "537.36"
+            }, getVersion: function () {
+                return "100.0"
+            }, isAir: function () {
+                return false
+            }, isChrome: function () {
+                return true
+            }, isFirefox: function () {
+                return false
+            }, isGecko: function () {
+                return true
+            }, isIe: function () {
+                return false
+            }, isIphone: function () {
+                return false
+            }, isLinux: function () {
+                return false
+            }, isMac: function () {
+                return false
+            }, isMobile: function () {
+                return false
+            }, isMozilla: function () {
+                return false
+            }, isOpera: function () {
+                return false
+            }, isRtf: function () {
+                return true
+            }, isSafari: function () {
+                return true
+            }, isSun: function () {
+                return false
+            }, isWap: function () {
+                return false
+            }, isWapXhtml: function () {
+                return false
+            }, isWebKit: function () {
+                return true
+            }, isWindows: function () {
+                return true
+            }, isWml: function () {
+                return false
+            }
+        }, Data: {
+            NAV_SELECTOR: "#navigation", isCustomizationView: function () {
+                return false
+            }, notices: [null]
+        }, ThemeDisplay: {
+            getLayoutId: function () {
+                return "295"
+            }, getLayoutURL: function () {
+                return "https://www25.senado.leg.br/web/atividade/legislacao/legislacao-federal"
+            }, getParentLayoutId: function () {
+                return "167"
+            }, isPrivateLayout: function () {
+                return "false"
+            }, isVirtualLayout: function () {
+                return false
+            }, getBCP47LanguageId: function () {
+                return "pt-BR"
+            }, getCDNBaseURL: function () {
+                return "https://www25.senado.leg.br"
+            }, getCDNDynamicResourcesHost: function () {
+                return ""
+            }, getCDNHost: function () {
+                return ""
+            }, getCompanyId: function () {
+                return "10159"
+            }, getCompanyGroupId: function () {
+                return "10199"
+            }, getDefaultLanguageId: function () {
+                return "pt_BR"
+            }, getDoAsUserIdEncoded: function () {
+                return ""
+            }, getLanguageId: function () {
+                return "pt_BR"
+            }, getParentGroupId: function () {
+                return "12427"
+            }, getPathContext: function () {
+                return ""
+            }, getPathImage: function () {
+                return "/image"
+            }, getPathJavaScript: function () {
+                return "/html/js"
+            }, getPathMain: function () {
+                return "/c"
+            }, getPathThemeImages: function () {
+                return "https://www25.senado.leg.br/senado-theme/images"
+            }, getPathThemeRoot: function () {
+                return "/senado-theme"
+            }, getPlid: function () {
+                return "120000830"
+            }, getPortalURL: function () {
+                return "https://www25.senado.leg.br"
+            }, getPortletSetupShowBordersDefault: function () {
+                return true
+            }, getScopeGroupId: function () {
+                return "12427"
+            }, getScopeGroupIdOrLiveGroupId: function () {
+                return "12427"
+            }, getSessionId: function () {
+                return ""
+            }, getSiteGroupId: function () {
+                return "12427"
+            }, getURLControlPanel: function () {
+                return "/group/control_panel?refererPlid=120000830"
+            }, getURLHome: function () {
+                return "https\x3a\x2f\x2fwww25\x2esenado\x2eleg\x2ebr\x2fweb\x2fguest"
+            }, getUserId: function () {
+                return "10163"
+            }, getUserName: function () {
+                return ""
+            }, isAddSessionIdToURL: function () {
+                return false
+            }, isFreeformLayout: function () {
+                return false
+            }, isImpersonated: function () {
+                return false
+            }, isSignedIn: function () {
+                return false
+            }, isStateExclusive: function () {
+                return false
+            }, isStateMaximized: function () {
+                return false
+            }, isStatePopUp: function () {
+                return false
+            }
+        }, PropsValues: {NTLM_AUTH_ENABLED: false}
+    };
+    var themeDisplay = Liferay.ThemeDisplay;
+    Liferay.AUI = {
+        getAvailableLangPath: function () {
+            return "available_languages.jsp?browserId=other&themeId=senado_WAR_senadotheme&colorSchemeId=01&minifierType=js&languageId=pt_BR&b=6205&t=1588113760000"
+        }, getCombine: function () {
+            return true
+        }, getComboPath: function () {
+            return "/combo/?browserId=other&minifierType=&languageId=pt_BR&b=6205&t=1588113760000&"
+        }, getFilter: function () {
+            return "min"
+        }, getJavaScriptRootPath: function () {
+            return "/html/js"
+        }, getLangPath: function () {
+            return "aui_lang.jsp?browserId=other&themeId=senado_WAR_senadotheme&colorSchemeId=01&minifierType=js&languageId=pt_BR&b=6205&t=1588113760000"
+        }, getStaticResourceURLParams: function () {
+            return "?browserId=other&minifierType=&languageId=pt_BR&b=6205&t=1588113760000"
+        }
+    };
+    Liferay.authToken = "gDgfqqZd";
+    Liferay.currentURL = "\x2fweb\x2fatividade\x2flegislacao\x2flegislacao-federal";
+    Liferay.currentURLEncoded = "%2Fweb%2Fatividade%2Flegislacao%2Flegislacao-federal";</script>
+    <script src="/html/js/barebone.jsp?browserId=other&amp;themeId=senado_WAR_senadotheme&amp;colorSchemeId=01&amp;minifierType=js&amp;minifierBundleId=javascript.barebone.files&amp;languageId=pt_BR&amp;b=6205&amp;t=1588113760000"
+            type="text/javascript"></script>
+    <script type="text/javascript">Liferay.Portlet.list = ["56_INSTANCE_OSu3NrHF0S98", "56_INSTANCE_VHfxXyXNWw0J", "56_INSTANCE_mZoEMIgyhhbk", "56_INSTANCE_7DdyZwQE5iCG", "56_INSTANCE_FZDPoaFElfIa", "56_INSTANCE_XCENw5vE9Tyf", "56_INSTANCE_zNUhtPTmdqPv", "56_INSTANCE_XcI0QJUsGZg5"];</script>
+    <link class="lfr-css-file"
+          href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;senado-theme&#x2f;css&#x2f;main&#x2e;css&#x3f;browserId&#x3d;other&#x26;themeId&#x3d;senado_WAR_senadotheme&#x26;minifierType&#x3d;css&#x26;languageId&#x3d;pt_BR&#x26;b&#x3d;6205&#x26;t&#x3d;1649081669000"
+          rel="stylesheet" type="text/css"/>
+    <style type="text/css">#p_p_id_56_INSTANCE_OSu3NrHF0S98_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_VHfxXyXNWw0J_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_mZoEMIgyhhbk_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_7DdyZwQE5iCG_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_FZDPoaFElfIa_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_XCENw5vE9Tyf_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_zNUhtPTmdqPv_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }
+
+    #p_p_id_56_INSTANCE_XcI0QJUsGZg5_ .portlet-borderless-container {
+        border-width:;
+        border-style:
+    }</style>
+    <link rel="stylesheet" type="text/css" href="https://www.senado.leg.br/inc/essencial-2020/css/essencial.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://www.senado.leg.br/inc/essencial-2020/css/essencial-fix-bs2.css"/>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CW3ZH25XMK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-CW3ZH25XMK');
+    </script>
+</head>
+<body class="yui3-skin-sam controls-visible signed-out public-page site twbs2" $container_body><a href="#main-content"
+                                                                                                  id="skip-to-content">Pular
+    para o conteúdo</a>
+<div id="wrapper" $container_height>
+    <div class="sf-wrapper">
+        <nav class="Triad navbar_global">
+            <div>
+                <button class="btn btn-lg btn-secondary js-sidebar-action" id="jstoggle" type="button"><i
+                        class="fas fa-bars"></i><span class="u-hideLower title-n"> Menu</span></button>
+            </div>
+            <div><a class="navbar_global-brand" href="https://www.senado.leg.br" title="Senado Federal"><img
+                    src="https://www.senado.leg.br/noticias/essencial/images/senado.svg" alt="Senado Federal"/></a>
+            </div>
+            <div>
+                <div class="Rail Rail--fenced u-hideLower"><a class="js-vlibras" role="button" title="acessibilidade">
+                    <img src="https://www.senado.leg.br/noticias/essencial/images/hands.svg" width="25px"/></a><a
+                        class="link link-deep"
+                        href="https://www12.senado.leg.br/institucional/responsabilidade-social/acessibilidade/pages/acessibilidade-no-portal-do-senado">Acessibilidade</a><a
+                        class="link link-deep" href="http://www12.senado.gov.br/institucional/falecomosenado">Fale com o
+                    Senado</a></div>
+                <a class="btn btn-lg btn-secondary u-hideUpper"
+                   href="http://www12.senado.gov.br/institucional/falecomosenado"><i class="fas fa-phone"></i></a></div>
+        </nav>
+    </div>
+    <div class="sf-wrapper">
+        <div class="js-sidebar-mountpoint" data-url="https://www12.senado.leg.br/hpsenado/wssidebar.json"></div>
+    </div>
+    <div class="sf-wrapper">
+        <div class="menu-local">
+            <div class="pt-2">
+                <div class="nav_control-title"><h1><a href="/web/atividade"> Atividade Legislativa </a></h1></div>
+            </div>
+            <button class="btn_control-res btn btn-tertiary btn-lg" type="button" data-toggle="collapse.se"
+                    data-target="#menu-local__form" aria-controls="menu-local__form" aria-expanded="false"
+                    aria-label="Exibe busca"><i class="fas fa-search"></i></button>
+            <form class="menu-local__form collapse" id="menu-local__form" method="GET"
+                  action="https://www6g.senado.leg.br/busca/"><input type="hidden" name="portal"
+                                                                     value="Atividade Legislativa"/>
+                <div class="search-wrapper"><input class="form-control search-out" type="search" name="q"
+                                                   placeholder="Buscar">
+                    <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="sf-wrapper">
+        <nav class="navbar navbar_control navbar-expand-lg navbar--sf">
+            <div class="navbar-toggler navbar-toggler--sf" role="button" data-toggle="collapse.se"
+                 data-target="#sfMenuLocalDropdown" aria-controls="sfMenuLocalDropdown" aria-expanded="false"
+                 aria-label="Exibe navegação">
+                <button class="btn btn-secondary"><i class="fas fa-bars"></i></button>
+                <div class="ml-2">MENU DESTA SEÇÃO</div>
+            </div>
+            <div class="collapse navbar-collapse-se" id="sfMenuLocalDropdown">
+                <ul class="navbar-nav navbar-nav--sf">
+                    <li class="nav-item dropdown" id="sfMenuGroup_58">
+                        <a class="link link--nav dropdown-toggle" id="sfMenuGroupName_58"
+                           href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;plenario"
+                           data-toggle="dropdown.se" aria-haspopup="true" aria-expanded="false">
+                            Plenário
+                        </a>
+                        <div class="dropdown-menu dropdown-menu--sf"
+                             aria-labelledby="js-menu-1">
+                            <a class="dropdown-item" id="sfMenuGroupItem_1"
+                               href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;sessao-plenaria"
+                               role="menuitem">Sessão Plenária</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_98"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;ordiaportal&#x2f;casa&#x2f;SF"
+                               role="menuitem">Ordem do Dia</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_281"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;diarios&#x2f;ver"
+                               role="menuitem">Diários</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_13"
+                               href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;pronunciamentos"
+                               role="menuitem">Pronunciamentos</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_55"
+                               href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;questoes-de-ordem"
+                               role="menuitem">Questões de Ordem</a>
+                        </div>
+                    <li class="nav-item dropdown" id="sfMenuGroup_97">
+                        <a class="link link--nav dropdown-toggle" id="sfMenuGroupName_97"
+                           href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;comissoes&#x2f;audiencias-publicas"
+                           data-toggle="dropdown.se" aria-haspopup="true" aria-expanded="false">
+                            Comissões
+                        </a>
+                        <div class="dropdown-menu dropdown-menu--sf"
+                             aria-labelledby="js-menu-1">
+                            <a class="dropdown-item" id="sfMenuGroupItem_282"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;comissoes&#x2f;"
+                               role="menuitem">Agenda</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_283"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;comissoes&#x2f;pesquisa_comissao&#x3f;tipo&#x3d;prm&#x2c;cpi&#x2c;tmp&#x26;casa&#x3d;sf&#x26;sit&#x3d;func&#x2c;aguard"
+                               role="menuitem">Senado</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_284"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;comissoes&#x2f;pesquisa_comissao&#x3f;tipo&#x3d;prm&#x2c;cpi&#x2c;tmp&#x2c;mpv&#x26;casa&#x3d;cn&#x26;sit&#x3d;func&#x2c;aguard"
+                               role="menuitem">Congresso</a>
+                            <a class="dropdown-item" id="sfMenuGroupItem_285"
+                               href="https&#x3a;&#x2f;&#x2f;legis&#x2e;senado&#x2e;leg&#x2e;br&#x2f;comissoes&#x2f;pesquisa_comissao"
+                               role="menuitem">Pesquisar Comissões</a>
+                        </div>
+                    <li class="nav-item dropdown" id="sfMenuGroup_92">
+                        <a class="link link--nav dropdown-toggle" id="sfMenuGroupName_92"
+                           href="https&#x3a;&#x2f;&#x2f;www25&#x2e;senado&#x2e;leg&#x2e;br&#x2f;web&#x2f;atividade&#x2f;materias&#x2f;home"
+<!-- ... -->
+ttom:12pt; text-indent:0pt; line-height:normal"><span style="font-size:1.2em; -aw-import:ignore">&#xa0;</span></p><p class="Epgrafe" style="text-indent:0pt; line-height:normal; font-size:1.2em"><span>LEI Nº 10.833, DE 29 DE DEZEMBRO DE 2003.</span></p><p class="Ementa" style="margin-top:12pt"><span style="font-size:1.2em">Altera a Legislação Tributária Federal e dá outras providências.</span></p><p class="Prembulo" style="margin-top:12pt"><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold">&#xa0;</span><span style="font-size:1.2em; font-weight:bold"> O PRESIDENTE DA REPÚBLICA</span></p><p class="Prembulo" style="margin-top:6pt; margin-bottom:18pt"><span style="font-size:1.2em; -aw-import:spaces">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-size:1.2em">Faço saber que o Congresso Nacional decreta e eu sanciono a seguinte Lei:</span></p><p class="Captulonum" style="margin-top:18pt; text-indent:0pt"><span style="font-size:1.2em">CAPÍTULO I</span></p><p class="Captulonome" style="margin-top:6pt; text-indent:0pt"><span style="font-size:1.2em">DA COBRANÇA NÃO-CUMULATIVA DA COFINS</span></p><p class="Artigo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> </span><span style="font-size:1.2em; font-weight:bold">Art</span><span style="font-size:1.2em">. 1º A Contribuição para o Financiamento da Seguridade Social - COFINS, com a incidência não-cumulativa, tem como fato gerador o faturamento mensal, assim entendido o total das receitas auferidas pela pessoa jurídica, independentemente de sua denominação ou classificação contábil.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 1º Para efeito do disposto neste artigo, o total das receitas compreende a receita bruta da venda de bens e serviços nas operações em conta própria ou alheia e todas as demais receitas auferidas pela pessoa jurídica.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 2º A base de cálculo da contribuição é o valor do faturamento, conforme definido no </span><span style="font-size:1.2em; font-weight:bold">caput</span><span style="font-size:1.2em">.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 3º Não integram a base de cálculo a que se refere este artigo as receitas:</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> I - isentas ou não alcançadas pela incidência da contribuição ou sujeitas à alíquota 0 (zero);</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> II - não-operacionais, decorrentes da venda de ativo permanente;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> III - auferidas pela pessoa jurídica revendedora, na revenda de mercadorias em relação às quais a contribuição seja exigida da empresa vendedora, na condição de substituta tributária;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> IV - de venda dos produtos de que tratam as Leis nºs 9.990, de 21 de julho de 2000, 10.147, de 21 de dezembro de 2000, 10.485, de 3 de julho de 2002, e 10.560, de 13 de novembro de 2002, ou quaisquer outras submetidas à incidência monofásica da contribuição;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> V - referentes a:</span></p><p class="Alnea" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> a) vendas canceladas e aos descontos incondicionais concedidos;</span></p><p class="Alnea" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> b) reversões de provisões e recuperações de créditos baixados como perda que não representem ingresso de novas receitas, o resultado positivo da avaliação de investimentos pelo valor do patrimônio líquido e os lucros e dividendos derivados de investimentos avaliados pelo custo de aquisição que tenham sido computados como receita.</span></p><p class="Artigo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> </span><span style="font-size:1.2em; font-weight:bold">Art</span><span style="font-size:1.2em">. 2º Para determinação do valor da COFINS aplicar-se-á, sobre a base de cálculo apurada conforme o disposto no art. 1º, a alíquota de 7,6% (sete inteiros e seis décimos por cento).</span></p><p class="Artigo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> </span><span style="font-size:1.2em; font-weight:bold">Art</span><span style="font-size:1.2em">. 3º Do valor apurado na forma do art. 2º a pessoa jurídica poderá descontar créditos calculados em relação a:</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> I - bens adquiridos para revenda, exceto em relação às mercadorias e aos produtos referidos nos incisos III e IV do § 3º do art. 1º;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> II - bens e serviços, utilizados como insumo na prestação de serviços e na produção ou fabricação de bens ou produtos destinados à venda, inclusive combustíveis e lubrificantes;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> III - energia elétrica consumida nos estabelecimentos da pessoa jurídica;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> IV - aluguéis de prédios, máquinas e equipamentos, pagos a pessoa jurídica, utilizados nas atividades da empresa;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> V - despesas financeiras decorrentes de empréstimos, financiamentos e o valor das contraprestações de operações de arrendamento mercantil de pessoa jurídica, exceto de optante pelo Sistema Integrado de Pagamento de Impostos e Contribuições das Microempresas e das Empresas de Pequeno Porte - SIMPLES;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> VI - máquinas, equipamentos e outros bens incorporados ao ativo imobilizado adquiridos para utilização na produção de bens destinados à venda, ou na prestação de serviços;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em; -aw-import:ignore">&#xa0;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> VII - edificações e benfeitorias em imóveis próprios ou de terceiros, utilizados nas atividades da empresa;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> VIII - bens recebidos em devolução cuja receita de venda tenha integrado faturamento do mês ou de mês anterior, e tributada conforme o disposto nesta Lei;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> IX - armazenagem de mercadoria e frete na operação de venda, nos casos dos incisos I e II, quando o ônus for suportado pelo vendedor.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 1º O crédito será determinado mediante a aplicação da alíquota prevista no art. 2º sobre o valor:</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> I - dos itens mencionados nos incisos I e II do </span><span style="font-size:1.2em; font-weight:bold">caput</span><span style="font-size:1.2em">, adquiridos no mês;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> II - dos itens mencionados nos incisos III a V e IX do </span><span style="font-size:1.2em; font-weight:bold">caput</span><span style="font-size:1.2em">, incorridos no mês;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> III - dos encargos de depreciação e amortização dos bens mencionados nos incisos VI e VII do </span><span style="font-size:1.2em; font-weight:bold">caput</span><span style="font-size:1.2em">, incorridos no mês;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> IV - dos bens mencionados no inciso VIII do </span><span style="font-size:1.2em; font-weight:bold">caput</span><span style="font-size:1.2em">, devolvidos no mês.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 2º Não dará direito a crédito o valor de mão-de-obra paga a pessoa física.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 3º O direito ao crédito aplica-se, exclusivamente, em relação:</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> I - aos bens e serviços adquiridos de pessoa jurídica domiciliada no País;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> II - aos custos e despesas incorridos, pagos ou creditados a pessoa jurídica domiciliada no País;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em; -aw-import:ignore">&#xa0;</span></p><p class="Inciso" style="margin-top:6pt"><span style="font-size:1.2em; -aw-import:spaces">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-size:1.2em">III - aos bens e serviços adquiridos e aos custos e despesas incorridos a partir do mês em que se iniciar a aplicação do disposto nesta Lei.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 4º O crédito não aproveitado em determinado mês poderá sê-lo nos meses subseqüentes.</span></p><p class="Pargrafo" style="margin-top:6pt"><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em">&#xa0;</span><span style="font-size:1.2em"> § 5º Sem prejuízo do aproveitamento dos créditos apurados na forma deste artigo, as pessoas jurídicas que produzam mercadorias de origem animal ou vegetal, classificadas nos capítulos 2 a 4, 8 a 12 e 23, e nos códigos 01.03, 01.05, 0504.00, 0701.90.00, 0702.00.00, 0706.10.00, 07.08, 0709.90, 07.10, 07.12 a 07.14, 15.07 a 1514, 1515.2, 1516.20.00, 15.17, 1701.11.00, 1701.99.00, 1702.90.00, 18.03, 1804.00
+<!-- FIXTURE TRUNCADO: original 346919 bytes; mantidos primeiros 19982 bytes e uma janela apos o marcador -->

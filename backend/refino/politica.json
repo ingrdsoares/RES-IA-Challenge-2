@@ -1,0 +1,134 @@
+{
+  "versao": 1,
+  "perfil": "tributario_df",
+  "perfis": {
+    "mei_simples_df": {
+      "foco": "MEI e Simples Nacional; DF como foco local",
+      "amplo": false,
+      "prioriza_df": true
+    },
+    "tributario_df": {
+      "foco": "Regimes tributários com foco DF",
+      "amplo": true,
+      "prioriza_df": true
+    },
+    "tributario_nacional": {
+      "foco": "Cobertura tributária nacional",
+      "amplo": true,
+      "prioriza_df": false
+    }
+  },
+  "familias_nucleo": [
+    "legislacao",
+    "mei",
+    "manuais",
+    "anexos-cgsn140",
+    "normas-citadas"
+  ],
+  "limiar_linhas_ausentes_versao_extra": 0.05,
+  "limiar_bytes_preferida": 0.2,
+  "auditoria_extracao": {
+    "razao_texto_minima": 0.5,
+    "bytes_apos_body_precoce": 2000,
+    "ancora_rodape": "Este conteúdo não substitui"
+  },
+  "similaridade": {
+    "shingles": 5,
+    "permutacoes": 120,
+    "bandas": 20,
+    "limiar_jaccard": 0.6
+  },
+  "familias_dados": [
+    "cnpj",
+    "cnpj-ampliado",
+    "cnpj-df",
+    "cnpj-df-censo",
+    "cnae",
+    "tabelas-fiscais",
+    "ibge-indicadores"
+  ],
+  "tipos_dados": [
+    "tabela_ncm_oficial",
+    "esquemas_xsd",
+    "leiaute_regras_eventos"
+  ],
+  "tipos_evidencia": [
+    "catalogo_tecnico",
+    "catalogo_disponibilidade",
+    "agenda_indice",
+    "indice_agendas_pdf",
+    "comparacao_cnae"
+  ],
+  "termos_nucleo": [
+    "simples nacional",
+    "microempreendedor individual",
+    "simei",
+    "pgdas",
+    "dasn-simei",
+    "fator r",
+    "cgsn",
+    "lc 123",
+    "lei complementar 123"
+  ],
+  "categorias": [
+    "nucleo",
+    "complementar",
+    "historico",
+    "revisao",
+    "evidencia",
+    "dados_estruturados",
+    "apoio"
+  ],
+  "apoio": {
+    "naturezas": [
+      "agenda_diaria",
+      "agenda_mes",
+      "agenda_indice"
+    ],
+    "restrito_marcadores": [
+      "necessario autenticar para visualizar essa pagina",
+      "administracao do site",
+      "ir para a pagina inicial"
+    ]
+  },
+  "ruido": {
+    "minimo_textos_sugestao": 50
+  },
+  "limite": "Classificação candidata e explicável; não certifica vigência ou aplicabilidade. Não apagar originais nem deduplicar versões pelo hash primário.",
+  "etiquetas": {
+    "relacionada": {
+      "frentes": [
+        "normas-citadas"
+      ],
+      "termos_tributarios": [
+        "\\btribut",
+        "\\bimposto",
+        "\\bcontribuic",
+        "\\bsimples nacional",
+        "\\bmicroempreendedor",
+        "\\bnota fiscal",
+        "\\bicms\\b",
+        "\\biss(qn)?\\b",
+        "\\bipi\\b",
+        "\\bpis\\b",
+        "\\bcofins\\b",
+        "\\birpj\\b",
+        "\\bcsll\\b",
+        "\\birrf\\b",
+        "\\bsimei\\b",
+        "\\bmei\\b",
+        "\\bcgsn\\b",
+        "\\bcnae\\b",
+        "\\bnfs-?e\\b",
+        "\\bsped\\b",
+        "\\bdctf\\b"
+      ],
+      "limite_termos_corpo": 5,
+      "janela_corpo": 20000
+    },
+    "revogada": {
+      "padrao": "\\brevogad[oa]\\b",
+      "negacao": "\\bnao\\b[^.;,:]{0,30}revogad"
+    }
+  }
+}

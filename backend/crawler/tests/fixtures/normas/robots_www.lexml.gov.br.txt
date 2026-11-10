@@ -1,0 +1,26 @@
+User-Agent: *
+Allow: /*******************.js
+Allow: /*******************.css
+Allow: /*******************.jpg
+Allow: /*******************.ico
+Allow: /*******************.png
+Allow: /*******************.txt
+Disallow: /busca/
+Disallow: /doc/
+Disallow: /linker/
+Allow: /urn
+Allow: /sru
+Crawl-delay: 5
+ 
+# OpenAI SearchBot – allow but slow down more
+User-agent: OAI-SearchBot
+Allow: /urn
+Allow: /sru
+Crawl-delay: 10
+ 
+# Python Requests – block completely (almost never respects robots.txt, but good to declare)
+User-agent: Python-Requests
+Disallow: /
+Allow: /urn
+Allow: /sru
+Crawl-delay: 5

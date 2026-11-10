@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+    <html>
+
+    <head id="Head1"><meta content="IE=Edge" http-equiv="X-UA-Compatible"/><meta content="pt-br" http-equiv="Content-Language"/><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><title>
+	
+            Lei 1254 de 08/11/1996
+        
+</title><meta name="keywords" content="Lei 1254 de 08/11/1996,sinj,distrito,federal,df"/><meta name="description" content="Dispõe quanto ao Imposto sobre Operações Relativas a Circulação de Mercadorias e sobre Prestações de Serviços de Transporte Interestadual e Intermunicipal e de Comunicação - ICMS, e da outras providencias."/><meta content="index,follow" name="robots"/><meta content="index,follow" name="googlebot"/><script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/platform.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/liblight.js"></script>
+
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/funcoes_norma.js?4.4.00134"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" language="javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/ckeditor/adapters/jquery.js"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.form.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.cookie.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/on_error.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Jquery-ui/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/liblight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/stacktrace.js"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.ajaxLight.js?3.2.00001"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.autocompleteLight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jMenu.jquery.min.js"></script>
+        <script type="text/javascript"
+            src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/jquery.modalLight.js?3.2.00001"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/login.js?3.2.00001"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/funcoes_sinj.js?3.2.00001"
+            charset="utf-8"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/sessao_sinj.js?3.2.00001"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/stacktable.js"></script>
+
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/platform.js"></script>
+        <script type="text/javascript" src="http://www.sinj.df.gov.br/sinjpadrao/Scripts/tooltip.js"></script>
+
+        <script type="text/javascript" language="javascript">
+            function Print() {
+                $('div.control').hide();
+                window.print();
+                $('div.control').show();
+            }
+            function exibirAlteracoes(el) {
+                if (el.getAttribute('refresh')) {
+                    location.reload();
+                }
+                else {
+
+                    // NOTE: Essa funcionalidade faz com o que o texto alterado "se transforme" 
+                    // em compilado (basicamente remove informações de vide), mas define 
+                    // um comportamento diferenciado para para os parágrafos que contiverem 
+                    // vides com os seguintes textos no link "revogado pelo(a)" ou 
+                    // "declarado(a) inconstitucional pelo(a)". By Questor
+                    
+                    var regex = undefined;
+                    regex = new RegExp(/Revogado.*?pelo\(a\)/);
+                    $('p[replaced_by]:contains("Revogado")').each(function (k, p) {
+                        if (regex.test($(p).text())) {
+                            var aLinkVide = $('a.link_vide', $(p));
+                            if (aLinkVide.length > 0) {
+                                var aTexto = $(aLinkVide[aLinkVide.length - 1]).text();
+                                if (regex.test(aTexto)) {
+                                    var ds = generateDescriptionToParagraph($(p).text());
+                                    $(p).text(ds + ' ');
+                                    $(aLinkVide[aLinkVide.length - 1]).appendTo($(p));
+                                    $(p).removeAttr('replaced_by');
+                                }
+                            }
+                        }
+                    });
+                    regex = new RegExp(/Inconstitucional.*?pelo\(a\)/);
+                    $('p[replaced_by]:contains("Inconstitucional")').each(function (k, p) {
+                        if (regex.test($(p).text())) {
+                            var aLinkVide = $('a.link_vide', $(p));
+                            if (aLinkVide.length > 0) {
+                                var aTexto = $(aLinkVide[aLinkVide.length - 1]).text();
+                                if (regex.test(aTexto)) {
+                                    var ds = generateDescriptionToParagraph($(p).text());
+                                    $(p).text(ds + ' ');
+                                    $(aLinkVide[aLinkVide.length - 1]).appendTo($(p));
+                                    $(p).removeAttr('replaced_by');
+                                }
+                            }
+                        }
+                    });
+                    $('p[replaced_by]').remove();
+                    $(el).attr('refresh', '1');
+                    $(el).text('Exibir Alterações');
+                }
+            }
+
+            //Verifica os links de LECO, ordena e insere o link 'exibir mais...' e 'exibir menos...' caso exista mais de 3 links de LECO
+            function verificarLinks() {
+                var aP = $('#div_texto > p');
+                var i = 0;
+                var length = aP.length;
+                var pAfter = null;
+                var aOrder = [];
+                for (; i < length; i++) {
+                    if ($('a[href]', aP[i]).length == 1 && $('a[href]', aP[i]).text().toLowerCase().indexOf('legislação correlata') == 0) {
+                        $('a[href]', aP[i]).attr('show', '1').attr('leco', 'leco');
+                        aOrder.push({ 'text': $('a[href]', aP[i]).text(), 'href': $('a[href]', aP[i]).attr('href') });
+                        if (i >= 3) {
+                            $('a[href]', aP[i]).attr('show', '0');
+                            pAfter = aP[i];
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+                aOrder.sort(function (a1, a2) {
+                    return a1.text > a2.text ? 1 : a1.text < a2.text ? -1 : 0;
+                });
+                $('#div_texto a[leco="leco"]').each(function (i, o) {
+                    o.innerText = aOrder[i].text;
+                    o.href = aOrder[i].href;
+                });
+                if (pAfter != null && $('a[show="0"]').length > 3) {
+                    $('a[show="0"]').closest('p').hide();
+                    $('<p id="p_show"><a href="javascript:void(0);" onclick="exibirLinks()">Exibir mais...</a></p>').insertAfter($(pAfter));
+                    $('<p id="p_hide" style="display:none"><a href="javascript:void(0);" onclick="esconderLinks()">Exibir menos...</a></p>').insertAfter($(pAfter));
+                }
+            }
+            function exibirLinks() {
+                $('a[show="0"]').closest('p').show();
+                $('#p_hide').show();
+                $('#p_show').hide();
+            }
+            function esconderLinks() {
+                $('a[show="0"]').closest('p').hide();
+                $('#p_hide').hide();
+                $('#p_show').show();
+            }
+
+            function generateDescriptionToParagraph(text) {
+                var ds = '';
+                text = $.trim(text);
+                if (text != "") {
+                    var palavras = text.split(' ');
+                    if (palavras[0] == 'ANEXO' || palavras[0] == 'TÍTULO' || palavras[0] == 'CAPÍTULO' || palavras[0] == 'Art.' || (palavras[0] == 'Parágrafo' && palavras[1] == 'Único') || palavras[0] == '§') {
+                        ds = palavras[0] + ' ' + palavras[1];
+                    }
+                    else if (ehInciso(palavras[0]) || ehAlinea(palavras[0]) || ehNum(palavras[0])) {
+                        ds = palavras[0];
+                    }
+                    else {
+                        ds = "...";
+                    }
+                }
+                return ds;
+            }
+
+            function ehInciso(termo) {
+                var lastIndex = termo.indexOf("-");
+                if (lastIndex > 0) {
+                    termo = termo.substring(0, lastIndex);
+                }
+                return termo.match(/^[IVXLCDM]+$/i);
+            }
+
+            function ehAlinea(termo) {
+                var lastIndex = termo.indexOf(")");
+                if (lastIndex < 0) {
+                    return false;
+                }
+                if (termo.length == (lastIndex + 1)) {
+                    termo = termo.substring(0, lastIndex);
+                    return termo.match(/[a-z]/i);
+                }
+                return false;
+            }
+
+            function ehNum(termo) {
+                var lastIndex = termo.indexOf(".");
+                if (lastIndex < 0) {
+                    return false;
+                }
+                if (termo.length == (lastIndex + 1)) {
+                    termo = termo.substring(0, lastIndex);
+                    return isInt(termo);
+                }
+                return false;
+            }
+
+            $(document).ready(function () {
+                //A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378
+
+
+
+                var urlPath = window.location.pathname;
+                var urlSplited = urlPath.split("/");
+                var numeroNorma = urlSplited[3];
+
+                //Pegar o texto do h1
+                var elementoh1 = $('#div_texto > h1')[0].textContent;
+                //Adicionar a tag 'a'
+                $('#div_texto > h1')[0].innerHTML = '<a>' + elementoh1 + '</a>';
+
+                //Adicionar o link
+                $("#div_texto h1 a").attr('href', '/' + urlSplited[1] + '/DetalhesDeNorma.aspx?id_norma=' + numeroNorma).attr("target", '_blank');
+                //--------------------------------------------------------------------------------------
+
+
+
+
+                // var paragrafo = $('p');
+                // for (var i = 0; i < paragrafo.length; i++) {
+                //     if (paragrafo[i].innerText.match(/Os anexos constam no DODF/g)) {
+    
+                //         var spanParagrafo = paragrafo[i].textContent;
+                //         var form_consultar_diario = "\"form_consultar_diario\"";
+                //         var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+    
+                //         $(paragrafo)[i].innerHTML = _form + _button + "<span>" + spanParagrafo + "<span>" + "</a></form>";
+    
+                //     }
+
+                //     if (paragrafo[i].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                //         var span = paragrafo[i].textContent;
+                //         var form_consultar_diario = "\"form_consultar_diario\"";
+                //         var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                //         var arraySpan = $("p > span");
+                //         $(paragrafo)[i].innerHTML = _form + _button + "<span style='text-decoration: underline red; color: red;' >" + span + "<span>" + "</a></form>";
+                //     }
+                // }
+                // if (!paragrafo[i - 1].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                //     $('#paginaEColuna').hide();
+                // }
+                //--------------------------------------------------------------------------------------
+
+
+
+                if ($('#div_erro').length > 0) {
+                    $('#div_norma').hide();
+                }
+                else {
+                    if ($('p[replaced_by]').length <= 0 || $('p').length == $('p[replaced_by]').length) {
+                        $('.compilado').hide();
+                    }
+                    verificarLinks();
+                }
+            });
+
+
+            var normaOVEmFunction = new normaOVEmFunction();
+            
+                //A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378
+
+
+            if (normaOVEmFunction != true) {
+
+                    var urlPath = window.location.pathname;
+                    var urlSplited = urlPath.split("/");
+                    var numeroNorma = urlSplited[3];
+
+                    //Pegar o texto do h1
+                    var elementoh1 = $('#div_texto > h1')[0].textContent;
+                    //Adicionar a tag 'a'
+                    $('#div_texto > h1')[0].innerHTML = '<a>' + elementoh1 + '</a>';
+
+                    //Adicionar o link
+                    $("#div_texto h1").attr('href', '/' + urlSplited[1] + '/DetalhesDeNorma.aspx?id_norma=' + numeroNorma).attr("target", '_blank');
+                    //--------------------------------------------------------------------------------------
+
+                //consultarDiarioAspErro
+                    var paragrafo = $('p');
+
+                    for (var i = 0; i < paragrafo.length; i++) {
+
+                        if (paragrafo[i].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                            var span = paragrafo[i].textContent;
+                            var form_consultar_diario = "\"form_consultar_diario\"";
+                            var _form = "<form id='form_consultar_diario' name='form_consultar_diario' method='post' onsubmit='javascript: return consultarDiarioHTML(" + form_consultar_diario + ")\'>";
+                            var _button = "<a href='javascript: void(0)' onclick='javascript: consultarDiarioAspErro(" + form_consultar_diario + ")\'>";
+                            var arraySpan = $("p > span");
+                            $(paragrafo)[i].innerHTML = _form + _button + "<span style='text-decoration: underline red; color: red;' >" + span + "<span>" + "</a></form>";
+                        }
+                    }
+                    if (!paragrafo[i - 1].innerText.match(/Este texto não substitui o publicado no DODF/g)) {
+                        $('#paginaEColuna').hide();
+                    }
+                    //--------------------------------------------------------------------------------------
+
+                    if ($('#div_erro').length > 0) {
+                        $('#div_norma').hide();
+                    }
+                    else {
+                        if ($('p[replaced_by]').length <= 0 || $('p').length == $('p[replaced_by]').length) {
+                            $('.compilado').hide();
+                        }
+                        verificarLinks();
+                    }
+             }
+        </script>
+        <style type="text/css">
+            .control {
+                width: 100%;
+                float: left;
+            }
+
+            .print {
+                float: right;
+            }
+
+            .compilado {
+                float: left;
+            }
+
+            div.strike {
+                text-decoration: line-through;
+            }
+
+            body,
+            p,
+            h1 {
+                font-family: Tahoma;
+                font-size: 14px;
+            }
+
+            p[nota=nota] {
+                font-size: 12px;
+                border: 1px solid #777;
+                padding: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="div_norma">
+            <!-- A epígrafe do texto da norma deverá ser um link que direciona, para uma nova aba, os detalhes daquela norma; tarefa 378-->
+            
+            <!-- corpo dela epigrafe-->
+
+            <a href="/sinj/ ~/" title="Visitar o SINJ-DF - Sistema Integrado de Normas Jurídicas do
+                DF"><img src="http://www.sinj.df.gov.br/sinjpadrao/Imagens/logo_sinj.png" alt="SINJ-DF" /></a>
+
+            <div class="control">
+                <div class="compilado">
+                    <a href="javascript:void(0)" onclick="javascript:exibirAlteracoes(this);">
+                        Texto Compilado
+                    </a>
+                </div>
+                <div class="print">
+                    <a href="javascript:void(0);" onclick="javascript:Print();" title="Imprimir">
+                        <img alt="print" src="http://www.sinj.df.gov.br/sinjpadrao/Imagens/ico_print_p.png" />
+                    </a>
+                </div>
+            </div>
+            <div id="div_texto"><p ch_norma_info="31519" linkname="txt_74fced0ce43e465b9a8f71883effe041"><a class="linkname" id="txt_74fced0ce43e465b9a8f71883effe041" name="txt_74fced0ce43e465b9a8f71883effe041"></a><a href="/sinj/Norma/31519/5703df9c.pdf">Legislação correlata - Decreto 18107 de 19/03/1997</a><p ch_norma_info="31613" linkname="txt_54c82cdf7d6c4f72b7a4e5ddb3aa75fa"><a class="linkname" id="txt_54c82cdf7d6c4f72b7a4e5ddb3aa75fa" name="txt_54c82cdf7d6c4f72b7a4e5ddb3aa75fa"></a><a href="/sinj/Norma/31613/8636d3b4.html">Legislação correlata - Decreto 18155 de 09/04/1997</a><p ch_norma_info="32147" linkname="txt_56acb2ceaa4045b8366aa59b8bcac497"><a class="linkname" id="txt_56acb2ceaa4045b8366aa59b8bcac497" name="txt_56acb2ceaa4045b8366aa59b8bcac497"></a><a href="/sinj/Norma/32147/dd772502.html">Legislação correlata - Decreto 18463 de 22/07/1997</a><p ch_norma_info="32351" linkname="txt_c19baba5c07548f6341e018db3ea21b7"><a class="linkname" id="txt_c19baba5c07548f6341e018db3ea21b7" name="txt_c19baba5c07548f6341e018db3ea21b7"></a><a href="/sinj/DetalhesDeNorma.aspx?id_norma=32351">Legislação correlata - Portaria 520 de 29/08/1997</a><p ch_norma_info="32566" linkname="txt_3fb16f1f6a164cd36a09827f0bb2fdc9"><a class="linkname" id="txt_3fb16f1f6a164cd36a09827f0bb2fdc9" name="txt_3fb16f1f6a164cd36a09827f0bb2fdc9"></a><a href="/sinj/Norma/32566/eef5ff0b.pdf">Legislação correlata - Decreto 18670 de 02/10/1997</a><p ch_norma_info="32661" linkname="txt_c0e00ef22cc1406217efa0d0b7901d67"><a class="linkname" id="txt_c0e00ef22cc1406217efa0d0b7901d67" name="txt_c0e00ef22cc1406217efa0d0b7901d67"></a><a href="/sinj/Norma/32661/091af5a8.pdf">Legislação correlata - Decreto 18726 de 15/10/1997</a><p ch_norma_info="32685" linkname="txt_a0a678fe335344a5e17295edb1beed0b"><a class="linkname" id="txt_a0a678fe335344a5e17295edb1beed0b" name="txt_a0a678fe335344a5e17295edb1beed0b"></a><a href="/sinj/Norma/32685/eca80e9f.pdf">Legislação correlata - Decreto 18740 de 21/10/1997</a><p ch_norma_info="31445" linkname="txt_09ec685bd6e141beb225326a0da79afa"><a class="linkname" id="txt_09ec685bd6e141beb225326a0da79afa" name="txt_09ec685bd6e141beb225326a0da79afa"></a><a href="/sinj/Norma/31445/sefp_prt_147_1997.html#art1">Legislação correlata - Portaria 147 de 07/03/1997</a><p ch_norma_info="41910" linkname="txt_239ddba6c6574fe62ee52306a6975a48"><a class="linkname" id="txt_239ddba6c6574fe62ee52306a6975a48" name="txt_239ddba6c6574fe62ee52306a6975a48"></a><a href="/sinj/Norma/41910/42133_4213_textointegral.htm">Legislação correlata - Decreto 23178 de 21/08/2002</a><p ch_norma_info="557c6acaa7284b3fa243042498badd5f" linkname="txt_d0242b53efb247b7ce89d5c44c12afb0"><a class="linkname" id="txt_d0242b53efb247b7ce89d5c44c12afb0" name="txt_d0242b53efb247b7ce89d5c44c12afb0"></a><a href="/sinj/Norma/557c6acaa7284b3fa243042498badd5f/Lei_6375_2019.html#art1_par8">Legislação correlata - Lei 6375 de 12/09/2019</a><p ch_norma_info="557c6acaa7284b3fa243042498badd5f" linkname="txt_d5b3de10cc254ddf6853ba60e0b6725b"><a class="linkname" id="txt_d5b3de10cc254ddf6853ba60e0b6725b" name="txt_d5b3de10cc254ddf6853ba60e0b6725b"></a><a href="/sinj/Norma/557c6acaa7284b3fa243042498badd5f/Lei_6375_2019.html#art2">Legislação correlata - Lei 6375 de 12/09/2019</a><p ch_norma_info="46199" linkname="txt_55f1a52cdf364a66afa77608e3a367b4"><a class="linkname" id="txt_55f1a52cdf364a66afa77608e3a367b4" name="txt_55f1a52cdf364a66afa77608e3a367b4"></a><a href="/sinj/Norma/46199/exec_dec_25473_2004.html#art1_par1_incIV">Legislação correlata - Decreto 25473 de 23/12/2004</a><p ch_norma_info="3a76531f0bc7453f842a1e548eb18055" linkname="txt_051ae56514c34957dc22d81ccb2e7bec"><a class="linkname" id="txt_051ae56514c34957dc22d81ccb2e7bec" name="txt_051ae56514c34957dc22d81ccb2e7bec"></a><a href="/sinj/Norma/3a76531f0bc7453f842a1e548eb18055/seec_surec_atd_5_2019.html#art1">Legislação correlata - Ato Declaratório 5 de 02/10/2019</a><p ch_norma_info="52685" linkname="txt_f367f5f4fbf44eca5da589b9a2f5cb0e"><a class="linkname" id="txt_f367f5f4fbf44eca5da589b9a2f5cb0e" name="txt_f367f5f4fbf44eca5da589b9a2f5cb0e"></a><a href="/sinj/Norma/52685/7c74b59d.html">Legislação correlata - Decreto 26705 de 31/03/2006</a><p ch_norma_info="52694" linkname="txt_fa652fda359a442259ee96b980f21945"><a class="linkname" id="txt_fa652fda359a442259ee96b980f21945" name="txt_fa652fda359a442259ee96b980f21945"></a><a href="/sinj/Norma/52694/exec_dec_26707_2006.html#txt_b2ca350a5e4048bfe430062fc8e30121">Legislação correlata - Decreto 26707 de 31/03/2006</a><p ch_norma_info="61596" linkname="txt_ea7108811f634773557bbfcf95a4e174"><a class="linkname" id="txt_ea7108811f634773557bbfcf95a4e174" name="txt_ea7108811f634773557bbfcf95a4e174"></a><a href="/sinj/Norma/61596/exec_dec_30935_2009.html#txt_211e7c86316c4f56ceac4a1e1a644eb6">Legislação correlata - Decreto 30935 de 22/10/2009</a><p ch_norma_info="70390" linkname="txt_b759caebd95b428edbaf6385eef51402"><a class="linkname" id="txt_b759caebd95b428edbaf6385eef51402" name="txt_b759caebd95b428edbaf6385eef51402"></a><a href="/sinj/Norma/70390/exec_dec_33492_2012.html#art3_par">Legislação correlata - Decreto 33492 de 17/01/2012</a><p ch_norma_info="73211" linkname="txt_b6b73396d5634e43863a0441120f8b70"><a class="linkname" id="txt_b6b73396d5634e43863a0441120f8b70" name="txt_b6b73396d5634e43863a0441120f8b70"></a><a href="/sinj/Norma/73211/Lei_5005.html#art3_par4_incI_alic_add_0">Legislação correlata - Lei 5005 de 21/12/2012</a><p ch_norma_info="fc880d81b6ec443d91ee7e2a8d483d28" linkname="txt_3897166d67fc4ecb10a2f311360fad6a"><a class="linkname" id="txt_3897166d67fc4ecb10a2f311360fad6a" name="txt_3897166d67fc4ecb10a2f311360fad6a"></a><a href="/sinj/Norma/fc880d81b6ec443d91ee7e2a8d483d28/seec_surec_int_16_2019_rep.html#art2">Legislação correlata - Instrução Normativa 16 de 14/10/2019</a><p ch_norma_info="0e76d43697764398b2f16bf86883792d"><a href="/sinj/Norma/0e76d43697764398b2f16bf86883792d/sef_prt_42_2016.html">Legislação correlata - Portaria 42 de 07/03/2016</a><p ch_norma_info="e03580d825e640b7801c64d8dc791936"><a href="/sinj/Norma/e03580d825e640b7801c64d8dc791936/sef_surec_atd_9_2018.html#art11">Legislação correlata - Ato Declaratório 9 de 18/12/2018</a><p ch_norma_info="fc880d81b6ec443d91ee7e2a8d483d28"><a href="/sinj/Norma/fc880d81b6ec443d91ee7e2a8d483d28/seec_surec_int_16_2019_rep.html#art2">Legislação correlata - Instrução Normativa 16 de 14/10/2019</a><p ch_norma_info="f6b1de6634b041179ac9ed50d10d4973"><a href="/sinj/Norma/f6b1de6634b041179ac9ed50d10d4973/exec_dec_18955_1997_rep_ret.html">Legislação correlata - Decreto Teste de 22/12/1997</a><p ch_norma_info="17018"><a href="/sinj/Norma/17018/Lei_7_1988.html">Legislação correlata - Lei 7 de 29/12/1988</a><p ch_norma_info="78418"><a href="/sinj/Norma/78418/Lei_5414_2014.html">Legislação Correlata - Lei 5414 de 13/11/2014</a><p ch_norma_info="79154"><a href="/sinj/Norma/79154/Lei_5463_2015.html">Legislação Correlata - Lei 5463 de 16/03/2015</a><p ch_norma_info="f1f45be6ee904579a161b2de4e5fc1f6"><a href="/sinj/Norma/f1f45be6ee904579a161b2de4e5fc1f6/seec_surec_atd_26_2020.html#art17_incI">Legislação Correlata - Ato Declaratório 26 de 11/12/2020</a><p ch_norma_info="463e79ed25464a5a93e25088ce10b43b"><a href="/sinj/Norma/463e79ed25464a5a93e25088ce10b43b/exec_dec_42495_2021.html#art1_par1_incII">Legislação Correlata - Decreto 42495 de 10/09/2021</a><p ch_norma_info="71626ae8f77d41629ad5f25375a84bb8"><a href="/sinj/Norma/71626ae8f77d41629ad5f25375a84bb8/seec_surec_atd_29_2021.html#art17_incI">Legislação Correlata - Ato Declaratório 29 de 23/12/2021</a><p ch_norma_info="b098c8a265514259893044c81f32b359"><a href="/sinj/Norma/b098c8a265514259893044c81f32b359/exec_dec_43062_2022.html#art3_par4_incI_alid">Legislação Correlata - Decreto 43062 de 07/03/2022</a><p ch_norma_info="45a5f84db2a24d35b745a72e2be68eac"><a href="/sinj/Norma/45a5f84db2a24d35b745a72e2be68eac/exec_dec_43521_2022.html#art1_incIII">Legislação Correlata - Decreto 43521 de 01/07/2022</a><p ch_norma_info="c7fb53cd8e244961814a2a2feee62b16"><a href="/sinj/Norma/c7fb53cd8e244961814a2a2feee62b16/seec_prt_271_2022.html#art2_incI">Legislação Correlata - Portaria 271 de 24/08/2022</a><p ch_norma_info="0d476ea1f9fa4868931e6ff9f6ac58ee"><a href="/sinj/Norma/0d476ea1f9fa4868931e6ff9f6ac58ee/sefaz_surec_atd_22_2022_rep.html">Legislação Correlata - Ato Declaratório 22 de 15/12/2022</a><p ch_norma_info="e00c2ee5b7324016bdfec3acee943a37"><a href="/sinj/Norma/e00c2ee5b7324016bdfec3acee943a37/exec_dec_44509_2023.html#art1_incI">Legislação Correlata - Decreto 44509 de 11/05/2023</a><p ch_norma_info="93f85312d5a8433a8251269e1e26982e"><a href="/sinj/Norma/93f85312d5a8433a8251269e1e26982e/sefaz_prt_348_2023.html#art1_par2">Legislação Correlata - Portaria 348 de 18/10/2023</a><p ch_norma_info="6c97b6d34ed14b2bba7fb57b5f25b8af"><a href="/sinj/Norma/6c97b6d34ed14b2bba7fb57b5f25b8af/sefaz_surec_atd_35_2023.html#art17_incI">Legislação Correlata - Ato Declaratório 35 de 22/12/2023</a><p ch_norma_info="1ce82547ad8f4e82b1568831d2c77a77" class="adicionado"><a href="/sinj/Norma/1ce82547ad8f4e82b1568831d2c77a77/seec_sef_surec_osv_16_2024.html#art1">Legislação Correlata - Ordem de Serviço 16 de 05/04/2024</a><p ch_norma_info="d5a66303f34d4e3d9ac3842fa992b4ec" class="adicionado"><a href="/sinj/Norma/d5a66303f34d4e3d9ac3842fa992b4ec/seec_prt_932_2024.html#art1_par3">Legislação Correlata - Portaria 932 de 28/11/2024</a><p ch_norma_info="59664" class="adicionado"><a href="/sinj/Norma/59664/sef_prt_53_2009.html#art1_incI_alia">Legislação Correlata - Portaria 53 de 29/01/2009</a><p ch_norma_info="f240766a60394ab39e3945edaebe4280" class="adicionado"><a href="/sinj/Norma/f240766a60394ab39e3945edaebe4280/seec_sefaz_surec_atd_38_2024.html">Legislação Correlata - Ato Declaratório 38 de 19/12/2024</a><h1 epigrafe="epigrafe" noindex="" nota="" style="font-weight:bold; text-align:center">LEI Nº 1.254, DE 8 DE NOVEMBRO DE 1996</h1><p ch_norma_info="33077" linkname="txt_3b4af90ad2a2451214a01e95ecb882cd"><a class="linkname" id="txt_3b4af90ad2a2451214a01e95ecb882cd" name="txt_3b4af90ad2a2451214a01e95ecb882cd"></a><a href="/sinj/Norma/33077/exec_dec_18955_1997_rep_ret.html">(regulamentado pelo(a) Decreto 18955 de 22/12/1997)</a><p ch_norma_info="31546" linkname="txt_331f176ac3db438b01fc33f8f6b0fbb7"><a class="linkname" id="txt_331f176ac3db438b01fc33f8f6b0fbb7" name="txt_331f176ac3db438b01fc33f8f6b0fbb7"></a><a href="/sinj/Norma/31546/cba8c709.html">(regulamentado pelo(a) Decreto 18122 de 26/03/1997)</a><p ch_norma_info="31025" linkname="txt_5acb4a780ab9411c40a82febcc53063c"><a class="linkname" id="txt_5acb4a780ab9411c40a82febcc53063c" name="txt_5acb4a780ab9411c40a82febcc53063c"></a><a href="/sinj/Norma/31025/exec_dec_17894_1996.html">(regulamentado pelo(a) Decreto 17894 de 10/12/1996)</a><p ch_norma_info="4a860a4b341841049f1a540e825ffa2b" style="text-align:center"><a href="/sinj/Norma/4a860a4b341841049f1a540e825ffa2b/DL_2372_2022.html#art2_incI_alia">(Prorrogado(a) pelo(a) Decreto Legislativo 2372 de 06/12/2022</a><p linkname="txt_a1d58d766b2e4bf56713748c3b87fe34" style="margin-left:50%; text-align:justify"><a class="linkname" id="txt_a1d58d766b2e4bf56713748c3b87fe34" name="txt_a1d58d766b2e4bf56713748c3b87fe34"></a>Dispõe quanto ao Imposto sobre Operações Relativas à Circulação de Mercadorias e sobre Prestações de Serviços de Transporte Interestadual e Intermunicipal e de Comunicação – ICMS e dá outras providências.<p linkname="txt_55a4fc2ab9d34da43c2deaf5a59ffd89" style="text-align:justify"><a class="linkname" id="txt_55a4fc2ab9d34da43c2deaf5a59ffd89" name="txt_55a4fc2ab9d34da43c2deaf5a59ffd89"></a>O GOVERNADOR DO DISTRITO FEDERAL, FAÇO SABER QUE A CÂMARA LEGISLATIVA DO DISTRITO FEDERAL DECRETA E EU SANCIONO A SEGUINTE LEI:<p linkname="txt_93bd64d943fe43358caf4d6ae348b7a3" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_93bd64d943fe43358caf4d6ae348b7a3" name="txt_93bd64d943fe43358caf4d6ae348b7a3"></a>Capítulo I<p linkname="txt_69d3c96e55fb49ddbae0065d374492cc" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_69d3c96e55fb49ddbae0065d374492cc" name="txt_69d3c96e55fb49ddbae0065d374492cc"></a>Das Disposições Preliminares<p linkname="art1" style="text-align:justify"><a class="linkname" id="art1" name="art1"></a>Art. 1º Esta Lei dispõe quanto ao Imposto sobre Operações Relativas à Circulação de Mercadorias e sobre Prestações de Serviços de Transporte Interestadual e Intermunicipal e de Comunicação – ICMS, com base no inciso II do art. 155 da Constituição da República Federativa do Brasil e na Lei Complementar nº 87, de 13 de setembro de 1996.<p linkname="txt_aaa7da58123b4699b402ed189a29674a" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_aaa7da58123b4699b402ed189a29674a" name="txt_aaa7da58123b4699b402ed189a29674a"></a>Capítulo II<p linkname="txt_bb4574c49d0e450699cf231ab4782e29" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_bb4574c49d0e450699cf231ab4782e29" name="txt_bb4574c49d0e450699cf231ab4782e29"></a>Das Hipóteses de Incidência<p linkname="art2" style="text-align:justify"><a class="linkname" id="art2" name="art2"></a>Art. 2º O imposto incide sobre:<p linkname="art2_incI" style="text-align:justify"><a class="linkname" id="art2_incI" name="art2_incI"></a>I – operações relativas à circulação de mercadorias, inclusive o fornecimento de alimentação e bebidas em qualquer estabelecimento, incluídos os serviços prestados;<p linkname="art2_incII" style="text-align:justify"><a class="linkname" id="art2_incII" name="art2_incII"></a>II – prestações de serviços de transporte interestadual e intermunicipal, por qualquer via, de pessoas, bens, mercadorias ou valores;<p linkname="art2_incIII" style="text-align:justify"><a class="linkname" id="art2_incIII" name="art2_incIII"></a>III – prestações onerosas de serviços de comunicação, por qualquer meio, inclusive a geração, a emissão, a recepção, a transmissão, a retransmissão, a repetição e a ampliação de comunicação de qualquer natureza;<p linkname="art2_incIV" style="text-align:justify"><a class="linkname" id="art2_incIV" name="art2_incIV"></a>IV – fornecimento de mercadoria com prestação de serviços:<p linkname="art2_incIV_alia" style="text-align:justify"><a class="linkname" id="art2_incIV_alia" name="art2_incIV_alia"></a>a) não compreendidos na competência tributária dos Municípios;<p linkname="art2_incIV_alib" style="text-align:justify"><a class="linkname" id="art2_incIV_alib" name="art2_incIV_alib"></a>b) compreendidos na competência tributária dos Municípios e com indicação expressa, em lei complementar aplicável, da incidência do ICMS.<p linkname="art2_par" style="text-align:justify"><a class="linkname" id="art2_par" name="art2_par"></a>Parágrafo único. O imposto incide também sobre:<p linkname="art2_par_incI_replaced" replaced_by="51078" style="display: block; text-align: justify;"><s><a name="art2_par_incI_replaced"></a>I – a entrada de mercadoria importada do exterior, por pessoa física ou jurídica, ainda quando se tratar de bem destinado a consumo ou a ativo permanente;</s><p linkname="art2_par_incI" style="text-align:justify"><a class="linkname" id="art2_par_incI" name="art2_par_incI"></a>I - a entrada de mercadoria ou bem importados do exterior, por pessoa física ou jurídica, ainda que não seja contribuinte habitual do imposto, qualquer que seja a sua finalidade; <a class="link_vide" href="/sinj/Norma/51078/Lei_3123_2003.html#txt_7bc4fc96e9df470b6bd78fd6151aa83b">(Inciso alterado(a) pelo(a) Lei 3123 de 06/01/2003)</a><p linkname="art2_par_incII" style="text-align:justify"><a class="linkname" id="art2_par_incII" name="art2_par_incII"></a>II – o serviço prestado no exterior ou cuja prestação se tenha iniciado no exterior;<p linkname="art2_par_incIII" style="text-align:justify"><a class="linkname" id="art2_par_incIII" name="art2_par_incIII"></a>III – a entrada no território do Distrito Federal, proveniente de outra unidade federada, de:<p linkname="art2_par_incIII_alia" style="text-align:justify"><a class="linkname" id="art2_par_incIII_alia" name="art2_par_incIII_alia"></a>a) mercadoria sujeita ao regime de pagamento antecipado do imposto;<p linkname="art2_par_incIII_alib" style="text-align:justify"><a class="linkname" id="art2_par_incIII_alib" name="art2_par_incIII_alib"></a>b) bens ou serviços adquiridos por contribuinte do imposto, destinados a uso, consumo ou ativo permanente;<p linkname="art2_par_incIII_alic" style="text-align:justify"><a class="linkname" id="art2_par_incIII_alic" name="art2_par_incIII_alic"></a>c) energia elétrica e petróleo, inclusive lubrificantes e combustíveis líquidos e gasosos dele derivados, quando não destinados à comercialização ou à industrialização;<p linkname="art2_par_incIII_alid" style="text-align:justify"><a class="linkname" id="art2_par_incIII_alid" name="art2_par_incIII_alid"></a>d) mercadoria a ser comercializada sem destinatário certo ou destinada a estabelecimento em situação cadastral irregular.<p linkname="art2_par_incIII_alid_add_0_replaced" style="text-align:justify"><s><a name="art2_par_incIII_alid_add_0_replaced"></a>e) mercadoria não sujeita ao regime de pagamento antecipado do imposto adquirida por contribuinte optante pelo Regime Especial Unificado de Arrecadação de Tributos e Contribuições devidos pelas Microempresas e Empresas de Pequeno Porte – Simples Nacional, instituído pela Lei Complementar federal nº 123, de 14 de dezembro de 2006;</s> <a class="link_vide" href="/sinj/Norma/3ef3880a345d466494e62529027843c3/Lei_5558_2015.html#txt_5bcf99f1b46249ac6059a2e9a4d23ab9">(Alínea acrescido(a) pelo(a) Lei 5558 de 18/11/2015)</a> <a class="link_vide" href="/sinj/Norma/8a784dce863b4c89baa6420d0180e505/Lei_6431_2019.html#txt_49db399ee9044dc343f26530e0db9495">(revogado(a) pelo(a) Lei 6431 de 20/12/2019)</a><p linkname="txt_6b66984ce2f24e92f47c20a653b80e59" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_6b66984ce2f24e92f47c20a653b80e59" name="txt_6b66984ce2f24e92f47c20a653b80e59"></a>Capítulo III<p linkname="txt_0bff5da928dd4d4de50ac37bc02dd640" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_0bff5da928dd4d4de50ac37bc02dd640" name="txt_0bff5da928dd4d4de50ac37bc02dd640"></a>Da Não-Incidência<p linkname="art3" style="text-align:justify"><a class="linkname" id="art3" name="art3"></a>Art. 3º O imposto não incide sobre:<p linkname="art3_incI" style="text-align:justify"><a class="linkname" id="art3_incI" name="art3_incI"></a>I – operação ou prestação que destine ao exterior mercadorias, inclusive produtos primários e industrializados, bem como os semi-elaborados, ou serviços;<p linkname="art3_incII" style="text-align:justify"><a class="linkname" id="art3_incII" name="art3_incII"></a>II – operação que destine a outra unidade federada energia elétrica e petróleo, inclusive lubrificantes, combustíveis líquidos e gasosos dele derivados, quando destinados à comercialização ou à industrialização;<p linkname="art3_incIII" style="text-align:justify"><a class="linkname" id="art3_incIII" name="art3_incIII"></a>III – operação com ouro, quando definido em lei como ativo financeiro ou instrumento cambial;<p linkname="art3_incIV" style="text-align:justify"><a class="linkname" id="art3_incIV" name="art3_incIV"></a>IV – operação com livros, jornais e periódicos, bem como o papel destinado a sua impressão;<p linkname="art3_incV" style="text-align:justify"><a class="linkname" id="art3_incV" name="art3_incV"></a>V – operação relativa a mercadorias que tenham sido ou que se destinem a ser utilizadas na prestação, pelo próprio autor da saída, de serviço compreendido na competência tributária dos Municípios, ressalvadas as hipóteses previstas em lei complementar aplicável;<p linkname="art3_incVI" style="text-align:justify"><a class="linkname" id="art3_incVI" name="art3_incVI"></a>VI – operação de qualquer natureza, dentro do território do Distrito Federal, de que decorra transferência de propriedade de estabelecimento industrial, comercial ou de outra espécie, ou mudança de endereço;<p linkname="art3_incVII" style="text-align:justify"><a class="linkname" id="art3_incVII" name="art3_incVII"></a>VII – operação decorrente de alienação fiduciária em garantia, inclusive aquela efetuada pelo credor em decorrência do inadimplemento do devedor;<p linkname="art3_incVIII" style="text-align:justify"><a class="linkname" id="art3_incVIII" name="art3_incVIII"></a>VIII – operação de contrato de arrendamento mercantil, exceto a venda do bem ao arrendatário, ao término do contrato, pelo valor residual;<p linkname="art3_incIX" style="text-align:justify"><a class="linkname" id="art3_incIX" name="art3_incIX"></a>IX – operação de qualquer natureza decorrente de transferência, para a companhia seguradora, de bens móveis salvados de sinistro;<p linkname="art3_incX" style="text-align:justify"><a class="linkname" id="art3_incX" name="art3_incX"></a>X – a saída de mercadoria com destino a armazém geral ou para depósito fechado do próprio contribuinte, no Distrito Federal, para guarda em nome do remetente, e o seu retorno ao estabelecimento do depositante.<p linkname="art3_incX_add_0" style="text-align:justify"><a name="art3_incX_add_0"></a>XI – operação com fonogramas e videofonogramas musicais produzidos no Brasil contendo obras musicais ou literomusicais de autores brasileiros ou obras em geral interpretadas por artistas brasileiros, bem como suportes materiais ou arquivos digitais que os contenham, salvo na etapa de replicação industrial de mídias ópticas de leitura a laser. <a class="link_vide" href="/sinj/Norma/77226/Lei_5361_2014.html#txt_75a91d3642434891c6fb8a3f79f21795">(Inciso acrescido(a) pelo(a) Lei 5361 de 03/07/2014)</a><p linkname="art3_par1" style="text-align:justify"><a class="linkname" id="art3_par1" name="art3_par1"></a>§ 1º Equipara-se à operação de que trata o inciso I do caput deste artigo, observadas as regras de controle definidas no regulamento com base em acordos celebrados com outras unidades federadas, a saída de mercadoria, quando realizada com o fim específico de exportação para o exterior, destinada a:<p linkname="art3_par1_incI" style="text-align:justify"><a class="linkname" id="art3_par1_incI" name="art3_par1_incI"></a>I – empresa comercial exportadora, inclusive trading, ou outro estabelecimento da mesma empresa;<p linkname="art3_par1_incII" style="text-align:justify"><a class="linkname" id="art3_par1_incII" name="art3_par1_incII"></a>II – armazém alfandegado, estação aduaneira de interior ou entreposto aduaneiro.<p linkname="art3_par2" style="text-align:justify"><a class="linkname" id="art3_par2" name="art3_par2"></a>§ 2º Considera-se destinado ao exterior o serviço de transporte, vinculado à operação de exportação, de mercadorias até o ponto de embarque em território nacional.<p linkname="art3_par3" style="text-align:justify"><a class="linkname" id="art3_par3" name="art3_par3"></a>§ 3º Considera-se livro, para efeitos do disposto no inciso IV do caput deste artigo, o volume ou tomo de publicação de conteúdo literário, didático, científico, técnico ou de entretenimento.<p linkname="art3_par4_replaced" replaced_by="71263" style="display: block; text-align: justify;"><s><a name="art3_par4_replaced"></a>§ 4º A não-incidência prevista no inciso IV do caput deste artigo não se aplica a papel encontrado com pessoa diversa de empresa jornalística, editora ou gráfica impressora de livro, jornal ou periódico.</s><p linkname="art3_par4_replaced_replaced" replaced_by="72930" style="display: block; text-align: justify;"><s><a name="art3_par4_replaced_replaced"></a>§ 4º A destinação do papel a que se refere o inciso IV deve ser comprovada por meio de documentação específica, prevista no Regulamento.</s> <a class="link_vide" href="/sinj/Norma/71263/Lei_4826_2012.html#art1">(Parágrafo alterado(a) pelo(a) Lei 4826 de 04/05/2012)</a><p linkname="art3_par4" style="text-align:justify"><a class="linkname" id="art3_par4" name="art3_par4"></a>§ 4º As operações com papel a que se refere o caput, IV, abrangem apenas as atividades: <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html#art1">(Parágrafo alterado(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_0" style="text-align:justify"><a name="art3_par4_add_0"></a>I – do fabricante; <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Inciso acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_1" style="text-align:justify"><a name="art3_par4_add_1"></a>II – do usuário, entendido como a empresa jornalística ou a editora que explore a indústria de livros, jornais ou periódicos; <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Inciso acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_2" style="text-align:justify"><a name="art3_par4_add_2"></a>III – do importador; <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Inciso acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_3" style="text-align:justify"><a name="art3_par4_add_3"></a>IV – do distribuidor <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Inciso acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_4" style="text-align:justify"><a name="art3_par4_add_4"></a>V – da gráfica, entendida como aquela que realiza impressão de jornais e periódicos e recebe o papel de terceiros ou o adquire com imunidade tributária. <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Inciso acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="art3_par4_add_5" style="text-align:justify"><a name="art3_par4_add_5"></a>§ 5º Não goza de imunidade o papel destinado à impressão de livros, jornais ou periódicos que contenham exclusivamente matéria de propaganda comercial. <a class="link_vide" href="/sinj/Norma/72930/Lei_4979_2012.html">(Parágrafo acrescido(a) pelo(a) Lei 4979 de 04/12/2012)</a><p linkname="txt_06e642c0a54c4079e2bb3ceb31588a60" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_06e642c0a54c4079e2bb3ceb31588a60" name="txt_06e642c0a54c4079e2bb3ceb31588a60"></a>Capítulo IV<p linkname="txt_287637b50cd74c22f1e7da3d5a55a03c" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_287637b50cd74c22f1e7da3d5a55a03c" name="txt_287637b50cd74c22f1e7da3d5a55a03c"></a>Das Isenções, Incentivos e Benefícios Fiscais<p linkname="art4" style="text-align:justify"><a class="linkname" id="art4" name="art4"></a>Art. 4º As isenções do imposto somente serão concedidas ou revogadas, nos termos da Lei Complementar nº 24, de 7 de janeiro de 1975, por meio de convênios celebrados e ratificados pelas unidades federadas e pelo Distrito Federal, representado pelo Secretário de Fazenda e Planejamento.<p linkname="art4_par1" style="text-align:justify"><a class="linkname" id="art4_par1" name="art4_par1"></a>§ 1º O disposto no caput deste artigo também se aplica:<p linkname="art4_par1_incI" style="text-align:justify"><a class="linkname" id="art4_par1_incI" name="art4_par1_incI"></a>I – à redução de base de cálculo;<p linkname="art4_par1_incII" style="text-align:justify"><a class="linkname" id="art4_par1_incII" name="art4_par1_incII"></a>II – à devolução total ou parcial, condicionada ou não, direta ou indireta, do imposto a contribuinte, responsável ou terceiro;<p linkname="art4_par1_incIII" style="text-align:justify"><a class="linkname" id="art4_par1_incIII" name="art4_par1_incIII"></a>III – à concessão de crédito presumido;<p linkname="art4_par1_incIV" style="text-align:justify"><a class="linkname" id="art4_par1_incIV" name="art4_par1_incIV"></a>IV – a quaisquer outros incentivos ou favores fiscais ou financeiro-fiscais, concedidos com base no imposto, dos quais resulte redução ou eliminação, direta ou indireta, do respectivo ônus;<p linkname="art4_par1_incV" style="text-align:justify"><a class="linkname" id="art4_par1_incV" name="art4_par1_incV"></a>V – às prorrogações e às extensões das isenções vigentes.<p linkname="art4_par2" style="text-align:justify"><a class="linkname" id="art4_par2" name="art4_par2"></a>§ 2º A inobservância dos dispositivos da lei complementar citada no caput deste artigo acarretará, imediata e cumulativamente:<p linkname="art4_par2_incI" style="text-align:justify"><a class="linkname" id="art4_par2_incI" name="art4_par2_incI"></a>I – a nulidade do ato e a ineficácia do crédito fiscal atribuído ao estabelecimento recebedor da mercadoria ou serviço;<p linkname="art4_par2_incII" style="text-align:justify"><a class="linkname" id="art4_par2_incII" name="art4_par2_incII"></a>II – a exigibilidade do imposto não-pago ou devolvido e a ineficácia da lei ou ato de que conste a dispensa do débito correspondente.<p linkname="art4_par3" style="text-align:justify"><a class="linkname" id="art4_par3" name="art4_par3"></a>§ 3º Os convênios de natureza autorizativa somente produzirão efeitos após sua homologação pela Câmara Legislativa.<p linkname="art4_par3_add_0" style="text-align:justify"><a name="art4_par3_add_0"></a>§ 4º Não se verificando as condições ou requisitos que legitimaram o benefício fiscal, o imposto será considerado devido desde o momento em que ocorreu a operação ou prestação, devendo ser exigido do contribuinte ou responsável, com os acréscimos legais cabíveis. <a class="link_vide" href="/sinj/Norma/51464/Lei_3531_2005.html#txt_1eeb69b056324ce91b7d00e7b5473b95">(Parágrafo acrescido(a) pelo(a) Lei 3531 de 03/01/2005)</a><p linkname="txt_40d1df829ca94e7a5defa8a79c0e1b0d" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_40d1df829ca94e7a5defa8a79c0e1b0d" name="txt_40d1df829ca94e7a5defa8a79c0e1b0d"></a>Capítulo V<p linkname="txt_0d285ec7d4a54ff7cab74c13ec625015" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_0d285ec7d4a54ff7cab74c13ec625015" name="txt_0d285ec7d4a54ff7cab74c13ec625015"></a>Dos Elementos do Imposto<p linkname="txt_8a5deae50df2471ccf913c46b3e8c37b" style="font-weight:bold; margin-bottom:0px; text-align:center"><a class="linkname" id="txt_8a5deae50df2471ccf913c46b3e8c37b" name="txt_8a5deae50df2471ccf913c46b3e8c37b"></a>Seção I<p linkname="txt_c5194fa65743498fea7d4cf803bc85e7" style="font-weight:bold; margin-top:0px; text-align:center"><a class="linkname" id="txt_c5194fa65743498fea7d4cf803bc85e7" name="txt_c5194fa65743498fea7d4cf803bc85e7"></a>Da Ocorrência do Fato Gerador<p linkname="art5" style="text-align:justify"><a class="linkname" id="art5" name="art5"></a>Art. 5º Considera-se ocorrido o fato gerador do imposto no momento:<p linkname="art5_incI_replaced_replaced_replaced" style="text-align: justify; display: block;" replaced_by="c1bc4f7b33af4ad2bf17a833c94ba6e2" class=""><s><a class="linkname" id="art5_incI" name="art5_incI_replaced_replaced_replaced"></a>I – da saída de mercadoria, a qualquer título, de estabelecimento de contribuinte, ainda que para outro estabelecimento do mesmo titular;</s><p style="text-align:justify" linkname="art5_incI" class=""><a name="art5_incI"></a>I – da saída de mercadoria, a qualquer título, de estabelecimento de contribuinte;&nbsp;<a href="/sinj/Norma/c1bc4f7b33af4ad2bf17a833c94ba6e2/Lei_7601_2024.html#art1">(Inciso Alterado(a) pelo(a) Lei 7601 de 12/12/2024)</a><p linkname="art5_incII" style="text-align:justify"><a class="linkname" id="art5_incII" name="art5_incII"></a>II – da saída de ouro, na operação em que este não for ativo financeiro ou instrumento cambial;<p linkname="art5_incIII_replaced" replaced_by="51078" style="display: block; text-align: justify;"><s><a name="art5_incIII_replaced"></a>III – da aquisição em licitação pública de mercadoria importada do exterior apreendida ou abandonada;</s><p linkname="art5_incIII" style="text-align:justify"><a class="linkname" id="art5_incIII" name="art5_incIII"></a>III - da aquisição em licitação pública de mercadorias ou bens importados do exterior apreendidos ou abandonados; <a class="link_vide" href="/sinj/Norma/51078/Lei_3123_2003.html#txt_7bc4fc96e9df470b6bd78fd6151aa83b">(Inciso alterado(a) pelo(a) Lei 3123 de 06/01/2003)</a><p linkname="art5_incIV_replaced" replaced_by="51078" style="display: block; text-align: justify;"><s><a name="art5_incIV_replaced"></a>IV – do desembaraço aduaneiro de mercadoria ou bem importados do exterior;</s><p linkname="art5_incIV" style="text-align:justify"><a class="linkname" id="art5_incIV" name="art5_incIV"></a>IV - do desembaraço aduaneiro de mercadorias ou bens importados do exterior; <a class="link_vide" href="/sinj/Norma/51078/Lei_3123_2003.html#txt_7bc4fc96e9df470b6bd78fd6151aa83b">(Inciso alterado(a) pelo(a) Lei 3123 de 06/01/2003)</a><p linkname="art5_incV" style="text-align:justify"><a class="linkname" id="art5_incV" name="art5_incV"></a>V – da transmissão a terceiro de mercadoria depositada em armazém geral ou em depósito fechado, no Distrito Federal;<p linkname="art5_incVI" style="text-align:justify"><a class="linkname" id="art5_incVI" name="art5_incVI"></a>VI – do fornecimento de alimentação, bebidas e outras mercadorias, por qualquer estabelecimento, incluídos os serviços prestados;<p linkname="art5_incVII" style="text-align:justify"><a class="linkname" id="art5_incVII" name="art5_incVII"></a>VII – do fornecimento de mercadoria com prestação de serviços:<p linkname="art5_incVII_alia" style="text-align:justify"><a class="linkname" id="art5_incVII_alia" name="art5_incVII_alia"></a>a) não compreendidos na competência tributária dos Municípios;<p linkname="art5_incVII_alib" style="text-align:justify"><a class="linkname" id="art5_incVII_alib" name="art5_incVII_alib"></a>b) compreendidos na competência tributária dos Municípios e com indicação expressa, em lei complementar aplicável, da incidência do ICMS;<p linkname="art5_incVIII" style="text-align:justify"><a class="linkname" id="art5_incVIII" name="art5_incVIII"></a>VIII – do início da prestação de serviços de transporte interestadual e intermunicipal, por qualquer via, de pessoas, bens, mercadorias ou valores;<p linkname="art5_incIX" style="text-align:justify"><a class="linkname" id="art5_incIX" name="art5_incIX"></a>IX – da prestação onerosa de serviços de comunicação, por qualquer meio, inclusive a geração, a emissão, a recepção, a transmissão, a retransmissão, a repetição e a ampliação de comunicação de qualquer natureza;<p linkname="art5_incX" style="text-align:justify"><a class="linkname" id="art5_incX" name="art5_incX"></a>X – da transmissão de propriedade de mercadoria, ou do título que a represente, quando esta não transitar pelo estabelecimento do transmitente;<p linkname="art5_incXI" style="text-align:justify"><a class="linkname" id="art5_incXI" name="art5_incXI"></a>XI – da entrada no território do Distrito Federal, procedente de outra unidade federada, de:<p linkname="art5_incXI_alia" style="text-align:justify"><a class="linkname" id="art5_incXI_alia" name="art5_incXI_alia"></a>a) mercadoria sujeita ao regime de pagamento antecipado do imposto, ressalvado o disposto no inciso XIV;<p linkname="art5_incXI_alib" style="text-align:justify"><a class="linkname" id="art5_incXI_alib" name="art5_incXI_alib"></a>b) bens ou serviços, adquiridos por contribuinte do imposto, destinados a uso, consumo ou ativo permanente;<p linkname="art5_incXI_alic" style="text-align:justify"><a class="linkname" id="art5_incXI_alic" name="art5_incXI_alic"></a>c) energia elétrica e de petróleo, inclusive lubrificantes e combustíveis líquidos e gasosos dele derivados, quando não destinados à comercialização ou à industrialização;<p linkname="art5_incXI_alid" style="text-align:justify"><a class="linkname" id="art5_incXI_alid" name="art5_incXI_alid"></a>d) mercadoria a ser comercializada sem destinatário certo ou destinada a estabelecimento em situação cadastral irregular;<p linkname="art5_incXI_alid_add_0_replaced" style="text-align:justify"><s><a name="art5_incXI_alid_add_0_replaced"></a>e) mercadoria não sujeita ao regime de pagamento antecipado do imposto adquirida por contribuinte optante pelo Simples Nacional, instituído pela Lei Complementar federal nº 123, de 2006;</s> <a class="link_vide" href="/sinj/Norma/3ef3880a345d466494e62529027843c3/Lei_5558_2015.html#txt_5bcf99f1b46249ac6059a2e9a4d23ab9">(Alínea acrescido(a) pelo(a) Lei 5558 de 18/11/2015)</a> <a class="link_vide" href="/sinj/Norma/8a784dce863b4c89baa6420d0180e505/Lei_6431_2019.html#txt_49db399ee9044dc343f26530e0db9495">(revogado(a) pelo(a) Lei 6431 de 20/12/2019)</a><p linkname="art5_incXII" style="text-align:justify"><a class="linkname" id="art5_incXII" name="art5_incXII"></a>XII – do recebimento, pelo destinatário, de serviço prestado ou cuja prestação se tenha iniciado no exterior;<p linkname="art5_incXIII" style="text-align:justify"><a class="linkname" id="art5_incXIII" name="art5_incXIII"></a>XIII – da constatação da existência de estabelecimento em situação cadastral irregular, em relação ao estoque de mercadorias nele encontrado;<p linkname="art5_incXIV" style="text-align:justify"><a class="linkname" id="art5_incXIV" name="art5_incXIV"></a>XIV – da entrada de mercadoria ou bem no estabelecimento do adquirente ou em outro por ele indicado, para efeito de exigência do imposto por substituição tributária;<p linkname="art5_incXV" style="text-align:justify"><a class="linkname" id="art5_incXV" name="art5_incXV"></a>XV – do ato final do transporte iniciado no exterior;<p linkname="art5_incXVI" style="text-align:justify"><a class="linkname" id="art5_incXVI" name="art5_incXVI"></a>XVI – da verificação da existência de mercadoria ou serviço em situação irregular;<p linkname="art5_incXVII" style="text-align:justify"><a class="linkname" id="art5_incXVII" name="art5_incXVII"></a>XVII – do encerramento das atividades do contribuinte.<p linkname="art5_incXVII_add_0" style="text-align:justify"><a name="art5_incXVII_add_0"></a>XVIII – da saída da mercadoria arrematada em leilão. <a class="link_vide" href="/sinj/Norma/72933/Lei_4982_2012.html#txt_e66d2d82ad154f7b1a67667cf119b5ad">(Inciso acrescido(a) pelo(a) Lei 4982 de 05/12/2012)</a><p linkname="art5_incXVII_add_0_add_0" style="text-align:justify"><a name="art5_incXVII_add_0_add_0"></a>XIX – da saída do estabelecimento remetente de bens ou do início da prestação de serviços em operações ou prestações interestaduais cujo adquirente ou tomador seja não contribuinte do imposto localizado no Distrito Federal. <a class="link_vide" href="/sinj/Norma/224e0e199abd44568e8b808f10e083cb/Lei_5546_2015.html#txt_bc42d9b4db884d8d6acade2f00a07e87">(Inciso acrescido(a) pelo(a) Lei 5546 de 05/10/2015)</a><p linkname="art5_par1" style="text-align:justify"><a class="linkname" id="art5_par1" name="art5_par1"></a>§ 1º Considera-se ocorrida a saída de mercadoria:<p linkname="art5_par1_incI" style="text-align:justify"><a class="linkname" id="art5_par1_incI" name="art5_par1_incI"></a>I – constante do estoque final, no encerramento de atividades do contribuinte;<p linkname="art5_par1_incII" style="text-align:justify"><a class="linkname" id="art5_par1_incII" name="art5_par1_incII"></a>II – encontrada em estabelecimento em situação cadastral irregular.<p linkname="art5_par2" style="text-align:justify"><a class="linkname" id="art5_par2" name="art5_par2"></a>§ 2º Equipara-se à entrada ou à saída a transmissão de propriedade ou a transferência de mercadoria, quando esta não transitar pelo estabelecimento do contribuinte.<p linkname="art5_par3" style="text-align:justify"><a class="linkname" id="art5_par3" name="art5_par3"></a>§ 3º Para efeito desta Lei, equipara-se à saída o consumo ou a integração no ativo permanente de mercadoria adquirida para industrialização ou comercialização.<p linkname="art5_par4" style="text-align:justify"><a class="linkname" id="art5_par4" name="art5_par4"></a>§ 4º São irrelevantes para a caracterização do fato gerador:<p linkname="art5_par4_incI" style="text-align:justify"><a class="linkname" id="art5_par4_incI" name="art5_par4_incI"></a>I – a natureza e a validade jurídicas das operações ou prestações de que resultem as situações previstas neste artigo;<p linkname="art5_par4_incII" style="text-align:justify"><a class="linkname" id="art5_par4_incII" name="art5_par4_incII"></a>II – o título pelo qual a mercadoria ou bem esteja na posse do respectivo titular;<p linkname="art5_par4_incIII" style="text-align:justify"><a class="linkname" id="art5_par4_incIII" name="art5_par4_incIII"></a>III – a natureza jurídica do objeto ou dos efeitos do ato praticado;<p linkname="art5_par4_incIV" style="text-align:justify"><a class="linkname" id="art5_par4_incIV" name="art5_par4_incIV"></a>IV – os efeitos dos fatos efetivamente ocorridos.<p linkname="art5_par5" style="text-align:justify"><a class="linkname" id=
+<!-- FIXTURE TRUNCADO: original 435160 bytes; mantidos primeiros 60000 bytes -->

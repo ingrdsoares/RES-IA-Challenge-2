@@ -1,0 +1,15 @@
+HTTP/1.1 200 
+vary: Origin
+vary: Access-Control-Request-Method
+vary: Access-Control-Request-Headers
+x-content-type-options: nosniff
+x-xss-protection: 0
+cache-control: no-cache, no-store, max-age=0, must-revalidate
+pragma: no-cache
+expires: 0
+x-frame-options: DENY
+content-type: application/json
+transfer-encoding: chunked
+date: Thu, 05 Nov 2026 22:54:40 GMT
+strict-transport-security: max-age=15768000
+

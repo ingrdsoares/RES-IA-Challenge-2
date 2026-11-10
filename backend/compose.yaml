@@ -1,0 +1,55 @@
+name: socio-digital
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.15.1
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./api
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
+      GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
+      TOP_K: ${TOP_K:-8}
+      SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
+      QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      NUM_CTX: ${NUM_CTX:-8192}
+      NUM_PREDICT: ${NUM_PREDICT:-1024}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-http://reranker:8080}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
+    depends_on:
+      - qdrant
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  reranker:
+    build:
+      context: ./reranker
+    gpus: all
+    volumes:
+      - reranker_modelos:/modelos
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
+  reranker_modelos:

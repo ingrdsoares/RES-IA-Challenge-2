@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 05 Nov 2026 22:49:50 GMT
+Content-Type: text/html;charset=UTF-8
+Content-Length: 34535
+Connection: keep-alive
+Age: 72
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Accept-Ranges: bytes
+

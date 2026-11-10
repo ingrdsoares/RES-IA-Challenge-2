@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+<title>Resolver de URN :: urn não encontrada</title>
+<link rel="stylesheet" type="text/css" href="http://www.lexml.gov.br/urn/css/estilos.css" />
+</head>
+<body>
+<br>
+<br>
+<center>
+<table border="0" class="grid" cellpadding="5px" cellspacing="5px" width="50%">
+<tr>
+<td align="center" valign="middle" nowrap>
+<img src="http://www.lexml.gov.br/busca/icons/default/logo3sf.gif" />
+</td>
+</tr>
+<tr>
+<td align="center" valign="middle" nowrap>
+<h3>
+O documento solicitado não pôde de ser encontrado, embora a urn informada possa ser válida.
+</h3>
+</td>
+</tr>
+<tr>
+<td align="center" valign="middle" nowrap>
+<h3>
+urn:lex:br:federal:lei:2003;99999
+</h3>
+</td>
+</tr>
+<tr>
+<td align="right" valign="middle" nowrap>
+<a href="/">Página Inicial</a>&nbsp;|&nbsp;<a href="javascript:history.back()">Página Anterior</a>
+</td>
+</tr>
+</table>
+</center>
+</body>
