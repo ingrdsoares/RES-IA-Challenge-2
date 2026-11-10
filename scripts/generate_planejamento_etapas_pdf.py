@@ -48,7 +48,6 @@ ETAPAS = [
             {
                 "t": "Migrar o motor fiscal de src/fiscal para backend",
                 "l": "etapa-1, backend, refactor",
-                "r": "Lucas",
                 "p": "Alta",
                 "d": "Mover calculator, models, repository e ingest de src/fiscal para um pacote dentro de backend/, mantendo as tabelas do Simples (30 faixas) e a base de CNAEs. Ajustar imports, o CI e os testes de raiz (test_fiscal.py).",
                 "c": [
@@ -61,7 +60,6 @@ ETAPAS = [
             {
                 "t": "Endpoint POST /fiscal/simular",
                 "l": "etapa-1, backend, feature",
-                "r": "Lucas",
                 "p": "Alta",
                 "d": "Expor o cálculo do Simples Nacional: recebe RBT12, CNAE e folha (opcional) e devolve alíquota efetiva, anexo aplicado, Fator R, tributos segregados e alerta de desenquadramento do MEI (limite de faturamento).",
                 "c": [
@@ -75,7 +73,6 @@ ETAPAS = [
             {
                 "t": "Modelo de dados do perfil da empresa (PostgreSQL)",
                 "l": "etapa-1, backend, dados",
-                "r": "Nasser (coordena), com Lucas e Clara",
                 "p": "Alta",
                 "d": "Criar o esquema da empresa: CNPJ, CNAE principal, município/UF, porte, regime e enquadramento, faturamento e folha. Cada campo registra a origem (informado pelo usuário ou consultado) e a data. Reaproveitar o que for útil do contrato SQL do refino.",
                 "c": [
@@ -88,7 +85,6 @@ ETAPAS = [
             {
                 "t": "API de cadastro e consulta da empresa",
                 "l": "etapa-1, backend, feature",
-                "r": "Lucas",
                 "p": "Alta",
                 "d": "Endpoints para criar, ler e atualizar o perfil da empresa, com validação de CNPJ e de CNAE contra a base. Preparar o vínculo com o usuário para a etapa 3.",
                 "c": [
@@ -101,7 +97,6 @@ ETAPAS = [
             {
                 "t": "Consulta de CNPJ com preenchimento manual como alternativa",
                 "l": "etapa-1, backend, integração",
-                "r": "Lucas",
                 "p": "Média",
                 "d": "Integrar uma fonte pública de consulta de CNPJ para pré-preencher o cadastro. Se a consulta estiver indisponível ou falhar, o fluxo manual continua funcionando. Verificar termos de uso e limites da fonte escolhida antes de integrar.",
                 "c": [
@@ -114,7 +109,6 @@ ETAPAS = [
             {
                 "t": "Orquestrar RAG e cálculo no assistente (plano em 3 passos)",
                 "l": "etapa-1, backend, ia",
-                "r": "Jhessica e Lucas",
                 "p": "Alta",
                 "d": "Estender /rag/query (ou criar /assistente/consultar) para receber o perfil da empresa, detectar quando há cálculo a fazer, chamar o motor fiscal e montar a resposta com norma citada, resultado do cálculo e plano em 3 etapas (RF07). Reaproveitar o extrator de entidades de src/rag.",
                 "c": [
@@ -128,7 +122,6 @@ ETAPAS = [
             {
                 "t": "Aposentar src/rag e consolidar os testes da raiz",
                 "l": "etapa-1, refactor, dívida-técnica",
-                "r": "Jhessica",
                 "p": "Média",
                 "d": "Portar para backend/ o que ainda vale do RAG antigo (extrator de entidades, prompts e testes de governança) e remover src/rag, o SQLite vetorial e os test_*.py soltos na raiz. Atualizar a documentação em docs/projeto/status-entregas-equipe.md.",
                 "c": [
@@ -141,7 +134,6 @@ ETAPAS = [
             {
                 "t": "Contrato de API versionado (OpenAPI) e padrão de erros",
                 "l": "etapa-1, backend, arquitetura",
-                "r": "Nasser",
                 "p": "Alta",
                 "d": "Definir o contrato dos serviços antes que o frontend dependa deles: prefixo e versionamento (/v1), formato único de erro, códigos HTTP, paginação e campos comuns. O contrato dos endpoints fiscais, de empresa e do assistente deve ser revisado por ele antes da implementação e mantido no OpenAPI.",
                 "c": [
@@ -173,7 +165,6 @@ ETAPAS = [
             {
                 "t": "Revisão independente do gabarito de avaliação",
                 "l": "etapa-2, avaliação, qualidade",
-                "r": "Jhessica (coordena); revisor externo com perfil contábil",
                 "p": "Alta",
                 "d": "Obter a revisão de uma pessoa que não escreveu as perguntas, preferencialmente com formação contábil/fiscal, sobre as perguntas, as referências e a classificação das respostas (correta, parcial, errada, recusa). Registrar divergências e quem revisou.",
                 "c": [
@@ -186,7 +177,6 @@ ETAPAS = [
             {
                 "t": "Congelar um conjunto de teste separado dos ajustes",
                 "l": "etapa-2, avaliação",
-                "r": "Jhessica",
                 "p": "Alta",
                 "d": "Separar um conjunto de validação que não será usado para ajustar prompts e parâmetros, versionado com hash. As 25 perguntas de desenvolvimento ficam só para ajuste.",
                 "c": [
@@ -199,7 +189,6 @@ ETAPAS = [
             {
                 "t": "Corrigir as respostas de q07, q13 e q20",
                 "l": "etapa-2, ia, bug",
-                "r": "Jhessica",
                 "p": "Alta",
                 "d": "q13 não cita o efeito retroativo do desenquadramento; q20 abre negando a continuidade do tratamento simplificado; q21 explica pior a não cumulatividade. Investigar recuperação, prompt e acervo e corrigir sem regredir as demais.",
                 "c": [
@@ -212,7 +201,6 @@ ETAPAS = [
             {
                 "t": "Guardrails em produção: aviso do CRC, fraude e abstenção",
                 "l": "etapa-2, ia, segurança",
-                "r": "Jhessica e Nasser",
                 "p": "Alta",
                 "d": "Garantir que toda resposta traga o aviso de que o produto não substitui contador, que pedidos de evasão ou fraude sejam recusados e que a falta de base resulte em abstenção. Portar os cenários de governança de src/rag para o backend atual.",
                 "c": [
@@ -225,7 +213,6 @@ ETAPAS = [
             {
                 "t": "Streaming da resposta",
                 "l": "etapa-2, backend, feature",
-                "r": "Lucas",
                 "p": "Média",
                 "d": "Entregar a resposta em fluxo (SSE ou equivalente) para reduzir a espera percebida. As fontes e o status devem chegar de forma consistente com a resposta completa.",
                 "c": [
@@ -238,7 +225,6 @@ ETAPAS = [
             {
                 "t": "Atender consultas simultâneas",
                 "l": "etapa-2, backend, desempenho",
-                "r": "Lucas",
                 "p": "Alta",
                 "d": "Hoje pedidos simultâneos recebem 503 e a execução exige um único worker. Introduzir fila ou limite de concorrência controlado e medir o impacto no Ollama ou no serviço de LLM escolhido.",
                 "c": [
@@ -251,7 +237,6 @@ ETAPAS = [
             {
                 "t": "Rodar a medição de qualidade no CI",
                 "l": "etapa-2, ci, avaliação",
-                "r": "Ingrid",
                 "p": "Média",
                 "d": "Executar uma verificação de qualidade (conjunto reduzido e determinístico) a cada mudança em prompts, recuperação ou acervo, falhando o CI se houver queda além de um limite acordado.",
                 "c": [
@@ -264,7 +249,6 @@ ETAPAS = [
             {
                 "t": "Testes adversariais: injeção de prompt e vazamento de contexto",
                 "l": "etapa-2, segurança, ia",
-                "r": "Nasser",
                 "p": "Alta",
                 "d": "Criar um conjunto de ataques ao assistente: instruções escondidas em perguntas, pedidos para ignorar regras, tentativa de obter o prompt do sistema ou dados de outra empresa, e conteúdo malicioso vindo de documentos do acervo. Medir e corrigir as falhas.",
                 "c": [
@@ -294,7 +278,6 @@ ETAPAS = [
             {
                 "t": "Decidir stack do frontend e método de autenticação (ADR)",
                 "l": "etapa-3, decisão, arquitetura",
-                "r": "Clara e Nasser",
                 "p": "Alta",
                 "d": "Registrar em um documento de decisão a stack (sugestão a avaliar: React ou Next.js), o método de autenticação (e-mail e senha, login social ou provedor externo) e como o token chega à API. Definir também quem será responsável pelo frontend.",
                 "c": [
@@ -307,7 +290,6 @@ ETAPAS = [
             {
                 "t": "Estrutura inicial do frontend e cliente da API",
                 "l": "etapa-3, frontend, infra",
-                "r": "A definir",
                 "p": "Alta",
                 "d": "Criar o projeto do frontend, rotas das 8 telas, navegação, tema e um cliente tipado gerado a partir do OpenAPI da API. Incluir lint, testes e build no CI.",
                 "c": [
@@ -320,7 +302,6 @@ ETAPAS = [
             {
                 "t": "Autenticação e tela de Acesso (01)",
                 "l": "etapa-3, frontend, backend, segurança",
-                "r": "Nasser (backend e segurança) e frontend a definir",
                 "p": "Alta",
                 "d": "Implementar login conforme a decisão do ADR, sessão com permissões da conta, redirecionamento (com empresa para a Visão geral; sem empresa para o Cadastro), erros junto ao formulário e estado de envio.",
                 "c": [
@@ -333,7 +314,6 @@ ETAPAS = [
             {
                 "t": "Tela de Cadastro da empresa (02)",
                 "l": "etapa-3, frontend, feature",
-                "r": "A definir",
                 "p": "Alta",
                 "d": "Formulário de CNPJ com consulta, conferência dos dados, CNAE, município/UF, porte e regime, com marcação de origem de cada campo e preenchimento manual se a consulta falhar.",
                 "c": [
@@ -346,7 +326,6 @@ ETAPAS = [
             {
                 "t": "Tela do Assistente fiscal (04)",
                 "l": "etapa-3, frontend, feature",
-                "r": "A definir",
                 "p": "Alta",
                 "d": "Conversa com o assistente, confirmação do contexto da empresa, exibição do plano em 3 passos, das fontes citadas e do aviso de que não substitui contador. Consumir o streaming quando disponível.",
                 "c": [
@@ -359,7 +338,6 @@ ETAPAS = [
             {
                 "t": "Tela de Visão geral (03)",
                 "l": "etapa-3, frontend, feature",
-                "r": "A definir",
                 "p": "Média",
                 "d": "Resumo da empresa, indicadores fiscais (alíquota efetiva, regime, Fator R) e próximas ações, usando o endpoint de simulação e o perfil.",
                 "c": [
@@ -371,7 +349,6 @@ ETAPAS = [
             {
                 "t": "Tarefas (06): modelo, API e tela",
                 "l": "etapa-3, frontend, backend, feature",
-                "r": "Lucas (API) e frontend a definir",
                 "p": "Média",
                 "d": "Persistir as ações recomendadas pelo assistente como tarefas da empresa (pendente, concluída), permitindo registrar a conclusão. Definir quando uma recomendação vira tarefa.",
                 "c": [
@@ -384,7 +361,6 @@ ETAPAS = [
             {
                 "t": "Perfil da empresa (07)",
                 "l": "etapa-3, frontend, feature",
-                "r": "A definir",
                 "p": "Baixa",
                 "d": "Tela para revisar e editar os dados da empresa, mostrando a origem e a data de cada um, e recalculando indicadores ao salvar.",
                 "c": ["Edição com validação", "Origem e data de cada dado visíveis"],
@@ -393,7 +369,6 @@ ETAPAS = [
             {
                 "t": "Situação fiscal (05)",
                 "l": "etapa-3, frontend, backend, feature",
-                "r": "A definir, com Lucas",
                 "p": "Baixa",
                 "d": "Indicadores, consultas e evidências da situação fiscal. Definir antes quais consultas públicas entram no MVP (o acervo contém regularização Receita/PGFN) e como as evidências são apresentadas.",
                 "c": [
@@ -406,7 +381,6 @@ ETAPAS = [
             {
                 "t": "Biblioteca de normas (08)",
                 "l": "etapa-3, frontend, backend, feature",
-                "r": "A definir, com Jhessica",
                 "p": "Média",
                 "d": "Navegação de leis e normas por assunto, reaproveitando o acervo e seus metadados. Exige endpoints de listagem e leitura de documentos, hoje inexistentes na API.",
                 "c": [
@@ -419,7 +393,6 @@ ETAPAS = [
             {
                 "t": "Autorização e isolamento de dados entre empresas",
                 "l": "etapa-3, backend, segurança, arquitetura",
-                "r": "Nasser",
                 "p": "Alta",
                 "d": "Definir e implementar o modelo de permissões: cada usuário só acessa a(s) própria(s) empresa(s), em todos os endpoints e no contexto enviado ao assistente. Decidir se uma conta pode ter mais de uma empresa e se há papéis (dono, contador convidado).",
                 "c": [
@@ -433,7 +406,6 @@ ETAPAS = [
             {
                 "t": "Atualizar o diagrama de arquitetura com os serviços reais",
                 "l": "etapa-3, documentação, arquitetura",
-                "r": "Nasser e Clara",
                 "p": "Média",
                 "d": "O diagrama atual (docs/arquitetura/diagramas) é alvo de projeto. Atualizá-lo com o que for decidido e construído: frontend, API única, PostgreSQL, Qdrant, serviço de LLM, autenticação e fluxo de dados do assistente, marcando o que cruza a fronteira ética e de LGPD.",
                 "c": [
@@ -463,7 +435,6 @@ ETAPAS = [
             {
                 "t": "Decidir a hospedagem do LLM e do embedding (ADR com custo)",
                 "l": "etapa-4, decisão, infra",
-                "r": "Clara, Nasser e Ingrid",
                 "p": "Alta",
                 "d": "Comparar servidor próprio com GPU, serviço gerenciado e API de LLM de terceiros quanto a custo mensal, latência, privacidade dos dados da empresa e esforço. É a decisão que mais impacta a arquitetura, e deve ser tomada cedo.",
                 "c": [
@@ -476,7 +447,6 @@ ETAPAS = [
             {
                 "t": "Containerização completa e Compose de produção",
                 "l": "etapa-4, infra, devops",
-                "r": "Ingrid",
                 "p": "Alta",
                 "d": "Imagens para API e frontend, serviços de Qdrant e PostgreSQL com volumes e backup, variáveis por ambiente e healthchecks. Remover a dependência de host.docker.internal para o modelo.",
                 "c": [
@@ -489,7 +459,6 @@ ETAPAS = [
             {
                 "t": "CI: build de imagens e testes de integração com Qdrant",
                 "l": "etapa-4, ci, devops",
-                "r": "Ingrid",
                 "p": "Alta",
                 "d": "Ampliar o CI com build das imagens, execução de testes de integração com Qdrant e Postgres em serviço e cache de dependências.",
                 "c": [
@@ -502,7 +471,6 @@ ETAPAS = [
             {
                 "t": "CD: deploy automatizado em staging e produção",
                 "l": "etapa-4, cd, devops",
-                "r": "Ingrid",
                 "p": "Alta",
                 "d": "Pipeline que publica imagens versionadas, implanta em staging a cada merge na main e em produção por aprovação, com forma de reverter.",
                 "c": [
@@ -515,7 +483,6 @@ ETAPAS = [
             {
                 "t": "Segurança da API: limite de uso, segredos, CORS e cabeçalhos",
                 "l": "etapa-4, segurança, backend",
-                "r": "Nasser, Lucas e Ingrid",
                 "p": "Alta",
                 "d": "Limitar requisições por usuário e por IP, gerenciar segredos fora do repositório, restringir CORS ao frontend, validar entradas e proteger contra abuso do endpoint de IA, que é caro de executar.",
                 "c": [
@@ -528,7 +495,6 @@ ETAPAS = [
             {
                 "t": "Conformidade com a LGPD",
                 "l": "etapa-4, lgpd, segurança",
-                "r": "Nasser (coordena) e Clara",
                 "p": "Alta",
                 "d": "CNPJ, faturamento e folha são dados da empresa e, em MEI, podem identificar uma pessoa. Definir base legal, política de privacidade, retenção, exclusão de conta e dados, e que dados chegam aos logs e a provedores externos de LLM.",
                 "c": [
@@ -542,7 +508,6 @@ ETAPAS = [
             {
                 "t": "Observabilidade: logs, métricas e alertas",
                 "l": "etapa-4, observabilidade, devops",
-                "r": "Ingrid",
                 "p": "Média",
                 "d": "Logs estruturados com identificador de requisição; métricas de latência por etapa (busca, geração), taxa de abstenção, erros e uso de GPU; alertas para indisponibilidade de Qdrant ou do modelo.",
                 "c": [
@@ -555,7 +520,6 @@ ETAPAS = [
             {
                 "t": "Feedback do usuário por resposta",
                 "l": "etapa-4, produto, backend",
-                "r": "Lucas, com frontend a definir",
                 "p": "Média",
                 "d": "Permitir marcar uma resposta como útil ou incorreta, com comentário opcional, ligada à pergunta, às fontes e à versão do acervo e do modelo, para alimentar a revisão de qualidade.",
                 "c": [
@@ -567,7 +531,6 @@ ETAPAS = [
             {
                 "t": "Pipeline de atualização do acervo",
                 "l": "etapa-4, dados, devops",
-                "r": "Lucas e Jhessica",
                 "p": "Média",
                 "d": "Rotina periódica para recoletar fontes, detectar normas alteradas, reprocessar o refino, reindexar no Qdrant e reavaliar a qualidade antes de promover a nova coleção. Manter a coleção anterior para voltar atrás.",
                 "c": [
@@ -581,7 +544,6 @@ ETAPAS = [
             {
                 "t": "Backup e restauração de Qdrant e PostgreSQL",
                 "l": "etapa-4, infra, confiabilidade",
-                "r": "Ingrid",
                 "p": "Média",
                 "d": "Rotina de backup dos dados do usuário e da coleção, com teste de restauração. O README atual já alerta para não remover o volume do Qdrant.",
                 "c": [
@@ -593,7 +555,6 @@ ETAPAS = [
             {
                 "t": "Teste de carga e dimensionamento",
                 "l": "etapa-4, desempenho, qualidade",
-                "r": "Lucas e Ingrid",
                 "p": "Média",
                 "d": "Simular usuários simultâneos no assistente para medir latência, taxa de erro e consumo, e definir o tamanho da infraestrutura e o número esperado de usuários no lançamento.",
                 "c": [
@@ -606,7 +567,6 @@ ETAPAS = [
             {
                 "t": "Modelagem de ameaças do sistema",
                 "l": "etapa-4, segurança, arquitetura",
-                "r": "Nasser",
                 "p": "Alta",
                 "d": "Mapear ativos (dados da empresa, acervo, chaves), pontos de entrada, fronteiras de confiança e ameaças (por exemplo, método STRIDE), com a mitigação e o responsável de cada risco. Cobre ainda a cadeia do acervo: um documento coletado alterado pode envenenar as respostas.",
                 "c": [
@@ -619,7 +579,6 @@ ETAPAS = [
             {
                 "t": "Plano de resposta a incidentes e de continuidade",
                 "l": "etapa-4, segurança, operação",
-                "r": "Nasser e Ingrid",
                 "p": "Média",
                 "d": "Definir o que fazer se houver vazamento de dados, resposta fiscal errada com impacto, indisponibilidade do modelo ou acervo corrompido: quem decide, como comunicar usuários, como desligar o assistente de forma segura e como voltar à coleção anterior.",
                 "c": [
@@ -657,7 +616,7 @@ def bloco_issue(etapa, i, issue, st):
     meta = Table(
         [
             [
-                Paragraph(f"<b>Responsável sugerido:</b> {esc(issue['r'])}", st["lbl"]),
+                Paragraph("<b>Quem assume:</b> a definir (atribuir no GitHub)", st["lbl"]),
                 Paragraph(f"<b>Prioridade:</b> {issue['p']}", st["lbl"]),
             ],
             [
@@ -727,17 +686,16 @@ def gerar(etapa):
         Paragraph(esc(etapa["saida"]), st["txt"]),
         Paragraph("Resumo das issues", st["h1"]),
     ]
-    linhas = [["ID", "Issue", "Prioridade", "Responsável sugerido"]]
+    linhas = [["ID", "Issue", "Prioridade"]]
     for i, iss in enumerate(etapa["issues"], 1):
         linhas.append(
             [
                 f"E{etapa['n']}.{i}",
                 Paragraph(esc(iss["t"]), st["lbl"]),
                 iss["p"],
-                Paragraph(esc(iss["r"]), st["lbl"]),
             ]
         )
-    tab = Table(linhas, colWidths=[1.5 * cm, 8.3 * cm, 2.2 * cm, 5.0 * cm], repeatRows=1)
+    tab = Table(linhas, colWidths=[1.6 * cm, 12.2 * cm, 3.2 * cm], repeatRows=1)
     tab.setStyle(
         TableStyle(
             [
@@ -757,7 +715,7 @@ def gerar(etapa):
         Paragraph(
             "Cada issue abaixo está escrita para ser copiada ao GitHub: o título da seção vira o título da issue; "
             "os rótulos indicados devem ser criados no repositório; a descrição e os critérios de aceite vão no corpo. "
-            "Responsáveis e prioridades são sugestões e devem ser confirmados pela equipe.",
+            "Não há responsável fixo: quem pegar a tarefa se atribui no GitHub. As prioridades são sugestões e devem ser confirmadas pela equipe.",
             st["pq"],
         )
     )
