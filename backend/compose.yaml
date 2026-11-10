@@ -1,6 +1,92 @@
 name: socio-digital
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: socio_digital
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sd_local}
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d socio_digital']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    command: [redis-server, --appendonly, "yes"]
+
+  storage:
+    image: chrislusf/seaweedfs:4.53
+    command: [mini, -dir=/data]
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-sd_local_user}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-sd_local_password}
+    ports:
+      - "127.0.0.1:9000:8333"
+    volumes:
+      - storage_data:/data
+
+  worker:
+    build: ./api
+    command: [python, -m, app.jobs.worker]
+    environment: &worker_environment
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-sd_local}@postgres:5432/socio_digital
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://storage:8333
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-sd_local_user}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-sd_local_password}
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000"]}'
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
+      GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
+      TOP_K: ${TOP_K:-8}
+      SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
+      QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      NUM_CTX: ${NUM_CTX:-8192}
+      NUM_PREDICT: ${NUM_PREDICT:-1024}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage:
+        condition: service_started
+    restart: unless-stopped
+
+  dispatcher:
+    build: ./api
+    command: [python, -m, app.jobs.outbox]
+    environment: *worker_environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
   qdrant:
     image: qdrant/qdrant:v1.15.1
     ports:
@@ -17,6 +103,14 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-sd_local}@postgres:5432/socio_digital
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://storage:8333
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-sd_local_user}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-sd_local_password}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000"]}'
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
@@ -30,10 +124,15 @@ services:
       NUM_CTX: ${NUM_CTX:-8192}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
       MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
-      RERANKER_URL: ${RERANKER_URL:-http://reranker:8080}
+      RERANKER_URL: ${RERANKER_URL:-}
       RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
     depends_on:
-      - qdrant
+      qdrant:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
       interval: 10s
@@ -43,6 +142,7 @@ services:
     restart: unless-stopped
 
   reranker:
+    profiles: [gpu]
     build:
       context: ./reranker
     gpus: all
@@ -51,5 +151,8 @@ services:
     restart: unless-stopped
 
 volumes:
+  storage_data:
+  postgres_data:
+  redis_data:
   qdrant_data:
   reranker_modelos:

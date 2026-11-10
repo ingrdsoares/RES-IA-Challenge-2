@@ -381,7 +381,9 @@ class DocumentBuilder:
 
 
 def generate_document():
-    pdf_path = Path("/Users/aluno2/RES-IA-Challenge-2/docs/entrega/status-entregas-equipe-grupo-08.pdf")
+    pdf_path = Path(
+        "/Users/aluno2/RES-IA-Challenge-2/docs/entrega/status-entregas-equipe-grupo-08.pdf"
+    )
     doc = DocumentBuilder(str(pdf_path))
 
     # ========================================================

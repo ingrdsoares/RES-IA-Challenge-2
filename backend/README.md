@@ -1,8 +1,10 @@
 # Backend — Sócio Digital
 
-API FastAPI de consulta RAG com Qdrant persistente e Qwen servido pelo Ollama local.
-A coleção nasce vazia. A alimentação será feita posteriormente pelo responsável pelos dados;
-esta entrega não contém ingestão, seed ou endpoint de escrita de documentos.
+Backend modular FastAPI com autenticação própria, perfis de empresa, chat persistido,
+biblioteca de normas, evidências privadas, tarefas e motor fiscal versionado.
+PostgreSQL, Redis, armazenamento S3 e Qdrant rodam no Compose; Qwen é servido pelo
+Ollama local. Normas entram por CLI administrativa, sem seed automático. Regras
+tributárias reais precisam de revisão humana registrada antes de serem habilitadas.
 
 ## Execução no Mac
 
@@ -25,8 +27,11 @@ Na raiz do repositório:
 
 ```bash
 cp backend/.env.example backend/.env
-docker compose -f backend/compose.yaml up -d --build
-docker compose -f backend/compose.yaml logs -f api
+docker compose --env-file backend/.env -f backend/compose.yaml build api worker dispatcher
+docker compose --env-file backend/.env -f backend/compose.yaml up -d postgres redis storage qdrant
+docker compose --env-file backend/.env -f backend/compose.yaml run --rm api alembic upgrade head
+docker compose --env-file backend/.env -f backend/compose.yaml up -d api worker dispatcher
+docker compose --env-file backend/.env -f backend/compose.yaml logs -f api
 ```
 
 Serviços:
@@ -35,6 +40,7 @@ Serviços:
 | --- | --- |
 | API / Swagger | http://localhost:8000/docs |
 | Qdrant / dashboard | http://localhost:6333/dashboard |
+| S3 local | http://localhost:9000 |
 | Ollama no host | http://localhost:11434 |
 
 Dentro do container a API acessa Ollama em `host.docker.internal:11434`.
@@ -76,7 +82,12 @@ Ollama em `localhost:11434`. Para carregar um arquivo, passe `--env-file ../.env
 ao Uvicorn e altere `OLLAMA_URL` desse arquivo para `http://localhost:11434`.
 O arquivo `.env` não é carregado implicitamente pelo código da aplicação.
 
-## Endpoints
+## Endpoints legados de RAG
+
+`/rag/query` exige sessão e CSRF. Os exemplos de consulta abaixo devem receber
+os cookies e `Origin`/`X-CSRF-Token` obtidos pelo fluxo de autenticação descrito
+em Contas e sessões; `/health` e `/ready` permanecem públicos.
+
 
 ```bash
 curl http://localhost:8000/health
@@ -291,3 +302,208 @@ python -m backend.crawler.legislacao --source lc116
 ## Refino da base
 
 A camada [refino](refino/README.md) organiza documentos/versões/conteúdos, mantém proveniência e separa datasets. O perfil padrão cobre todos os regimes com foco DF. Consulte a [arquitetura](../docs/arquitetura/arquitetura-refino.md) e o [handoff para outros agentes](../handoff/refino/CONTINUAR.md). Originais preservados; PostgreSQL ainda não importado.
+
+## Contas e sessões do MVP
+
+O RAG agora exige sessão. Execute PostgreSQL e Redis e aplique a migração antes
+de cadastrar contas:
+
+```bash
+docker compose -f backend/compose.yaml up -d postgres redis
+docker compose -f backend/compose.yaml run --rm api alembic upgrade head
+```
+
+Faça rebuild da imagem após atualizar o código. Na execução nativa:
+`python -m alembic -c backend/api/alembic.ini upgrade head`.
+
+Obtenha `GET /auth/csrf`, preserve os cookies e envie `Origin` e
+`X-CSRF-Token` nas requisições mutáveis, inclusive cadastro e login.
+`POST /auth/register` e `/auth/login` recebem `email` e `password` (12–128
+caracteres); cadastro cria sessão imediatamente. Após login/cadastro, obtenha
+novamente o token CSRF, pois a sessão o rotaciona. `GET /auth/session` retorna
+identidade; `POST /auth/logout` revoga a sessão. Cookies expiram em 24 horas.
+
+HTTPS e `COOKIE_SECURE=true` são necessários fora do ambiente local.
+`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. Não existem
+confirmação de e-mail ou recuperação de senha nesta etapa.
+
+Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
+na porta 16379, em containers separados. Essa base é recriada por teste;
+nunca aponte esse ambiente para dados da aplicação.
+
+## Jobs e armazenamento S3 local
+
+O serviço `storage` usa SeaweedFS 4.53 (compatível com S3). A proposta inicial
+MinIO foi substituída porque as imagens oficiais não estão disponíveis publicamente.
+O contrato da aplicação continua usando boto3 e pode apontar para outro S3.
+
+Depois das migrações, inicie `storage`, `worker` e `dispatcher`. Inicialize os buckets
+privados uma vez com `ObjectStorage.initialize()`; a rotina administrativa de ingestão
+será responsável por isso no fluxo seguinte. Originais jurídicos e anexos usam buckets
+separados. URLs assinadas duram cinco minutos, e sua emissão deve ocorrer depois da
+autorização do recurso.
+
+`GET /operacoes/{id}` permite acompanhar somente operações da própria conta.
+A operação no PostgreSQL é a outbox: o dispatcher encaminha apenas seu UUID ao RQ.
+Após falha, até três tentativas são permitidas. Operações pendentes despachadas há mais
+de quinze minutos podem ser reenfileiradas; handlers devem manter efeitos transacionais
+no banco e usar chaves imutáveis/idempotentes para efeitos em S3 e Qdrant.
+
+Referências de implementação: [sessões SQLAlchemy](https://docs.sqlalchemy.org/en/21/orm/session_basics.html),
+[Argon2](https://argon2-cffi.readthedocs.io/en/stable/howto.html),
+[RQ](https://python-rq.org/docs/),
+[URLs S3 assinadas](https://docs.aws.amazon.com/boto3/latest/guide/s3-presigned-urls.html)
+e [SeaweedFS S3](https://github.com/seaweedfs/seaweedfs/wiki/Amazon-S3-API).
+
+## Ingestão administrativa de normas versionadas
+
+Aplique as migrações e inicie storage, dispatcher e worker. Na pasta `backend/api`,
+com as variáveis de ambiente configuradas:
+
+```bash
+python -m app.legal.cli ingest --file /caminho/norma.md --metadata /caminho/metadata.json --key lei123-v1
+```
+
+Metadados mínimos (exemplo de teste, não uma norma fiscal):
+
+```json
+{"document_key":"lei-teste","title":"Lei de teste","official_url":"https://example.org/lei","version_label":"v1","authority":"Teste","norm_type":"lei","jurisdiction":"BR","subjects":["MEI"]}
+```
+
+`effective_from` e `effective_to` são datas ISO opcionais. Vigência desconhecida
+não equivale a vigência atual. O comando imprime o UUID da versão e agenda o job.
+Recebe HTML, Markdown ou PDF textual até 20 MiB. PDFs sem texto exigem tratamento
+manual. Original e JSON permanecem no bucket; o catálogo fica no PostgreSQL e os
+vetores em `legal_versions_v1`, separada da coleção RAG existente.
+
+O worker usa o embedding configurado, sem baixar modelos. Repetir chave e conteúdo
+não duplica a operação. Alterar conteúdo ou metadados de uma versão existente gera
+conflito; forneça nova identificação de versão. Publicação ocorre apenas após
+normalização, escrita do JSON e indexação. Falhas após três tentativas marcam a
+versão como falha. O comando idempotente com nova chave pode agendar uma recuperação.
+
+## Biblioteca e leitor
+
+Com sessão válida, `GET /normas` retorna catálogo paginado sem baixar documentos.
+Filtros: `q`, `subject` (assunto exato), `norm_type`, `authority`, `effective_on`,
+`limit` e `cursor`. A busca textual usa título, identificador e índice de termos
+no PostgreSQL. Após atualizar instalações com versões já publicadas sem índice
+textual, prepare reindexação administrativa antes de esperar busca pelo corpo;
+a migração não baixa nem reprocessa objetos automaticamente.
+
+`GET /normas/{document_id}/versoes/{version_id}` abre o leitor.
+`GET /citacoes/resolver?document_id=...&version_id=...&anchor_id=...` resolve citações.
+A resposta contém metadados, URLs temporárias e estado `exact`, `anchor_unavailable`
+ou `version_unavailable`. Nunca substitui automaticamente uma versão histórica pela
+atual. O CORS do bucket jurídico permite GET/HEAD somente para `ALLOWED_ORIGINS`.
+
+## Conversas por empresa
+
+`POST /empresas/{id}/conversas` cria uma conversa; GET na mesma rota lista as
+conversas da empresa. `GET /conversas/{id}` recupera o cabeçalho e GET
+`/conversas/{id}/mensagens` recupera o histórico. A empresa da conversa é fixa.
+
+Envie `POST /conversas/{id}/mensagens` com `Idempotency-Key`, cookies e CSRF:
+`{"text":"Como funciona o MEI?"}`. HTTP 202 retorna `operation_id`, `status_url`
+e estado. Reenvio idêntico com a mesma chave recupera a operação; conteúdo diferente
+retorna 409. Contexto ambíguo retorna `awaiting_data` com `missing_fields`.
+
+Para confirmar a competência solicitada, envie uma nova chave idempotente e
+`{"text":"Confirmo outubro de 2026","confirmation_for":"UUID_DA_OPERACAO","confirmation":{"period":"2026-10"}}`.
+A confirmação retoma a operação original e preserva o perfil cadastrado. O histórico
+mantém as mensagens de confirmação e o snapshot utilizado em cada solicitação.
+
+## Respostas do assistente
+
+O worker recupera trechos em `legal_versions_v1`, aplica limiar de similaridade e
+vigência e confere novamente documento, versão publicada e âncora no catálogo.
+A competência informada usa seu primeiro dia como referência de recuperação;
+sem competência, usa a data atual. `reference_date` identifica essa escolha em
+cada citação. Isso não define critérios de apuração do motor fiscal.
+
+As respostas persistem citações estruturadas e até três próximos passos. Eles não
+criam tarefas automaticamente. Sem contexto suficiente, o worker registra abstenção
+sem chamar o gerador. Falha de geração ou citação inválida não publica resposta parcial.
+Mensagens da mesma conversa aguardam processamento das anteriores; espera não
+consome as três tentativas reservadas para falhas.
+
+O formato enviado ao modelo usa gramática JSON simplificada para compatibilidade
+com o servidor local; o backend valida integralmente os limites de resposta depois.
+Para testar a geração real com documento sintético e índice em memória:
+
+```bash
+OLLAMA_TEST_URL=http://localhost:11434 .venv/bin/python -m pytest backend/api/tests/mvp/test_assistant.py::test_real_ollama_structured_response -q
+```
+
+Esse teste usa o PostgreSQL e Redis isolados dos demais testes MVP e não altera a
+coleção Qdrant da aplicação. Não é uma avaliação de corretude tributária.
+
+## Evidências, painel e tarefas
+
+Cadastre obrigações manualmente em POST `/empresas/{id}/obrigacoes` com `name`,
+`period` e `due_date` opcional. POST `/empresas/{id}/evidencias` recebe `kind`
+(guide/payment/declaration/certificate/registration/other), `scope`
+(registration/federal_certificate/obligations), competência, validade e vínculo de
+obrigação opcionais. Use `Idempotency-Key`, sessão e CSRF. A origem é sempre declarada.
+
+PUT `/evidencias/{id}/arquivo` recebe bytes PDF/PNG/JPEG até 10 MiB, com Content-Type.
+Valida assinatura, tamanho e propriedade antes de registrar o anexo; não extrai
+nem confirma o conteúdo. O anexo é imutável. GET na mesma rota emite URL temporária
+somente após autorização. O arquivo permanece fora do índice jurídico.
+
+GET `/empresas/{id}/situacao-fiscal` separa cadastro, certidão federal e obrigações,
+mostrando ausência, declaração ou evidência vencida. Verificação oficial permanece
+`unverified`, inclusive para pagamentos declarados. A cobertura é parcial.
+
+POST/GET `/empresas/{id}/tarefas`, GET/PATCH `/tarefas/{id}` e GET do histórico
+permitem organizar ações. PATCH recebe `completed` e chave idempotente; concluir ou
+reabrir não altera situação fiscal. Para transformar um próximo passo em tarefa,
+envie `source_message_id` e `source_step_index` (0–2) explicitamente. O backend
+valida a empresa da mensagem e evita duplicar a tarefa do mesmo passo.
+Listagens aceitam `limit` e `cursor`; tarefas também filtram por `completed`.
+
+## Registro de regras fiscais
+
+POST `/empresas/{id}/calculos` recebe `kind` (`mei`/`simples`) e `period` (`YYYY-MM`).
+Valores monetários são strings decimais. O cálculo fica auditável em GET `/calculos/{id}`,
+com regra, referências, entradas e snapshot da empresa. Sem regra revisada, retorna
+`rule_unavailable` e nenhum valor calculado.
+
+A administração ocorre por CLI, na pasta backend/api: `python -m app.fiscal.cli import --file regra.json`.
+Importação sempre cria draft; não transforma tabelas legadas em regras aprovadas.
+Uma revisão humana registrada usa `python -m app.fiscal.cli review --id UUID --reviewer NOME --evidence REFERENCIA_DA_REVISAO`.
+Nenhuma regra tributária real revisada acompanha a aplicação. Testes usam parâmetros
+sintéticos, que não devem ser usados para orientação ou apuração tributária.
+
+Os simuladores usam Decimal, parâmetros explícitos e arredondamento HALF_UP registrado
+na regra. O Fator R é comparado sem arredondamento prévio; alíquota efetiva usa a
+precisão explícita da regra. Repartições preservam a soma em centavos, alocando resíduo
+na maior participação (desempate pelo nome). Cenários especiais e RBT12 zero exigem
+regra específica e retornam limitação, sem extrapolar faixas.
+
+No chat, cálculos usam o campo estruturado `calculation` da mensagem, por exemplo:
+`{"text":"Simular","calculation":{"kind":"mei","period":"2026-10","activity":"services","conditions_confirmed":true}}`.
+O resultado é produzido e explicado deterministicamente, preserva o snapshot da
+solicitação e não depende de o LLM fazer contas. Dados ausentes retornam `missing_inputs`;
+casos fora da cobertura retornam `unsupported_case`. Nenhuma tabela sintética é seed
+ou regra habilitada por padrão. Uma revisão identificada é condição para habilitar
+parâmetros reais, e o mecanismo não certifica a qualificação do revisor.
+
+
+## Escopo territorial e execução
+
+Metadados de ingestão aceitam `jurisdiction: "BR"` para norma nacional ou `"BR-DF"`
+(padrão BR-UF) para norma estadual/distrital. Escopo desconhecido permanece legível
+na biblioteca, mas não é usado pelo assistente. A recuperação filtra o estado do
+perfil e revalida escopo e vigência no catálogo. Normas municipais sem mapeamento
+territorial ficam fora da recuperação automática nesta versão.
+
+O reranker NVIDIA é opcional: habilite o profile `gpu` e configure `RERANKER_URL`
+explicitamente para utilizá-lo. Com URL vazia, API e worker operam sem esse serviço.
+Em execução nativa por HTTP, configure `COOKIE_SECURE=false` e origens permitidas;
+as CLIs leem variáveis exportadas, sem carregar `.env` implicitamente.
+
+Os testes de ponta a ponta são opt-in: `MVP_TEST_URL`, `MVP_DATABASE_URL` e
+`MVP_S3_URL` devem apontar para uma stack **isolada de teste**. Eles criam somente
+contas e documentos sintéticos. A avaliação fiscal profissional e o deploy público
+não fazem parte dessa validação.

@@ -42,6 +42,22 @@ jobs:
   test:
     name: Testes Unitarios e Integracao (Pytest)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: sd_test_local
+          POSTGRES_DB: sd_test
+        ports: ['15432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sd_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['16379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
     steps:
       - name: Checkout do Repositorio
         uses: actions/checkout@v4
@@ -58,6 +74,19 @@ jobs:
           pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
           pip install -r backend/api/requirements-eval.txt
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Iniciar S3 isolado para testes do MVP
+        run: |
+          docker run -d --name sd-mvp-test-s3 \
+            -e AWS_ACCESS_KEY_ID=sd_test_user \
+            -e AWS_SECRET_ACCESS_KEY=sd_test_password \
+            -p 127.0.0.1:19000:8333 chrislusf/seaweedfs:4.53 mini -dir=/data
+          for attempt in {1..30}; do
+            if curl --silent --output /dev/null http://localhost:19000; then exit 0; fi
+            sleep 1
+          done
+          docker logs sd-mvp-test-s3
+          exit 1
 
       - name: Executar Pytest
         env:

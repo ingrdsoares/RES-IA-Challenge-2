@@ -596,14 +596,30 @@ ETAPAS = [
 def estilos():
     base = getSampleStyleSheet()
     return {
-        "capa": ParagraphStyle("capa", parent=base["Title"], fontSize=26, leading=30, textColor=AZUL, alignment=TA_LEFT),
-        "sub": ParagraphStyle("sub", parent=base["Normal"], fontSize=12, leading=16, textColor=CINZA),
-        "h1": ParagraphStyle("h1", parent=base["Heading1"], fontSize=15, textColor=AZUL, spaceBefore=14, spaceAfter=6),
+        "capa": ParagraphStyle(
+            "capa", parent=base["Title"], fontSize=26, leading=30, textColor=AZUL, alignment=TA_LEFT
+        ),
+        "sub": ParagraphStyle(
+            "sub", parent=base["Normal"], fontSize=12, leading=16, textColor=CINZA
+        ),
+        "h1": ParagraphStyle(
+            "h1", parent=base["Heading1"], fontSize=15, textColor=AZUL, spaceBefore=14, spaceAfter=6
+        ),
         "txt": ParagraphStyle("txt", parent=base["Normal"], fontSize=10, leading=14),
         "pq": ParagraphStyle("pq", parent=base["Normal"], fontSize=9, leading=12, textColor=CINZA),
-        "it": ParagraphStyle("it", parent=base["Normal"], fontSize=10, leading=14, leftIndent=12, bulletIndent=2),
-        "it_t": ParagraphStyle("it_t", parent=base["Heading2"], fontSize=12, leading=15, spaceAfter=2),
-        "lbl": ParagraphStyle("lbl", parent=base["Normal"], fontSize=9, leading=12, textColor=colors.HexColor("#0f172a")),
+        "it": ParagraphStyle(
+            "it", parent=base["Normal"], fontSize=10, leading=14, leftIndent=12, bulletIndent=2
+        ),
+        "it_t": ParagraphStyle(
+            "it_t", parent=base["Heading2"], fontSize=12, leading=15, spaceAfter=2
+        ),
+        "lbl": ParagraphStyle(
+            "lbl",
+            parent=base["Normal"],
+            fontSize=9,
+            leading=12,
+            textColor=colors.HexColor("#0f172a"),
+        ),
     }
 
 
