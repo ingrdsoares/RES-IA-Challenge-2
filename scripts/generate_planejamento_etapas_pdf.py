@@ -75,7 +75,7 @@ ETAPAS = [
             {
                 "t": "Modelo de dados do perfil da empresa (PostgreSQL)",
                 "l": "etapa-1, backend, dados",
-                "r": "Lucas, com Clara e Nasser",
+                "r": "Nasser (coordena), com Lucas e Clara",
                 "p": "Alta",
                 "d": "Criar o esquema da empresa: CNPJ, CNAE principal, município/UF, porte, regime e enquadramento, faturamento e folha. Cada campo registra a origem (informado pelo usuário ou consultado) e a data. Reaproveitar o que for útil do contrato SQL do refino.",
                 "c": [
@@ -138,6 +138,20 @@ ETAPAS = [
                 ],
                 "dep": "Orquestração do assistente",
             },
+            {
+                "t": "Contrato de API versionado (OpenAPI) e padrão de erros",
+                "l": "etapa-1, backend, arquitetura",
+                "r": "Nasser",
+                "p": "Alta",
+                "d": "Definir o contrato dos serviços antes que o frontend dependa deles: prefixo e versionamento (/v1), formato único de erro, códigos HTTP, paginação e campos comuns. O contrato dos endpoints fiscais, de empresa e do assistente deve ser revisado por ele antes da implementação e mantido no OpenAPI.",
+                "c": [
+                    "Guia de contrato publicado no repositório",
+                    "Formato de erro único adotado pelos endpoints novos",
+                    "Mudança incompatível exige nova versão, com regra registrada",
+                    "Revisão do contrato dos endpoints da etapa 1 concluída",
+                ],
+                "dep": "Nenhuma (deve ser feita antes ou junto de E1.2 e E1.4)",
+            },
         ],
     },
     {
@@ -198,7 +212,7 @@ ETAPAS = [
             {
                 "t": "Guardrails em produção: aviso do CRC, fraude e abstenção",
                 "l": "etapa-2, ia, segurança",
-                "r": "Jhessica e Clara",
+                "r": "Jhessica e Nasser",
                 "p": "Alta",
                 "d": "Garantir que toda resposta traga o aviso de que o produto não substitui contador, que pedidos de evasão ou fraude sejam recusados e que a falta de base resulte em abstenção. Portar os cenários de governança de src/rag para o backend atual.",
                 "c": [
@@ -247,6 +261,19 @@ ETAPAS = [
                 ],
                 "dep": "Conjunto de teste congelado",
             },
+            {
+                "t": "Testes adversariais: injeção de prompt e vazamento de contexto",
+                "l": "etapa-2, segurança, ia",
+                "r": "Nasser",
+                "p": "Alta",
+                "d": "Criar um conjunto de ataques ao assistente: instruções escondidas em perguntas, pedidos para ignorar regras, tentativa de obter o prompt do sistema ou dados de outra empresa, e conteúdo malicioso vindo de documentos do acervo. Medir e corrigir as falhas.",
+                "c": [
+                    "Conjunto de ataques versionado, com resultado esperado por caso",
+                    "Falhas encontradas registradas e corrigidas ou aceitas com justificativa",
+                    "Execução automatizada, de preferência no CI",
+                ],
+                "dep": "Guardrails em produção",
+            },
         ],
     },
     {
@@ -293,7 +320,7 @@ ETAPAS = [
             {
                 "t": "Autenticação e tela de Acesso (01)",
                 "l": "etapa-3, frontend, backend, segurança",
-                "r": "A definir (frontend) e Lucas (backend)",
+                "r": "Nasser (backend e segurança) e frontend a definir",
                 "p": "Alta",
                 "d": "Implementar login conforme a decisão do ADR, sessão com permissões da conta, redirecionamento (com empresa para a Visão geral; sem empresa para o Cadastro), erros junto ao formulário e estado de envio.",
                 "c": [
@@ -389,6 +416,33 @@ ETAPAS = [
                 ],
                 "dep": "Estrutura do frontend",
             },
+            {
+                "t": "Autorização e isolamento de dados entre empresas",
+                "l": "etapa-3, backend, segurança, arquitetura",
+                "r": "Nasser",
+                "p": "Alta",
+                "d": "Definir e implementar o modelo de permissões: cada usuário só acessa a(s) própria(s) empresa(s), em todos os endpoints e no contexto enviado ao assistente. Decidir se uma conta pode ter mais de uma empresa e se há papéis (dono, contador convidado).",
+                "c": [
+                    "Regra de acesso definida e documentada",
+                    "Toda consulta ao banco filtrada pela empresa do usuário",
+                    "Testes provando que uma conta não lê dados de outra",
+                    "Contexto do assistente montado só com dados da empresa autorizada",
+                ],
+                "dep": "Autenticação; modelo de dados do perfil da empresa",
+            },
+            {
+                "t": "Atualizar o diagrama de arquitetura com os serviços reais",
+                "l": "etapa-3, documentação, arquitetura",
+                "r": "Nasser e Clara",
+                "p": "Média",
+                "d": "O diagrama atual (docs/arquitetura/diagramas) é alvo de projeto. Atualizá-lo com o que for decidido e construído: frontend, API única, PostgreSQL, Qdrant, serviço de LLM, autenticação e fluxo de dados do assistente, marcando o que cruza a fronteira ética e de LGPD.",
+                "c": [
+                    "Arquivo editável (.excalidraw) e imagem atualizados",
+                    "Fronteiras de confiança e fluxo de dados pessoais indicados",
+                    "Documento arquitetura.md refletindo o diagrama",
+                ],
+                "dep": "ADR de stack e autenticação; decisão de hospedagem do LLM",
+            },
         ],
     },
     {
@@ -461,7 +515,7 @@ ETAPAS = [
             {
                 "t": "Segurança da API: limite de uso, segredos, CORS e cabeçalhos",
                 "l": "etapa-4, segurança, backend",
-                "r": "Lucas e Ingrid",
+                "r": "Nasser, Lucas e Ingrid",
                 "p": "Alta",
                 "d": "Limitar requisições por usuário e por IP, gerenciar segredos fora do repositório, restringir CORS ao frontend, validar entradas e proteger contra abuso do endpoint de IA, que é caro de executar.",
                 "c": [
@@ -474,7 +528,7 @@ ETAPAS = [
             {
                 "t": "Conformidade com a LGPD",
                 "l": "etapa-4, lgpd, segurança",
-                "r": "Clara e Nasser",
+                "r": "Nasser (coordena) e Clara",
                 "p": "Alta",
                 "d": "CNPJ, faturamento e folha são dados da empresa e, em MEI, podem identificar uma pessoa. Definir base legal, política de privacidade, retenção, exclusão de conta e dados, e que dados chegam aos logs e a provedores externos de LLM.",
                 "c": [
@@ -548,6 +602,32 @@ ETAPAS = [
                     "Meta de capacidade do lançamento definida",
                 ],
                 "dep": "Consultas simultâneas; hospedagem definida",
+            },
+            {
+                "t": "Modelagem de ameaças do sistema",
+                "l": "etapa-4, segurança, arquitetura",
+                "r": "Nasser",
+                "p": "Alta",
+                "d": "Mapear ativos (dados da empresa, acervo, chaves), pontos de entrada, fronteiras de confiança e ameaças (por exemplo, método STRIDE), com a mitigação e o responsável de cada risco. Cobre ainda a cadeia do acervo: um documento coletado alterado pode envenenar as respostas.",
+                "c": [
+                    "Documento de ameaças com severidade e mitigação por item",
+                    "Riscos altos viram issues com responsável",
+                    "Revisão antes do lançamento",
+                ],
+                "dep": "Diagrama de arquitetura atualizado",
+            },
+            {
+                "t": "Plano de resposta a incidentes e de continuidade",
+                "l": "etapa-4, segurança, operação",
+                "r": "Nasser e Ingrid",
+                "p": "Média",
+                "d": "Definir o que fazer se houver vazamento de dados, resposta fiscal errada com impacto, indisponibilidade do modelo ou acervo corrompido: quem decide, como comunicar usuários, como desligar o assistente de forma segura e como voltar à coleção anterior.",
+                "c": [
+                    "Procedimentos escritos por tipo de incidente",
+                    "Contatos e responsáveis definidos",
+                    "Simulação (exercício de mesa) realizada uma vez",
+                ],
+                "dep": "Modelagem de ameaças; backup e restauração",
             },
         ],
     },
