@@ -99,6 +99,7 @@ jobs:
           PYTHONPATH: backend/api:.
         run: |
           if [ -f test_fiscal.py ]; then python test_fiscal.py; fi
+          if [ -f test_pipeline.py ]; then python test_pipeline.py; fi
           if [ -f test_entity_extractor.py ]; then python test_entity_extractor.py; fi
           if [ -f test_rag_service.py ]; then python test_rag_service.py; fi
 
