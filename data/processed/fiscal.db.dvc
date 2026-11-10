@@ -1,0 +1,5 @@
+outs:
+- md5: 91c1d7dc450951fd6aa80c606a1e2993
+  size: 98304
+  hash: md5
+  path: fiscal.db

@@ -72,6 +72,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r backend/api/requirements.txt
           pip install -r backend/api/requirements-eval.txt
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
@@ -99,6 +100,58 @@ jobs:
         run: |
           if [ -f test_fiscal.py ]; then python test_fiscal.py; fi
           if [ -f test_entity_extractor.py ]; then python test_entity_extractor.py; fi
+          if [ -f test_rag_service.py ]; then python test_rag_service.py; fi
+
+  rag-quality-gate:
+    name: RAG Quality Gate & Benchmark (MLOps)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/api/requirements.txt
+          pip install mlflow
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Ingestao do Acervo e Bases Fiscais
+        run: |
+          python test_fiscal.py
+          python test_pipeline.py
+
+      - name: Executar Testes de Regras e Servico RAG
+        run: |
+          python test_entity_extractor.py
+          python test_rag_service.py
+
+      - name: Executar Benchmark de Governanca RAG (MLOps)
+        run: |
+          python benchmark_rag.py
+
+      - name: Verificar Limites de Regressao de Qualidade
+        run: |
+          python scripts/check_rag_regression.py
+
+      - name: Registrar Metricas no MLflow
+        run: |
+          python scripts/log_mlflow_benchmark.py
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///mlruns.db
+
+      - name: Arquivar Relatorio de Benchmark (JSON)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rag-benchmark-results
+          path: data/benchmark/benchmark_results.json
 
   dvc-validation:
     name: Validacao de Dados e DVC

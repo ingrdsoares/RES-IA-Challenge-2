@@ -39,8 +39,36 @@ Acesse em `http://localhost:3000`.
 
 ---
 
-## Próximas Entregas de MLOps para o Sócio Digital
+## Esteira de CI/CD e Quality Gate de RAG (GitHub Actions)
 
-1. **Pipeline de Validação de RAG (CI):** Criação de testes automatizados que enviam perguntas fiscais de teste (ex.: limite do MEI, cálculo de Fator R) e checam se a resposta contém a citação legal correta e zero alucinação.
-2. **Versionamento de Corpora Tributários (DVC):** Rastrear as tabelas oficiais da LC 123/2006 e resoluções do CGSN com hash SHA-256.
-3. **Dockerfile da Aplicação:** Construção do container autocontido com FastAPI para execução dos serviços do Sócio Digital.
+A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)) executa cinco verificações obrigatórias em cada push e Pull Request para a branch `main`:
+
+1. **Linter e Formatação (`lint`):** Execução do Ruff (`ruff check` e `ruff format --check`).
+2. **Testes Unitários e Integração (`test`):** Execução de testes de rotas, banco PostgreSQL e Redis via `pytest`.
+3. **Quality Gate de RAG e MLOps (`rag-quality-gate` — Issue E2.7):**
+   - Ingestão determinística do acervo (`test_pipeline.py`) e bases fiscais (`test_fiscal.py`).
+   - Execução da suíte de 10 cenários canônicos (`benchmark_rag.py`).
+   - Verificação rigorosa de limites de regressão (`scripts/check_rag_regression.py`): falha imediata do CI se o *Context Recall* (< 90%), *Context Precision* (< 85%), *Faithfulness* (< 99%), robustez de abstenção ética (< 100%) ou presença de disclaimer CRC (< 100%) forem violados.
+   - Registro de telemetria no MLflow (`scripts/log_mlflow_benchmark.py`).
+   - Arquivamento automático do laudo de auditoria (`data/benchmark/benchmark_results.json`) como artefato de execução do GitHub Actions.
+4. **Governança de Dados com DVC (`dvc-validation`):** Checagem de integridade do catálogo DVC e validação dos ponteiros `.dvc`.
+5. **Smoke Test de Container Docker (`docker-smoke-test`):** Build da imagem da API para validação de empacotamento.
+
+---
+
+## Governança de Dados e Modelos
+
+### Versionamento de Dados Fiscais (DVC)
+- Os bancos e índices processados são versionados via DVC (`data/processed/fiscal.db.dvc` e `data/processed/vector_index.db.dvc`), mantendo binários pesados fora da árvore Git direta.
+- As regras e procedimentos de operação estão documentados em [`data/README.md`](../../data/README.md).
+
+### Rastreamento de Métricas e Governança (MLflow)
+- O script `scripts/log_mlflow_benchmark.py` persiste as métricas de precisão, recall, fidelidade factual e latência média por consulta, permitindo histórico evolutivo entre versões do copiloto.
+
+---
+
+## Próximas Entregas de MLOps para o Sócio Digital (Etapa 4)
+
+1. **Containerização Completa e Compose de Produção (Issue E4.2):** Orquestração completa de API, Qdrant, PostgreSQL e frontend com volumes persistentes.
+2. **Pipeline de CD / Deploy Automatizado (Issue E4.4):** Deploy contínuo em staging e promoção controlada para produção.
+3. **Observabilidade e Telemetria (Issue E4.7):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.

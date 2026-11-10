@@ -56,3 +56,5 @@ backend/evaluation/cache/
 # Processed data, vector index & databases
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/*.dvc
+!data/processed/.gitignore

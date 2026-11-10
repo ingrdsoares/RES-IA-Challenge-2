@@ -1,0 +1,5 @@
+outs:
+- md5: 51884de6a6e8283811739cada510521f
+  size: 1261568
+  hash: md5
+  path: vector_index.db

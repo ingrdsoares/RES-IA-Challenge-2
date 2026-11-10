@@ -100,8 +100,11 @@ flowchart TD
 > **Foco:** Configuração e esteiras de CI/CD, governança de modelos/dados (MLflow/DVC), infraestrutura, GitHub Pages e consolidação dos entregáveis.
 
 #### Entregas de Infraestrutura e Governança:
+* [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml): **Esteira de Integração Contínua e Quality Gate MLOps** — linters (Ruff), testes de integração (PostgreSQL/Redis), validação DVC, smoke test Docker e Quality Gate de RAG (`rag-quality-gate` — Issue E2.7) com trava de regressão para fidelidade factual (zero alucinação >= 99%) e robustez ética (100%).
 * [`.github/workflows/pages.yml`](../../.github/workflows/pages.yml): Esteira automatizada de publicação contínua no GitHub Pages a partir da branch `main`.
 * **Portal Docs-as-Code (Docsify):** Configuração da documentação interativa com renderização nativa de diagramas Mermaid e leitura acessível ([ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)).
+* [`scripts/check_rag_regression.py`](../../scripts/check_rag_regression.py) & [`scripts/log_mlflow_benchmark.py`](../../scripts/log_mlflow_benchmark.py): Scripts automatizados de auditoria de regressão e registro no MLflow.
+* **Governança de Dados com DVC:** Versionamento de bases geradas (`data/processed/fiscal.db.dvc` e `data/processed/vector_index.db.dvc`).
 * [`docs/projeto/definicao-projeto.md`](definicao-projeto.md): **Pacote Completo de Definição do Projeto** — formulação do problema, Essential Question, mapa de stakeholders, personas detalhadas (Carlos MEI, Mariana ME, Rafael contador), matriz de riscos/mitigações e catálogo de 12 requisitos funcionais e 10 não funcionais.
 * [`docs/projeto/guiding-questions.md`](guiding-questions.md): Fundamentação conceitual de qualidade de vida vinculada ao estresse financeiro-tributário e fluxo consultivo de tomada de decisão.
 * [`docs/arquitetura/devops-mlops.md`](../arquitetura/devops-mlops.md): Planejamento da esteira de MLOps com versionamento de dados fiscais (DVC), monitoramento de métricas de fidelidade (MLflow/Ragas) e conteinerização.
@@ -120,11 +123,11 @@ flowchart TD
 | **RAGService com Guardrails** | Jhessica | Base para os endpoints FastAPI do Lucas | Pronto para exposição na API |
 | **Topologia e Diretrizes Éticas** | Clara e Nasser | Implementadas no `RAGService` e `FiscalCalculator` | 100% aderente |
 | **Documentação & GitHub Pages** | Ingrid | Hospeda relatórios, PDFs e entregáveis de todas as frentes | Ativo e automatizado |
+| **CI/CD Quality Gate & MLOps** | Ingrid | Protege a branch `main` contra regressões e alucinações | Integrado no GitHub Actions |
 
 ---
 
 ## 4. Próximos Passos Recomendados para o Grupo
 
-1. **Lucas:** Conectar o `RAGService` na rota `POST /copiloto/consultar` em `api/app/main.py`.
-2. **Ingrid:** Adicionar workflow de CI (`.github/workflows/ci.yml`) para rodar `pytest` automaticamente nos Pull Requests.
-3. **Equipe:** Abrir o Pull Request da branch `feat/rag-pipeline-ingestao` para a branch `main`.
+1. **Frontend (Etapa 3):** Implementar a interface web com login, cadastro de empresa e chat com o copiloto fiscal.
+2. **Produção (Etapa 4 - Ingrid/Nasser/Lucas):** Montar o Compose de produção e configurar a esteira de CD automatizada.
