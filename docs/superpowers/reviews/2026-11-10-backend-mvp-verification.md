@@ -70,3 +70,9 @@ Final review: self-review (user explicitly prohibited subagents). Reviewed plan/
 Final: minor (deferred): existing FastAPI/Starlette deprecation warnings on Python 3.14; image uses Python 3.12 and passes real workflow.
 
 ```
+
+## Fechamento
+
+Commit de implementação final: `3bd09e7`. A tarefa 11 foi concluída com execução real de `test_mvp_workflow.py`: um teste aprovado em 23,18 segundos. Todos os onze blocos estão completos; não foi feito merge ou push. A stack de validação permanece acessível em http://localhost:18080/docs, com volumes separados dos serviços existentes.
+
+Comandos finais: `python -m pytest` (239 aprovados, cinco pulados), `ruff check .`, `ruff format --check .`, `git diff --check` e validação Compose. O CI remoto ainda depende da execução no GitHub Actions.
