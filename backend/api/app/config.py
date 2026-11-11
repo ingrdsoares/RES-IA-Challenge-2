@@ -15,6 +15,18 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     allowed_origins: list[str] = ["http://localhost:8000"]
 
+    # Seguranca e Rotacao de Segredos
+    app_secret_key: str = Field(
+        default="sd_default_secret_dev_key_change_in_prod_1234567890", min_length=16
+    )
+    hsts_enabled: bool = Field(default=True)
+
+    # Rate Limiting
+    rate_limit_enabled: bool = Field(default=True)
+    rate_limit_requests_per_minute: int = Field(default=120, ge=1)
+    rate_limit_ai_per_minute: int = Field(default=20, ge=1)
+    rate_limit_auth_per_minute: int = Field(default=10, ge=1)
+
     qdrant_url: HttpUrl = "http://localhost:6333"
     ollama_url: HttpUrl = "http://localhost:11434"
     embedding_model: str = Field(default="qwen3-embedding:0.6b", min_length=1)

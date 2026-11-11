@@ -23,6 +23,7 @@ from app.jobs.router import router as jobs_router
 from app.legal.router import router as legal_router
 from app.models import LocalModels
 from app.rag import RagService
+from app.rate_limit import RateLimiter
 from app.schemas import QueryRequest, QueryResponse
 from app.tasks.router import router as tasks_router
 from app.vector_store import VectorStore
@@ -161,7 +162,30 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             ) from None
         return {"status": "ready"}
 
-    @app.post("/rag/query", response_model=QueryResponse, dependencies=[Depends(require_account)])
+    @app.middleware("http")
+    async def security_headers_middleware(request: Request, call_next):
+        response = await call_next(request)
+        headers = response.headers
+        headers["X-Content-Type-Options"] = "nosniff"
+        headers["X-Frame-Options"] = "DENY"
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=(), payment=()"
+        headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https:; connect-src 'self' http: https:; frame-ancestors 'none';"
+        )
+        settings = getattr(request.app.state, "settings", None)
+        if settings and (
+            getattr(settings, "hsts_enabled", False) or getattr(settings, "cookie_secure", False)
+        ):
+            headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+        return response
+
+    @app.post(
+        "/rag/query",
+        response_model=QueryResponse,
+        dependencies=[Depends(require_account), Depends(RateLimiter(namespace="ai_rag"))],
+    )
     def query(payload: QueryRequest, request: Request):
         return request.app.state.rag.query(payload.question)
 

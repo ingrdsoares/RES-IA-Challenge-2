@@ -71,6 +71,8 @@ A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/
 
 ## Entregas de MLOps para o Sócio Digital (Etapa 4)
 
-1. **Containerização Completa e Compose de Produção (Issue E4.2 — Concluído):** Orquestração completa de API, Qdrant, PostgreSQL, Redis, S3, Worker e Frontend com volumes persistentes via [`backend/compose.prod.yaml`](../../backend/compose.prod.yaml).
-2. **Pipeline de CD / Deploy Automatizado (Issue E4.4 — Concluído):** Deploy contínuo em staging no merge da `main`, publicação de imagens versionadas no GHCR, promoção controlada com aprovação manual para produção e protocolo de rollback operacional documentado em [`docs/arquitetura/deploy-cd-e-rollback.md`](deploy-cd-e-rollback.md).
-3. **Observabilidade e Telemetria (Issue E4.7 — Em Planejamento):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.
+1. **Hospedagem & Projeção de Custos de IA (Issue E4.1 — Concluído):** Formalização da ADR 001 com estudo comparativo entre GPU própria (vLLM) e APIs gerenciadas eficientes (Gemini Flash/GPT-4o-mini), modelando o TCO e comprovando economia de 94% a 99% em [`docs/arquitetura/adr-001-hospedagem-e-custo-ia.md`](adr-001-hospedagem-e-custo-ia.md).
+2. **Containerização Completa e Compose de Produção (Issue E4.2 — Concluído):** Orquestração completa de API, Qdrant, PostgreSQL, Redis, S3, Worker e Frontend com volumes persistentes via [`backend/compose.prod.yaml`](../../backend/compose.prod.yaml).
+3. **Pipeline de CD / Deploy Automatizado (Issue E4.4 — Concluído):** Deploy contínuo em staging no merge da `main`, publicação de imagens versionadas no GHCR, promoção controlada com aprovação manual para produção e protocolo de rollback operacional documentado em [`docs/arquitetura/deploy-cd-e-rollback.md`](deploy-cd-e-rollback.md).
+4. **Segurança de API & Rate Limiting (Issue E4.5 — Concluído):** Implementação de limitação de taxa via Redis (Token Bucket com TTL atômico), cabeçalhos de segurança HTTP (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) e rotação de segredos documentada em [`docs/arquitetura/seguranca-e-rate-limit.md`](seguranca-e-rate-limit.md).
+5. **Observabilidade e Telemetria (Issue E4.7 — Em Planejamento):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.

@@ -24,7 +24,9 @@
   * [Estratégia de Embeddings e Qdrant](arquitetura/estrategia-embeddings.md)
   * [Tool Calling na Busca RAG](arquitetura/tool-calling-busca-rag.md)
   * [DevOps e MLOps](arquitetura/devops-mlops.md)
+  * [ADR 001: Hospedagem e Custo de IA](arquitetura/adr-001-hospedagem-e-custo-ia.md)
   * [Pipeline de CD e Rollback](arquitetura/deploy-cd-e-rollback.md)
+  * [Segurança de API e Rate Limiting](arquitetura/seguranca-e-rate-limit.md)
   * [Retomada na Máquina RTX 3080 Ti](arquitetura/retomada-rtx3080ti.md)
 
 * **Dados e Acervo**
