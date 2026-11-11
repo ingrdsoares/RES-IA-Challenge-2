@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Plus, Check } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import { Empresa } from '../types';
 
 interface EmpresasProps {

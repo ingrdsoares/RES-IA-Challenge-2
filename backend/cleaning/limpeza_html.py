@@ -6,6 +6,7 @@ texto puro. Links viram ``[texto](url)``; nenhuma outra tag HTML sobrevive.
 Uso:
     python -m backend.cleaning.limpeza_html lei.html [outras.html ...] -o saida/
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,9 +21,34 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 DEFAULT_STRIKE_TAGS = ("strike",)
 DROP_TAGS = {"script", "style", "noscript", "head", "title", "meta", "link"}
 BLOCK_TAGS = {
-    "p", "div", "dir", "ul", "ol", "li", "blockquote", "pre", "section", "article",
-    "h1", "h2", "h3", "h4", "h5", "h6", "tr", "table", "center", "body", "html",
-    "dl", "dt", "dd", "hr", "address", "fieldset", "form",
+    "p",
+    "div",
+    "dir",
+    "ul",
+    "ol",
+    "li",
+    "blockquote",
+    "pre",
+    "section",
+    "article",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "tr",
+    "table",
+    "center",
+    "body",
+    "html",
+    "dl",
+    "dt",
+    "dd",
+    "hr",
+    "address",
+    "fieldset",
+    "form",
 }
 CELL_TAGS = {"td", "th"}
 
@@ -59,7 +85,13 @@ def _is_strike(node: Tag, strike_tags: tuple[str, ...]) -> bool:
 def _render(node, base_url: str | None, out: list[str]) -> None:
     """Renderiza ``node`` em texto puro, acumulando pedaços em ``out``."""
     if isinstance(node, NavigableString):
-        if type(node).__name__ in ("Comment", "Doctype", "CData", "ProcessingInstruction", "Declaration"):
+        if type(node).__name__ in (
+            "Comment",
+            "Doctype",
+            "CData",
+            "ProcessingInstruction",
+            "Declaration",
+        ):
             return
         out.append(re.sub(r"[ \t\r\n\xa0]+", " ", str(node)))
         return
@@ -129,7 +161,8 @@ def limpar_html(
 
     # Só o strike mais externo; os aninhados vão junto com ele.
     outer = [
-        n for n in soup.find_all(list(strike_tags))
+        n
+        for n in soup.find_all(list(strike_tags))
         if not any(_is_strike(p, strike_tags) for p in n.parents if isinstance(p, Tag))
     ]
 
@@ -172,14 +205,21 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("arquivos", nargs="+", type=Path, help="arquivos HTML de entrada")
     ap.add_argument("-o", "--saida", type=Path, required=True, help="diretório de saída")
-    ap.add_argument("--tags", default=",".join(DEFAULT_STRIKE_TAGS),
-                    help="tags tratadas como riscadas, separadas por vírgula (padrão: strike)")
+    ap.add_argument(
+        "--tags",
+        default=",".join(DEFAULT_STRIKE_TAGS),
+        help="tags tratadas como riscadas, separadas por vírgula (padrão: strike)",
+    )
     ap.add_argument("--base-url", help="URL base para resolver links relativos")
     args = ap.parse_args(argv)
     tags = tuple(t.strip().lower() for t in args.tags.split(",") if t.strip())
     for arq in args.arquivos:
-        limpo, removido, r = processar_arquivo(arq, args.saida, strike_tags=tags, base_url=args.base_url)
-        print(f"{arq.name}: {r.trechos_removidos} trecho(s) riscado(s) -> {limpo.name}, {removido.name}")
+        limpo, removido, r = processar_arquivo(
+            arq, args.saida, strike_tags=tags, base_url=args.base_url
+        )
+        print(
+            f"{arq.name}: {r.trechos_removidos} trecho(s) riscado(s) -> {limpo.name}, {removido.name}"
+        )
     return 0
 
 
