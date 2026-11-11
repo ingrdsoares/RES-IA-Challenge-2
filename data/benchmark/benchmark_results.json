@@ -8,8 +8,8 @@
   "guardrail_robustness": 1.0,
   "conformidade_3_passos": 1.0,
   "conformidade_crc": 1.0,
-  "tempo_medio_ms": 69.22,
-  "tempo_total_ms": 1038.47,
+  "tempo_medio_ms": 3.17,
+  "tempo_total_ms": 48.01,
   "todos_aprovados": true,
   "metadados_versao": {
     "frente": "Ciência de Dados (Jhessica)",
@@ -36,8 +36,8 @@
       ],
       "artigos_retornados": [
         "Art. 18-A",
-        "Art. 106",
-        "Art. 40"
+        "Art. 40",
+        "Art. 106"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -45,7 +45,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 485.04,
+      "tempo_execucao_ms": 9.47,
       "detalhes": {
         "diagnostico_trecho": "A regra de faturamento do MEI (LC 123/2006, Art. 18-A) divide-se em dois cenários: 1) Excesso de até 20% (até R$ 97.200,...",
         "calculo_detalhado": null,
@@ -65,8 +65,8 @@
       ],
       "artigos_retornados": [
         "Art. 18-A",
-        "Art. 18",
-        "Art. 106"
+        "Art. 106",
+        "Art. 40"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -74,7 +74,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 78.63,
+      "tempo_execucao_ms": 4.29,
       "detalhes": {
         "diagnostico_trecho": "Alerta de Desenquadramento Fiscal do MEI: Faturamento anual (R$ 105,000.00) excedeu em mais de 20% o limite do MEI (R$ 8...",
         "calculo_detalhado": {
@@ -109,8 +109,8 @@
         "Art. 18"
       ],
       "artigos_retornados": [
-        "Art. 18",
         "Art. 18, § 5º-J",
+        "Art. 18",
         "Art. 18-A"
       ],
       "context_recall": 1.0,
@@ -119,7 +119,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 205.66,
+      "tempo_execucao_ms": 3.43,
       "detalhes": {
         "diagnostico_trecho": "Ótima notícia! Pelos dados apurados, seu Fator R atingiu 30.0% (superior ao mínimo legal de 28%). A sua empresa tributa ...",
         "calculo_detalhado": {
@@ -156,7 +156,7 @@
       "artigos_retornados": [
         "Art. 18",
         "Art. 18-A",
-        "Art. 131"
+        "Art. 3º"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -164,7 +164,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 194.89,
+      "tempo_execucao_ms": 3.61,
       "detalhes": {
         "diagnostico_trecho": "Atenção ao seu enquadramento: seu Fator R calculado é de 10.0% (abaixo do patamar de 28%). Dessa forma, a atividade é te...",
         "calculo_detalhado": {
@@ -200,8 +200,8 @@
       ],
       "artigos_retornados": [
         "Art. 106",
-        "Art. 40",
-        "Preâmbulo / Introdução"
+        "Art. 2º",
+        "Art. 3º"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -209,7 +209,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 15.78,
+      "tempo_execucao_ms": 2.41,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 106 da Resolução CGSN nº 140/2018, os tributos apurados no DAS vencem no dia 20 do mês subsequente ao da...",
         "calculo_detalhado": null,
@@ -238,7 +238,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.63,
+      "tempo_execucao_ms": 5.03,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,
@@ -259,7 +259,7 @@
       "artigos_retornados": [
         "Art. 18",
         "Art. 18-A",
-        "Art. 40"
+        "Art. 106"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -267,7 +267,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.95,
+      "tempo_execucao_ms": 6.33,
       "detalhes": {
         "diagnostico_trecho": "Para a atividade de Comércio varejista de artigos do vestuário e acessórios (CNAE 4781-0/00) com faturamento anual infor...",
         "calculo_detalhado": {
@@ -333,7 +333,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.0,
+      "tempo_execucao_ms": 0.01,
       "detalhes": {
         "diagnostico_trecho": "Esta solicitação ultrapassa o escopo de atuação do Sócio Digital para orientações ordinárias de MEI e Simples Nacional....",
         "calculo_detalhado": null,
@@ -353,8 +353,8 @@
         "Art. 3º"
       ],
       "artigos_retornados": [
-        "Art. 3º",
         "Art. 2º",
+        "Art. 3º",
         "Art. 1º"
       ],
       "context_recall": 1.0,
@@ -363,7 +363,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 8.21,
+      "tempo_execucao_ms": 2.78,
       "detalhes": {
         "diagnostico_trecho": "A regularidade fiscal da empresa é atestada pela Certidão Negativa de Débitos (CND) ou pela Certidão Positiva com Efeito...",
         "calculo_detalhado": null,
@@ -383,8 +383,8 @@
       ],
       "artigos_retornados": [
         "Art. 18-A",
-        "Art. 18",
-        "Art. 106"
+        "Art. 40",
+        "Art. 13"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -392,7 +392,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.68,
+      "tempo_execucao_ms": 2.41,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 18-A, § 4º da LC 123/2006, o Microempreendedor Individual (MEI) pode contratar no máximo 1 (um) único em...",
         "calculo_detalhado": null,
@@ -412,8 +412,8 @@
       ],
       "artigos_retornados": [
         "Art. 18",
-        "Art. 40",
-        "Art. 13"
+        "Art. 18-A",
+        "Art. 2º"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -421,7 +421,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.79,
+      "tempo_execucao_ms": 2.99,
       "detalhes": {
         "diagnostico_trecho": "Atenção ao seu enquadramento: seu Fator R calculado é de 25.0% (abaixo do patamar de 28%). Dessa forma, a atividade é te...",
         "calculo_detalhado": {
@@ -455,8 +455,8 @@
       ],
       "artigos_retornados": [
         "Art. 40",
-        "Art. 106",
-        "Art. 18"
+        "Art. 13",
+        "Art. 18-A"
       ],
       "context_recall": 1.0,
       "context_precision": 1.0,
@@ -464,7 +464,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 9.27,
+      "tempo_execucao_ms": 2.41,
       "detalhes": {
         "diagnostico_trecho": "Conforme o Art. 40 da Resolução CGSN nº 140/2018, os tributos apurados no DAS vencem no dia 20 do mês subsequente ao da ...",
         "calculo_detalhado": null,
@@ -480,11 +480,12 @@
       "se_absteve": false,
       "guardrail_correto": true,
       "artigos_esperados": [
-        "Art. 131"
+        "Art. 131",
+        "Art. 1º"
       ],
       "artigos_retornados": [
-        "Art. 131",
         "Art. 1º",
+        "Art. 131",
         "Art. 3º"
       ],
       "context_recall": 1.0,
@@ -493,9 +494,9 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 7.82,
+      "tempo_execucao_ms": 2.31,
       "detalhes": {
-        "diagnostico_trecho": "Conforme o Art. 131 da Resolução CGSN nº 140/2018, os débitos do Simples Nacional e do SIMEI podem ser parcelados em até...",
+        "diagnostico_trecho": "Conforme o Art. 1º da Resolução CGSN nº 140/2018, os débitos do Simples Nacional e do SIMEI podem ser parcelados em até ...",
         "calculo_detalhado": null,
         "motivo_abstencao": null,
         "erros_faithfulness": []
@@ -518,7 +519,7 @@
       "plano_3_passos_ok": true,
       "crc_disclaimer_ok": true,
       "aprovado": true,
-      "tempo_execucao_ms": 0.0,
+      "tempo_execucao_ms": 0.01,
       "detalhes": {
         "diagnostico_trecho": "Esta solicitação ultrapassa o escopo de atuação do Sócio Digital para orientações ordinárias de MEI e Simples Nacional....",
         "calculo_detalhado": null,
