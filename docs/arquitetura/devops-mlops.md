@@ -69,8 +69,8 @@ A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/
 
 ---
 
-## Próximas Entregas de MLOps para o Sócio Digital (Etapa 4)
+## Entregas de MLOps para o Sócio Digital (Etapa 4)
 
-1. **Containerização Completa e Compose de Produção (Issue E4.2):** Orquestração completa de API, Qdrant, PostgreSQL e frontend com volumes persistentes.
-2. **Pipeline de CD / Deploy Automatizado (Issue E4.4):** Deploy contínuo em staging e promoção controlada para produção.
-3. **Observabilidade e Telemetria (Issue E4.7):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.
+1. **Containerização Completa e Compose de Produção (Issue E4.2 — Concluído):** Orquestração completa de API, Qdrant, PostgreSQL, Redis, S3, Worker e Frontend com volumes persistentes via [`backend/compose.prod.yaml`](../../backend/compose.prod.yaml).
+2. **Pipeline de CD / Deploy Automatizado (Issue E4.4 — Concluído):** Deploy contínuo em staging no merge da `main`, publicação de imagens versionadas no GHCR, promoção controlada com aprovação manual para produção e protocolo de rollback operacional documentado em [`docs/arquitetura/deploy-cd-e-rollback.md`](deploy-cd-e-rollback.md).
+3. **Observabilidade e Telemetria (Issue E4.7 — Em Planejamento):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.

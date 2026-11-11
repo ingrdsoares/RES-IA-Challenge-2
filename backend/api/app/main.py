@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -74,7 +75,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     app.include_router(tasks_router)
     app.include_router(fiscal_router)
 
-    legacy_paths = {"/health", "/ready", "/rag/query"}
+    legacy_paths = {"/health", "/ready", "/version", "/rag/query"}
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, exc: RequestValidationError):
@@ -140,6 +141,15 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     @app.get("/health")
     def health():
         return {"status": "ok"}
+
+    @app.get("/version")
+    def version():
+        return {
+            "version": os.getenv("APP_VERSION", "0.1.0"),
+            "commit_sha": os.getenv("GIT_COMMIT_SHA", "development"),
+            "environment": os.getenv("ENVIRONMENT", "local"),
+            "build_timestamp": os.getenv("BUILD_TIMESTAMP", "unknown"),
+        }
 
     @app.get("/ready")
     def ready(request: Request):

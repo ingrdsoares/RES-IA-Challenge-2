@@ -1,0 +1,170 @@
+name: socio-digital-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-socio_digital}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Variavel POSTGRES_PASSWORD obrigatoria}
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-socio_digital}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${POSTGRES_PORT_BIND:-127.0.0.1:5432}:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "${REDIS_PORT_BIND:-127.0.0.1:6379}:6379"
+    volumes:
+      - redis_prod_data:/data
+    command: [redis-server, --appendonly, "yes"]
+    restart: always
+
+  storage:
+    image: chrislusf/seaweedfs:4.53
+    command: [mini, -dir=/data]
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?Variavel S3_ACCESS_KEY obrigatoria}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?Variavel S3_SECRET_KEY obrigatoria}
+    ports:
+      - "${STORAGE_PORT_BIND:-127.0.0.1:9000}:8333"
+    volumes:
+      - storage_prod_data:/data
+    restart: always
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.1
+    ports:
+      - "${QDRANT_PORT_BIND:-127.0.0.1:6333}:6333"
+    volumes:
+      - qdrant_prod_data:/qdrant/storage
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+    restart: always
+
+  api:
+    image: ${REGISTRY:-ghcr.io/ingrdsoares/res-ia-challenge-2}/backend-api:${IMAGE_TAG:-latest}
+    ports:
+      - "${API_PORT_BIND:-127.0.0.1:8000}:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-socio_digital}
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://storage:8333
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:9000}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      ENVIRONMENT: ${ENVIRONMENT:-staging}
+      APP_VERSION: ${IMAGE_TAG:-latest}
+      GIT_COMMIT_SHA: ${GIT_COMMIT_SHA:-unknown}
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["https://staging.sociodigital.ia","https://sociodigital.ia","http://localhost:3000"]}'
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
+      GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
+      TOP_K: ${TOP_K:-8}
+      SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
+      QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      NUM_CTX: ${NUM_CTX:-8192}
+      NUM_PREDICT: ${NUM_PREDICT:-1024}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: always
+
+  worker:
+    image: ${REGISTRY:-ghcr.io/ingrdsoares/res-ia-challenge-2}/backend-api:${IMAGE_TAG:-latest}
+    command: [python, -m, app.jobs.worker]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-socio_digital}
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://storage:8333
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:9000}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      ENVIRONMENT: ${ENVIRONMENT:-staging}
+      APP_VERSION: ${IMAGE_TAG:-latest}
+      GIT_COMMIT_SHA: ${GIT_COMMIT_SHA:-unknown}
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["https://staging.sociodigital.ia","https://sociodigital.ia","http://localhost:3000"]}'
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
+      GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
+      TOP_K: ${TOP_K:-8}
+      SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
+      QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      NUM_CTX: ${NUM_CTX:-8192}
+      NUM_PREDICT: ${NUM_PREDICT:-1024}
+      MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
+      RERANKER_URL: ${RERANKER_URL:-}
+      RERANKER_TIMEOUT: ${RERANKER_TIMEOUT:-10}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage:
+        condition: service_started
+    restart: always
+
+  dispatcher:
+    image: ${REGISTRY:-ghcr.io/ingrdsoares/res-ia-challenge-2}/backend-api:${IMAGE_TAG:-latest}
+    command: [python, -m, app.jobs.outbox]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-socio_digital}
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: ${ENVIRONMENT:-staging}
+      APP_VERSION: ${IMAGE_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    image: ${REGISTRY:-ghcr.io/ingrdsoares/res-ia-challenge-2}/frontend:${IMAGE_TAG:-latest}
+    ports:
+      - "${FRONTEND_PORT_BIND:-127.0.0.1:3000}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  storage_prod_data:
+  qdrant_prod_data:
