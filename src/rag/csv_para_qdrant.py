@@ -62,6 +62,8 @@ def configurar(limite_corpo: int, limpar: bool) -> None:
     SOBREPOSICAO = limite_corpo // 10
     CHUNKER = LegalHierarchicalChunker(max_chunk_chars=limite_corpo, overlap_chars=SOBREPOSICAO)
     LIMPAR = limpar
+
+
 # Páginas de login do gov.br coletadas no lugar das súmulas do CARF; não têm conteúdo.
 TITULO_PAGINA_LOGIN = "Conteúdo Restrito"
 
