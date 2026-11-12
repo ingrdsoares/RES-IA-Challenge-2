@@ -200,3 +200,43 @@ def test_unicode_context_is_trimmed_to_fit_prompt_budget():
     )
     assert models.answer("Pergunta", selected) == "Resposta [1]"
     models.close()
+
+
+def _chat(conteudo):
+    def handler(request):
+        corpo = json.loads(request.content)
+        assert corpo["format"]["required"] == ["precisa_dados", "faltam"]
+        assert corpo["options"]["temperature"] == 0
+        return httpx.Response(200, json={"message": {"role": "assistant", "content": conteudo}})
+
+    return handler
+
+
+def test_dados_faltantes_devolve_lista_quando_o_modelo_pede():
+    resposta = json.dumps({"precisa_dados": True, "faltam": ["CNAE", " receita ", "", "a", "b"]})
+    assert make_models(_chat(resposta)).dados_faltantes("Posso ser MEI?") == [
+        "CNAE",
+        "receita",
+        "a",
+        "b",
+    ]
+
+
+@pytest.mark.parametrize(
+    "conteudo",
+    [
+        json.dumps({"precisa_dados": False, "faltam": ["CNAE"]}),
+        json.dumps({"precisa_dados": True, "faltam": "CNAE"}),
+        "não é json",
+        "",
+    ],
+)
+def test_dados_faltantes_vazio_quando_nao_precisa_ou_resposta_invalida(conteudo):
+    assert make_models(_chat(conteudo)).dados_faltantes("Posso ser MEI?") == []
+
+
+def test_dados_faltantes_nao_bloqueia_quando_ollama_falha():
+    def handler(request):
+        return httpx.Response(500, json={"error": "falhou"})
+
+    assert make_models(handler).dados_faltantes("Posso ser MEI?") == []

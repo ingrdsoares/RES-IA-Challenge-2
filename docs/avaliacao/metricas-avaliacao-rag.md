@@ -59,7 +59,7 @@ As metas antigas eram Recall@k de pelo menos 90% e MRR de pelo menos 85%. Elas f
 
 **Documentos equivalentes.** O campo opcional `equivalent_sources` do conjunto lista documentos que trazem a mesma regra. `scripts/medir_recuperacao_qdrant.py` passa a reportar também Recall e MRR "lenientes", que aceitam o esperado ou um equivalente; as chaves estritas continuam iguais, para comparar com as rodadas antigas. Por enquanto, só q01 e q13 têm equivalentes (CGSN 140 e manual da DASN-Simei), marcados como `pendente_revisao_humana`.
 
-**Veredito:** as metas de 90% e 85% não são atingidas e não são realistas para esta base com a medição por documento. Elas ficam como objetivo de longo prazo, não como critério desta entrega.
+**Veredito:** as metas de 90% e 85% não são atingidas e não são realistas para esta base com a medição por documento. Foram substituídas pelas metas da seção 3.1.
 
 Dois fatores explicam boa parte da distância:
 
@@ -67,6 +67,27 @@ Dois fatores explicam boa parte da distância:
 2. **Amostra pequena.** Vinte perguntas; uma pergunta a mais ou a menos muda o Recall em 5 pontos.
 
 Por isso, a avaliação desta entrega se apoia mais na qualidade das respostas (seção 5) do que no Recall por documento.
+
+### 3.1 Metas atuais (12/11/2026)
+
+Estas metas substituem as de 90% e 85%. Valem para o `teste_ampliado_2026-11-12.jsonl` (81 perguntas, não usadas em ajustes), com `--repeticoes 3`. "Respostas boas" só vira número oficial depois da revisão fiscal independente (`revisao_independente.xlsx`).
+
+| Métrica | v2 em 12/11 | Meta | Tipo |
+|---|---:|---:|---|
+| Respostas erradas | 0 de 20 | 0 | Bloqueio: qualquer erro reprova a versão |
+| Respostas boas (corretas + recusas adequadas) | 85–90% | ≥ 90% | Meta |
+| Recusa indevida | 0–5% | ≤ 5% | Meta |
+| Recusa em pergunta fora do acervo | 4 de 4 | 100% | Bloqueio |
+| Pedido de dados em pergunta `clarify` | 1 de 10 no conjunto ampliado | ≥ 80% | Meta |
+| `citacao_suportada` | sem medição | ≥ 0,95 | Meta; abaixo disso, há base legal inventada |
+| `artigo_esperado` | sem medição | ≥ 0,80 | Meta |
+| Recall@8 leniente (com equivalentes) | 0,475 (estrito) | ≥ 0,80 | Meta |
+| MRR leniente | 0,473 (estrito) | ≥ 0,65 | Meta |
+| ROUGE-L e BERTScore | 0,34 e 0,62 | não piorar | Só para comparar versões; medem redação, não acerto |
+| Tempo por pergunta | mediana 2,7 s, máximo 6,7 s | mediana ≤ 5 s, p95 ≤ 15 s | Meta |
+| Concordância entre repetições | fontes 20 de 20, texto 15 de 20 | fontes 100%, conclusão ≥ 90% | Meta |
+
+Com 20 perguntas, "18 de 20" tem intervalo de confiança de cerca de 68% a 99%. Com 81, a margem cai para cerca de 7 pontos. Por isso a conferência usa o conjunto ampliado.
 
 ---
 
@@ -149,5 +170,6 @@ Em `backend/evaluation/data/`, no formato de `backend/evaluation/dataset.schema.
 | `teste_final_v3_2026-11-07.jsonl` | Teste por artigo, 20 perguntas |
 | `teste_compostas_2026-11-07.jsonl` | 20 perguntas usadas nos ajustes das compostas, 14 delas compostas |
 | `teste_compostas_confirmacao_2026-11-07.jsonl` | 10 perguntas compostas novas |
+| `teste_ampliado_2026-11-12.jsonl` | 81 perguntas (split final): 46 diretas, 10 compostas, 5 com valor desatualizado, 10 de esclarecimento e 10 de abstenção; base no `recorte-completo.csv.gz`, com trecho de evidência em `metadata`, revisão humana pendente e `equivalent_sources` onde há evidência |
 
 `data/benchmark/ground_truth_25_perguntas.json` ainda tem as referências anteriores, algumas tiradas de textos de demonstração; não deve ser usado. Detalhes dos testes em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.

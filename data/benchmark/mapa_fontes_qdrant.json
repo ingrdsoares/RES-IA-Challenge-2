@@ -139,6 +139,61 @@
     "df-sc-31-2024": {
       "documento_id": "33bf4c66ed",
       "nota": "Item 17: alíquota geral do DF de 20% a partir de 22/01/2024."
+    },
+    "man-mei-faq": {
+      "documento_id": "44dfbab041",
+      "titulo": "Perguntas frequentes MEI (Portal do Empreendedor)",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "df-decreto-43982-recorte": {
+      "documento_id": "145cb693b0",
+      "titulo": "Decreto DF nº 43.982/2022 — Sistema de Gestão do ISS (cópia do recorte-completo)",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "df-manual-substituto-iss": {
+      "documento_id": "804f4255b4",
+      "titulo": "Manual do Substituto/Responsável Tributário do ISS (DF), nov/2024",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "df-sc-35-2024": {
+      "documento_id": "582685e052",
+      "titulo": "Solução de Consulta DF 35/2024",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "df-di-8-2024": {
+      "documento_id": "445f632acd",
+      "titulo": "Declaração de Ineficácia DF 8/2024",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "df-di-14-2024": {
+      "documento_id": "7e4455ea78",
+      "titulo": "Declaração de Ineficácia DF 14/2024",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "carf-ac-8390033": {
+      "documento_id": "4404b6829d",
+      "titulo": "CARF Simples Nacional acórdão id 8390033",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "carf-ac-8629348": {
+      "documento_id": "6888da5610",
+      "titulo": "CARF Simples Nacional acórdão id 8629348",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "carf-ac-8520447": {
+      "documento_id": "9e0c2f0adf",
+      "titulo": "CARF Simples Nacional acórdão id 8520447",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "carf-mei-8712620": {
+      "documento_id": "929f513a61",
+      "titulo": "CARF MEI atividade não permitida (id 8712620)",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
+    },
+    "leg-sinief7": {
+      "documento_id": "7ad468bb99",
+      "titulo": "Ajuste SINIEF 7/2005 (NF-e)",
+      "nota": "Adicionado em 2026-11-12 para teste_ampliado; conferido no recorte-completo.csv.gz."
     }
   }
 }

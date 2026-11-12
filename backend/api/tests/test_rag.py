@@ -52,6 +52,17 @@ def test_complete_rag_returns_only_bounded_context(service):
     assert 0 < len(response.sources[0].text) < 4000
 
 
+def test_conferir_citacoes_avisa_so_quando_ligado(service, monkeypatch):
+    add_document(service, "Art. 3. Regra.")
+    resposta = "Vale o art. 99 da LC 123 [1]."
+    monkeypatch.setattr(service.models, "answer", lambda *a, **k: resposta)
+    assert service.query("Pergunta").answer == resposta
+    service.settings = service.settings.model_copy(update={"conferir_citacoes": True})
+    texto = service.query("Pergunta").answer
+    assert texto.startswith(resposta)
+    assert "art. 99 da Lei Complementar 123" in texto
+
+
 def test_query_failure_releases_lock(service, monkeypatch):
     original = service.store.count
 
@@ -97,3 +108,25 @@ def test_pergunta_de_caso_sem_dados_pede_esclarecimento_sem_modelos(service, mon
     assert response.status == "needs_clarification"
     assert response.sources == []
     assert "CNAE" in response.answer
+
+
+def test_filtro_com_modelo_pede_dados_antes_da_busca(service, monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Pedido de dados não deve consultar a base")
+
+    service.settings = service.settings.model_copy(update={"esclarecimento_modelo": True})
+    monkeypatch.setattr(service.models, "dados_faltantes", lambda q: ["o CNAE", "a receita"])
+    monkeypatch.setattr(service.store, "count", forbidden)
+    response = service.query("Sou dentista, posso abrir uma empresa no Simples?")
+    assert response.status == "needs_clarification"
+    assert "- o CNAE" in response.answer
+
+
+def test_filtro_com_modelo_desligado_ou_pergunta_geral_nao_chama_o_modelo(service, monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Filtro com modelo não deveria rodar")
+
+    monkeypatch.setattr(service.models, "dados_faltantes", forbidden)
+    assert service.query("Sou dentista, posso abrir uma empresa?").status != "needs_clarification"
+    service.settings = service.settings.model_copy(update={"esclarecimento_modelo": True})
+    assert service.query("Qual é o limite do MEI?").status != "needs_clarification"

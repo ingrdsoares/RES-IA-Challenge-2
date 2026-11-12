@@ -37,6 +37,20 @@ class Settings(BaseSettings):
     candidate_k: int = Field(default=30, ge=1, le=200)
     # Reforço multiplicativo do RRF para natureza "legislacao"; 0 desliga.
     legislation_boost: float = Field(default=0.2, ge=0, le=2, allow_inf_nan=False)
+    # Somado ao score do reranker para trechos de legislação; 0 desliga.
+    rerank_legislation_boost: float = Field(default=0.0, ge=0, le=1, allow_inf_nan=False)
+    # Caracteres de trechos vizinhos do mesmo documento somados a cada fonte; 0 desliga.
+    context_window_chars: int = Field(default=0, ge=0, le=8000)
+    # Máximo de trechos do mesmo documento no top-k (variedade de fontes); 0 desliga.
+    max_trechos_por_documento: int = Field(default=0, ge=0, le=10)
+    # Pergunta em 1ª pessoa passa por uma chamada curta ao modelo que decide se faltam dados.
+    esclarecimento_modelo: bool = False
+    # Acrescenta aviso listando norma/artigo citado que não está nas fontes entregues ao modelo.
+    conferir_citacoes: bool = False
+    # Peso dos sinônimos e siglas do glossário na busca esparsa; 0 desliga a expansão.
+    peso_expansao: float = Field(default=0.5, ge=0, le=1, allow_inf_nan=False)
+    # E-mails (separados por vírgula) com acesso a GET /rag/metricas; vazio: ninguém.
+    admin_emails: str = ""
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)

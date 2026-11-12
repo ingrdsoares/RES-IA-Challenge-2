@@ -3,6 +3,7 @@ import math
 import re
 from collections.abc import Sequence
 
+import httpx
 import ollama
 
 from app.config import Settings
@@ -30,6 +31,23 @@ SYSTEM_PROMPT = (
     "Não invente normas, datas ou referências."
 )
 AVISO_CITACAO = "\n\n(Citações sem fonte correspondente foram removidas desta resposta.)"
+ESCLARECIMENTO_PROMPT = (
+    "Você classifica perguntas fiscais de pequenas empresas brasileiras. Decida se a pergunta "
+    "trata do caso concreto do usuário e só pode ser respondida com dados desse caso que ele "
+    "NÃO informou (por exemplo: atividade ou CNAE, receita bruta, regime tributário, folha, "
+    "município, período, valor). Pergunta sobre regra geral, ou que já traz os dados "
+    "necessários, não precisa de dados. Na dúvida, responda que não precisa. "
+    'Responda só com JSON: {"precisa_dados": true|false, "faltam": ["dado 1", "dado 2"]}, '
+    "com no máximo 4 itens curtos em português."
+)
+_FORMATO_ESCLARECIMENTO = {
+    "type": "object",
+    "properties": {
+        "precisa_dados": {"type": "boolean"},
+        "faltam": {"type": "array", "items": {"type": "string"}, "maxItems": 4},
+    },
+    "required": ["precisa_dados", "faltam"],
+}
 
 
 def citacoes_validas(texto: str, total: int) -> tuple[str, bool]:
@@ -187,6 +205,41 @@ class LocalModels:
             if not content or not content.strip():
                 raise DependencyUnavailable("O modelo não retornou uma resposta utilizável.")
             return content.strip()
+
+    def dados_faltantes(self, question: str) -> list[str]:
+        """Dados do caso que faltam para responder, segundo o modelo; [] se não faltam.
+
+        Qualquer falha (Ollama fora, JSON inválido) devolve [] e a pergunta segue para a busca:
+        este filtro nunca impede uma resposta por erro próprio.
+        """
+        try:
+            response = self.client.chat(
+                model=self.settings.generation_model,
+                messages=[
+                    {"role": "system", "content": ESCLARECIMENTO_PROMPT},
+                    {"role": "user", "content": question},
+                ],
+                stream=False,
+                think=False,
+                format=_FORMATO_ESCLARECIMENTO,
+                options={"num_ctx": 2048, "num_predict": 128, "temperature": 0, "seed": 42},
+            )
+            dados = json.loads(response.message.content or "")
+        except (
+            ollama.ResponseError,
+            httpx.HTTPError,
+            ConnectionError,
+            ValueError,
+            TypeError,
+            AttributeError,
+        ):
+            return []
+        if not isinstance(dados, dict) or dados.get("precisa_dados") is not True:
+            return []
+        faltam = dados.get("faltam")
+        if not isinstance(faltam, list):
+            return []
+        return [str(f).strip() for f in faltam if str(f).strip()][:4]
 
     def close(self) -> None:
         self.client.close()

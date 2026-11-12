@@ -46,6 +46,20 @@ def vetor_documento(texto: str) -> tuple[list[int], list[float]]:
     return indices, [pesos[i] * (K1 + 1) / (pesos[i] + fator) for i in indices]
 
 
-def vetor_consulta(texto: str) -> tuple[list[int], list[float]]:
-    indices = sorted({_indice(t) for t in tokens(texto)})
-    return indices, [1.0] * len(indices)
+PESO_EXPANSAO = 0.5
+
+
+def vetor_consulta(
+    texto: str, peso_expansao: float = PESO_EXPANSAO
+) -> tuple[list[int], list[float]]:
+    """Termos da pergunta pesam 1.0; sinônimos do glossário (só na consulta) pesam peso_expansao.
+
+    Com peso 0 não há expansão: o vetor é o mesmo de antes do glossário.
+    """
+    from app.sinonimos import expandir_consulta  # import tardio: sinonimos importa fold daqui
+
+    expansao = expandir_consulta(texto) if peso_expansao > 0 else ""
+    pesos = {_indice(t): peso_expansao for t in tokens(expansao)}
+    pesos |= {_indice(t): 1.0 for t in tokens(texto)}
+    indices = sorted(pesos)
+    return indices, [pesos[i] for i in indices]

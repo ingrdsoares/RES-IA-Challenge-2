@@ -38,3 +38,10 @@ def service():
     store.ensure_collection()
     yield service
     service.close()
+
+
+@pytest.fixture(autouse=True)
+def _sem_telemetria_no_banco(request, monkeypatch):
+    """Fora de tests/mvp não há Postgres: evita a gravação de telemetria em /rag/query."""
+    if "mvp" not in request.node.nodeid:
+        monkeypatch.setattr("app.main.registrar", lambda *args: None)
