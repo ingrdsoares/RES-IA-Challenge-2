@@ -175,6 +175,43 @@ services:
       - reranker_modelos:/modelos
     restart: unless-stopped
 
+  # Serviços dos testes do MVP (backend/api/tests/mvp), iguais aos do CI. Sem volume: os dados
+  # somem ao parar. Subir/remover: ver "Os testes de acesso" em backend/README.md.
+  postgres-test:
+    profiles: [test]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: sd_test_local
+      POSTGRES_DB: sd_test
+    ports:
+      - "127.0.0.1:15432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sd_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis-test:
+    profiles: [test]
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:16379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  storage-test:
+    profiles: [test]
+    image: chrislusf/seaweedfs:4.53
+    command: ["mini", "-dir=/data"]
+    environment:
+      AWS_ACCESS_KEY_ID: sd_test_user
+      AWS_SECRET_ACCESS_KEY: sd_test_password
+    ports:
+      - "127.0.0.1:19000:8333"
+
 volumes:
   storage_data:
   postgres_data:

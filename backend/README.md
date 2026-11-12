@@ -331,6 +331,18 @@ Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
 na porta 16379, em containers separados. Essa base é recriada por teste;
 nunca aponte esse ambiente para dados da aplicação.
 
+Para rodar os testes do MVP (`backend/api/tests/mvp`) localmente, suba os serviços
+do perfil `test`, iguais aos do CI e sem volume: Postgres na 15432, Redis na 16379 e
+S3 na 19000.
+
+```bash
+docker compose -f backend/compose.yaml --profile test up -d postgres-test redis-test storage-test
+cd backend/api && .venv/Scripts/python -m pytest tests/mvp -q   # Linux/macOS: .venv/bin/python
+docker compose -f backend/compose.yaml --profile test rm -sf postgres-test redis-test storage-test
+```
+
+Use `rm -sf` com os nomes dos serviços, e não `down`, que derruba o projeto inteiro (API, Qdrant e bancos).
+
 ## Jobs e armazenamento S3 local
 
 O serviço `storage` usa SeaweedFS 4.53 (compatível com S3). A proposta inicial
