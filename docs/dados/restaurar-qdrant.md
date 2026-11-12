@@ -1,5 +1,7 @@
 # Restaurar a base Qdrant (knowledge_base_v3)
 
+> **Base padrão do projeto: `knowledge_base_v2`** (155.781 pontos), definida em 12/11/2026 após a comparação em `docs/avaliacao/avaliacao-rag-v3-2026-11-12.md`. A `knowledge_base_v3` descrita aqui é uma alternativa (chunk de 4000, Markdown limpo) e não é o padrão: para usá-la, defina `COLLECTION_NAME=knowledge_base_v3`.
+
 Snapshot pronto da coleção, para o grupo não precisar reindexar (a carga leva ~2,5 h numa RTX 3080 Ti).
 
 | Item | Valor |
@@ -32,7 +34,7 @@ curl -X POST "http://127.0.0.1:6333/collections/knowledge_base_v3/snapshots/uplo
 curl -s http://127.0.0.1:6333/collections/knowledge_base_v3   # points_count = 103540
 ```
 
-Na API, `COLLECTION_NAME=knowledge_base_v3` (já é o padrão em `backend/.env.example`).
+Na API, `COLLECTION_NAME=knowledge_base_v3` (o padrão em `backend/.env.example` é `knowledge_base_v2`).
 
 ## Regras para os vetores baterem
 
