@@ -73,18 +73,38 @@ class RAGService:
         else:
             self.base_dir = Path(base_dir)
 
-        # 1. Inicializa Vector Store se não for injetado
+        # 1. Inicializa Vector Store se não for injetado (auto-ingestão se vazio ou inexistente)
         if vector_store:
             self.vector_store = vector_store
         else:
             db_path = self.base_dir / "data" / "processed" / "vector_index.db"
             self.vector_store = LegalVectorStore(db_path=str(db_path), use_dense=True)
+            stats = self.vector_store.get_stats()
+            if stats.get("total_chunks", 0) == 0:
+                from src.rag.ingest import IngestionPipeline
 
-        # 2. Inicializa Motor Fiscal se não for injetado
+                pipeline = IngestionPipeline(
+                    raw_dir=str(self.base_dir / "data" / "raw"),
+                    db_path=str(db_path),
+                    use_dense=True,
+                    include_subdirs=False,
+                )
+                pipeline.run()
+
+        # 2. Inicializa Motor Fiscal se não for injetado (auto-ingestão se inexistente)
         if calculator:
             self.calculator = calculator
         else:
             fiscal_db = self.base_dir / "data" / "processed" / "fiscal.db"
+            if not fiscal_db.exists():
+                from src.fiscal.ingest import FiscalIngestionPipeline
+
+                fiscal_pipeline = FiscalIngestionPipeline(
+                    raw_dir=str(self.base_dir / "data" / "raw"),
+                    db_path=str(fiscal_db),
+                )
+                fiscal_pipeline.run()
+
             if fiscal_db.exists():
                 repo = FiscalRepository(db_path=str(fiscal_db))
                 self.calculator = FiscalCalculator(repository=repo)
