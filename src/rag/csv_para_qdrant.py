@@ -34,7 +34,7 @@ if str(BACKEND_API) not in sys.path:
 from app.config import Settings  # noqa: E402
 from app.errors import DependencyUnavailable, dependency_errors  # noqa: E402
 from app.models import LocalModels  # noqa: E402
-from app.normas import chave_artigo, chaves_normas  # noqa: E402
+from app.normas import _NOMES, chave_artigo, chaves_normas, fold, nome_norma  # noqa: E402
 from app.sparse import vetor_documento  # noqa: E402
 from app.vector_store import DENSE, SPARSE, VectorStore  # noqa: E402
 from qdrant_client import QdrantClient  # noqa: E402
@@ -54,15 +54,60 @@ NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "socio-digital/recorte-rag-v1")
 CHUNKER = LegalHierarchicalChunker()
 # Ligada por --limpar; desligada mantém a carga igual à da knowledge_base_v2.
 LIMPAR = False
+# Ligadas por --contexto-norma / --corte-por-artigo; desligadas, a carga é a da knowledge_base_v2.
+CONTEXTO_NORMA = False
+CHUNKER_ARTIGO: LegalHierarchicalChunker | None = None
+# Naturezas tratadas como legislação no corte por artigo: leis grandes (ex.: Lei 9.249) vêm
+# como "nao_informada" no CSV. Só vale se o texto tiver "Art. N" (senão o chunker não muda).
+NATUREZAS_ARTIGO = frozenset({"legislacao", "nao_informada", "ato_normativo_administrativo"})
+# Marca gravada no payload só nos modos novos; --retomar só pula ponto da mesma configuração.
+CARGA = ""
 
 
-def configurar(limite_corpo: int, limpar: bool) -> None:
+def configurar(
+    limite_corpo: int,
+    limpar: bool,
+    contexto_norma: bool = False,
+    corte_por_artigo: bool = False,
+) -> None:
     """Tamanho do chunk e limpeza da carga; ids de ponto mudam, então use outra coleção."""
-    global LIMITE_CORPO, SOBREPOSICAO, CHUNKER, LIMPAR
+    global LIMITE_CORPO, SOBREPOSICAO, CHUNKER, LIMPAR, CONTEXTO_NORMA, CHUNKER_ARTIGO, CARGA
     LIMITE_CORPO = limite_corpo
     SOBREPOSICAO = limite_corpo // 10
     CHUNKER = LegalHierarchicalChunker(max_chunk_chars=limite_corpo, overlap_chars=SOBREPOSICAO)
+    CHUNKER_ARTIGO = (
+        LegalHierarchicalChunker(
+            max_chunk_chars=limite_corpo, overlap_chars=SOBREPOSICAO, por_artigo=True
+        )
+        if corte_por_artigo
+        else None
+    )
     LIMPAR = limpar
+    CONTEXTO_NORMA = contexto_norma
+    CARGA = "+".join(
+        n for n, on in (("contexto", contexto_norma), ("artigo", corte_por_artigo)) if on
+    )
+
+
+def contexto_da_norma(linha: dict, artigo: str) -> str:
+    """Trecho curto para o cabeçalho: nome por extenso, artigo, natureza e frente.
+
+    O título já está no cabeçalho do chunker (DOCUMENTO/FONTE); aqui entra só o que falta:
+    o tipo por extenso quando o título abrevia ("IN 1503/2014"), o artigo normalizado e os
+    rótulos do CSV.
+    """
+    partes = []
+    titulo = fold(linha["titulo"])
+    chaves = chaves_normas(linha["titulo"])
+    if chaves and fold(_NOMES[chaves[0].split(":")[0]]) not in titulo:
+        partes.append(nome_norma(chaves[0]))
+    if chave := chave_artigo(artigo):
+        partes.append(f"art. {chave.upper()}")
+    for campo in ("natureza", "frente"):
+        valor = (linha.get(campo) or "").replace("_", " ").replace("-", " ").strip()
+        if valor and valor != "nao informada":
+            partes.append(valor)
+    return " | ".join(partes).replace("]", ")").replace(chr(10), " ")
 
 
 # Páginas de login do gov.br coletadas no lugar das súmulas do CARF; não têm conteúdo.
@@ -217,7 +262,10 @@ def itens_do_documento(
     texto_doc = limpar_segmentos(linha["texto"])
     if LIMPAR:
         texto_doc = limpar_markdown(texto_doc)
-    for chunk in CHUNKER.chunk_document(texto_doc, linha["titulo"]):
+    chunker = CHUNKER
+    if CHUNKER_ARTIGO and linha.get("natureza") in NATUREZAS_ARTIGO:
+        chunker = CHUNKER_ARTIGO
+    for chunk in chunker.chunk_document(texto_doc, linha["titulo"]):
         estatisticas["chunks_base"] += 1
         bruto = chunk.raw_text
         cabecalho = (
@@ -239,6 +287,13 @@ def itens_do_documento(
             ini = 0 if a == 0 else mapa[a]
             fim = len(bruto) if b >= len(limpo) else mapa[b]
             trechos.append((trecho, bruto[ini:fim]))
+        if (
+            CONTEXTO_NORMA
+            and cabecalho.startswith("[")
+            and (ctx := contexto_da_norma(linha, chunk.artigo))
+        ):
+            # Dentro do mesmo colchete: a API tira a linha "[...]" inteira e o corpo fica igual.
+            cabecalho = f"[{ctx} | " + cabecalho[1:]
         for k, (trecho, original) in enumerate(trechos, 1):
             texto = cabecalho + trecho
             dados = {
@@ -253,6 +308,8 @@ def itens_do_documento(
                 "natureza": linha.get("natureza") or None,
                 "ordem": indice,
             }
+            if CARGA:
+                dados["carga"] = CARGA
             # reference_date: dia da coleta (versão do texto); effective_date: início da
             # vigência na fonte (hoje vazio no CSV). Ausente/inválido = campo omitido.
             for campo, coluna in (
@@ -279,6 +336,8 @@ def _filtro_documento(documento_id: str) -> qm.Filter:
 
 def _pontos_do_documento(client: QdrantClient, colecao: str, documento_id: str) -> int:
     filtro = _filtro_documento(documento_id)
+    if CARGA:
+        filtro.must.append(qm.FieldCondition(key="carga", match=qm.MatchValue(value=CARGA)))
     return client.count(colecao, count_filter=filtro, exact=True).count
 
 
@@ -440,8 +499,18 @@ def main(
     parser.add_argument(
         "--limpar", action="store_true", help="aplica backend/cleaning/limpeza_markdown"
     )
+    parser.add_argument(
+        "--contexto-norma",
+        action="store_true",
+        help="põe no cabeçalho do chunk o tipo da norma por extenso, o artigo, a natureza e a frente",
+    )
+    parser.add_argument(
+        "--corte-por-artigo",
+        action="store_true",
+        help="legislação: um ponto por artigo; artigo grande vira janelas com sobreposição",
+    )
     args = parser.parse_args(argv)
-    configurar(args.limite_corpo, args.limpar)
+    configurar(args.limite_corpo, args.limpar, args.contexto_norma, args.corte_por_artigo)
     settings = Settings()
 
     if args.dry_run:

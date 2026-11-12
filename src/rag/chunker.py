@@ -106,7 +106,11 @@ class LegalHierarchicalChunker:
         max_chunk_chars: int = 2000,
         min_chunk_chars: int = 150,
         overlap_chars: int = 200,
+        por_artigo: bool = False,
     ):
+        # por_artigo: artigo grande vira janelas com sobreposição (um rótulo só, sem quebrar por
+        # parágrafo nem repetir o caput); desligado mantém o corte por parágrafo de sempre.
+        self.por_artigo = por_artigo
         self.max_chunk_chars = max_chunk_chars
         self.min_chunk_chars = min_chunk_chars
         self.overlap_chars = overlap_chars
@@ -267,6 +271,23 @@ class LegalHierarchicalChunker:
                             "char_count": len(enriched_content),
                             "is_subchunk": False,
                         },
+                    )
+                )
+            elif self.por_artigo:
+                cabecalho = f"[DOCUMENTO: {document_id} | FONTE: {source_doc} | CAPÍTULO: {capitulo_label} | ARTIGO: {artigo_label} | TEMA: {tema_label}]\n"
+                chunks.extend(
+                    self._sliding_window_split(
+                        text=art_text,
+                        header=cabecalho,
+                        base_id=f"{document_id}_{self._sanitize_id(artigo_label)}",
+                        source_doc=source_doc,
+                        document_id=document_id,
+                        title=title,
+                        artigo_label=artigo_label,
+                        paragrafo_label="",
+                        tema_label=tema_label,
+                        reference_date=reference_date,
+                        effective_date=effective_date,
                     )
                 )
             else:
