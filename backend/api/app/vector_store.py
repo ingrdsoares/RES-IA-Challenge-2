@@ -201,5 +201,66 @@ class VectorStore:
                     seguintes[p.id] = fontes[0]
         return seguintes
 
+    def vizinhos(self, ids: list, raio: int = 2) -> dict:
+        """Por ponto, os trechos até `raio` posições antes e depois no MESMO documento.
+
+        Devolve {id: {delta: Source}}, delta = ordem do vizinho - ordem do ponto (sem 0).
+        Uma leitura por id e uma única busca filtrada para todos os pontos.
+        """
+        with dependency_errors("Qdrant"):
+            pontos = self.client.retrieve(
+                self.settings.collection_name, ids, with_payload=["document_id", "ordem"]
+            )
+            origem = {
+                p.id: (p.payload["document_id"], p.payload["ordem"])
+                for p in pontos
+                if (p.payload or {}).get("document_id") is not None
+                and (p.payload or {}).get("ordem") is not None
+            }
+            if not origem:
+                return {}
+            filtro = models.Filter(
+                should=[
+                    models.Filter(
+                        must=[
+                            models.FieldCondition(
+                                key="document_id", match=models.MatchValue(value=doc)
+                            ),
+                            models.FieldCondition(
+                                key="ordem", range=models.Range(gte=o - raio, lte=o + raio)
+                            ),
+                        ]
+                    )
+                    for doc, o in origem.values()
+                ]
+            )
+            achados, _ = self.client.scroll(
+                self.settings.collection_name,
+                filtro,
+                limit=len(origem) * 2 * raio + len(origem),
+                with_payload=True,
+            )
+            por_chave = {
+                ((a.payload or {}).get("document_id"), (a.payload or {}).get("ordem")): a
+                for a in achados
+            }
+            saida: dict = {}
+            for pid, (doc, o) in origem.items():
+                vizinhos = {}
+                for delta in range(-raio, raio + 1):
+                    achado = por_chave.get((doc, o + delta))
+                    if delta and achado:
+                        fonte = self._fontes(
+                            [
+                                models.ScoredPoint(
+                                    id=achado.id, version=0, score=0.0, payload=achado.payload
+                                )
+                            ]
+                        )
+                        if fonte:
+                            vizinhos[delta] = fonte[0]
+                saida[pid] = vizinhos
+        return saida
+
     def close(self) -> None:
         self.client.close()

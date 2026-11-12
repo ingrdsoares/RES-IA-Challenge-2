@@ -45,6 +45,43 @@ def _corpo_bruto(fonte: Source) -> str:
     return re.sub(r"\A\[[^\]]*\]\n", "", fonte.text).strip()
 
 
+def expandir_janela(fontes: list[Source], vizinhos: dict, janela: int) -> list[Source]:
+    """Cada fonte ganha até `janela` caracteres de corpo dos trechos vizinhos do documento.
+
+    Ordem de preferência: seguinte, anterior, 2º seguinte, 2º anterior... O anterior entra
+    logo após o cabeçalho; o seguinte, no fim. Vizinho já escolhido (id ou corpo igual) é
+    pulado. Fonte que termina em ":" recebe o seguinte inteiro, sem cortar.
+    """
+    ja = {f.id for f in fontes}
+    corpos = {_corpo(f) for f in fontes}
+    saida = []
+    for fonte in fontes:
+        viz = vizinhos.get(fonte.id) or {}
+        restante = janela
+        antes, depois = [], []
+        for n in range(1, max(map(abs, viz), default=0) + 1):
+            for delta in (n, -n):
+                v = viz.get(delta)
+                if v is None or v.id in ja or restante <= 0:
+                    continue
+                corpo = _corpo_bruto(v)
+                if not corpo or _corpo(v) in corpos:
+                    continue
+                if not (delta == 1 and fonte.text.rstrip().endswith(":")):
+                    corpo = corpo[:restante]
+                restante -= len(corpo)
+                corpos.add(_corpo(v))
+                (depois if delta > 0 else antes).append((delta, corpo))
+        if antes or depois:
+            cabecalho = re.match(r"\A\[[^\]]*\]\n", fonte.text)
+            cabecalho = cabecalho.group(0) if cabecalho else ""
+            corpo = fonte.text[len(cabecalho) :].rstrip()
+            partes = [c for _, c in sorted(antes)] + [corpo] + [c for _, c in sorted(depois)]
+            fonte = fonte.model_copy(update={"text": cabecalho + "\n".join(partes)})
+        saida.append(fonte)
+    return saida
+
+
 class RagService:
     def __init__(self, settings: Settings, store: VectorStore, models: LocalModels):
         self.settings = settings
@@ -77,10 +114,17 @@ class RagService:
             escolhidos = combinar(
                 citados, ordem[:2] + self._por_parte(question) + ordem, self.settings.top_k
             )
-            cortados = [f.id for f in escolhidos if f.text.rstrip().endswith(":")]
-            seguintes = self.store.continuacoes(cortados) if cortados else {}
+            if self.settings.context_window_chars:
+                vizinhos = self.store.vizinhos([f.id for f in escolhidos])
+                escolhidos = expandir_janela(
+                    escolhidos, vizinhos, self.settings.context_window_chars
+                )
+            else:
+                cortados = [f.id for f in escolhidos if f.text.rstrip().endswith(":")]
+                seguintes = self.store.continuacoes(cortados) if cortados else {}
+                escolhidos = juntar_continuacoes(escolhidos, seguintes)
             sources = prepare_sources(
-                juntar_continuacoes(escolhidos, seguintes),
+                escolhidos,
                 self.settings.max_context_chars,
                 question=question,
                 num_ctx=self.settings.num_ctx,
