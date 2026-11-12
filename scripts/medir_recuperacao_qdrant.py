@@ -50,6 +50,9 @@ def carregar_casos(caminho: Path, mapa: dict) -> list[dict]:
                 "total_esperado": len(ids),
                 "esperados": [i for i in ids if i],
                 "equivalentes": [i for i in equivalentes if i],
+                "so_recorte_completo": bool(
+                    caso.get("metadata", {}).get("fonte_so_no_recorte_completo")
+                ),
             }
         )
     return casos
@@ -193,6 +196,13 @@ def main() -> int:
     rodadas = {
         camada: [avaliar(lista, k, 0.0) for k in TOP_KS] for camada, lista in por_camada.items()
     }
+    # Mesma medição sem as perguntas cuja fonte só existe no recorte completo (coleções públicas).
+    rodadas_sem = {
+        camada: [
+            avaliar([c for c in lista if not c["so_recorte_completo"]], k, 0.0) for k in TOP_KS
+        ]
+        for camada, lista in por_camada.items()
+    }
     args.saida.parent.mkdir(parents=True, exist_ok=True)
     args.saida.write_text(
         json.dumps(
@@ -208,6 +218,7 @@ def main() -> int:
                     "citation_slots": settings.citation_slots,
                 },
                 "rodadas": rodadas,
+                "rodadas_sem_recorte_completo": rodadas_sem,
                 "por_pergunta": [
                     {
                         "id": c["id"],

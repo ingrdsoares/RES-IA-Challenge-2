@@ -256,6 +256,16 @@ docker compose -f backend/compose.yaml exec api env | grep -E 'BOOST|WINDOW|TREC
 
 Tudo o que usa modelo (embedding, geração, reranker) roda na máquina de configuração superior. Em cada passo, compare com a v2 original no `teste_ampliado` com `--repeticoes 3`, reportando com e sem as 7 perguntas que só têm fonte no recorte completo. Um passo só fica se ganhar.
 
+**Como rodar os passos 1 a 3 de uma vez.** `scripts/experimentos.py` percorre os experimentos de `data/benchmark/experimentos.exemplo.json` (linha de base v2, cada parâmetro de consulta sozinho, `esclarecimento_modelo`, `conferir_citacoes`, v4a/v4b/v4d/v4e). Em cada um: confere que as variáveis chegaram a `Settings` (se divergirem, o experimento é abortado), roda a avaliação com `--repeticoes 3` no `teste_ampliado`, confere o `manifest.json` da execução, roda `medir_recuperacao_qdrant.py` e grava tudo em `data/benchmark/experimentos-<data>/`. A avaliação e a medição rodam a API em processo, então o env vai direto ao subprocesso: não há contêiner para reiniciar. Qdrant, Ollama e reranker precisam estar no ar, e as coleções v4*, carregadas. Fora do exemplo: siglas (`PESO_EXPANSAO` é constante em `app/sparse.py`, sem variável de ambiente), v4c e a combinação v5.
+
+```bash
+python scripts/experimentos.py --config data/benchmark/experimentos.exemplo.json --dry-run   # só valida e mostra o plano
+python scripts/experimentos.py --config data/benchmark/experimentos.exemplo.json             # tudo; retoma pulando o que já tem resultado.json
+python scripts/experimentos.py --config data/benchmark/experimentos.exemplo.json --so base_v2,candidate_k_60 --repeticoes 1
+```
+
+A tabela única sai em `comparacao.md` e `comparacao.json` (todos os casos, e sem as 7 com `fonte_so_no_recorte_completo`), com ✓/✗ contra as metas da seção 3.1. "Respostas boas" e "erradas" ficam `n/d` até a revisão humana; a recusa indevida da tabela é só o status do RAG. Ajuste `RERANKER_URL` no `env_comum` do JSON e use o Python do ambiente da API (`--python`); `--avaliacao-args "--device cuda"` repassa opções ao `evaluation run`.
+
 0. **Snapshot da v2** (seção 7), antes de qualquer outra coisa.
 1. **Linha de base:** v2 com reranker, todos os parâmetros novos em 0 e `CANDIDATE_K=30`. Avaliação de respostas e `scripts/medir_recuperacao_qdrant.py` (Recall e MRR, estritos e lenientes).
 2. **Consulta, sem reindexar,** um parâmetro por vez:
