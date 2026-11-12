@@ -149,5 +149,6 @@ Em `backend/evaluation/data/`, no formato de `backend/evaluation/dataset.schema.
 | `teste_final_v3_2026-11-07.jsonl` | Teste por artigo, 20 perguntas |
 | `teste_compostas_2026-11-07.jsonl` | 20 perguntas usadas nos ajustes das compostas, 14 delas compostas |
 | `teste_compostas_confirmacao_2026-11-07.jsonl` | 10 perguntas compostas novas |
+| `teste_ampliado_2026-11-12.jsonl` | 81 perguntas (split final): 46 diretas, 10 compostas, 5 com valor desatualizado, 10 de esclarecimento e 10 de abstenção; base no `recorte-completo.csv.gz`, com trecho de evidência em `metadata`, revisão humana pendente e `equivalent_sources` onde há evidência |
 
 `data/benchmark/ground_truth_25_perguntas.json` ainda tem as referências anteriores, algumas tiradas de textos de demonstração; não deve ser usado. Detalhes dos testes em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.
