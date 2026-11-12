@@ -36,6 +36,8 @@ class Source(BaseModel):
 
 
 class QueryResponse(BaseModel):
-    status: Literal["answered", "empty_knowledge_base", "insufficient_context"]
+    status: Literal[
+        "answered", "empty_knowledge_base", "insufficient_context", "needs_clarification"
+    ]
     answer: str
     sources: list[Source]
