@@ -27,6 +27,9 @@
   * [ADR 001: Hospedagem e Custo de IA](arquitetura/adr-001-hospedagem-e-custo-ia.md)
   * [Pipeline de CD e Rollback](arquitetura/deploy-cd-e-rollback.md)
   * [Segurança de API e Rate Limiting](arquitetura/seguranca-e-rate-limit.md)
+  * [Conformidade com a LGPD e Privacidade](arquitetura/lgpd-e-privacidade.md)
+  * [Modelagem de Ameaças (STRIDE & OWASP)](arquitetura/modelagem-ameacas.md)
+  * [Plano de Resposta a Incidentes e Continuidade](arquitetura/plano-resposta-incidentes.md)
   * [Retomada na Máquina RTX 3080 Ti](arquitetura/retomada-rtx3080ti.md)
 
 * **Dados e Acervo**

@@ -1,5 +1,6 @@
 import logging
 import os
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -164,8 +165,11 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
 
     @app.middleware("http")
     async def security_headers_middleware(request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        request.state.request_id = request_id
         response = await call_next(request)
         headers = response.headers
+        headers["X-Request-ID"] = request_id
         headers["X-Content-Type-Options"] = "nosniff"
         headers["X-Frame-Options"] = "DENY"
         headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
