@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     embedding_dimensions: int = Field(default=1024, ge=32, le=4096)
     top_k: int = Field(default=8, ge=1, le=10)
     candidate_k: int = Field(default=30, ge=1, le=200)
+    # Reforço multiplicativo do RRF para natureza "legislacao"; 0 desliga.
+    legislation_boost: float = Field(default=0.2, ge=0, le=2, allow_inf_nan=False)
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)

@@ -198,3 +198,24 @@ def test_consulta_reserva_norma_avisa_ausente_e_valida_citacao(client):
     assert resposta.sources[0].id == 3
     assert modelo.ausentes == ["decreto:43982"]
     assert "[7]" not in resposta.answer
+
+
+def test_legislacao_ganha_reforco_sobre_consulta_de_mesmo_texto():
+    def ordem(boost):
+        client = QdrantClient(":memory:")
+        store = VectorStore(Settings(legislation_boost=boost, score_threshold=0.0), client)
+        store.ensure_collection()
+        texto = "presunção lucro serviços"
+        client.upsert(
+            store.settings.collection_name,
+            [
+                ponto(1, eixo(0), texto, natureza="consulta_tributaria"),
+                ponto(2, eixo(1), texto, natureza="legislacao"),
+            ],
+        )
+        ids = [s.id for s in store.search(eixo(0), texto)]
+        client.close()
+        return ids
+
+    assert ordem(0)[0] == 1
+    assert ordem(1.0)[0] == 2
