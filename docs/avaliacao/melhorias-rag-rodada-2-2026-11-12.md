@@ -10,8 +10,15 @@ Branch `feat/rag-rodada-2`, criada a partir da `main` depois da mesclagem do PR 
 | Janela de contexto | Soma trechos vizinhos do mesmo documento a cada fonte | `CONTEXT_WINDOW_CHARS` | 0 (desligado) |
 | Vigência | Grava datas no payload do Qdrant | Reindexação | Ativo na próxima carga |
 | Pedido de dados | 4 famílias novas: multa, juros, ISS e retenção | Sempre | Ligado |
-| Siglas e sinônimos | Expande siglas e termos na busca esparsa | Sempre | Ligado |
+| Siglas e sinônimos | Expande siglas e termos na busca esparsa | `PESO_EXPANSAO` | 0,5 (ligado); 0 desliga |
 | Conjunto ampliado | 81 perguntas novas e equivalentes no gabarito | Avaliação | — |
+| Variedade de documentos (§8) | Limita trechos do mesmo documento no top-k | `MAX_TRECHOS_POR_DOCUMENTO` | 0 (desligado) |
+| Cabeçalho com a norma e corte por artigo (§8) | Carga enriquecida para Recall | `--contexto-norma`, `--corte-por-artigo` | Só em coleção nova |
+| Pedido de dados com modelo (§9) | Chamada curta ao modelo em pergunta de 1ª pessoa | `ESCLARECIMENTO_MODELO` | `false` |
+| Conferência de citações (§10) | Aviso para norma/artigo sem suporte nas fontes | `CONFERIR_CITACOES` | `false` |
+| Data do ato (§11) | `vigencia_fonte` preenchida; opção na carga para os CSVs atuais | `--vigencia-do-titulo` | Só em coleção nova |
+| Telemetria e avaliação do usuário (§12) | Métricas de uso sem dado pessoal e botão útil/não útil | `ADMIN_EMAILS` para ver as métricas | Ligado (gravação) |
+| Script de experimentos (Roteiro) | Roda o roteiro e compara com a v2 | `scripts/experimentos.py` | — |
 
 ## 1. Legislação também com o reranker ligado
 
@@ -268,19 +275,105 @@ O `compose.yaml` e o `compose.prod.yaml` repassam à API cada variável de forma
 - `CONTEXT_WINDOW_CHARS`
 - `MAX_TRECHOS_POR_DOCUMENTO`
 - `ESCLARECIMENTO_MODELO`
+- `CONFERIR_CITACOES`
+- `PESO_EXPANSAO`
+- `ADMIN_EMAILS`
 
 O `backend/.env.example` também lista todos eles. Na máquina de medição, confira dentro do contêiner que o valor chegou, antes de cada rodada:
 
 ```bash
-docker compose -f backend/compose.yaml exec api env | grep -E 'BOOST|WINDOW|TRECHOS|ESCLARECIMENTO|CANDIDATE'
+docker compose -f backend/compose.yaml exec api env | grep -E 'BOOST|WINDOW|TRECHOS|ESCLARECIMENTO|CANDIDATE|CITACOES|EXPANSAO'
 ```
+
+O `scripts/experimentos.py` não usa Docker. Ele roda a avaliação no próprio processo e confere as configurações efetivas antes de cada experimento.
+
+## 10. Conferência de citações na resposta
+
+**Mudança.**
+- Com `CONFERIR_CITACOES=true` (padrão `false`), a resposta que cita um par norma/artigo sem suporte nas fontes ganha um aviso no fim: "(Atenção: as referências a seguir não constam das fontes consultadas e devem ser conferidas: ...)".
+- O texto da resposta não é alterado, então um alarme falso nunca estraga uma resposta correta.
+- Só vale para respostas com status `answered`.
+- A regra de suporte ficou em `app/citacoes_normas.py`, compartilhada com a métrica `citacao_suportada`. API e avaliação dão o mesmo resultado.
+- Uma fonte sustenta o par se cita o artigo junto da norma, ou se o título/fonte é da norma e o texto menciona o artigo. Conta também o texto dos vizinhos da janela de contexto.
+
+**Riscos de alarme falso.**
+- Artigo citado sem norma logo depois herda a norma citada antes. Por exemplo, "art. 5º da Constituição" depois de uma lei.
+- "arts. 3º e 5º" conta só o primeiro artigo.
+
+**Medir.** Que fração das respostas recebe o aviso, e conferir à mão cada resposta avisada para contar os alarmes falsos.
+
+## 11. Data do ato na carga (vigência)
+
+**Achado.**
+- A coluna `vigencia_fonte` saía vazia porque o refino descartava as datas que o coletor já tinha salvo nos metadados: `data_publicacao_fonte` e `data` da Receita, `data_publicacao` da SEFAZ-DF.
+- Outras fontes de data: o título ("…, de 3 de janeiro de 2005") e a linha "PUBLICADA NO DODF … DE 20/04/2022".
+
+**Mudança.**
+- A exportação (`src/rag/recorte_csv.py`) grava a **data do ato** (publicação, senão edição) em AAAA-MM-DD, usando `src/rag/vigencia.py`.
+- Não é o início da vigência: vacância e efeitos diferidos não são deduzidos.
+- **Texto consolidado fica sem data de propósito.** São leis com "Redação dada pela", "alterado pelo" ou visão multivigente da Receita. A data original de uma lei já alterada faria a versão vigente perder para uma lei mais nova que só a alterou.
+- Para os CSVs atuais, `--vigencia-do-titulo` na carga deriva a data quando a coluna está vazia. Sem a opção, a carga continua idêntica.
+
+**Cobertura** no recorte público (4.026 documentos):
+
+| Natureza | Documentos | Próxima exportação | `--vigencia-do-titulo` |
+|---|---:|---:|---:|
+| Interpretação administrativa | 1.808 | 1.808 | 1.058 |
+| Legislação | 935 | 100 | 98 |
+| Consulta tributária | 810 | 810 | 613 |
+| Outras | 473 | 11 | 6 |
+| **Total** | **4.026** | **2.729 (68%)** | **1.775 (44%)** |
+
+**Pendente.**
+- Legislação tem pouca data porque 784 leis da Receita e 43 do SINJ são consolidadas.
+- No caso do ICMS-DF, a Lei 3.531/2005 e a LC 1.025/2023 ficam distinguíveis por data, mas a Lei 1.254/1996 consolidada fica sem data.
+- Ainda falta a API preferir a regra mais recente quando há documentos datados e sem data sobre o mesmo ponto.
+
+## 12. Uso real: telemetria, métricas e avaliação do usuário
+
+**Telemetria.** Cada `POST /rag/query` grava em `rag_consultas` (migração `0010_telemetria_rag`):
+- `request_id`, horário e status (incluindo `error`);
+- latência em ms, número de fontes e coleção.
+
+**Não grava** pergunta, resposta, hash da pergunta, conta nem IP. Segue `docs/arquitetura/lgpd-e-privacidade.md`: só métricas sem dado pessoal. O hash foi descartado porque perguntas curtas podem ser descobertas por tentativa. Falha da telemetria só gera log e nunca derruba a consulta.
+
+**Métricas.** `GET /rag/metricas?from=AAAA-MM-DD&to=AAAA-MM-DD`:
+- devolve, por dia, o total, a contagem por status e a mediana e o p95 da latência;
+- aceita intervalo de até 93 dias;
+- só é liberado para os e-mails em `ADMIN_EMAILS`, separados por vírgula; vazio, ninguém tem acesso.
+
+**Avaliação do usuário.** `POST /rag/feedback`:
+- exige sessão e CSRF;
+- corpo `{"request_id": "...", "useful": true|false, "reason": "..."}`;
+- `reason` só aceita a lista fechada `incorreta`, `incompleta`, `desatualizada`, `sem_fonte`, `confusa` e `outro`, **sem texto livre**, por LGPD;
+- vale uma avaliação por conta e consulta (a nova substitui a anterior), e as avaliações são apagadas junto com a conta.
+
+**Contrato para o botão do frontend.**
+- Ler o cabeçalho `X-Request-ID` da resposta de `/rag/query`.
+- Mandar o `POST /rag/feedback`, que responde 204.
+- Mostrar a lista de motivos só em "não útil".
+- Erros: 404 para `request_id` desconhecido e 422 para motivo inválido.
+
+**Outras mudanças.**
+- A conexão com o Postgres agora tem timeout de 5 s. Antes, banco fora do ar travava `/rag/query`.
+- Os testes da API fora de `tests/mvp` não gravam telemetria.
+
+## 13. Testes do MVP sem Postgres manual
+
+`backend/compose.yaml` ganhou o perfil `test`, com os mesmos serviços e portas do CI e sem volume:
+- `postgres-test` na 15432;
+- `redis-test` na 16379;
+- `storage-test` (S3) na 19000.
+
+O uso está em `backend/README.md`, na parte "Os testes de acesso". Para remover, use `rm -sf` com os nomes dos serviços, e não `down`, que derruba o projeto inteiro.
 
 ## Testes
 
-- API: 248 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
-- Raiz: 93 testes passando (`pytest tests`).
+- API: 262 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
+- Raiz: 126 testes passando (`pytest tests`).
 - `ruff check` e `ruff format --check` limpos nos arquivos alterados.
-- `tests/mvp` não rodou: precisa do Postgres de teste na porta 15432.
+- Migração `0010_telemetria_rag` conferida com `alembic upgrade --sql`, no modo offline.
+- `tests/mvp` não rodou aqui: o Docker estava desligado. Com o perfil `test`, roda localmente; no CI, roda como antes.
 
 ## Roteiro de medição (máquina com GPU, serviços no ar)
 
@@ -303,7 +396,9 @@ A tabela única sai em `comparacao.md` e `comparacao.json` (todos os casos, e se
    - `CANDIDATE_K` em 60 e 100, medindo também a latência;
    - `RERANK_LEGISLATION_BOOST` em 0,10 e 0,20, olhando n11 e n03;
    - siglas: zerar `PESO_EXPANSAO` para ter o "antes";
-   - `ESCLARECIMENTO_MODELO=true`: acerto nas perguntas de pedido de dados e zero falso positivo nas perguntas com resposta (seção 9).
+   - `ESCLARECIMENTO_MODELO=true`: acerto nas perguntas de pedido de dados e zero falso positivo nas perguntas com resposta (seção 9);
+   - `CONFERIR_CITACOES=true`: fração de respostas avisadas e alarmes falsos, conferidos à mão (seção 10);
+   - `--vigencia-do-titulo`: exige recarga; entra junto com a próxima coleção nova (seção 11).
 3. **Coleções novas,** cada uma contra a v2:
    - v4a (chunk 1000) com `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500;
    - v4b (`--limpar`);
