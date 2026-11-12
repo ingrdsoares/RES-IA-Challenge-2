@@ -219,3 +219,21 @@ def test_legislacao_ganha_reforco_sobre_consulta_de_mesmo_texto():
 
     assert ordem(0)[0] == 1
     assert ordem(1.0)[0] == 2
+
+
+def de_doc(pid, doc):
+    return Source(id=pid, text=f"trecho {pid}", source="Fonte", score=0.9, document_id=doc)
+
+
+def test_combinar_limita_trechos_por_documento_e_completa_com_sobras():
+    hits = [de_doc(1, "a"), de_doc(2, "a"), de_doc(3, "a"), de_doc(4, "b"), de_doc(5, "c")]
+    assert [s.id for s in combinar([], hits, 4)] == [1, 2, 3, 4]
+    assert [s.id for s in combinar([], hits, 4, por_documento=2)] == [1, 2, 4, 5]
+    # Sem documentos suficientes, a sobra volta para não entregar menos contexto.
+    assert [s.id for s in combinar([], hits[:3], 3, por_documento=1)] == [1, 2, 3]
+
+
+def test_combinar_por_documento_mantem_citados():
+    citados = [de_doc(1, "lei"), de_doc(2, "lei")]
+    hits = [de_doc(3, "lei"), de_doc(4, "sc")]
+    assert [s.id for s in combinar(citados, hits, 3, por_documento=1)] == [1, 2, 4]

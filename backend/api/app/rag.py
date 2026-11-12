@@ -17,16 +17,36 @@ def _corpo(fonte: Source) -> str:
     return " ".join(re.sub(r"\A\[[^\]]*\]\n", "", fonte.text).split())
 
 
-def combinar(citados: list[Source], candidatos: list[Source], top_k: int) -> list[Source]:
-    """Norma citada primeiro, depois a busca; sem ponto ou corpo repetido."""
+def combinar(
+    citados: list[Source], candidatos: list[Source], top_k: int, por_documento: int = 0
+) -> list[Source]:
+    """Norma citada primeiro, depois a busca; sem ponto ou corpo repetido.
+
+    Com `por_documento` > 0, cada documento ocupa no máximo essa quantidade de vagas, para o
+    top-k cobrir mais documentos; se faltar fonte, as excedentes voltam na ordem original.
+    Trechos citados na pergunta sempre entram.
+    """
     vistos: set[str] = set()
-    saida: list[Source] = []
+    unicos: list[Source] = []
     for fonte in citados + candidatos:
         corpo = _corpo(fonte)
         if corpo not in vistos:
             vistos.add(corpo)
+            unicos.append(fonte)
+    if not por_documento:
+        return unicos[:top_k]
+    ids_citados = {f.id for f in citados}
+    contagem: dict[str | None, int] = {}
+    saida: list[Source] = []
+    sobras: list[Source] = []
+    for fonte in unicos:
+        doc = fonte.document_id or fonte.id
+        if fonte.id in ids_citados or contagem.get(doc, 0) < por_documento:
+            contagem[doc] = contagem.get(doc, 0) + 1
             saida.append(fonte)
-    return saida[:top_k]
+        else:
+            sobras.append(fonte)
+    return (saida + sobras)[:top_k] if len(saida) < top_k else saida[:top_k]
 
 
 def juntar_continuacoes(fontes: list[Source], seguintes: dict) -> list[Source]:
@@ -112,7 +132,10 @@ class RagService:
             candidatos = combinar([], citados + self.store.search(vector, question), 1000)
             ordem = self.reranker.reordenar(question, candidatos)
             escolhidos = combinar(
-                citados, ordem[:2] + self._por_parte(question) + ordem, self.settings.top_k
+                citados,
+                ordem[:2] + self._por_parte(question) + ordem,
+                self.settings.top_k,
+                self.settings.max_trechos_por_documento,
             )
             if self.settings.context_window_chars:
                 vizinhos = self.store.vizinhos([f.id for f in escolhidos])

@@ -53,3 +53,9 @@ def test_rerank_boost_e_janela_desligados_por_padrao():
         Settings(rerank_legislation_boost=-0.1)
     with pytest.raises(ValidationError):
         Settings(context_window_chars=8001)
+
+
+def test_max_trechos_por_documento_desligado_por_padrao():
+    assert Settings().max_trechos_por_documento == 0
+    with pytest.raises(ValidationError):
+        Settings(max_trechos_por_documento=-1)

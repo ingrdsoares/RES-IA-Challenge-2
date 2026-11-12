@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     rerank_legislation_boost: float = Field(default=0.0, ge=0, le=1, allow_inf_nan=False)
     # Caracteres de trechos vizinhos do mesmo documento somados a cada fonte; 0 desliga.
     context_window_chars: int = Field(default=0, ge=0, le=8000)
+    # Máximo de trechos do mesmo documento no top-k (variedade de fontes); 0 desliga.
+    max_trechos_por_documento: int = Field(default=0, ge=0, le=10)
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)
