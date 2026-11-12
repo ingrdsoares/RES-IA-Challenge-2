@@ -2,6 +2,21 @@
 
 > **Base padrão do projeto: `knowledge_base_v2`** (155.781 pontos), definida em 12/11/2026 após a comparação em `docs/avaliacao/avaliacao-rag-v3-2026-11-12.md`. A `knowledge_base_v3` descrita aqui é uma alternativa (chunk de 4000, Markdown limpo) e não é o padrão: para usá-la, defina `COLLECTION_NAME=knowledge_base_v3`.
 
+## Base padrão: knowledge_base_v2
+
+| Item | Valor |
+|---|---|
+| Coleção | `knowledge_base_v2` |
+| Pontos | 155.781 |
+| CSV de origem | `recorte-publico.csv.gz` (sem dados pessoais), chunk 2000, sem limpeza |
+| Embedding | `qwen3-embedding:0.6b` (Ollama) |
+| Qdrant | 1.15.1 |
+| SHA-256 | `99fc9b10a62e866e69360403a9917b41187508512d5211bad8964ec40e32261f` |
+
+Download: [release `qdrant-kb-v2`](https://github.com/ingrdsoares/RES-IA-Challenge-2/releases/tag/qdrant-kb-v2). Os passos de restauração são os mesmos da v3 abaixo, trocando o nome do arquivo e da coleção; `points_count` esperado: 155781.
+
+---
+
 Snapshot pronto da coleção, para o grupo não precisar reindexar (a carga leva ~2,5 h numa RTX 3080 Ti).
 
 | Item | Valor |
