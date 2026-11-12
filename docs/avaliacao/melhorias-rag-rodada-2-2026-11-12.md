@@ -203,9 +203,51 @@ python -m src.rag.csv_para_qdrant --csv $CSV --colecao knowledge_base_v4f --cont
 
 Rode cada comando antes com `--dry-run`, e use `--retomar` se a carga parar. A v4d tem o mesmo número de pontos da v2 e é a mais barata de embedar.
 
+## 9. Pedido de dados com o modelo
+
+**Problema.** As regras fixas do pedido de dados (seção 4) pegam 7 de 7 casos no conjunto antigo, para o qual foram escritas, mas só 1 de 10 no `teste_ampliado`. A meta é ≥ 80% (`metricas-avaliacao-rag.md`, §3.1). Aumentar a lista de palavras seria ajustar o filtro ao teste.
+
+**Mudança.** Com `ESCLARECIMENTO_MODELO=true`, a pergunta passa por três etapas:
+
+1. **Regras fixas** (seção 4). São instantâneas e, quando disparam, já respondem.
+2. **`caso_proprio()`** (`app/esclarecimento.py`) procura marcas de 1ª pessoa ("minha", "meu", "eu", "sou", "posso", "preciso", "abri"...). Pergunta geral não passa daqui e não paga a chamada ao modelo.
+3. **`LocalModels.dados_faltantes()`** (`app/models.py`) faz uma chamada curta ao gerador com saída em JSON (`{"precisa_dados", "faltam"}`):
+   - usa temperatura 0, `num_predict` 128 e `num_ctx` 2048;
+   - se faltam dados, a API devolve `needs_clarification` com a lista que o modelo deu;
+   - o prompt manda responder "não precisa" na dúvida;
+   - qualquer falha (Ollama fora, JSON inválido) devolve lista vazia e a pergunta segue para a busca. O filtro nunca impede uma resposta por erro próprio.
+
+**Alcance** nos 196 casos dos conjuntos:
+- **Pedido de dados:** as 17 perguntas desse tipo chegam ao modelo, então o teto de acerto é 100%.
+- **Custo:** só 15 das 158 perguntas com resposta pagam a chamada extra (~10%), cerca de 0,5–1 s cada.
+- **Risco:** essas 15 são as únicas que podem virar falso positivo, ou seja, uma pergunta que tinha resposta e recebe um pedido de dados.
+
+**Medir** (máquina com GPU), com `ESCLARECIMENTO_MODELO=true`:
+- acerto nas 10 perguntas de pedido de dados do `teste_ampliado` (meta ≥ 8);
+- **zero** pedidos de dados nas perguntas com resposta, em especial nas 15 em 1ª pessoa;
+- tempo extra nessas perguntas.
+
+Se houver falso positivo, a primeira tentativa é ajustar o `ESCLARECIMENTO_PROMPT`, e não a lista de palavras.
+
+## Variáveis no Docker Compose
+
+O `compose.yaml` e o `compose.prod.yaml` repassam à API cada variável de forma explícita. Os parâmetros novos das rodadas 1 e 2 não estavam nessa lista, então mudar o `.env` não tinha efeito dentro do contêiner. Agora estão repassados, com os mesmos padrões do código:
+- `CANDIDATE_K`
+- `LEGISLATION_BOOST`
+- `RERANK_LEGISLATION_BOOST`
+- `CONTEXT_WINDOW_CHARS`
+- `MAX_TRECHOS_POR_DOCUMENTO`
+- `ESCLARECIMENTO_MODELO`
+
+O `backend/.env.example` também lista todos eles. Na máquina de medição, confira dentro do contêiner que o valor chegou, antes de cada rodada:
+
+```bash
+docker compose -f backend/compose.yaml exec api env | grep -E 'BOOST|WINDOW|TRECHOS|ESCLARECIMENTO|CANDIDATE'
+```
+
 ## Testes
 
-- API: 232 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
+- API: 248 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
 - Raiz: 93 testes passando (`pytest tests`).
 - `ruff check` e `ruff format --check` limpos nos arquivos alterados.
 - `tests/mvp` não rodou: precisa do Postgres de teste na porta 15432.
@@ -220,7 +262,8 @@ Tudo o que usa modelo (embedding, geração, reranker) roda na máquina de confi
    - `MAX_TRECHOS_POR_DOCUMENTO` em 2 e 3;
    - `CANDIDATE_K` em 60 e 100, medindo também a latência;
    - `RERANK_LEGISLATION_BOOST` em 0,10 e 0,20, olhando n11 e n03;
-   - siglas: zerar `PESO_EXPANSAO` para ter o "antes".
+   - siglas: zerar `PESO_EXPANSAO` para ter o "antes";
+   - `ESCLARECIMENTO_MODELO=true`: acerto nas perguntas de pedido de dados e zero falso positivo nas perguntas com resposta (seção 9).
 3. **Coleções novas,** cada uma contra a v2:
    - v4a (chunk 1000) com `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500;
    - v4b (`--limpar`);
