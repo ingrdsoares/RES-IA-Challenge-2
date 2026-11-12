@@ -189,7 +189,37 @@ O cliente do reranker passou a mandar no máximo 300 textos por pedido, que é o
 | 1000 | 314.556 | 314.556 | 271.393 | 271.393 |
 | 2000 | 153.001 | 153.001 | 131.479 | 131.479 |
 
-A carga padrão de hoje gera 153.001 pontos; a v2 original tem 155.781. A diferença não foi investigada. Por isso a comparação deve ser com a **v2 original** (snapshot da seção 7), e não com uma v2 recarregada.
+**Por que 153.001 e não 155.781.** A carga padrão de hoje gera 153.001 pontos; a v2 original tem 155.781.
+
+- **O carregador não explica a diferença.** O carregador de cada commit a partir do `3f83648` (07/11, o que criou a v2), inclusive o `27b8335` (promoção da API), dá os mesmos 153.001 pontos sobre o mesmo `recorte-publico.csv.gz`. O CSV não muda desde 06/11, antes da v2. O carregador anterior à limpeza (`d430cde`) dá 183.356.
+- **Explicação mais provável, não confirmada.** O relatório de 07/11 diz que a v2 recebeu "4 documentos antes barrados e 7 oficiais do DF e do STJ" além do CSV. O `pipeline-ingestao.md` (§4.3) diz que esses complementos são carregados "na mesma coleção". Os ~2.780 pontos a mais seriam desses 11 documentos, cerca de 250 por documento. O arquivo de origem deles não está no git.
+- **Consequência.** O CSV sozinho não reproduz a v2. A comparação deve ser com a **v2 original** (snapshot da seção 7), e não com uma v2 recarregada. As coleções v4 recarregadas não terão esses 11 documentos, o que as deixa em ligeira desvantagem.
+
+**Para fechar a questão** (na máquina com a v2), liste os documentos da coleção que não estão no CSV e conte os pontos deles. O esperado é cerca de 2.780.
+
+```python
+import csv, gzip
+from qdrant_client import QdrantClient
+
+csv.field_size_limit(10**9)
+no_csv = {r["documento_id"] for r in csv.DictReader(
+    gzip.open("data/recorte-rag-v1/recorte-publico.csv.gz", "rt", encoding="utf-8"))}
+cliente, pontos, proximo = QdrantClient("http://127.0.0.1:6333"), {}, None
+while True:
+    lote, proximo = cliente.scroll("knowledge_base_v2", limit=1000, offset=proximo,
+                                   with_payload=["document_id"], with_vectors=False)
+    for p in lote:
+        doc = (p.payload or {}).get("document_id")
+        if doc not in no_csv:
+            pontos[doc] = pontos.get(doc, 0) + 1
+    if proximo is None:
+        break
+print(len(pontos), "documentos fora do CSV;", sum(pontos.values()), "pontos")
+for doc, n in sorted(pontos.items(), key=lambda x: -x[1]):
+    print(n, doc)
+```
+
+Se a hipótese se confirmar, vale versionar a origem desses 11 documentos (um CSV complementar ou a lista em `pipeline-ingestao.md`), para as próximas coleções terem o mesmo conteúdo da v2.
 
 **Coleções novas**, cada uma mudando uma coisa a partir da v2:
 
@@ -266,7 +296,7 @@ python scripts/experimentos.py --config data/benchmark/experimentos.exemplo.json
 
 A tabela única sai em `comparacao.md` e `comparacao.json` (todos os casos, e sem as 7 com `fonte_so_no_recorte_completo`), com ✓/✗ contra as metas da seção 3.1. "Respostas boas" e "erradas" ficam `n/d` até a revisão humana; a recusa indevida da tabela é só o status do RAG. Ajuste `RERANKER_URL` no `env_comum` do JSON e use o Python do ambiente da API (`--python`); `--avaliacao-args "--device cuda"` repassa opções ao `evaluation run`.
 
-0. **Snapshot da v2** (seção 7), antes de qualquer outra coisa.
+0. **Snapshot da v2** (seção 7), antes de qualquer outra coisa. Em seguida, rodar o script da seção 8 que lista os documentos da v2 fora do CSV.
 1. **Linha de base:** v2 com reranker, todos os parâmetros novos em 0 e `CANDIDATE_K=30`. Avaliação de respostas e `scripts/medir_recuperacao_qdrant.py` (Recall e MRR, estritos e lenientes).
 2. **Consulta, sem reindexar,** um parâmetro por vez:
    - `MAX_TRECHOS_POR_DOCUMENTO` em 2 e 3;
