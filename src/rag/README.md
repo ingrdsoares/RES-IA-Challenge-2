@@ -107,3 +107,9 @@ python -m src.rag.csv_para_qdrant --csv <arquivo.csv> --colecao <nome> [--limite
 A gravação exige `--colecao` (sem padrão); o Ollama vem de `backend/api/app/config.py` (`Settings`).
 Antes de subir um documento, seus pontos antigos saem pelo `document_id`. Texto com `~~riscado~~` ou marcado como tachado na fonte não é embeddado; o original fica em `texto_com_rasuras`.
 Os pontos têm id estável (versão + índice do chunk), então reexecutar não duplica.
+
+## Data do ato (`vigencia_fonte` / `effective_date`)
+
+`recorte_csv` grava em `vigencia_fonte` a data do ato (publicação, senão edição) em AAAA-MM-DD, lida dos metadados do coletor e, na falta, do título. Não é início de vigência. Texto consolidado (visão multivigente da RFB, anotações "alterado(a) pelo(a)", "Redação dada pela") fica vazio: a data do ato original não é a da redação atual. Ver `vigencia.py`.
+
+Para CSV já gerado, `csv_para_qdrant --vigencia-do-titulo` deriva `effective_date` do título (", de 3 de janeiro de 2005") e da linha "PUBLICADA NO DODF" quando a coluna está vazia. Sem a flag a carga não muda.

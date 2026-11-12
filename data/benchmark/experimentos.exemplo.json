@@ -1,0 +1,141 @@
+{
+  "_nota": [
+    "Chaves iniciadas por _ sao comentarios. Cada experimento parte dos padroes da linha de base (CANDIDATE_K=30, LEGISLATION_BOOST=0.2, PESO_EXPANSAO=0.5, demais parametros novos desligados) e sobrepoe o seu env.",
+    "Fora daqui: v4c (so local) e a combinacao v5 (depende dos vencedores). Acrescente como novo experimento quando existirem.",
+    "Para a v2 com 155.781 pontos, confira no Qdrant antes (ha outra knowledge_base_v2 de 2.944 pontos no qdrant-sd).",
+    "RERANKER_URL em env_comum e um exemplo (porta 8080 do servico reranker); ajuste a URL alcancavel a partir da maquina de medicao."
+  ],
+  "baseline": "base_v2",
+  "conjunto": "backend/evaluation/data/teste_ampliado_2026-11-12.jsonl",
+  "split": "final",
+  "repeticoes": 3,
+  "env_comum": {
+    "RERANKER_URL": "http://localhost:8080"
+  },
+  "experimentos": [
+    {
+      "nome": "base_v2",
+      "descricao": "Linha de base: v2, reranker, parametros novos desligados, CANDIDATE_K=30",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2"
+      }
+    },
+    {
+      "nome": "siglas_desligadas",
+      "descricao": "v2 sem a expansao de siglas e sinonimos (PESO_EXPANSAO=0): o 'antes' das siglas",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "PESO_EXPANSAO": 0
+      }
+    },
+    {
+      "nome": "max_trechos_2",
+      "descricao": "v2 com MAX_TRECHOS_POR_DOCUMENTO=2",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "MAX_TRECHOS_POR_DOCUMENTO": 2
+      }
+    },
+    {
+      "nome": "max_trechos_3",
+      "descricao": "v2 com MAX_TRECHOS_POR_DOCUMENTO=3",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "MAX_TRECHOS_POR_DOCUMENTO": 3
+      }
+    },
+    {
+      "nome": "candidate_k_60",
+      "descricao": "v2 com CANDIDATE_K=60 (olhar a latencia)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "CANDIDATE_K": 60
+      }
+    },
+    {
+      "nome": "candidate_k_100",
+      "descricao": "v2 com CANDIDATE_K=100 (olhar a latencia)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "CANDIDATE_K": 100
+      }
+    },
+    {
+      "nome": "rerank_boost_010",
+      "descricao": "v2 com RERANK_LEGISLATION_BOOST=0.10 (olhar n11 e n03)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "RERANK_LEGISLATION_BOOST": "0.10"
+      }
+    },
+    {
+      "nome": "rerank_boost_020",
+      "descricao": "v2 com RERANK_LEGISLATION_BOOST=0.20 (olhar n11 e n03)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "RERANK_LEGISLATION_BOOST": "0.20"
+      }
+    },
+    {
+      "nome": "esclarecimento_modelo",
+      "descricao": "v2 com ESCLARECIMENTO_MODELO=true (acerto nos clarify, zero falso positivo)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "ESCLARECIMENTO_MODELO": true
+      }
+    },
+    {
+      "nome": "conferir_citacoes",
+      "descricao": "v2 com CONFERIR_CITACOES=true (citacao_suportada)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v2",
+        "CONFERIR_CITACOES": true
+      }
+    },
+    {
+      "nome": "v4a_janela_0",
+      "descricao": "v4a (chunk 1000) com CONTEXT_WINDOW_CHARS=0",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4a",
+        "CONTEXT_WINDOW_CHARS": 0
+      }
+    },
+    {
+      "nome": "v4a_janela_1000",
+      "descricao": "v4a (chunk 1000) com CONTEXT_WINDOW_CHARS=1000",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4a",
+        "CONTEXT_WINDOW_CHARS": 1000
+      }
+    },
+    {
+      "nome": "v4a_janela_1500",
+      "descricao": "v4a (chunk 1000) com CONTEXT_WINDOW_CHARS=1500",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4a",
+        "CONTEXT_WINDOW_CHARS": 1500
+      }
+    },
+    {
+      "nome": "v4b_limpar",
+      "descricao": "v4b (--limpar)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4b"
+      }
+    },
+    {
+      "nome": "v4d_contexto_norma",
+      "descricao": "v4d (--contexto-norma)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4d"
+      }
+    },
+    {
+      "nome": "v4e_corte_por_artigo",
+      "descricao": "v4e (--corte-por-artigo)",
+      "env": {
+        "COLLECTION_NAME": "knowledge_base_v4e"
+      }
+    }
+  ]
+}

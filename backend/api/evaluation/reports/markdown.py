@@ -7,6 +7,11 @@ https://docs.databricks.com/aws/en/agents/tutorials/ai-cookbook/evaluate-define-
 - BERTimbau: https://huggingface.co/neuralmind/bert-base-portuguese-cased"""
 
 
+def _resumo(summary, metric):
+    m = summary["primary"]["metrics"][metric]
+    return {k: m[k] for k in ["n", "mean", "sample_std", "ci95", "unscored_questions"]}
+
+
 def render(snapshot, summary, comparison, images):
     config = summary["config"]
     comparison_note = (
@@ -40,6 +45,13 @@ Resumo principal (comportamento esperado answer):
 Resumo principal: {json.dumps(summary["primary"]["metrics"]["bert_score"], ensure_ascii=False)}.
 Valores ausentes indicam ausência de observações válidas ou falha identificada; não são nota zero.
 
+### Fidelidade às fontes (determinística)
+Artigo esperado recuperado (norma+artigo da ground_truth presentes nas fontes):
+{json.dumps(_resumo(summary, "artigo_esperado"), ensure_ascii=False)}.
+Citação suportada (citações da resposta presentes nas fontes; baixa = indício de alucinação):
+{json.dumps(_resumo(summary, "citacao_suportada"), ensure_ascii=False)}.
+Perguntas sem referência normativa, recusas e esclarecimentos são N/A, não zero.
+
 ## 7. Intervalos de confiança
 Bootstrap percentil por pergunta, {config["bootstrap"]} reamostragens com reposição, seed
 {config["seed"]}, IC de 95%. Sem pelo menos duas perguntas válidas, IC e desvio amostral são
@@ -48,6 +60,8 @@ indisponíveis. IC degenerado não prova ausência de incerteza populacional.
 ## 8. Variabilidade
 Repetições são agregadas por pergunta antes da análise. Desvios dentro da pergunta são
 apresentados separadamente; repetições não aumentam o número de perguntas independentes.
+Concordância entre repetições: {json.dumps(summary["repetitions"], ensure_ascii=False)}.
+Detalhe por pergunta nas abas Concordância e Variabilidade (média e desvio por métrica).
 
 ## 9. Dimensionamento
 n = ceil((1,96*s/E)^2), E={config["margin"]}. Origem de s: {summary["sample_size_origin"]}.

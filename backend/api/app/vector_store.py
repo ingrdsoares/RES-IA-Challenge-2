@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 DENSE = "dense"
 SPARSE = "sparse"
 RRF_K = 60
+NATUREZA_NORMA = "legislacao"
 
 
 class VectorStore:
@@ -86,7 +87,7 @@ class VectorStore:
         ).points
 
     def _esparsa(self, question: str, limit: int):
-        indices, valores = vetor_consulta(question)
+        indices, valores = vetor_consulta(question, self.settings.peso_expansao)
         if not indices:
             return []
         try:
@@ -103,6 +104,9 @@ class VectorStore:
 
     def search(self, vector: list[float], question: str = "") -> list[Source]:
         """Candidatos por RRF de densa e esparsa, com o cosseno real em `score`.
+
+        A legislação recebe reforço (`legislation_boost`) sobre soluções de consulta e FAQs que
+        repetem a mesma regra.
 
         Trecho só da esparsa passa pelo mesmo limiar: sem isso, a pergunta fora do acervo
         deixaria de cair em contexto insuficiente.
@@ -121,6 +125,9 @@ class VectorStore:
             for posicao, hit in enumerate(lista, 1):
                 if hit.id in por_id:
                     rrf[hit.id] = rrf.get(hit.id, 0.0) + 1 / (RRF_K + posicao)
+        for pid in rrf:
+            if (por_id[pid].payload or {}).get("natureza") == NATUREZA_NORMA:
+                rrf[pid] *= 1 + self.settings.legislation_boost
         ordem = sorted(rrf, key=lambda pid: rrf[pid], reverse=True)
         return self._fontes(por_id[pid] for pid in ordem)
 
@@ -193,6 +200,67 @@ class VectorStore:
                 if fontes:
                     seguintes[p.id] = fontes[0]
         return seguintes
+
+    def vizinhos(self, ids: list, raio: int = 2) -> dict:
+        """Por ponto, os trechos até `raio` posições antes e depois no MESMO documento.
+
+        Devolve {id: {delta: Source}}, delta = ordem do vizinho - ordem do ponto (sem 0).
+        Uma leitura por id e uma única busca filtrada para todos os pontos.
+        """
+        with dependency_errors("Qdrant"):
+            pontos = self.client.retrieve(
+                self.settings.collection_name, ids, with_payload=["document_id", "ordem"]
+            )
+            origem = {
+                p.id: (p.payload["document_id"], p.payload["ordem"])
+                for p in pontos
+                if (p.payload or {}).get("document_id") is not None
+                and (p.payload or {}).get("ordem") is not None
+            }
+            if not origem:
+                return {}
+            filtro = models.Filter(
+                should=[
+                    models.Filter(
+                        must=[
+                            models.FieldCondition(
+                                key="document_id", match=models.MatchValue(value=doc)
+                            ),
+                            models.FieldCondition(
+                                key="ordem", range=models.Range(gte=o - raio, lte=o + raio)
+                            ),
+                        ]
+                    )
+                    for doc, o in origem.values()
+                ]
+            )
+            achados, _ = self.client.scroll(
+                self.settings.collection_name,
+                filtro,
+                limit=len(origem) * 2 * raio + len(origem),
+                with_payload=True,
+            )
+            por_chave = {
+                ((a.payload or {}).get("document_id"), (a.payload or {}).get("ordem")): a
+                for a in achados
+            }
+            saida: dict = {}
+            for pid, (doc, o) in origem.items():
+                vizinhos = {}
+                for delta in range(-raio, raio + 1):
+                    achado = por_chave.get((doc, o + delta))
+                    if delta and achado:
+                        fonte = self._fontes(
+                            [
+                                models.ScoredPoint(
+                                    id=achado.id, version=0, score=0.0, payload=achado.payload
+                                )
+                            ]
+                        )
+                        if fonte:
+                            vizinhos[delta] = fonte[0]
+                saida[pid] = vizinhos
+        return saida
 
     def close(self) -> None:
         self.client.close()

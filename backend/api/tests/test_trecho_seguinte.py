@@ -1,5 +1,5 @@
 from app.config import Settings
-from app.rag import RagService, juntar_continuacoes
+from app.rag import RagService, expandir_janela, juntar_continuacoes
 from app.schemas import Source
 from app.sparse import vetor_documento
 from app.vector_store import DENSE, SPARSE, VectorStore
@@ -104,4 +104,66 @@ class Modelos:
 def test_servico_entrega_o_trecho_com_a_continuacao():
     modelos = Modelos()
     RagService(Settings(reranker_url=None), Store(), modelos).query("Qual é o fato gerador?")
+    assert modelos.fontes[0].text.endswith("prestação de serviços.")
+
+
+def store_com_janela():
+    client = QdrantClient(":memory:")
+    settings = Settings()
+    store = VectorStore(settings, client)
+    store.ensure_collection()
+    client.upsert(
+        settings.collection_name,
+        [ponto(i, f"[H{i}]\nCorpo {i}", "doc-a", i, eixo=i) for i in range(1, 6)]
+        + [ponto(9, "[H9]\nCorpo outro doc", "doc-b", 3)],
+    )
+    return store
+
+
+def test_vizinhos_ficam_no_mesmo_documento_e_na_vizinhanca():
+    viz = store_com_janela().vizinhos([3, 1, 999], raio=1)
+    assert {d: f.id for d, f in viz[3].items()} == {-1: 2, 1: 4}
+    assert {d: f.id for d, f in viz[1].items()} == {1: 2}
+    assert 999 not in viz
+
+
+def test_janela_prefere_seguinte_depois_anterior_e_respeita_o_limite():
+    store = store_com_janela()
+    base = fonte(3, "[H3]\nCorpo 3")
+    viz = store.vizinhos([3], raio=2)
+    um = expandir_janela([base], viz, 7)  # so cabe o seguinte (7 chars)
+    assert um[0].text == "[H3]\nCorpo 3\nCorpo 4"
+    dois = expandir_janela([base], viz, 14)
+    assert dois[0].text == "[H3]\nCorpo 2\nCorpo 3\nCorpo 4"
+    assert expandir_janela([base], viz, 0)[0].text == base.text
+
+
+def test_janela_nao_repete_trecho_ja_escolhido():
+    store = store_com_janela()
+    a, b = fonte(3, "[H3]\nCorpo 3"), fonte(4, "[H4]\nCorpo 4")
+    saida = expandir_janela([a, b], store.vizinhos([3, 4], raio=1), 100)
+    assert saida[0].text == "[H3]\nCorpo 2\nCorpo 3"
+    assert saida[1].text == "[H4]\nCorpo 4\nCorpo 5"
+
+
+def test_janela_completa_continuacao_de_dois_pontos():
+    store = store_com_pontos()
+    cortado = fonte(1, CORTADO)
+    saida = expandir_janela([cortado], store.vizinhos([1], raio=1), 5)
+    assert (
+        saida[0].text
+        == CORTADO + "\nArt. 1º O imposto tem como fato gerador a prestação de serviços."
+    )
+
+
+class StoreJanela(Store):
+    def vizinhos(self, ids, raio=2):
+        return {1: {1: fonte(2, SEGUINTE)}}
+
+
+def test_servico_com_janela_usa_vizinhos():
+    modelos = Modelos()
+    RagService(Settings(reranker_url=None, context_window_chars=500), StoreJanela(), modelos).query(
+        "Qual é o fato gerador?"
+    )
     assert modelos.fontes[0].text.endswith("prestação de serviços.")

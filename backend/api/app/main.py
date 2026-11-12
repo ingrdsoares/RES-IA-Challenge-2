@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -26,6 +28,8 @@ from app.rag import RagService
 from app.rate_limit import RateLimiter
 from app.schemas import QueryRequest, QueryResponse
 from app.tasks.router import router as tasks_router
+from app.telemetria.router import router as telemetria_router
+from app.telemetria.service import registrar
 from app.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
@@ -75,6 +79,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     app.include_router(evidence_router)
     app.include_router(tasks_router)
     app.include_router(fiscal_router)
+    app.include_router(telemetria_router)
 
     legacy_paths = {"/health", "/ready", "/version", "/rag/query"}
 
@@ -164,8 +169,11 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
 
     @app.middleware("http")
     async def security_headers_middleware(request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        request.state.request_id = request_id
         response = await call_next(request)
         headers = response.headers
+        headers["X-Request-ID"] = request_id
         headers["X-Content-Type-Options"] = "nosniff"
         headers["X-Frame-Options"] = "DENY"
         headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -187,7 +195,22 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
         dependencies=[Depends(require_account), Depends(RateLimiter(namespace="ai_rag"))],
     )
     def query(payload: QueryRequest, request: Request):
-        return request.app.state.rag.query(payload.question)
+        # Telemetria sem conteúdo (LGPD): só status, latência, nº de fontes e coleção.
+        inicio = time.perf_counter()
+        status, fontes = "error", 0
+        try:
+            resposta = request.app.state.rag.query(payload.question)
+            status, fontes = resposta.status, len(resposta.sources)
+            return resposta
+        finally:
+            registrar(
+                request.app.state.db_factory,
+                request.state.request_id,
+                status,
+                round((time.perf_counter() - inicio) * 1000),
+                fontes,
+                request.app.state.settings.collection_name,
+            )
 
     return app
 

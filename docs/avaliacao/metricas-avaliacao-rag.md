@@ -57,7 +57,9 @@ As metas antigas eram Recall@k de pelo menos 90% e MRR de pelo menos 85%. Elas f
 | Híbrida com norma citada | 0,375 | 0,323 | 0,400 | 0,331 |
 | Reranker com norma citada (em uso) | 0,400 | 0,473 | 0,475 | 0,473 |
 
-**Veredito:** as metas de 90% e 85% não são atingidas e não são realistas para esta base com a medição por documento. Elas ficam como objetivo de longo prazo, não como critério desta entrega.
+**Documentos equivalentes.** O campo opcional `equivalent_sources` do conjunto lista documentos que trazem a mesma regra. `scripts/medir_recuperacao_qdrant.py` passa a reportar também Recall e MRR "lenientes", que aceitam o esperado ou um equivalente; as chaves estritas continuam iguais, para comparar com as rodadas antigas. Por enquanto, só q01 e q13 têm equivalentes (CGSN 140 e manual da DASN-Simei), marcados como `pendente_revisao_humana`.
+
+**Veredito:** as metas de 90% e 85% não são atingidas e não são realistas para esta base com a medição por documento. Foram substituídas pelas metas da seção 3.1.
 
 Dois fatores explicam boa parte da distância:
 
@@ -65,6 +67,27 @@ Dois fatores explicam boa parte da distância:
 2. **Amostra pequena.** Vinte perguntas; uma pergunta a mais ou a menos muda o Recall em 5 pontos.
 
 Por isso, a avaliação desta entrega se apoia mais na qualidade das respostas (seção 5) do que no Recall por documento.
+
+### 3.1 Metas atuais (12/11/2026)
+
+Estas metas substituem as de 90% e 85%. Valem para o `teste_ampliado_2026-11-12.jsonl` (81 perguntas, não usadas em ajustes), com `--repeticoes 3`. "Respostas boas" só vira número oficial depois da revisão fiscal independente (`revisao_independente.xlsx`).
+
+| Métrica | v2 em 12/11 | Meta | Tipo |
+|---|---:|---:|---|
+| Respostas erradas | 0 de 20 | 0 | Bloqueio: qualquer erro reprova a versão |
+| Respostas boas (corretas + recusas adequadas) | 85–90% | ≥ 90% | Meta |
+| Recusa indevida | 0–5% | ≤ 5% | Meta |
+| Recusa em pergunta fora do acervo | 4 de 4 | 100% | Bloqueio |
+| Pedido de dados em pergunta `clarify` | 1 de 10 no conjunto ampliado | ≥ 80% | Meta |
+| `citacao_suportada` | sem medição | ≥ 0,95 | Meta; abaixo disso, há base legal inventada |
+| `artigo_esperado` | sem medição | ≥ 0,80 | Meta |
+| Recall@8 leniente (com equivalentes) | 0,475 (estrito) | ≥ 0,80 | Meta |
+| MRR leniente | 0,473 (estrito) | ≥ 0,65 | Meta |
+| ROUGE-L e BERTScore | 0,34 e 0,62 | não piorar | Só para comparar versões; medem redação, não acerto |
+| Tempo por pergunta | mediana 2,7 s, máximo 6,7 s | mediana ≤ 5 s, p95 ≤ 15 s | Meta |
+| Concordância entre repetições | fontes 20 de 20, texto 15 de 20 | fontes 100%, conclusão ≥ 90% | Meta |
+
+Com 20 perguntas, "18 de 20" tem intervalo de confiança de cerca de 68% a 99%. Com 81, a margem cai para cerca de 7 pontos. Por isso a conferência usa o conjunto ampliado.
 
 ---
 
@@ -79,9 +102,21 @@ Por isso, a avaliação desta entrega se apoia mais na qualidade das respostas (
 | `NUM_CTX` | 8.192 | Maior valor estável na placa de 12 GB |
 | Temperatura e semente | 0 e 42 | Respostas repetíveis entre rodadas |
 
+| `LEGISLATION_BOOST` | 0,2 | Multiplica por 1,2 o score híbrido de trechos com `natureza = legislacao`, para a lei vencer documento secundário quando a relevância é próxima (n11, n03). Com o reranker ligado, só afeta os dois trechos que entram antes dele; 0 desliga. A medir com os serviços no ar: 0, 0,2 e 0,4 |
+
+Sem `RERANKER_URL`, a API registra um aviso na partida: a busca fica só na ordem híbrida, pior que a do reranker (seção 3). No `compose.yaml` de desenvolvimento, o reranker só sobe com o perfil `gpu`.
+
+**Pedido de dados.** Pergunta sobre o próprio caso sem os dados necessários ("Minha empresa pode entrar no Simples?") recebe `status = needs_clarification` com a lista de dados que faltam, sem busca nem chamada ao modelo (`app/esclarecimento.py`). A regra é conservadora: qualquer número na pergunta conta como dado informado. Nos 115 casos dos conjuntos, dispara só em n18, q25 e t19, todos do tipo `clarify`.
+
 A calibração anterior, que recomendava limiar de 0,30, foi feita no protótipo e com referências antigas (`data/benchmark/calibracao_parametros_recuperacao.json`). Esses números não valem para a API atual.
 
-O limiar de 0,5 não passou por uma nova calibração completa. Na demonstração, a pergunta sem base no acervo recebeu trechos com score de 0,50 a 0,53, logo acima do corte, e o modelo recusou responder. Subir o limiar para cerca de 0,55 é uma opção a testar.
+O limiar de 0,5 não passou por uma nova calibração completa. Na demonstração, a pergunta sem base no acervo recebeu trechos com score de 0,50 a 0,53, logo acima do corte, e o modelo recusou responder. Subir o limiar para cerca de 0,55 é uma opção a testar com:
+
+```bash
+python scripts/calibrar_limiar.py --dataset backend/evaluation/data/ground_truth_avaliacao.jsonl --saida data/benchmark/calibracao_limiar.json
+```
+
+O script varre limiares de 0,40 a 0,65 e mostra, para cada um, quantas perguntas do acervo perderiam todo o contexto e quantas perguntas de recusa ainda receberiam trechos. Recomenda o maior limiar que não tira contexto de nenhuma pergunta do acervo. Precisa do Qdrant e do Ollama no ar.
 
 ---
 
@@ -106,6 +141,22 @@ Cada resposta é comparada com uma referência conferida no texto oficial e rece
 
 A classificação é preliminar: foi feita pela mesma equipe que escreveu as perguntas, sem revisão fiscal. ROUGE-L e BERTScore medem semelhança de texto, não acerto fiscal.
 
+**Versões dos números.** As tabelas acima são da API promovida no commit `27b8335`, com o teste novo marcando 18 respostas boas e ROUGE-L 0,355. O relatório de 07/11 (`avaliacao-rag-2026-11-07.md`) traz 17 e ROUGE-L 0,335, porque mediu a configuração congelada no commit `2b4d8f9`, antes dos ajustes finais. A comparação da v3 (`avaliacao-rag-v3-2026-11-12.md`) usou esses 17 como referência. Ao comparar versões novas, use a mesma referência e cite o commit.
+
+### 5.1 Métricas de fidelidade
+
+Calculadas no relatório, sem modelo juiz e com o mesmo leitor de normas e artigos da API (`app.normas`):
+
+- **`artigo_esperado`**: fração dos pares norma/artigo da referência que aparecem nas fontes recuperadas. Mede se a busca trouxe a base legal certa. Fica N/A em pergunta que não espera resposta, em referência sem artigo e em pedido de dados (`needs_clarification`).
+- **`citacao_suportada`**: fração das citações da resposta (norma/artigo e marcadores `[n]`) sustentadas pelas fontes entregues. Citação sem suporte é candidata a alucinação e fica listada em `details.sem_suporte`. Fica N/A em recusa, pedido de dados e resposta sem citação.
+
+Limite: "arts. 3º e 5º" conta só o primeiro artigo.
+
+### 5.2 Repetições e revisão independente
+
+- `python -m evaluation run ... --repeticoes 3` repete cada pergunta. O relatório mostra a concordância de texto e de fontes entre as repetições (aba Concordância e seção 8 do `report.md`). Diferença de uma rodada só entre versões pode ser acaso; use pelo menos 3 repetições ao comparar.
+- `report`, `run` e `compare` geram `revisao_independente.xlsx`, a planilha para um revisor fiscal de fora da equipe. Ela traz pergunta, referência, resposta, fontes citadas e colunas vazias para veredito (cinco classes), base legal conferida e comentário.
+
 ---
 
 ## 6. Conjuntos de Perguntas
@@ -119,5 +170,6 @@ Em `backend/evaluation/data/`, no formato de `backend/evaluation/dataset.schema.
 | `teste_final_v3_2026-11-07.jsonl` | Teste por artigo, 20 perguntas |
 | `teste_compostas_2026-11-07.jsonl` | 20 perguntas usadas nos ajustes das compostas, 14 delas compostas |
 | `teste_compostas_confirmacao_2026-11-07.jsonl` | 10 perguntas compostas novas |
+| `teste_ampliado_2026-11-12.jsonl` | 81 perguntas (split final): 46 diretas, 10 compostas, 5 com valor desatualizado, 10 de esclarecimento e 10 de abstenção; base no `recorte-completo.csv.gz`, com trecho de evidência em `metadata`, revisão humana pendente e `equivalent_sources` onde há evidência |
 
 `data/benchmark/ground_truth_25_perguntas.json` ainda tem as referências anteriores, algumas tiradas de textos de demonstração; não deve ser usado. Detalhes dos testes em `docs/avaliacao/avaliacao-rag-2026-11-07.md`.

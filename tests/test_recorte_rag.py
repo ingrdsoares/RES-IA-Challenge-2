@@ -537,6 +537,20 @@ def test_chunk_totalmente_riscado_nao_sobe(tmp_path):
     assert _pontos(client) == []
 
 
+def test_datas_no_payload(run, tmp_path):
+    saida = tmp_path / "recorte.csv"
+    gerar_recorte(run, saida)
+    linha = dict(next(iter(ler_csv(saida))))
+    linha.update(coletado_em="2026-11-05T00:05:06.361084+00:00", vigencia_fonte="")
+    dados = next(itens_do_documento(linha, estatisticas_novas()))[2]
+    assert dados["reference_date"] == "2026-11-05"
+    assert "effective_date" not in dados
+    linha.update(coletado_em="lixo", vigencia_fonte="2024-01-22")
+    dados = next(itens_do_documento(linha, estatisticas_novas()))[2]
+    assert "reference_date" not in dados
+    assert dados["effective_date"] == "2024-01-22"
+
+
 def test_falha_no_lote_informa_documento_e_chunk(run, tmp_path):
     saida = tmp_path / "recorte.csv"
     gerar_recorte(run, saida)

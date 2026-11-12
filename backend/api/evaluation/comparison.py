@@ -2,7 +2,8 @@ from collections import defaultdict
 
 import numpy as np
 
-from evaluation.statistics import summarize_values
+from evaluation.metrics.fidelidade import get_score
+from evaluation.statistics import METRICAS, summarize_values
 
 
 def compare_runs(a, b, config):
@@ -27,8 +28,8 @@ def compare_runs(a, b, config):
         for left in rows:
             key = (left.case.id, left.attempt.repeat_index)
             right = lookup.get(key)
-            ls = getattr(left, metric)
-            rs = getattr(right, metric) if right else None
+            ls = get_score(left, metric)
+            rs = get_score(right, metric) if right else None
             if ls.state != "success" or rs is None or rs.state != "success":
                 excluded.append(list(key))
                 continue
@@ -55,20 +56,19 @@ def compare_runs(a, b, config):
         "categories": {},
         "behaviors": {},
     }
-    for metric in ["rouge_l", "bert_score"]:
+    for metric in METRICAS:
         if metric == "bert_score" and not a.metric_metadata.get("resolved"):
             result["metrics"][metric] = {"error": "unresolved_model_configuration"}
         else:
             result["metrics"][metric] = calculate(a.results, metric)
     for category in sorted({r.case.category for r in a.results}):
         result["categories"][category] = {
-            m: calculate([r for r in a.results if r.case.category == category], m)
-            for m in ["rouge_l", "bert_score"]
+            m: calculate([r for r in a.results if r.case.category == category], m) for m in METRICAS
         }
     for behavior in ["answer", "abstain", "clarify"]:
         result["behaviors"][behavior] = {
             m: calculate([r for r in a.results if r.case.expected_behavior == behavior], m)
-            for m in ["rouge_l", "bert_score"]
+            for m in METRICAS
         }
     return result
 

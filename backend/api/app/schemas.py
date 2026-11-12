@@ -22,6 +22,8 @@ class Source(BaseModel):
     title: Annotated[str, Field(max_length=256)] | None = None
     document_id: str | None = None
     chunk_id: str | None = None
+    # Tipo do documento na carga ("legislacao", "consulta_tributaria", ...).
+    natureza: str | None = None
     reference_date: date | None = None
     effective_date: date | None = None
 
@@ -36,6 +38,8 @@ class Source(BaseModel):
 
 
 class QueryResponse(BaseModel):
-    status: Literal["answered", "empty_knowledge_base", "insufficient_context"]
+    status: Literal[
+        "answered", "empty_knowledge_base", "insufficient_context", "needs_clarification"
+    ]
     answer: str
     sources: list[Source]

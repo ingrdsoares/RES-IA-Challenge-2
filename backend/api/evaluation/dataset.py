@@ -29,6 +29,8 @@ def load_dataset(path: Path) -> list[EvalCase]:
         question = " ".join(unicodedata.normalize("NFKC", case.question).casefold().split())
         if case.id in ids or question in questions:
             raise ValueError("ID ou pergunta duplicados")
+        if case.equivalent_sources and not case.expected_sources:
+            raise ValueError("equivalent_sources exige expected_sources")
         ids.add(case.id)
         questions.add(question)
         if case.group_id:
