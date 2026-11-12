@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     context_window_chars: int = Field(default=0, ge=0, le=8000)
     # Máximo de trechos do mesmo documento no top-k (variedade de fontes); 0 desliga.
     max_trechos_por_documento: int = Field(default=0, ge=0, le=10)
+    # Pergunta em 1ª pessoa passa por uma chamada curta ao modelo que decide se faltam dados.
+    esclarecimento_modelo: bool = False
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)

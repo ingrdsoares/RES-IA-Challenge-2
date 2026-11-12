@@ -16,6 +16,12 @@ _RETER = re.compile(
     r"\b(preciso|devo|tenho\s+que)\s+reter\b.*\b(dess[ae]|dest[ae]|minha)\s+nota", re.I
 )
 _DIGITO = re.compile(r"\d")
+# Pergunta sobre o próprio caso, em 1ª pessoa: só essas vão ao filtro com modelo (~1 s a mais).
+_CASO_PROPRIO = re.compile(
+    r"\b(minhas?|meus?|eu|sou|estou|tenho|posso|preciso|devo|vou|quero|abri|faturo|faturei"
+    r"|atrasei|emiti|pago)\b",
+    re.I,
+)
 
 # ponytail: regras por palavra-chave; qualquer dígito conta como "dado informado". Teto: não
 # entende paráfrases nem valores por extenso ("duzentos mil"). Evoluir para classificador se
@@ -74,14 +80,22 @@ def _tipo(pergunta: str) -> str | None:
     return None
 
 
-def pedir_esclarecimento(pergunta: str) -> str | None:
-    """Texto pedindo os dados que faltam, ou None se a pergunta pode seguir para a busca."""
-    tipo = _tipo(pergunta)
-    if tipo is None:
-        return None
-    itens = "\n".join(f"- {item}" for item in _PEDIDOS[tipo])
+def caso_proprio(pergunta: str) -> bool:
+    """Pergunta em 1ª pessoa, sobre o caso do usuário (candidata ao filtro com modelo)."""
+    return bool(_CASO_PROPRIO.search(pergunta))
+
+
+def texto_pedido(dados: list[str]) -> str:
+    """Mensagem ao usuário pedindo os dados listados."""
+    itens = "\n".join(f"- {item}" for item in dados)
     return (
         "Faltam dados para responder ao seu caso. Informe, por favor:\n"
         f"{itens}\n"
         "Com isso consigo consultar a base e orientar com segurança."
     )
+
+
+def pedir_esclarecimento(pergunta: str) -> str | None:
+    """Texto pedindo os dados que faltam, ou None se a pergunta pode seguir para a busca."""
+    tipo = _tipo(pergunta)
+    return texto_pedido(_PEDIDOS[tipo]) if tipo else None

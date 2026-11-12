@@ -4,7 +4,7 @@ from threading import Lock
 from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
-from app.esclarecimento import pedir_esclarecimento
+from app.esclarecimento import caso_proprio, pedir_esclarecimento, texto_pedido
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
 from app.reranker import Reranker
@@ -116,6 +116,11 @@ class RagService:
         try:
             if pedido := pedir_esclarecimento(question):
                 return QueryResponse(status="needs_clarification", answer=pedido, sources=[])
+            if self.settings.esclarecimento_modelo and caso_proprio(question):
+                if faltam := self.models.dados_faltantes(question):
+                    return QueryResponse(
+                        status="needs_clarification", answer=texto_pedido(faltam), sources=[]
+                    )
             self.store.ensure_collection()
             if self.store.count() == 0:
                 return QueryResponse(

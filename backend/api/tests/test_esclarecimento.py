@@ -42,3 +42,33 @@ def test_pede_dados_quando_faltam(pergunta, trecho):
 )
 def test_nao_dispara_em_pergunta_geral_ou_completa(pergunta):
     assert pedir_esclarecimento(pergunta) is None
+
+
+@pytest.mark.parametrize(
+    "pergunta",
+    [
+        "Minha empresa pode ser MEI?",
+        "Sou dentista, qual imposto pago?",
+        "Abri uma loja, preciso emitir nota?",
+    ],
+)
+def test_caso_proprio_reconhece_primeira_pessoa(pergunta):
+    from app.esclarecimento import caso_proprio
+
+    assert caso_proprio(pergunta)
+
+
+@pytest.mark.parametrize(
+    "pergunta",
+    ["Qual é o limite de receita do MEI?", "O que é o Fator R?", "Meunier é sócio?"],
+)
+def test_caso_proprio_ignora_pergunta_geral(pergunta):
+    from app.esclarecimento import caso_proprio
+
+    assert not caso_proprio(pergunta)
+
+
+def test_texto_pedido_lista_os_dados():
+    from app.esclarecimento import texto_pedido
+
+    assert "- CNAE\n- receita" in texto_pedido(["CNAE", "receita"])

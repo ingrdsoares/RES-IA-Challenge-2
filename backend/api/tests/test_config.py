@@ -59,3 +59,7 @@ def test_max_trechos_por_documento_desligado_por_padrao():
     assert Settings().max_trechos_por_documento == 0
     with pytest.raises(ValidationError):
         Settings(max_trechos_por_documento=-1)
+
+
+def test_esclarecimento_modelo_desligado_por_padrao():
+    assert Settings().esclarecimento_modelo is False
