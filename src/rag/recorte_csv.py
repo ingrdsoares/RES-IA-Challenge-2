@@ -7,6 +7,9 @@ Com --publico, o recorte vai para o repositório público: regras aplicadas a do
 inteiros (nunca texto redigido), CSV comprimido em gzip nível 9 e manifesto que lista cada
 documento excluído com título, natureza e regra, sem o valor que casou.
 
+vigencia_fonte: data do ato (publicação, senão edição), AAAA-MM-DD, vinda dos metadados do
+coletor ou do título; vazia em texto consolidado. Não é início de vigência (src/rag/vigencia.py).
+
 Uso: python -m src.rag.recorte_csv --run <dir do refino> --saida <arquivo.csv> [--publico]
 """
 
@@ -23,6 +26,8 @@ import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
+
+from src.rag.vigencia import data_do_ato
 
 NATUREZAS_PERMITIDAS = frozenset(
     {
@@ -73,6 +78,7 @@ _ATO_LEGAL = re.compile(
 )
 # O refino grava "nao_verificada" em toda ocorrência: não é informação da fonte.
 VIGENCIAS_SEM_INFORMACAO = frozenset({"", "nao_verificada"})
+CRAWLER_DATA = Path(__file__).resolve().parents[2] / "backend" / "crawler" / "data"
 TETO_BYTES = 1024**3
 TETO_GZ_BYTES = 95 * 10**6
 REGRAS_CONTEUDO = {
@@ -204,6 +210,14 @@ def regra_conteudo(
 _HOST = re.compile(r"https?://[^/\s]+")
 
 
+def _metadados(raiz: Path, ocorrencia: dict) -> dict:
+    """Metadados do coletor da ocorrência; {} se o arquivo não está na máquina."""
+    try:
+        return json.loads((raiz / ocorrencia["metadados_ref"]).read_text(encoding="utf-8"))
+    except (KeyError, TypeError, OSError, ValueError):
+        return {}
+
+
 def _ato_legal(ocorrencia: dict) -> bool:
     # O host sai da busca: "in.gov.br" não pode fazer uma página do portal passar por IN.
     texto = _HOST.sub(" ", f"{ocorrencia['titulo']} {ocorrencia['chave_origem']}")
@@ -270,6 +284,7 @@ def gerar_recorte(
     publico: bool = False,
     teto_gz_bytes: int = TETO_GZ_BYTES,
     revisao_manual: frozenset[str] | None = None,
+    crawler_data: Path = CRAWLER_DATA,
 ) -> dict:
     run = Path(run)
     saida = Path(saida)
@@ -344,6 +359,13 @@ def gerar_recorte(
 
                 rep = ocs[0]
                 vigencia = "" if rep["vigencia"] in VIGENCIAS_SEM_INFORMACAO else rep["vigencia"]
+                # Sem informação da fonte: data do ato (ver vigencia.py; texto consolidado fica vazio).
+                vigencia = vigencia or (
+                    data_do_ato(
+                        rep["titulo"], texto, _metadados(crawler_data, rep), rep["natureza"]
+                    )
+                    or ""
+                )
                 escrever(
                     [
                         nucleo["documento_id"],

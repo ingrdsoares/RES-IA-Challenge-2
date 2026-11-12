@@ -42,6 +42,7 @@ from qdrant_client import models as qm  # noqa: E402
 
 from backend.cleaning.limpeza_markdown import limpar_markdown  # noqa: E402
 from src.rag.chunker import LegalHierarchicalChunker  # noqa: E402
+from src.rag.vigencia import data_do_ato  # noqa: E402
 
 TAMANHO_LOTE = 64
 LIMITE_CORPO = 2000
@@ -62,6 +63,8 @@ CHUNKER_ARTIGO: LegalHierarchicalChunker | None = None
 NATUREZAS_ARTIGO = frozenset({"legislacao", "nao_informada", "ato_normativo_administrativo"})
 # Marca gravada no payload só nos modos novos; --retomar só pula ponto da mesma configuração.
 CARGA = ""
+# Ligada por --vigencia-do-titulo: CSV sem vigencia_fonte ganha a data do ato (título/DODF).
+VIGENCIA_DO_TITULO = False
 
 
 def configurar(
@@ -69,9 +72,18 @@ def configurar(
     limpar: bool,
     contexto_norma: bool = False,
     corte_por_artigo: bool = False,
+    vigencia_do_titulo: bool = False,
 ) -> None:
     """Tamanho do chunk e limpeza da carga; ids de ponto mudam, então use outra coleção."""
-    global LIMITE_CORPO, SOBREPOSICAO, CHUNKER, LIMPAR, CONTEXTO_NORMA, CHUNKER_ARTIGO, CARGA
+    global \
+        LIMITE_CORPO, \
+        SOBREPOSICAO, \
+        CHUNKER, \
+        LIMPAR, \
+        CONTEXTO_NORMA, \
+        CHUNKER_ARTIGO, \
+        CARGA, \
+        VIGENCIA_DO_TITULO
     LIMITE_CORPO = limite_corpo
     SOBREPOSICAO = limite_corpo // 10
     CHUNKER = LegalHierarchicalChunker(max_chunk_chars=limite_corpo, overlap_chars=SOBREPOSICAO)
@@ -84,6 +96,7 @@ def configurar(
     )
     LIMPAR = limpar
     CONTEXTO_NORMA = contexto_norma
+    VIGENCIA_DO_TITULO = vigencia_do_titulo
     CARGA = "+".join(
         n for n, on in (("contexto", contexto_norma), ("artigo", corte_por_artigo)) if on
     )
@@ -310,13 +323,16 @@ def itens_do_documento(
             }
             if CARGA:
                 dados["carga"] = CARGA
+            vigencia = linha.get("vigencia_fonte")
+            if VIGENCIA_DO_TITULO and not data_iso(vigencia):
+                vigencia = data_do_ato(linha["titulo"], linha["texto"], None, linha.get("natureza"))
             # reference_date: dia da coleta (versão do texto); effective_date: início da
             # vigência na fonte (hoje vazio no CSV). Ausente/inválido = campo omitido.
-            for campo, coluna in (
-                ("reference_date", "coletado_em"),
-                ("effective_date", "vigencia_fonte"),
+            for campo, valor in (
+                ("reference_date", linha.get("coletado_em")),
+                ("effective_date", vigencia),
             ):
-                if valor := data_iso(linha.get(coluna)):
+                if valor := data_iso(valor):
                     dados[campo] = valor
             if original != trecho:
                 dados["texto_com_rasuras"] = cabecalho + original
@@ -509,8 +525,19 @@ def main(
         action="store_true",
         help="legislação: um ponto por artigo; artigo grande vira janelas com sobreposição",
     )
+    parser.add_argument(
+        "--vigencia-do-titulo",
+        action="store_true",
+        help="vigencia_fonte vazia: effective_date = data do ato no título/DODF (não em texto consolidado)",
+    )
     args = parser.parse_args(argv)
-    configurar(args.limite_corpo, args.limpar, args.contexto_norma, args.corte_por_artigo)
+    configurar(
+        args.limite_corpo,
+        args.limpar,
+        args.contexto_norma,
+        args.corte_por_artigo,
+        args.vigencia_do_titulo,
+    )
     settings = Settings()
 
     if args.dry_run:
