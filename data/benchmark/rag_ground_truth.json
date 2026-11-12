@@ -186,7 +186,7 @@
     "categoria": "parcelamento",
     "pergunta": "Como funciona o parcelamento ordinário de dívidas do Simples Nacional e em quantas parcelas pode ser dividido?",
     "contexto_empresa": null,
-    "artigos_esperados": ["Art. 131"],
+    "artigos_esperados": ["Art. 131", "Art. 1º"],
     "tags_esperadas": ["parcelamento", "certidoes"],
     "deve_abster": false,
     "anexo_esperado": null,

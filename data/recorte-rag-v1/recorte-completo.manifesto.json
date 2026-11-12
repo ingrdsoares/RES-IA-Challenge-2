@@ -1,0 +1,221 @@
+{
+  "bytes": 191540881,
+  "bytes_texto_por_natureza": {
+    "anexo_convertido": 6181791,
+    "ato_normativo_administrativo": 334713,
+    "consulta_acordao_administrativo": 48796,
+    "consulta_tributaria": 12132413,
+    "diario_com_consulta_tributaria": 4276937,
+    "diario_com_jurisprudencia_tributaria": 995325,
+    "documentacao_classificacao_oficial": 16154846,
+    "informativo_jurisprudencial": 74044,
+    "interpretacao_administrativa": 64108270,
+    "jurisprudencia_tarf": 1731675,
+    "legislacao": 74371256,
+    "manual": 5356937,
+    "nao_informada": 2575876,
+    "orientacao_mei": 110156,
+    "orientacao_oficial": 26612,
+    "pagina_oficial": 18067,
+    "perguntas_respostas": 313375,
+    "quadro_sumulas_com_referencias_precedentes": 677290
+  },
+  "colunas": [
+    "documento_id",
+    "versao_id",
+    "titulo",
+    "natureza",
+    "frente",
+    "chave_origem",
+    "source_url",
+    "coletado_em",
+    "vigencia_fonte",
+    "texto"
+  ],
+  "condicionais_excluidos": [
+    {
+      "chave_origem": "url:https://www.gov.br/receitafederal/pt-br/assuntos/agenda-tributaria/2026",
+      "natureza": "pagina_oficial",
+      "titulo": "Índice anual federal 2026"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/emitir-certidao-de-regularidade-fiscal-perante-a-fazenda-nacional",
+      "natureza": "pagina_oficial",
+      "titulo": "Emitir certidão de regularidade fiscal perante a Fazenda Nacional"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pgfn/pt-br/servicos/perguntas-frequentes/simples-nacional-regularizacao-das-pendencias-para-a-manutencao-no-simples-nacional",
+      "natureza": "pagina_oficial",
+      "titulo": "PGFN — regularização para manutenção no Simples Nacional"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/pagamentos-e-parcelamentos/parcelamento-simples-nacional/perguntas-e-respostas",
+      "natureza": "pagina_oficial",
+      "titulo": "RFB — perguntas e respostas de parcelamento Simples"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/consultar-dividas-e-pendencias-fiscais",
+      "natureza": "pagina_oficial",
+      "titulo": "Consultar dívidas e pendências fiscais — orientações"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pgfn/pt-br/servicos/orientacoes-contribuintes/parcelamentos-1/parcelamentos-1",
+      "natureza": "pagina_oficial",
+      "titulo": "PGFN — orientações de parcelamento"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/consultar-certidoes-emitidas-pela-receita-federal-e-ou-procuradoria-geral-da-fazenda-nacional",
+      "natureza": "pagina_oficial",
+      "titulo": "Consultar certidões emitidas RFB/PGFN"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pgfn/pt-br/servicos/orientacoes-contribuintes/orientacoes-da-divida-ativa",
+      "natureza": "pagina_oficial",
+      "titulo": "PGFN — Carta de Serviços da Dívida Ativa"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pgfn/pt-br/servicos/orientacoes-contribuintes/primeiros-passos-1/primeiros-passos",
+      "natureza": "pagina_oficial",
+      "titulo": "PGFN — primeiros passos na dívida ativa"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/gestao/pt-br/assuntos/noticias/2025/dezembro/confira-o-calendario-oficial-de-feriados-nacionais-e-pontos-facultativos-em-2026",
+      "natureza": "pagina_oficial",
+      "titulo": "federal-calendario-mgi"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pgfn/pt-br/servicos/perguntas-frequentes/parcelamentos",
+      "natureza": "pagina_oficial",
+      "titulo": "PGFN — perguntas frequentes de parcelamentos"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/parcelar-imposto-mei",
+      "natureza": "pagina_oficial",
+      "titulo": "Parcelar dívidas do MEI"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/parcelar-imposto-simples",
+      "natureza": "pagina_oficial",
+      "titulo": "Parcelar dívidas do Simples Nacional"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/pt-br/servicos/liberar-emissao-de-certidao-de-regularidade-fiscal-perante-a-pgfn",
+      "natureza": "pagina_oficial",
+      "titulo": "Liberar emissão de certidão perante a PGFN"
+    },
+    {
+      "chave_origem": "url:https://www.gov.br/inpi/pt-br/central-de-conteudo/noticias/ponto-facultativo-do-dia-do-servidor-sera-em-30-de-outubro",
+      "natureza": "pagina_oficial",
+      "titulo": "federal-inpi-alteracao"
+    }
+  ],
+  "contagens_por_natureza": {
+    "anexo_convertido": 382,
+    "ato_normativo_administrativo": 32,
+    "consulta_acordao_administrativo": 7,
+    "consulta_tributaria": 987,
+    "diario_com_consulta_tributaria": 4,
+    "diario_com_jurisprudencia_tributaria": 1,
+    "documentacao_classificacao_oficial": 19,
+    "informativo_jurisprudencial": 1,
+    "interpretacao_administrativa": 1872,
+    "jurisprudencia_tarf": 475,
+    "legislacao": 962,
+    "manual": 8,
+    "nao_informada": 16,
+    "orientacao_mei": 4,
+    "orientacao_oficial": 6,
+    "pagina_oficial": 7,
+    "perguntas_respostas": 2,
+    "quadro_sumulas_com_referencias_precedentes": 26
+  },
+  "excluidos": {
+    "agenda_diaria": {
+      "bytes_texto": 1189398,
+      "documentos": 116
+    },
+    "agenda_mes": {
+      "bytes_texto": 23664,
+      "documentos": 11
+    },
+    "catalogo_ou_orientacao": {
+      "bytes_texto": 26511,
+      "documentos": 8
+    },
+    "documentacao_tecnica": {
+      "bytes_texto": 2975184,
+      "documentos": 30
+    },
+    "especificacao_tecnica": {
+      "bytes_texto": 927961,
+      "documentos": 2
+    },
+    "html": {
+      "bytes_texto": 14662,
+      "documentos": 3
+    },
+    "json": {
+      "bytes_texto": 16313,
+      "documentos": 4
+    },
+    "manual_fornecedor": {
+      "bytes_texto": 311773,
+      "documentos": 1
+    },
+    "manual_regularizacao": {
+      "bytes_texto": 29759,
+      "documentos": 1
+    },
+    "norma_contabil": {
+      "bytes_texto": 1141320,
+      "documentos": 5
+    },
+    "notas_explicativas_cnae": {
+      "bytes_texto": 1518827,
+      "documentos": 1
+    },
+    "orientacao": {
+      "bytes_texto": 64971,
+      "documentos": 4
+    },
+    "orientacao_declaracao": {
+      "bytes_texto": 24111,
+      "documentos": 3
+    },
+    "pagina_oficial": {
+      "bytes_texto": 115013,
+      "documentos": 15
+    },
+    "pdf": {
+      "bytes_texto": 2386219,
+      "documentos": 7
+    },
+    "pdf_zip": {
+      "bytes_texto": 1669630,
+      "documentos": 2
+    }
+  },
+  "linhas": 4811,
+  "naturezas_permitidas": [
+    "anexo_convertido",
+    "ato_normativo_administrativo",
+    "consulta_acordao_administrativo",
+    "consulta_tributaria",
+    "diario_com_consulta_tributaria",
+    "diario_com_jurisprudencia_tributaria",
+    "documentacao_classificacao_oficial",
+    "informativo_jurisprudencial",
+    "interpretacao_administrativa",
+    "jurisprudencia_tarf",
+    "legislacao",
+    "manual",
+    "orientacao_mei",
+    "orientacao_oficial",
+    "perguntas_respostas",
+    "quadro_sumulas_com_referencias_precedentes"
+  ],
+  "run": "E:\\RES-IA-Challenge-2\\backend\\refino\\data\\42519bf3b85704f26362ac4da9011c963a880a89400be8298432d8adb895d3f6",
+  "saida": "E:\\RES-IA-Challenge-2\\exports\\recorte-rag-v1\\recorte.csv",
+  "sha256": "41130a6ebca35038737c0e0df5bffba85d85a64537e7e891cef1a45e7c43a09f",
+  "teto_bytes": 1073741824
+}

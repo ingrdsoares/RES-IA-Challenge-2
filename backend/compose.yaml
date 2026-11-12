@@ -51,7 +51,7 @@ services:
       S3_PUBLIC_ENDPOINT: http://localhost:9000
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-sd_local_user}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-sd_local_password}
-      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000"]}'
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173"]}'
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
@@ -110,7 +110,7 @@ services:
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-sd_local_user}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-sd_local_password}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000"]}'
+      ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173"]}'
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
@@ -139,6 +139,19 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3000:80"
+    environment:
+      VITE_API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
     restart: unless-stopped
 
   reranker:

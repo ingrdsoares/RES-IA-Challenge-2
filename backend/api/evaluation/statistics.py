@@ -3,6 +3,10 @@ from collections import Counter, defaultdict
 
 import numpy as np
 
+from evaluation.metrics.fidelidade import FIDELIDADE, get_score
+
+METRICAS = ["rouge_l", "bert_score", *FIDELIDADE]
+
 
 def summarize_values(values, config):
     x = np.asarray(values, dtype=float)
@@ -61,6 +65,30 @@ def estimate_sample_size(sample_std, margin, available):
     }
 
 
+def agreement(rows):
+    """Concordância entre repetições por pergunta (só perguntas com 2+ tentativas bem-sucedidas)."""
+    by_id = defaultdict(list)
+    for r in rows:
+        if r.attempt.state == "success":
+            by_id[r.case.id].append(r.attempt)
+
+    def share(values):
+        return Counter(values).most_common(1)[0][1] / len(values)
+
+    return [
+        {
+            "id": case_id,
+            "repeats": len(att),
+            "answer_agreement": share([" ".join((a.answer or "").split()) for a in att]),
+            "source_agreement": share(
+                [tuple(str(s.get("chunk_id") or s.get("id")) for s in a.sources) for a in att]
+            ),
+        }
+        for case_id, att in by_id.items()
+        if len(att) > 1
+    ]
+
+
 def summarize_run(manifest, attempts, config, pilot_summary=None):
     def group(rows, category=None, behavior=None):
         if category is not None:
@@ -80,10 +108,10 @@ def summarize_run(manifest, attempts, config, pilot_summary=None):
             "metrics": {},
             "variability": [],
         }
-        for metric in ["rouge_l", "bert_score"]:
+        for metric in METRICAS:
             by_id = defaultdict(list)
             for row in rows:
-                score = getattr(row, metric)
+                score = get_score(row, metric)
                 if score.state == "success" and score.f1 is not None:
                     by_id[row.case.id].append(score.f1)
             values = [float(np.mean(v)) for v in by_id.values()]
@@ -107,6 +135,7 @@ def summarize_run(manifest, attempts, config, pilot_summary=None):
                         else None,
                     }
                 )
+        output["agreement"] = agreement(rows)
         judged = [r for r in rows if r.judgment != "not_assessed"]
         output["behavioral_review"] = {
             "reviewed": len(judged),
@@ -132,6 +161,18 @@ def summarize_run(manifest, attempts, config, pilot_summary=None):
         and not manifest.run_config.selection.all_cases
         else "exploratory",
     }
+    ag = summary["all"]["agreement"]
+    summary["repetitions"] = {
+        "questions_with_repeats": len(ag),
+        "mean_answer_agreement": float(np.mean([a["answer_agreement"] for a in ag]))
+        if ag
+        else None,
+        "mean_source_agreement": float(np.mean([a["source_agreement"] for a in ag]))
+        if ag
+        else None,
+        "identical_answers": sum(a["answer_agreement"] == 1 for a in ag),
+        "identical_sources": sum(a["source_agreement"] == 1 for a in ag),
+    }
     for category in sorted({r.case.category for r in attempts}):
         summary["categories"][category] = group(
             [r for r in attempts if r.case.category == category], category=category
@@ -141,7 +182,7 @@ def summarize_run(manifest, attempts, config, pilot_summary=None):
             [r for r in attempts if r.case.expected_behavior == behavior], behavior=behavior
         )
     if pilot_summary:
-        for metric in ["rouge_l", "bert_score"]:
+        for metric in METRICAS:
             sd = pilot_summary["primary"]["metrics"][metric]["sample_std"]
             summary["primary"]["metrics"][metric]["sample_size"] = estimate_sample_size(
                 sd, config.margin, manifest.selection.available.get("answer", 0)

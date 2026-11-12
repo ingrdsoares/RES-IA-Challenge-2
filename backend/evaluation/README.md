@@ -177,3 +177,16 @@ Smoke de BERT com pesos reais é opcional e exige preparação autorizada do enc
 - Zhang et al., 2020: https://arxiv.org/abs/1904.09675
 - Databricks: https://docs.databricks.com/aws/en/agents/tutorials/ai-cookbook/evaluate-define-quality
 - BERTimbau: https://huggingface.co/neuralmind/bert-base-portuguese-cased
+
+## Repetições, fidelidade e revisão independente
+
+- `--repeticoes N` (alias de `--repeats`; padrão 1) em `collect`/`run`: N tentativas por pergunta.
+  O relatório traz a aba Concordância (respostas idênticas e fontes idênticas por pergunta),
+  `summary.json["repetitions"]` e média/desvio por métrica em Variabilidade.
+- Métricas de fidelidade (determinísticas, sem LLM), calculadas no relatório junto de ROUGE-L/BERTScore:
+  `artigo_esperado` (norma+artigo da ground_truth presentes nas fontes recuperadas) e
+  `citacao_suportada` (citações norma/artigo e marcadores `[n]` da resposta sustentados pelas fontes).
+  Sem referência normativa, recusa ou esclarecimento (`insufficient_context`, `needs_clarification`)
+  o valor é N/A, não zero.
+- `report`/`run` também geram `revisao_independente.xlsx` para revisor fiscal externo
+  (veredito: correta, recusa adequada, parcial, errada, recusa indevida; base legal; comentário).

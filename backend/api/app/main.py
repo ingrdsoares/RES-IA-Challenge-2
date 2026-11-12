@@ -1,4 +1,6 @@
 import logging
+import os
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -22,6 +24,7 @@ from app.jobs.router import router as jobs_router
 from app.legal.router import router as legal_router
 from app.models import LocalModels
 from app.rag import RagService
+from app.rate_limit import RateLimiter
 from app.schemas import QueryRequest, QueryResponse
 from app.tasks.router import router as tasks_router
 from app.vector_store import VectorStore
@@ -74,7 +77,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     app.include_router(tasks_router)
     app.include_router(fiscal_router)
 
-    legacy_paths = {"/health", "/ready", "/rag/query"}
+    legacy_paths = {"/health", "/ready", "/version", "/rag/query"}
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, exc: RequestValidationError):
@@ -141,6 +144,15 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     def health():
         return {"status": "ok"}
 
+    @app.get("/version")
+    def version():
+        return {
+            "version": os.getenv("APP_VERSION", "0.1.0"),
+            "commit_sha": os.getenv("GIT_COMMIT_SHA", "development"),
+            "environment": os.getenv("ENVIRONMENT", "local"),
+            "build_timestamp": os.getenv("BUILD_TIMESTAMP", "unknown"),
+        }
+
     @app.get("/ready")
     def ready(request: Request):
         try:
@@ -151,7 +163,33 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             ) from None
         return {"status": "ready"}
 
-    @app.post("/rag/query", response_model=QueryResponse, dependencies=[Depends(require_account)])
+    @app.middleware("http")
+    async def security_headers_middleware(request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        request.state.request_id = request_id
+        response = await call_next(request)
+        headers = response.headers
+        headers["X-Request-ID"] = request_id
+        headers["X-Content-Type-Options"] = "nosniff"
+        headers["X-Frame-Options"] = "DENY"
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=(), payment=()"
+        headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https:; connect-src 'self' http: https:; frame-ancestors 'none';"
+        )
+        settings = getattr(request.app.state, "settings", None)
+        if settings and (
+            getattr(settings, "hsts_enabled", False) or getattr(settings, "cookie_secure", False)
+        ):
+            headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+        return response
+
+    @app.post(
+        "/rag/query",
+        response_model=QueryResponse,
+        dependencies=[Depends(require_account), Depends(RateLimiter(namespace="ai_rag"))],
+    )
     def query(payload: QueryRequest, request: Request):
         return request.app.state.rag.query(payload.question)
 

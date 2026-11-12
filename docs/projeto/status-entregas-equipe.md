@@ -108,6 +108,13 @@ flowchart TD
 * [`docs/projeto/definicao-projeto.md`](definicao-projeto.md): **Pacote Completo de Definição do Projeto** — formulação do problema, Essential Question, mapa de stakeholders, personas detalhadas (Carlos MEI, Mariana ME, Rafael contador), matriz de riscos/mitigações e catálogo de 12 requisitos funcionais e 10 não funcionais.
 * [`docs/projeto/guiding-questions.md`](guiding-questions.md): Fundamentação conceitual de qualidade de vida vinculada ao estresse financeiro-tributário e fluxo consultivo de tomada de decisão.
 * [`docs/arquitetura/devops-mlops.md`](../arquitetura/devops-mlops.md): Planejamento da esteira de MLOps com versionamento de dados fiscais (DVC), monitoramento de métricas de fidelidade (MLflow/Ragas) e conteinerização.
+* [`docs/arquitetura/adr-001-hospedagem-e-custo-ia.md`](../arquitetura/adr-001-hospedagem-e-custo-ia.md): **ADR 001 de Hospedagem & Custos de IA (Issue E4.1)** — formalização do TCO de inferência e comprovação de economia de 94% a 99% com APIs gerenciadas.
+* [`docs/arquitetura/deploy-cd-e-rollback.md`](../arquitetura/deploy-cd-e-rollback.md): **Pipeline de CD & Rollback (Issue E4.4)** — workflow automatizado com GHCR, endpoint `/version` e runbook de reversão operacional.
+* [`docs/arquitetura/seguranca-e-rate-limit.md`](../arquitetura/seguranca-e-rate-limit.md): **Segurança de API & Rate Limiting (Issue E4.5)** — rate limiting atômico via Redis e middleware de security headers.
+* [`docs/arquitetura/lgpd-e-privacidade.md`](../arquitetura/lgpd-e-privacidade.md): **Conformidade com a LGPD e Privacidade (Issue E4.6)** — política de privacidade para MEI, termos de uso, isolamento de PII e sanitizador automático de logs (`app.sanitizer`).
+* [`docs/arquitetura/modelagem-ameacas.md`](../arquitetura/modelagem-ameacas.md): **Modelagem de Ameaças do Sistema (Issue E4.12)** — matriz STRIDE e OWASP Top 10 for LLM Applications (2025).
+* [`docs/arquitetura/plano-resposta-incidentes.md`](../arquitetura/plano-resposta-incidentes.md): **Plano de Resposta a Incidentes e Continuidade (Issue E4.13)** — SOPs para contenção de alucinação fiscal, vazamento de PII e simulação de continuidade.
+* [`docs/entrega/entrega2_semana3_llm_rag.pdf`](../entrega/entrega2_semana3_llm_rag.pdf): **Relatório Comparativo LLM x RAG (Semana 3)** — relatório técnico executivo de 6 páginas com benchmark experimental, métricas e comprovação da superioridade do RAG com motor fiscal.
 * [`docs/entrega/entregaveis-challenge-2-grupo-08-final.pdf`](../entrega/entregaveis-challenge-2-grupo-08-final.pdf): Diagramação, compilação e versionamento dos relatórios formais consolidados da semana.
 
 ---

@@ -22,6 +22,16 @@ def test_health():
     assert r.json() == {"status": "ok"}
 
 
+def test_version():
+    r = client.get("/version")
+    assert r.status_code == 200
+    data = r.json()
+    assert "version" in data
+    assert "commit_sha" in data
+    assert "environment" in data
+    assert "build_timestamp" in data
+
+
 @pytest.mark.parametrize("question", ["", "  ", "x" * 2001])
 def test_invalid_question_returns_422(service, question):
     with TestClient(create_app(service=service)) as client:

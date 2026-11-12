@@ -24,6 +24,12 @@
   * [Estratégia de Embeddings e Qdrant](arquitetura/estrategia-embeddings.md)
   * [Tool Calling na Busca RAG](arquitetura/tool-calling-busca-rag.md)
   * [DevOps e MLOps](arquitetura/devops-mlops.md)
+  * [ADR 001: Hospedagem e Custo de IA](arquitetura/adr-001-hospedagem-e-custo-ia.md)
+  * [Pipeline de CD e Rollback](arquitetura/deploy-cd-e-rollback.md)
+  * [Segurança de API e Rate Limiting](arquitetura/seguranca-e-rate-limit.md)
+  * [Conformidade com a LGPD e Privacidade](arquitetura/lgpd-e-privacidade.md)
+  * [Modelagem de Ameaças (STRIDE & OWASP)](arquitetura/modelagem-ameacas.md)
+  * [Plano de Resposta a Incidentes e Continuidade](arquitetura/plano-resposta-incidentes.md)
   * [Retomada na Máquina RTX 3080 Ti](arquitetura/retomada-rtx3080ti.md)
 
 * **Dados e Acervo**
@@ -39,6 +45,7 @@
   * [Avaliação do RAG (07/11/2026)](avaliacao/avaliacao-rag-2026-11-07.md)
 
 * **Entregáveis**
+  * [Semana 3: Relatório Comparativo LLM x RAG (PDF)](entrega/entrega2_semana3_llm_rag.pdf)
   * [Entregas da Equipe (PDF)](entrega/status-entregas-equipe-grupo-08.pdf)
   * [PDF da Semana](entrega/entregaveis-challenge-2-grupo-08-final.pdf)
   * [Relatório Técnico: Projeto, RAG & MLOps (PDF)](entrega/relatorio-socio-digital-rag-mlops.pdf)

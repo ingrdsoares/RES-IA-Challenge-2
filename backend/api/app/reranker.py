@@ -13,6 +13,10 @@ class Reranker:
 
     def __init__(self, settings: Settings, client: httpx.Client | None = None):
         self.url = str(settings.reranker_url) if settings.reranker_url else None
+        if not self.url:
+            logger.warning(
+                "RERANKER_URL não definida: a busca segue só com a ordem híbrida (recall reduzido)"
+            )
         self.client = client or httpx.Client(timeout=settings.reranker_timeout)
 
     def reordenar(self, pergunta: str, fontes: list[Source]) -> list[Source]:

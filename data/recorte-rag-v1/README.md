@@ -87,3 +87,10 @@ avise o mantenedor para remover o documento.**
 
 Gerado a partir do run do refino `42519bf3b85704f26362ac4da9011c963a880a89400be8298432d8adb895d3f6`
 pelo comando `python -m src.rag.recorte_csv --run <run> --saida data/recorte-rag-v1/recorte-publico.csv --publico`.
+
+## Recorte completo (sem filtro de dados pessoais)
+
+`recorte-completo.csv.gz` (41 626 267 bytes, sha256 `ce495abb65ef639d5f85190b694bd983bf0c989da79e2efe51f82f7850d5ae24`)
+e `recorte-completo.manifesto.json`: mesmo formato, **sem** o filtro de dados pessoais/identificação
+de partes aplicado ao recorte público. Publicado por decisão do mantenedor; o recorte público
+continua sendo a versão recomendada para uso externo.

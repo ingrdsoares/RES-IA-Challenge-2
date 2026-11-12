@@ -12,7 +12,8 @@
 - **Integração Contínua (CI):** GitHub Actions para linters, testes unitários (`pytest`) e verificação de tipos
 - **Versionamento de Dados Fiscais:** DVC (Data Version Control) para rastrear tabelas de CNAEs, bases da Receita e documentos legais
 - **Registro e Governança de Modelos / RAG:** MLflow para rastreamento de experimentos, prompts, embeddings e métricas de fidelidade (Ragas / TruLens)
-- **Conteinerização:** Docker para o servidor de inferência FastAPI e serviços de banco vetorial
+- **Conteinerização:** Docker para a API FastAPI, worker assíncrono, serviços de banco vetorial e frontend Nginx
+- **Interface Web:** React 18, TypeScript, Vite e TailwindCSS com arquitetura SPA e proxy reverso
 
 ---
 
@@ -53,6 +54,7 @@ A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/
    - Arquivamento automático do laudo de auditoria (`data/benchmark/benchmark_results.json`) como artefato de execução do GitHub Actions.
 4. **Governança de Dados com DVC (`dvc-validation`):** Checagem de integridade do catálogo DVC e validação dos ponteiros `.dvc`.
 5. **Smoke Test de Container Docker (`docker-smoke-test`):** Build da imagem da API para validação de empacotamento.
+6. **Qualidade, Testes e Build do Frontend (`frontend-ci`):** Validação estática de tipos com TypeScript, testes unitários com Vitest, build de produção React/Vite e compilação da imagem Docker baseada em Nginx.
 
 ---
 
@@ -67,8 +69,12 @@ A esteira de integração contínua ([`.github/workflows/ci.yml`](../../.github/
 
 ---
 
-## Próximas Entregas de MLOps para o Sócio Digital (Etapa 4)
+## Entregas de MLOps para o Sócio Digital (Etapa 4)
 
-1. **Containerização Completa e Compose de Produção (Issue E4.2):** Orquestração completa de API, Qdrant, PostgreSQL e frontend com volumes persistentes.
-2. **Pipeline de CD / Deploy Automatizado (Issue E4.4):** Deploy contínuo em staging e promoção controlada para produção.
-3. **Observabilidade e Telemetria (Issue E4.7):** Coleta de logs estruturados com Request ID e monitoramento de abstenção.
+1. **Hospedagem & Projeção de Custos de IA (Issue E4.1 — Concluído):** Formalização da ADR 001 com estudo comparativo entre GPU própria (vLLM) e APIs gerenciadas eficientes (Gemini Flash/GPT-4o-mini), modelando o TCO e comprovando economia de 94% a 99% em [`docs/arquitetura/adr-001-hospedagem-e-custo-ia.md`](adr-001-hospedagem-e-custo-ia.md).
+2. **Containerização Completa e Compose de Produção (Issue E4.2 — Concluído):** Orquestração completa de API, Qdrant, PostgreSQL, Redis, S3, Worker e Frontend com volumes persistentes via [`backend/compose.prod.yaml`](../../backend/compose.prod.yaml).
+3. **Pipeline de CD / Deploy Automatizado (Issue E4.4 — Concluído):** Deploy contínuo em staging no merge da `main`, publicação de imagens versionadas no GHCR, promoção controlada com aprovação manual para produção e protocolo de rollback operacional documentado em [`docs/arquitetura/deploy-cd-e-rollback.md`](deploy-cd-e-rollback.md).
+4. **Segurança de API & Rate Limiting (Issue E4.5 — Concluído):** Implementação de limitação de taxa via Redis (Token Bucket com TTL atômico), cabeçalhos de segurança HTTP (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) e rotação de segredos documentada em [`docs/arquitetura/seguranca-e-rate-limit.md`](seguranca-e-rate-limit.md).
+5. **Conformidade com a LGPD e Sanitização de Logs (Issue E4.6 — Concluído):** Implementação de sanitizador de PII (CPF/CNPJ/e-mail/tokens) no logging nativo da FastAPI, injeção de `X-Request-ID` para rastreabilidade auditável e documentação de base legal e política de privacidade em [`docs/arquitetura/lgpd-e-privacidade.md`](lgpd-e-privacidade.md).
+6. **Modelagem de Ameaças do Sistema (Issue E4.12 — Concluído):** Análise abrangente de riscos pelos modelos STRIDE e OWASP Top 10 for LLM Applications (2025), cobrindo prompt injection, data poisoning e governança multi-tenant em [`docs/arquitetura/modelagem-ameacas.md`](modelagem-ameacas.md).
+7. **Plano de Resposta a Incidentes e Continuidade (Issue E4.13 — Concluído):** Protocolos para contenção de alucinações críticas, vazamento de PII, indisponibilidade de LLM parceiro e corrupção de acervo com simulação operacional documentada em [`docs/arquitetura/plano-resposta-incidentes.md`](plano-resposta-incidentes.md).

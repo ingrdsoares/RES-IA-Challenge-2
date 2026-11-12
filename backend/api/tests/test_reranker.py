@@ -120,3 +120,9 @@ def test_servico_reordena_candidatos_e_mantem_norma_citada_primeiro():
     resposta = servico.query("LC 87")
 
     assert [f.text for f in resposta.sources] == ["citada", "boa", "ruim"]
+
+
+def test_avisa_quando_sem_url(caplog):
+    with caplog.at_level("WARNING"):
+        Reranker(Settings())
+    assert "RERANKER_URL" in caplog.text
