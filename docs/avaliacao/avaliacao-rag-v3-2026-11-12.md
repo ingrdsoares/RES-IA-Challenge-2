@@ -1,62 +1,41 @@
 # Avaliação das respostas na knowledge_base_v3 (12/11/2026)
 
+> Corrige a primeira versão deste documento. Ela comparava a v3 com números de 07/11 de outra máquina, sem reranker, e atribuía à v3 uma lentidão que era do ambiente.
+
 ## Conclusão
 
-A v3 (Markdown limpo, chunk de 4000 caracteres, 4.818 documentos, 103.540 pontos) **não melhorou as respostas** em relação à coleção anterior no mesmo teste de 20 perguntas, e ficou **bem mais lenta**. Corretas ou recusas/esclarecimentos adequados: 14 de 20, contra 17 de 20 na versão anterior. A leitura é preliminar: foi feita por quem rodou o teste, sem revisão independente, como a do relatório de 07/11.
+Nas mesmas condições (máquina, código, modelos e reranker), a v3 (Markdown limpo, chunk de 4000, 103.540 pontos) fica **ligeiramente abaixo** da v2 (155.781 pontos) e responde **no mesmo tempo**. A diferença de qualidade é pequena e perto do ruído do próprio teste. A causa provável é o orçamento de contexto: com chunks de 4000 caracteres cabem menos trechos no prompt.
 
-## Como foi rodado
+## Comparação nas mesmas condições
 
-Conjunto `teste_final_v2_2026-11-07.jsonl` (20 perguntas, split `final`), uma repetição, geração `qwen3:8b`, embedding `qwen3-embedding:0.6b`, coleção `knowledge_base_v3`. Resultados em `backend/evaluation/runs/v3_2026-11-12/` (não versionado).
+Mesmo teste (`teste_final_v2_2026-11-07.jsonl`, 20 perguntas), `qwen3:8b`, reranker `bge-reranker-v2-m3` ligado, `NUM_CTX` 8192, no mesmo dia e na mesma máquina.
 
-## Métricas de texto
+| Coleção | ROUGE-L | BERTScore | Mediana | Fontes/pergunta |
+|---|---:|---:|---:|---:|
+| v2 (155.781 pontos) | 0,355 | 0,622 | 2,5 s | 7,4 |
+| v3 (103.540 pontos) | 0,318 | 0,606 | 2,3 s | 6,1 |
+| v3, outra repetição | 0,332 | 0,608 | 21 s (ambiente) | n/d |
+| v3 sem reranker | 0,318 | 0,601 | 20,7 s (ambiente) | n/d |
 
-| Conjunto | Métrica | Anterior ("atual") | v3 |
-|---|---|---:|---:|
-| 20 perguntas | ROUGE-L | 0,335 | 0,318 |
-| 20 perguntas | BERTScore | 0,623 | 0,601 |
-| Sem n05 a n09 (15) | ROUGE-L | 0,289 | 0,258 |
-| Sem n05 a n09 (15) | BERTScore | 0,600 | 0,571 |
-| Só `answer` (14) | ROUGE-L | n/d | 0,357 (IC 95% 0,27 a 0,44) |
-| Só `answer` (14) | BERTScore | n/d | 0,628 (IC 95% 0,58 a 0,67) |
+Duas repetições da v3 variam 0,014 em ROUGE-L, então a diferença para a v2 (0,02 a 0,04) é de uma a duas vezes o ruído. As métricas medem semelhança de texto, não acerto fiscal.
 
-A queda de 0,02 a 0,03 cabe no ruído de 20 perguntas. Essas métricas medem semelhança de texto, não acerto fiscal.
+## O que explica a queda
 
-## Leitura pergunta a pergunta
+- **Contexto:** o limite que vale não é `MAX_CONTEXT_CHARS`, e sim o orçamento de tokens (`num_ctx` 8192 menos 1024 de resposta e 256 de folga, a 2 bytes por token), cerca de 10 mil caracteres. Com chunks de 4000 cabem 2 a 3 inteiros e o último é cortado. Subir `MAX_CONTEXT_CHARS` para 20.000 não mudou nada (6,1 fontes, 10.246 caracteres).
+- **Efeito nas respostas:** n14 respondeu só "sociedade empresária" e n13 citou o parágrafo errado da EC 132, onde a v2 trouxe o trecho certo.
+- **Teste com `NUM_CTX` 16384:** ROUGE-L 0,342 e BERTScore 0,620, no nível da v2. Mas a mediana foi 114 s e o máximo 727 s, porque a VRAM de 12 GB estoura com o `qwen3:8b`, o embedding e o reranker, e uma pergunta ficou sem fontes. Não serve como configuração.
 
-| Leitura preliminar | Anterior | v3 |
-|---|---:|---:|
-| Correta | 13 | 10 (inclui o esclarecimento adequado de n19) |
-| Recusa adequada | 4 | 4 |
-| Parcial | 3 | 4 |
-| Errada | 0 | 1 |
-| Recusa indevida | 0 | 1 |
+## Sobre o tempo de 21 s
 
-- **Corretas:** n01, n02, n04, n05, n06, n09, n10, n12, n14, mais n19 (pede dados em vez de chutar).
-- **Recusas adequadas:** n15, n16, n17, n20.
-- **Parciais:**
-  - n03: acerta o mínimo de 2% (LC 116, art. 8º-A), mas atribui o máximo de 5% ao Simples e à CGSN, não ao art. 8º, II, da LC 116.
-  - n07: omite a exceção para usuários do SIAFI e do SIGGO.
-  - n08: não cita a NFS-e (art. 3º).
-  - n13: diz "sim", sem os arts. 156-A e 195, V, nem a condição.
-- **Recusa indevida:** n11. A referência é 32% (Lei 9.249/1995, art. 15, § 1º, III, a). A resposta diz que os documentos não trazem percentual geral para serviços. Falha de recuperação: o trecho certo não chegou ao gerador.
-- **Errada:** n18 ("Minha empresa pode entrar no Simples?"). Devia pedir atividade, receita e situação. Respondeu com um CNAE qualquer (8599-6/04) e concluiu que pode.
+Duas das rodadas da v3 tiveram mediana de 21 s e a v2 pequena, 19 s, logo depois de a máquina reiniciar e o Ollama e o Docker serem recarregados. Medida por etapa, a v3 responde em 2,7 a 5,2 s, e uma repetição completa deu 2,3 s de mediana. O tempo não é efeito da coleção.
 
-## Tempo por pergunta
+## Sobre a v2 de 07/11
 
-| Versão | Mediana | Máximo |
-|---|---:|---:|
-| Anterior | 2,7 s | 6,7 s |
-| v3 | 20,7 s | 36,4 s |
-
-Causa provável: chunks de 4000 caracteres alongam o prompt do `qwen3:8b`, e a GPU estava dividida com outras tarefas durante a medição. Não foi isolado qual pesa mais.
-
-## Recuperação (mesma coleção)
-
-20 perguntas de desenvolvimento, nível de documento: densa R@8 0,45, MRR@10 0,36; híbrida com norma citada R@20 0,58, MRR@10 0,40. Detalhes em `data/benchmark/recuperacao_v3.json`.
+A `knowledge_base_v2` de 155.781 pontos está no volume `socio-digital_qdrant_data`. Existe também uma `knowledge_base_v2` de 2.944 pontos no Qdrant do `qdrant-sd`, que não é a de 07/11 e não deve ser usada como referência.
 
 ## Próximos passos
 
-1. Comparar v3 contra a coleção anterior no mesmo dia e na mesma máquina, para separar o efeito do tamanho do chunk do efeito da carga na GPU.
-2. Testar chunk de 2000 com a limpeza, que mantém o prompt menor.
-3. Reranker ou peso maior para legislação (n11 e n03 falham por trechos errados).
+1. Reindexar com chunk de 2000 e limpeza: cabem 5 trechos no mesmo contexto.
+2. Ou manter o chunk de 4000 e cortar cada trecho enviado ao modelo em torno do trecho achado pelo reranker.
+3. Reranker ou peso maior para legislação nas perguntas em que a norma certa não chega.
 4. Regra de esclarecimento para perguntas sem dados (n18).
