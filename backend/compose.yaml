@@ -56,7 +56,7 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
-      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v3}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
       TOP_K: ${TOP_K:-8}
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
@@ -115,7 +115,7 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
-      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
+      COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v3}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
       TOP_K: ${TOP_K:-8}
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}

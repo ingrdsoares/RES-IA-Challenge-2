@@ -39,6 +39,7 @@ from app.vector_store import DENSE, SPARSE, VectorStore  # noqa: E402
 from qdrant_client import QdrantClient  # noqa: E402
 from qdrant_client import models as qm  # noqa: E402
 
+from backend.cleaning.limpeza_markdown import limpar_markdown  # noqa: E402
 from src.rag.chunker import LegalHierarchicalChunker  # noqa: E402
 
 TAMANHO_LOTE = 64
@@ -50,6 +51,19 @@ ESPERAS_RETENTATIVA = (30, 60, 120, 120, 120)
 TIMEOUT_QDRANT_CARGA = 120
 NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "socio-digital/recorte-rag-v1")
 CHUNKER = LegalHierarchicalChunker()
+# Ligada por --limpar; desligada mantém a carga igual à da knowledge_base_v2.
+LIMPAR = False
+
+
+def configurar(limite_corpo: int, limpar: bool) -> None:
+    """Tamanho do chunk e limpeza da carga; ids de ponto mudam, então use outra coleção."""
+    global LIMITE_CORPO, SOBREPOSICAO, CHUNKER, LIMPAR
+    LIMITE_CORPO = limite_corpo
+    SOBREPOSICAO = limite_corpo // 10
+    CHUNKER = LegalHierarchicalChunker(max_chunk_chars=limite_corpo, overlap_chars=SOBREPOSICAO)
+    LIMPAR = limpar
+
+
 # Páginas de login do gov.br coletadas no lugar das súmulas do CARF; não têm conteúdo.
 TITULO_PAGINA_LOGIN = "Conteúdo Restrito"
 
@@ -188,7 +202,10 @@ def itens_do_documento(
 ) -> Iterator[tuple[str, str, dict]]:
     """(id do ponto, texto a embeddar, payload) de cada ponto do documento."""
     indice = 0
-    for chunk in CHUNKER.chunk_document(limpar_segmentos(linha["texto"]), linha["titulo"]):
+    texto_doc = limpar_segmentos(linha["texto"])
+    if LIMPAR:
+        texto_doc = limpar_markdown(texto_doc)
+    for chunk in CHUNKER.chunk_document(texto_doc, linha["titulo"]):
         estatisticas["chunks_base"] += 1
         bruto = chunk.raw_text
         cabecalho = (
@@ -394,7 +411,17 @@ def main(
         action="store_true",
         help="pula documento com todos os pontos já gravados; só para o mesmo CSV e chunker",
     )
+    parser.add_argument(
+        "--limite-corpo",
+        type=int,
+        default=2000,
+        help="caracteres por chunk (sobreposição de 10%%); padrão 2000",
+    )
+    parser.add_argument(
+        "--limpar", action="store_true", help="aplica backend/cleaning/limpeza_markdown"
+    )
     args = parser.parse_args(argv)
+    configurar(args.limite_corpo, args.limpar)
     settings = Settings()
 
     if args.dry_run:
