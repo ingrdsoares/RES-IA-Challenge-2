@@ -2,9 +2,12 @@ import csv
 import json
 from pathlib import Path
 
+from evaluation.metrics.fidelidade import get_score
 from evaluation.reports.excel import csv_safe, write_excel
 from evaluation.reports.markdown import render
 from evaluation.reports.plots import write_plots
+from evaluation.reports.revisao import INSTRUCOES_REVISAO, linhas_revisao
+from evaluation.statistics import METRICAS
 
 
 def atomic_text(path, text):
@@ -33,11 +36,11 @@ def write_report(snapshot, summary, output_dir, comparison=None):
             | row.attempt.model_dump()
             | {"judgment": row.judgment, "reviewer": row.reviewer, "rationale": row.rationale}
         )
-        for metric in ["rouge_l", "bert_score"]:
+        for metric in METRICAS:
             flat.update(
                 {
                     f"{metric}_{key}": value
-                    for key, value in getattr(row, metric).model_dump().items()
+                    for key, value in get_score(row, metric).model_dump().items()
                 }
             )
         rows.append(flat)
@@ -117,19 +120,26 @@ def write_report(snapshot, summary, output_dir, comparison=None):
         "Abstenções": [
             r
             for r in rows
-            if r["expected_behavior"] != "answer" or r["rag_status"] == "insufficient_context"
+            if r["expected_behavior"] != "answer"
+            or r["rag_status"] in ("insufficient_context", "needs_clarification")
         ],
         "Variabilidade": summary["all"]["variability"],
         "Tamanho amostral": [
             {"metric": k, **v["sample_size"]} for k, v in summary["primary"]["metrics"].items()
         ],
         "Fontes": sources,
+        "Concordância": summary["all"]["agreement"],
     }
     if comparison:
         tables["Comparação"] = [{"metric": k, **v} for k, v in comparison["metrics"].items()]
         atomic_text(
             output_dir / "comparison.json", json.dumps(comparison, ensure_ascii=False, indent=2)
         )
+    write_excel(
+        output_dir / "revisao_independente.xlsx.tmp",
+        {"Revisão": linhas_revisao(snapshot), "Instruções": INSTRUCOES_REVISAO},
+    )
+    (output_dir / "revisao_independente.xlsx.tmp").replace(output_dir / "revisao_independente.xlsx")
     images = write_plots(snapshot, summary, output_dir)
     write_excel(output_dir / "report.xlsx.tmp", tables, images)
     (output_dir / "report.xlsx.tmp").replace(output_dir / "report.xlsx")
@@ -195,6 +205,7 @@ def write_template(output_dir):
                 "Variabilidade",
                 "Tamanho amostral",
                 "Fontes",
+                "Concordância",
             ]
         },
     )

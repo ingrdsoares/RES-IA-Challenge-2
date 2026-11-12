@@ -27,10 +27,30 @@ from app.schemas import Source
         ("Quais obrigações a ME e a EPP têm?", ["Quais obrigações a ME e a EPP têm?"]),
         ("Qual é o limite de receita do MEI?", ["Qual é o limite de receita do MEI?"]),
         ("Qual é o prazo e o valor?", ["Qual é o prazo e o valor?"]),
+        (
+            "Qual é o limite de receita do MEI e ele pode emitir a NFS-e de padrão nacional em "
+            "operação só de ICMS?",
+            [
+                "Qual é o limite de receita do MEI",
+                "ele pode emitir a NFS-e de padrão nacional em operação só de ICMS",
+            ],
+        ),
+        (
+            "Qual o limite do MEI, e precisa declarar o faturamento?",
+            ["Qual o limite do MEI", "precisa declarar o faturamento"],
+        ),
+        (
+            "O MEI paga DAS e também deve recolher ISS?",
+            ["O MEI paga DAS", "também deve recolher ISS"],
+        ),
+        ("Qual a diferença entre Simples e Lucro Presumido?", None),
+        ("O MEI pode emitir NF-e e NFS-e?", None),
+        ("Como o ICMS e o ISS incidem sobre receita e despesa?", None),
+        ("Quais obrigações a ME e a EPP têm?", None),
     ],
 )
 def test_partes_da_pergunta(pergunta, esperado):
-    assert partes_da_pergunta(pergunta) == esperado
+    assert partes_da_pergunta(pergunta) == (esperado or [pergunta])
 
 
 def test_parte_curta_herda_o_assunto_da_primeira():
@@ -39,6 +59,11 @@ def test_parte_curta_herda_o_assunto_da_primeira():
         "Qual é a alíquota mínima do ISS",
         "qual é a máxima ISS a aliquota minima do iss",
     ]
+
+
+def test_parte_sem_interrogativa_carrega_o_assunto_do_mei():
+    partes = ["Qual é o limite de receita do MEI", "ele pode emitir NFS-e"]
+    assert consultas_de_busca(partes)[1] == "ele pode emitir NFS-e o limite de receita do mei"
 
 
 def test_parte_sem_sigla_herda_as_anteriores_e_parte_com_sigla_fica_como_esta():

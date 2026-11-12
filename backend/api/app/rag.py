@@ -4,6 +4,7 @@ from threading import Lock
 from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
+from app.esclarecimento import pedir_esclarecimento
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
 from app.reranker import Reranker
@@ -56,6 +57,8 @@ class RagService:
         if not self._query_lock.acquire(blocking=False):
             raise QueryBusy()
         try:
+            if pedido := pedir_esclarecimento(question):
+                return QueryResponse(status="needs_clarification", answer=pedido, sources=[])
             self.store.ensure_collection()
             if self.store.count() == 0:
                 return QueryResponse(

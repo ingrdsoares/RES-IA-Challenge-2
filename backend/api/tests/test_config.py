@@ -37,3 +37,9 @@ def test_rejects_incompatible_configuration(values):
 
 def test_empty_reranker_url_disables_optional_gpu_service():
     assert Settings(reranker_url="").reranker_url is None
+
+
+def test_legislation_boost_padrao_e_limites():
+    assert Settings().legislation_boost > 0
+    with pytest.raises(ValidationError):
+        Settings(legislation_boost=-1)

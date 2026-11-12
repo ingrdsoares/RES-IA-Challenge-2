@@ -11,6 +11,8 @@ class EvalCase(BaseModel):
     question: str
     ground_truth: str
     expected_sources: list[str | int] = Field(default_factory=list)
+    # Documentos que trazem a mesma regra; contam como acerto "leniente" na recuperação.
+    equivalent_sources: list[str | int] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
     expected_behavior: Literal["answer", "abstain", "clarify"] = "answer"
     split: Literal["development", "final"] = "development"

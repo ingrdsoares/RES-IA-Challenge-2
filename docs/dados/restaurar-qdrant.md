@@ -32,7 +32,7 @@ curl -X POST "http://127.0.0.1:6333/collections/knowledge_base_v3/snapshots/uplo
 curl -s http://127.0.0.1:6333/collections/knowledge_base_v3   # points_count = 103540
 ```
 
-Na API, `COLLECTION_NAME=knowledge_base_v3` (já é o padrão em `backend/.env.example`).
+Na API, defina `COLLECTION_NAME=knowledge_base_v3` em `backend/.env`. O padrão é `knowledge_base_v2`, que teve melhores respostas e tempo na avaliação de 12/11 (`docs/avaliacao/avaliacao-rag-v3-2026-11-12.md`).
 
 ## Regras para os vetores baterem
 

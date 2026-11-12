@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 DENSE = "dense"
 SPARSE = "sparse"
 RRF_K = 60
+NATUREZA_NORMA = "legislacao"
 
 
 class VectorStore:
@@ -104,6 +105,9 @@ class VectorStore:
     def search(self, vector: list[float], question: str = "") -> list[Source]:
         """Candidatos por RRF de densa e esparsa, com o cosseno real em `score`.
 
+        A legislação recebe reforço (`legislation_boost`) sobre soluções de consulta e FAQs que
+        repetem a mesma regra.
+
         Trecho só da esparsa passa pelo mesmo limiar: sem isso, a pergunta fora do acervo
         deixaria de cair em contexto insuficiente.
         """
@@ -121,6 +125,9 @@ class VectorStore:
             for posicao, hit in enumerate(lista, 1):
                 if hit.id in por_id:
                     rrf[hit.id] = rrf.get(hit.id, 0.0) + 1 / (RRF_K + posicao)
+        for pid in rrf:
+            if (por_id[pid].payload or {}).get("natureza") == NATUREZA_NORMA:
+                rrf[pid] *= 1 + self.settings.legislation_boost
         ordem = sorted(rrf, key=lambda pid: rrf[pid], reverse=True)
         return self._fontes(por_id[pid] for pid in ordem)
 

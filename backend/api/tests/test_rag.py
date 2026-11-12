@@ -84,3 +84,16 @@ def test_concurrent_query_is_rejected_without_waiting(service, monkeypatch):
         finally:
             release.set()
         assert first.result(timeout=5).status == "empty_knowledge_base"
+
+
+def test_pergunta_de_caso_sem_dados_pede_esclarecimento_sem_modelos(service, monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Esclarecimento não deve consultar a base nem o Ollama")
+
+    monkeypatch.setattr(service.store, "count", forbidden)
+    monkeypatch.setattr(service.models, "embed_question", forbidden)
+    monkeypatch.setattr(service.models, "answer", forbidden)
+    response = service.query("Minha empresa pode entrar no Simples?")
+    assert response.status == "needs_clarification"
+    assert response.sources == []
+    assert "CNAE" in response.answer

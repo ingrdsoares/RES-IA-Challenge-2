@@ -34,7 +34,7 @@ def build_parser():
             group.add_argument("--limit", type=int)
             group.add_argument("--all", dest="all_cases", action="store_true", default=None)
             p.add_argument("--split", choices=["development", "final"])
-            p.add_argument("--repeats", type=int)
+            p.add_argument("--repeats", "--repeticoes", dest="repeats", type=int)
         if command in ["collect", "run"]:
             p.add_argument("--rag-version")
             p.add_argument("--corpus-version")
