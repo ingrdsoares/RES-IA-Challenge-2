@@ -58,3 +58,8 @@ data/processed/*
 !data/processed/.gitkeep
 !data/processed/*.dvc
 !data/processed/.gitignore
+
+# Local scratch, handoff packages and exports (not versioned)
+tmp/
+handoff/
+exports/
