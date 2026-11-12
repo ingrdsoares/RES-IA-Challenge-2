@@ -110,6 +110,55 @@ Branch `feat/rag-rodada-2`, criada a partir da `main` depois da mesclagem do PR 
 4. `mei01`, `lp05` e `cl03` têm valores calculados a partir da regra, sinalizados em `metadata.nota`.
 5. Faltou material no acervo para ISS-DF (FAQ e NFS-e), CARF (só 6 acórdãos) e ICMS-DF (só a alíquota de 20%).
 
+## 7. Próximas coleções: uma mudança por vez a partir da v2
+
+A `knowledge_base_v2` é a melhor coleção nos testes até agora e continua sendo a referência. A v3 mudou **três** coisas de uma vez, e não dá para saber qual delas piorou o resultado:
+
+| Coleção | CSV | Documentos | Limpeza | Chunk | Pontos |
+|---|---|---:|---|---:|---:|
+| v2 (referência) | `recorte-publico.csv.gz` (sem dados pessoais) | 4.026 | não | 2000 | 155.781 |
+| v3 | `recorte-completo.csv.gz` (sem filtro de dados pessoais) | 4.811 | `--limpar` | 4000 | 103.540 |
+
+As próximas coleções partem da v2 e mudam uma coisa só. Todas usam o recorte público, salvo a v4c.
+
+| Coleção | Muda | Comando de carga | Configuração da API |
+|---|---|---|---|
+| `knowledge_base_v4a` | chunk de 2000 para 1000 | `python -m src.rag.csv_para_qdrant --csv data/recorte-rag-v1/recorte-publico.csv.gz --colecao knowledge_base_v4a --limite-corpo 1000` | `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500 |
+| `knowledge_base_v4b` | liga a limpeza do Markdown | `python -m src.rag.csv_para_qdrant --csv data/recorte-rag-v1/recorte-publico.csv.gz --colecao knowledge_base_v4b --limpar` | padrão |
+| `knowledge_base_v4c` (opcional, só local) | recorte completo (+785 documentos) | `python -m src.rag.csv_para_qdrant --csv data/recorte-rag-v1/recorte-completo.csv.gz --colecao knowledge_base_v4c` | padrão |
+
+- Antes de cada carga, rode o mesmo comando com `--dry-run` para conferir quantos documentos e pontos vão entrar. A v4a deve ficar perto de 300 mil pontos.
+- Cada carga leva cerca de 2,5 h numa RTX 3080 Ti (a v4a, mais). Use `--retomar` se ela parar no meio.
+- A v4c usa o recorte sem filtro de dados pessoais: serve só para medir localmente e não deve ir para snapshot público.
+- A coleção nova só substitui a v2 se ganhar dela em respostas boas e em tempo, no `teste_ampliado` com `--repeticoes 3`. Se ganhar, a combinação das mudanças vencedoras vira a v5.
+
+**Perguntas sem fonte no recorte público.** 7 das 61 perguntas com resposta do `teste_ampliado` só têm fonte no recorte completo: 3 do CARF, 3 de ISS-DF e 1 do manual da ECF. Elas estão marcadas com `metadata.fonte_so_no_recorte_completo = true`. Nas comparações com coleções do recorte público, reporte o resultado com e sem essas 7, como foi feito com n05–n09 no relatório de 07/11.
+
+### Snapshot de segurança da v2
+
+Hoje só a v3 tem snapshot publicado (release `qdrant-kb-v3`). A v2 existe só no volume `socio-digital_qdrant_data` de uma máquina. Na máquina que tem a v2 de 155.781 pontos:
+
+```bash
+# 1. Conferir que é a v2 certa (existe outra knowledge_base_v2 de 2.944 pontos no qdrant-sd)
+curl -s http://127.0.0.1:6333/collections/knowledge_base_v2 | grep points_count   # 155781
+
+# 2. Criar o snapshot (devolve o nome do arquivo)
+curl -s -X POST "http://127.0.0.1:6333/collections/knowledge_base_v2/snapshots?wait=true"
+
+# 3. Baixar e registrar o SHA-256
+curl -s -o knowledge_base_v2.snapshot \
+  "http://127.0.0.1:6333/collections/knowledge_base_v2/snapshots/<nome-do-passo-2>"
+sha256sum knowledge_base_v2.snapshot
+
+# 4. Publicar como release (a v2 vem do recorte público)
+gh release create qdrant-kb-v2 knowledge_base_v2.snapshot -R ingrdsoares/RES-IA-Challenge-2 \
+  --title "Snapshot knowledge_base_v2" --notes "155.781 pontos; recorte-publico; chunk 2000; qwen3-embedding:0.6b; Qdrant 1.15.1; SHA-256: <hash>"
+```
+
+Depois, acrescente a v2 em `docs/dados/restaurar-qdrant.md`, com a mesma tabela usada para a v3: pontos, chunk, CSV, SHA-256 e release.
+
+**Atenção:** pelo próprio `restaurar-qdrant.md`, o snapshot publicado da v3 vem do recorte completo, sem filtro de dados pessoais, e o repositório é público. Com o snapshot da v2 publicado, vale avaliar com o grupo se a release `qdrant-kb-v3` deve continuar pública.
+
 ## Testes
 
 - API: 228 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
@@ -119,9 +168,10 @@ Branch `feat/rag-rodada-2`, criada a partir da `main` depois da mesclagem do PR 
 
 ## Roteiro de medição (com os serviços no ar)
 
-1. Linha de base: v2, reranker ligado e os dois bônus de busca em 0. Avaliação em `teste_final_v2` e `teste_ampliado` com `--repeticoes 3`.
+0. Snapshot da v2 (seção 7), antes de qualquer outra coisa.
+1. Linha de base: v2, reranker ligado e os dois bônus de busca em 0. Avaliação em `teste_final_v2` e `teste_ampliado` com `--repeticoes 3`, reportando com e sem as 7 perguntas que só têm fonte no recorte completo.
 2. `RERANK_LEGISLATION_BOOST` em 0,10 e 0,20, olhando n11, n03 e o conjunto completo.
-3. Reindexar com `--limite-corpo 1000` numa coleção nova e testar `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500, olhando latência e qualidade.
+3. Coleções v4a, v4b e, se quiser, v4c (seção 7), cada uma contra a v2. Na v4a, testar `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500, olhando latência e qualidade.
 4. Siglas: recall e MRR antes e depois. Para comparar, dá para desligar zerando `PESO_EXPANSAO`.
 5. `scripts/calibrar_limiar.py` na configuração vencedora.
 6. Mandar `revisao_independente.xlsx` a um revisor fiscal externo.
