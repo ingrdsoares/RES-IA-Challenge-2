@@ -33,6 +33,20 @@
         "title": "Expected Sources",
         "type": "array"
       },
+      "equivalent_sources": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "title": "Equivalent Sources",
+        "type": "array"
+      },
       "metadata": {
         "additionalProperties": true,
         "title": "Metadata",

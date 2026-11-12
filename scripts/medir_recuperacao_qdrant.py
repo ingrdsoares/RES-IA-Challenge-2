@@ -9,6 +9,13 @@ em data/benchmark/mapa_fontes_qdrant.json):
 - estrita: fonte sem documento conta como não recuperada;
 - mapeada: só as fontes com documento; pergunta sem nenhuma delas fica de fora.
 
+Equivalência (campo equivalent_sources do gold set): documentos que trazem a mesma regra.
+Além das métricas estritas (só expected_sources, comparáveis com relatórios antigos), sai a
+leitura leniente (*_leniente): um documento esperado OU equivalente recuperado conta como
+acerto. Recall leniente = min(1, aceitáveis distintos recuperados / fontes esperadas); o RR
+usa o primeiro aceitável. Sem equivalentes, leniente == estrita. Equivalente fora do mapa
+de fontes é lido como prefixo de documento_id.
+
 Uso:
   python scripts/medir_recuperacao_qdrant.py --saida data/benchmark/recuperacao_qdrant.json
 """
@@ -32,12 +39,17 @@ def carregar_casos(caminho: Path, mapa: dict) -> list[dict]:
         if caso.get("expected_behavior", "answer") != "answer" or not caso.get("expected_sources"):
             continue
         ids = [mapa[fonte]["documento_id"] for fonte in caso["expected_sources"]]
+        equivalentes = [
+            (mapa.get(fonte) or {"documento_id": fonte})["documento_id"]
+            for fonte in caso.get("equivalent_sources", [])
+        ]
         casos.append(
             {
                 "id": caso["id"],
                 "question": caso["question"],
                 "total_esperado": len(ids),
                 "esperados": [i for i in ids if i],
+                "equivalentes": [i for i in equivalentes if i],
             }
         )
     return casos
@@ -58,8 +70,20 @@ def avaliar(casos: list[dict], k: int, limiar: float) -> dict:
     mapeada: list[float] = []
     rrs: list[float] = []
     rrs_mapeada: list[float] = []
+    len_estrita: list[float] = []
+    len_mapeada: list[float] = []
+    rrs_len: list[float] = []
+    rrs_len_mapeada: list[float] = []
     for caso in casos:
         docs = documentos_recuperados(caso["hits"], k, limiar)
+        aceitaveis = list(dict.fromkeys(caso["esperados"] + caso.get("equivalentes", [])))
+        achados_len = sum(any(d.startswith(a) for d in docs) for a in aceitaveis)
+        rr_len = next(
+            (1.0 / r for r, d in enumerate(docs, 1) if any(d.startswith(a) for a in aceitaveis)),
+            0.0,
+        )
+        len_estrita.append(min(1.0, achados_len / caso["total_esperado"]))
+        rrs_len.append(rr_len)
         achados = sum(any(d.startswith(esperado) for d in docs) for esperado in caso["esperados"])
         rr = 0.0
         for rank, d in enumerate(docs, 1):
@@ -71,6 +95,8 @@ def avaliar(casos: list[dict], k: int, limiar: float) -> dict:
         if caso["esperados"]:
             mapeada.append(achados / len(caso["esperados"]))
             rrs_mapeada.append(rr)
+            len_mapeada.append(min(1.0, achados_len / len(caso["esperados"])))
+            rrs_len_mapeada.append(rr_len)
 
     def media(valores: list[float]) -> float | None:
         return round(sum(valores) / len(valores), 4) if valores else None
@@ -83,6 +109,10 @@ def avaliar(casos: list[dict], k: int, limiar: float) -> dict:
         "n_estrita": len(estrita),
         "recall_mapeada": media(mapeada),
         "mrr_mapeada": media(rrs_mapeada),
+        "recall_estrita_leniente": media(len_estrita),
+        "mrr_estrita_leniente": media(rrs_len),
+        "recall_mapeada_leniente": media(len_mapeada),
+        "mrr_mapeada_leniente": media(rrs_len_mapeada),
         "n_mapeada": len(mapeada),
     }
 
@@ -102,6 +132,12 @@ def _verificar() -> None:
     assert (r["recall_mapeada"], r["mrr_mapeada"], r["n_mapeada"]) == (1.0, 0.5, 1)
     assert avaliar(casos, 2, 0.0)["recall_mapeada"] == 0.0
     assert avaliar(casos, 3, 0.7)["recall_mapeada"] == 0.0
+    assert r["recall_mapeada_leniente"] == r["recall_mapeada"]  # sem equivalentes
+    casos[0]["equivalentes"] = ["bbb"]  # bbb1 em rank 1 passa a valer
+    r = avaliar(casos, 3, 0.0)
+    assert (r["recall_mapeada_leniente"], r["mrr_mapeada_leniente"]) == (1.0, 1.0)
+    assert (r["recall_mapeada"], r["mrr_mapeada"]) == (1.0, 0.5)  # estrita intacta
+    assert r["recall_estrita_leniente"] == 0.5  # min(1, 2/2)=1 no caso 0; 0 no caso 1
 
 
 def main() -> int:
