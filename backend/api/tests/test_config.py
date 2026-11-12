@@ -63,3 +63,9 @@ def test_max_trechos_por_documento_desligado_por_padrao():
 
 def test_esclarecimento_modelo_desligado_por_padrao():
     assert Settings().esclarecimento_modelo is False
+
+
+def test_peso_expansao_padrao_e_limites():
+    assert Settings().peso_expansao == 0.5
+    with pytest.raises(ValidationError):
+        Settings(peso_expansao=1.5)

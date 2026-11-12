@@ -73,6 +73,8 @@ services:
       CONTEXT_WINDOW_CHARS: ${CONTEXT_WINDOW_CHARS:-0}
       MAX_TRECHOS_POR_DOCUMENTO: ${MAX_TRECHOS_POR_DOCUMENTO:-0}
       ESCLARECIMENTO_MODELO: ${ESCLARECIMENTO_MODELO:-false}
+      CONFERIR_CITACOES: ${CONFERIR_CITACOES:-false}
+      PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
     depends_on:
       postgres:
         condition: service_healthy
@@ -138,6 +140,8 @@ services:
       CONTEXT_WINDOW_CHARS: ${CONTEXT_WINDOW_CHARS:-0}
       MAX_TRECHOS_POR_DOCUMENTO: ${MAX_TRECHOS_POR_DOCUMENTO:-0}
       ESCLARECIMENTO_MODELO: ${ESCLARECIMENTO_MODELO:-false}
+      CONFERIR_CITACOES: ${CONFERIR_CITACOES:-false}
+      PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
     depends_on:
       qdrant:
         condition: service_started

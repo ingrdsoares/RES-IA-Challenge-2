@@ -50,3 +50,13 @@ def test_estatisticas_datasets():
     ]
     expandidas = [q for q in perguntas if expandir_consulta(q)]
     assert perguntas and len(expandidas) < len(perguntas)
+
+
+def test_peso_zero_desliga_a_expansao():
+    from app.sparse import tokens, vetor_consulta
+
+    pergunta = "Qual o limite do MEI?"
+    indices, valores = vetor_consulta(pergunta, peso_expansao=0)
+    assert len(indices) == len(set(tokens(pergunta)))
+    assert all(v == 1.0 for v in valores)
+    assert len(vetor_consulta(pergunta)[0]) > len(indices)

@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     max_trechos_por_documento: int = Field(default=0, ge=0, le=10)
     # Pergunta em 1ª pessoa passa por uma chamada curta ao modelo que decide se faltam dados.
     esclarecimento_modelo: bool = False
+    # Acrescenta aviso listando norma/artigo citado que não está nas fontes entregues ao modelo.
+    conferir_citacoes: bool = False
+    # Peso dos sinônimos e siglas do glossário na busca esparsa; 0 desliga a expansão.
+    peso_expansao: float = Field(default=0.5, ge=0, le=1, allow_inf_nan=False)
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)

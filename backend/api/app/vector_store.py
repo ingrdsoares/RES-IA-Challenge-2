@@ -87,7 +87,7 @@ class VectorStore:
         ).points
 
     def _esparsa(self, question: str, limit: int):
-        indices, valores = vetor_consulta(question)
+        indices, valores = vetor_consulta(question, self.settings.peso_expansao)
         if not indices:
             return []
         try:
