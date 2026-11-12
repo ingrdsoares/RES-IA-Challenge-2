@@ -159,21 +159,76 @@ Depois, acrescente a v2 em `docs/dados/restaurar-qdrant.md`, com a mesma tabela 
 
 **Atenção:** pelo próprio `restaurar-qdrant.md`, o snapshot publicado da v3 vem do recorte completo, sem filtro de dados pessoais, e o repositório é público. Com o snapshot da v2 publicado, vale avaliar com o grupo se a release `qdrant-kb-v3` deve continuar pública.
 
+## 8. Recall: rumo à meta de 0,80
+
+Meta de Recall@8 leniente ≥ 0,80 e MRR ≥ 0,65 (`metricas-avaliacao-rag.md`, §3.1). Hoje: 0,475 e 0,473, medição estrita.
+
+### Na consulta (sem reindexar)
+
+| Parâmetro | O que faz | Padrão | Testar |
+|---|---|---|---|
+| `MAX_TRECHOS_POR_DOCUMENTO` | No máximo N trechos do mesmo documento no top-k. Abre vagas para outros documentos. Se faltar fonte, as excedentes voltam; trechos citados sempre entram. | 0 (desligado) | 2 e 3 |
+| `CANDIDATE_K` | Candidatos por busca (densa e esparsa) antes do reranker | 30 | 60 e 100 |
+
+O cliente do reranker passou a mandar no máximo 300 textos por pedido, que é o limite do serviço. Antes, um `CANDIDATE_K` alto fazia o pedido ser recusado, e a busca caía sem aviso para a ordem híbrida. O excedente segue na ordem da busca, logo atrás dos que o reranker ordenou.
+
+### Na carga (coleção nova)
+
+| Opção | O que faz |
+|---|---|
+| `--contexto-norma` | Põe no cabeçalho de cada trecho o tipo da norma por extenso (quando o título abrevia: "IN 1503" vira "Instrução Normativa 1503"), o artigo, a natureza e a frente. O cabeçalho entra no embedding e no BM25. Continua sendo uma única linha `[...]`, então a API o reconhece e retira como antes. |
+| `--corte-por-artigo` | Leis e atos normativos (natureza `legislacao`, `nao_informada` e `ato_normativo_administrativo`; a Lei 9.249 está marcada como `nao_informada` no CSV) são cortados por artigo. Artigo maior que `--limite-corpo` vira janelas sobrepostas, cada uma com o rótulo do artigo. Os outros documentos seguem o corte atual. |
+
+- Sem as opções, a carga é **idêntica** à anterior: o hash de todos os pontos do recorte público é o mesmo antes e depois da mudança.
+- Com as opções, cada ponto ganha o campo `carga` no payload, para o `--retomar` não misturar configurações.
+
+**Contagem de pontos** (`--dry-run`, roda sem Qdrant e Ollama, cerca de 2 min; recorte público, 4.026 documentos):
+
+| `--limite-corpo` | Padrão | `--contexto-norma` | `--corte-por-artigo` | Ambas |
+|---|---:|---:|---:|---:|
+| 1000 | 314.556 | 314.556 | 271.393 | 271.393 |
+| 2000 | 153.001 | 153.001 | 131.479 | 131.479 |
+
+A carga padrão de hoje gera 153.001 pontos; a v2 original tem 155.781. A diferença não foi investigada. Por isso a comparação deve ser com a **v2 original** (snapshot da seção 7), e não com uma v2 recarregada.
+
+**Coleções novas**, cada uma mudando uma coisa a partir da v2:
+
+```bash
+CSV=data/recorte-rag-v1/recorte-publico.csv.gz
+python -m src.rag.csv_para_qdrant --csv $CSV --colecao knowledge_base_v4d --contexto-norma
+python -m src.rag.csv_para_qdrant --csv $CSV --colecao knowledge_base_v4e --corte-por-artigo
+# Combinação, só se v4d e v4e ganharem da v2 cada uma:
+python -m src.rag.csv_para_qdrant --csv $CSV --colecao knowledge_base_v4f --contexto-norma --corte-por-artigo
+```
+
+Rode cada comando antes com `--dry-run`, e use `--retomar` se a carga parar. A v4d tem o mesmo número de pontos da v2 e é a mais barata de embedar.
+
 ## Testes
 
-- API: 228 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
-- Raiz: 25 testes passando (`tests/test_recorte_rag.py` e `tests/test_calibrar_limiar.py`).
+- API: 232 testes passando (`pytest tests -m "not integration" --ignore=tests/mvp`, em `backend/api`).
+- Raiz: 93 testes passando (`pytest tests`).
 - `ruff check` e `ruff format --check` limpos nos arquivos alterados.
 - `tests/mvp` não rodou: precisa do Postgres de teste na porta 15432.
 
-## Roteiro de medição (com os serviços no ar)
+## Roteiro de medição (máquina com GPU, serviços no ar)
 
-0. Snapshot da v2 (seção 7), antes de qualquer outra coisa.
-1. Linha de base: v2, reranker ligado e os dois bônus de busca em 0. Avaliação em `teste_final_v2` e `teste_ampliado` com `--repeticoes 3`, reportando com e sem as 7 perguntas que só têm fonte no recorte completo.
-2. `RERANK_LEGISLATION_BOOST` em 0,10 e 0,20, olhando n11, n03 e o conjunto completo.
-3. Coleções v4a, v4b e, se quiser, v4c (seção 7), cada uma contra a v2. Na v4a, testar `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500, olhando latência e qualidade.
-4. Siglas: recall e MRR antes e depois. Para comparar, dá para desligar zerando `PESO_EXPANSAO`.
+Tudo o que usa modelo (embedding, geração, reranker) roda na máquina de configuração superior. Em cada passo, compare com a v2 original no `teste_ampliado` com `--repeticoes 3`, reportando com e sem as 7 perguntas que só têm fonte no recorte completo. Um passo só fica se ganhar.
+
+0. **Snapshot da v2** (seção 7), antes de qualquer outra coisa.
+1. **Linha de base:** v2 com reranker, todos os parâmetros novos em 0 e `CANDIDATE_K=30`. Avaliação de respostas e `scripts/medir_recuperacao_qdrant.py` (Recall e MRR, estritos e lenientes).
+2. **Consulta, sem reindexar,** um parâmetro por vez:
+   - `MAX_TRECHOS_POR_DOCUMENTO` em 2 e 3;
+   - `CANDIDATE_K` em 60 e 100, medindo também a latência;
+   - `RERANK_LEGISLATION_BOOST` em 0,10 e 0,20, olhando n11 e n03;
+   - siglas: zerar `PESO_EXPANSAO` para ter o "antes".
+3. **Coleções novas,** cada uma contra a v2:
+   - v4a (chunk 1000) com `CONTEXT_WINDOW_CHARS` em 0, 1000 e 1500;
+   - v4b (`--limpar`);
+   - v4d (`--contexto-norma`);
+   - v4e (`--corte-por-artigo`);
+   - v4c, opcional e só local (recorte completo).
+4. **Combinação** das mudanças vencedoras numa coleção v5, com os parâmetros de consulta vencedores.
 5. `scripts/calibrar_limiar.py` na configuração vencedora.
 6. Mandar `revisao_independente.xlsx` a um revisor fiscal externo.
 
-Só depois disso mudar os padrões em `config.py` e no `.env.example`.
+Só depois disso mudar os padrões em `config.py` e no `.env.example`. Se o Recall leniente continuar abaixo de 0,80, os próximos passos são modelo de embedding maior (`qwen3-embedding` 4B ou `bge-m3`), reescrita da pergunta (HyDE) e ajuste fino do embedding com pares gerados do acervo, nessa ordem de custo.
