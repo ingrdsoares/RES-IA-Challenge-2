@@ -8,11 +8,19 @@ _SIMPLES = re.compile(r"\bsimples\b", re.I)
 _ELEGIBILIDADE = re.compile(r"\b(entrar|optar|enquadr\w*|pode|posso|consigo|participar)\b", re.I)
 _ANEXO = re.compile(r"\b(qual|que)\s+anexo\b|\bfator\s+r\b", re.I)
 _IMPOSTO = re.compile(r"\bquanto\s+(vou|devo|tenho\s+que)\s+pagar\s+de\s+(imposto|tributo)", re.I)
+_ATRASO = re.compile(r"\b(atrasei|estou\s+atrasad[oa]|fiquei\s+atrasad[oa])\b", re.I)
+_MULTA = re.compile(r"\bmultas?\b", re.I)
+_JUROS = re.compile(r"\bjuros\b", re.I)
+_ISS_EU_PAGO = re.compile(r"\bquanto\s+de\s+iss\s+(eu\s+)?(pago|devo)\b", re.I)
+_RETER = re.compile(
+    r"\b(preciso|devo|tenho\s+que)\s+reter\b.*\b(dess[ae]|dest[ae]|minha)\s+nota", re.I
+)
 _DIGITO = re.compile(r"\d")
 
 # ponytail: regras por palavra-chave; qualquer dígito conta como "dado informado". Teto: não
 # entende paráfrases nem valores por extenso ("duzentos mil"). Evoluir para classificador se
-# o dataset de avaliação mostrar casos fora dessas três famílias.
+# o dataset de avaliação mostrar casos fora dessas sete famílias (multa/juros exigem verbo de atraso
+# em 1ª pessoa; ISS e retenção exigem a frase "quanto de ISS eu pago" / "preciso reter ... dessa nota").
 _PEDIDOS = {
     "simples": [
         "a atividade da empresa (CNAE)",
@@ -25,6 +33,24 @@ _PEDIDOS = {
         "a folha de salários dos últimos 12 meses (inclui pró-labore e encargos)",
     ],
     "imposto": ["o regime tributário", "a atividade da empresa", "a receita do período"],
+    "multa": ["qual declaração ou obrigação atrasou", "o regime tributário", "o período em atraso"],
+    "juros": [
+        "qual guia (tributo) está atrasada",
+        "o valor original da guia",
+        "o período em atraso",
+    ],
+    "iss": [
+        "o município",
+        "a atividade (serviço prestado)",
+        "o regime tributário",
+        "o valor do serviço",
+    ],
+    "retencao": [
+        "o município do prestador e do tomador",
+        "o serviço prestado",
+        "quem é o tomador",
+        "quem é o prestador",
+    ],
 }
 
 
@@ -37,6 +63,14 @@ def _tipo(pergunta: str) -> str | None:
         return "simples"
     if _IMPOSTO.search(pergunta):
         return "imposto"
+    if _ATRASO.search(pergunta) and _JUROS.search(pergunta):
+        return "juros"
+    if _ATRASO.search(pergunta) and _MULTA.search(pergunta):
+        return "multa"
+    if _ISS_EU_PAGO.search(pergunta):
+        return "iss"
+    if _RETER.search(pergunta):
+        return "retencao"
     return None
 
 
