@@ -7,6 +7,8 @@ from app.config import Settings
 from app.schemas import Source
 
 logger = logging.getLogger(__name__)
+# Limite de textos por pedido do serviço (backend/reranker/main.py).
+MAX_TEXTOS = 300
 
 
 def _sigmoide(x: float) -> float:
@@ -28,6 +30,11 @@ class Reranker:
     def reordenar(self, pergunta: str, fontes: list[Source]) -> list[Source]:
         if not self.url or not fontes:
             return fontes
+        # O serviço recusa mais de MAX_TEXTOS; o excedente segue na ordem da busca, depois.
+        fontes, resto = fontes[:MAX_TEXTOS], fontes[MAX_TEXTOS:]
+        return self._reordenar(pergunta, fontes) + resto
+
+    def _reordenar(self, pergunta: str, fontes: list[Source]) -> list[Source]:
         try:
             resposta = self.client.post(
                 self.url.rstrip("/") + "/rerank",

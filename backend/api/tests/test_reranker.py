@@ -163,3 +163,18 @@ def test_avisa_quando_sem_url(caplog):
     with caplog.at_level("WARNING"):
         Reranker(Settings())
     assert "RERANKER_URL" in caplog.text
+
+
+def test_envia_no_maximo_o_limite_do_servico_e_mantem_o_resto_depois():
+    from app.reranker import MAX_TEXTOS
+
+    def handler(request):
+        textos = json.loads(request.content)["texts"]
+        assert len(textos) == MAX_TEXTOS
+        return httpx.Response(200, json={"scores": list(range(len(textos)))})
+
+    fontes = [fonte(f"t{i}") for i in range(MAX_TEXTOS + 5)]
+    saida = reranker(handler).reordenar("pergunta", fontes)
+
+    assert saida[0].text == f"t{MAX_TEXTOS - 1}"
+    assert [f.text for f in saida[-5:]] == [f"t{i}" for i in range(MAX_TEXTOS, MAX_TEXTOS + 5)]
