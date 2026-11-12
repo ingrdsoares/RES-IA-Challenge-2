@@ -21,8 +21,19 @@ _INTERROGATIVAS = (
     "o que",
     "por que",
 )
+# ponytail: segunda oração sem interrogativa ("e ele pode emitir?") só é reconhecida por pronome
+# opcional + verbo modal desta lista; verbo fora dela não divide. Subir para análise sintática se preciso.
+_MODAIS = (
+    r"(?:(?:ele|ela|eles|elas|voce|ja)\s+)?(?:tambem\s+)?"
+    r"(?:pode|podem|posso|precisa|precisam|preciso|deve|devem|devo|tem\s+que|tem\s+de|tenho\s+que"
+    r"|e\s+obrigad[oa]s?|sao\s+obrigad[oa]s?)"
+)
 _EMENDA = re.compile(
-    r",?\s+e\s+(?=(?:" + "|".join(i.replace(" ", r"\s+") for i in _INTERROGATIVAS) + r")\s)"
+    r",?\s+e\s+(?=(?:"
+    + "|".join(i.replace(" ", r"\s+") for i in _INTERROGATIVAS)
+    + r"|"
+    + _MODAIS
+    + r")\s)"
 )
 _PREFIXO = re.compile(r"\A\s*((?:qual|quais|quem|quando)\s+(?:e|sao|foi)\s+|o que\s+)")
 # Siglas (ISS, NFS-e, DASN-Simei) e normas citadas (LC 87, Lei 9.430), que dão o assunto à parte.
