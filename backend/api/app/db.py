@@ -21,9 +21,14 @@ def session_factory(url: str):
         "evidence",
         "tasks",
         "fiscal",
+        "telemetria",
     ):
         import_module(f"app.{module}.models")
-    return sessionmaker(create_engine(url, pool_pre_ping=True), expire_on_commit=False)
+    # Sem timeout de conexão, banco inalcançável trava a requisição (inclusive a telemetria).
+    args = {"connect_timeout": 5} if url.startswith("postgresql") else {}
+    return sessionmaker(
+        create_engine(url, pool_pre_ping=True, connect_args=args), expire_on_commit=False
+    )
 
 
 def get_db(request: Request) -> Iterator[Session]:

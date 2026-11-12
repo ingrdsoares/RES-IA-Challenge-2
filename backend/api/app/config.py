@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     conferir_citacoes: bool = False
     # Peso dos sinônimos e siglas do glossário na busca esparsa; 0 desliga a expansão.
     peso_expansao: float = Field(default=0.5, ge=0, le=1, allow_inf_nan=False)
+    # E-mails (separados por vírgula) com acesso a GET /rag/metricas; vazio: ninguém.
+    admin_emails: str = ""
     citation_slots: int = Field(default=2, ge=0, le=10)
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)

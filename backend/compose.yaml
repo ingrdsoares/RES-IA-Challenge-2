@@ -75,6 +75,7 @@ services:
       ESCLARECIMENTO_MODELO: ${ESCLARECIMENTO_MODELO:-false}
       CONFERIR_CITACOES: ${CONFERIR_CITACOES:-false}
       PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -142,6 +143,7 @@ services:
       ESCLARECIMENTO_MODELO: ${ESCLARECIMENTO_MODELO:-false}
       CONFERIR_CITACOES: ${CONFERIR_CITACOES:-false}
       PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     depends_on:
       qdrant:
         condition: service_started
