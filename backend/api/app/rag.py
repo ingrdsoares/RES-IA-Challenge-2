@@ -1,6 +1,7 @@
 import re
 from threading import Lock
 
+from app.citacoes_normas import avisar_sem_suporte
 from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
@@ -170,6 +171,8 @@ class RagService:
             answer, _ = citacoes_validas(
                 self.models.answer(question, sources, ausentes), len(sources)
             )
+            if self.settings.conferir_citacoes:
+                answer, _ = avisar_sem_suporte(answer, sources)
             return QueryResponse(status="answered", answer=answer, sources=sources)
         finally:
             self._query_lock.release()

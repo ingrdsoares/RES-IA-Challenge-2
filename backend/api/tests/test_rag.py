@@ -52,6 +52,17 @@ def test_complete_rag_returns_only_bounded_context(service):
     assert 0 < len(response.sources[0].text) < 4000
 
 
+def test_conferir_citacoes_avisa_so_quando_ligado(service, monkeypatch):
+    add_document(service, "Art. 3. Regra.")
+    resposta = "Vale o art. 99 da LC 123 [1]."
+    monkeypatch.setattr(service.models, "answer", lambda *a, **k: resposta)
+    assert service.query("Pergunta").answer == resposta
+    service.settings = service.settings.model_copy(update={"conferir_citacoes": True})
+    texto = service.query("Pergunta").answer
+    assert texto.startswith(resposta)
+    assert "art. 99 da Lei Complementar 123" in texto
+
+
 def test_query_failure_releases_lock(service, monkeypatch):
     original = service.store.count
 

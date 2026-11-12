@@ -9,26 +9,14 @@ nunca 0.
 
 import re
 
-from app.normas import _ARTIGO, _forma_artigo, artigos_citados, chaves_normas
-from app.sparse import fold
+from app.citacoes_normas import pares_fontes
+from app.normas import artigos_citados
 
 from evaluation.schemas import MetricScore
 
 FIDELIDADE = ["artigo_esperado", "citacao_suportada"]
 SEM_RESPOSTA = ("needs_clarification", "insufficient_context", "empty_knowledge_base")
 _MARCADOR = re.compile(r"\[(\d{1,3})\]")
-
-
-def pares_fontes(sources):
-    """Pares (norma, artigo) sustentados pelas fontes: citados no texto, ou artigo do texto + norma do título."""
-    pares = set()
-    for s in sources:
-        texto = s.get("text") or ""
-        pares.update(artigos_citados(texto))
-        normas = chaves_normas(f"{s.get('title') or ''} {s.get('source') or ''}")
-        artigos = {_forma_artigo(m) for m in re.finditer(_ARTIGO, fold(texto))}
-        pares.update((n, a) for n in normas for a in artigos)
-    return pares
 
 
 def _na(motivo):
