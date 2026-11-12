@@ -24,6 +24,7 @@ import sys
 import time
 import uuid
 from collections.abc import Callable, Iterator
+from datetime import date
 from pathlib import Path
 
 BACKEND_API = Path(__file__).resolve().parents[2] / "backend" / "api"
@@ -197,6 +198,17 @@ def partir_corpo(texto: str, limite: int, sobreposicao: int) -> list[tuple[int, 
     return intervalos
 
 
+def data_iso(valor: str | None) -> str | None:
+    """Data AAAA-MM-DD dos primeiros 10 caracteres, ou None se vazia/inválida.
+
+    O validador de Source derruba o chunk inteiro com data malformada: nunca gravar lixo.
+    """
+    try:
+        return date.fromisoformat((valor or "").strip()[:10]).isoformat()
+    except ValueError:
+        return None
+
+
 def itens_do_documento(
     linha: dict, estatisticas: dict[str, int]
 ) -> Iterator[tuple[str, str, dict]]:
@@ -241,6 +253,14 @@ def itens_do_documento(
                 "natureza": linha.get("natureza") or None,
                 "ordem": indice,
             }
+            # reference_date: dia da coleta (versão do texto); effective_date: início da
+            # vigência na fonte (hoje vazio no CSV). Ausente/inválido = campo omitido.
+            for campo, coluna in (
+                ("reference_date", "coletado_em"),
+                ("effective_date", "vigencia_fonte"),
+            ):
+                if valor := data_iso(linha.get(coluna)):
+                    dados[campo] = valor
             if original != trecho:
                 dados["texto_com_rasuras"] = cabecalho + original
                 estatisticas["pontos_com_rasura"] += 1
