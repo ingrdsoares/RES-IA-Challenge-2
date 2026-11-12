@@ -43,3 +43,13 @@ def test_legislation_boost_padrao_e_limites():
     assert Settings().legislation_boost > 0
     with pytest.raises(ValidationError):
         Settings(legislation_boost=-1)
+
+
+def test_rerank_boost_e_janela_desligados_por_padrao():
+    settings = Settings()
+    assert settings.rerank_legislation_boost == 0
+    assert settings.context_window_chars == 0
+    with pytest.raises(ValidationError):
+        Settings(rerank_legislation_boost=-0.1)
+    with pytest.raises(ValidationError):
+        Settings(context_window_chars=8001)

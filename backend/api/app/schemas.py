@@ -22,6 +22,8 @@ class Source(BaseModel):
     title: Annotated[str, Field(max_length=256)] | None = None
     document_id: str | None = None
     chunk_id: str | None = None
+    # Tipo do documento na carga ("legislacao", "consulta_tributaria", ...).
+    natureza: str | None = None
     reference_date: date | None = None
     effective_date: date | None = None
 

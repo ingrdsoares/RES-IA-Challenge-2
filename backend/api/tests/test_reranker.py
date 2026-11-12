@@ -19,9 +19,9 @@ def fonte(texto: str, score: float = 0.8) -> Source:
     )
 
 
-def reranker(handler) -> Reranker:
+def reranker(handler, boost: float = 0.0) -> Reranker:
     return Reranker(
-        Settings(reranker_url="http://reranker.test"),
+        Settings(reranker_url="http://reranker.test", rerank_legislation_boost=boost),
         httpx.Client(transport=httpx.MockTransport(handler)),
     )
 
@@ -120,6 +120,43 @@ def test_servico_reordena_candidatos_e_mantem_norma_citada_primeiro():
     resposta = servico.query("LC 87")
 
     assert [f.text for f in resposta.sources] == ["citada", "boa", "ruim"]
+
+
+def _ordem_com_boost(notas, boost, leis=("lei",)):
+    textos = ["lei", "sec"]
+    fontes = [fonte(t) for t in textos]
+    for f in fontes:
+        f.natureza = "legislacao" if f.text in leis else "secundaria"
+
+    def handler(request):
+        return httpx.Response(200, json={"scores": notas})
+
+    return [f.text for f in reranker(handler, boost).reordenar("p", fontes)]
+
+
+def test_boost_zero_mantem_ordem_do_reranker():
+    assert _ordem_com_boost([1.0, 1.2], 0.0) == ["sec", "lei"]
+
+
+def test_boost_sobe_legislacao_ligeiramente_abaixo():
+    # sigmoide(1.0)=0.73, sigmoide(1.2)=0.77: diferença < 0.1
+    assert _ordem_com_boost([1.0, 1.2], 0.1) == ["lei", "sec"]
+
+
+def test_boost_nao_supera_secundaria_muito_melhor():
+    assert _ordem_com_boost([-3.0, 4.0], 0.1) == ["sec", "lei"]
+
+
+def test_boost_sem_legislacao_nao_muda_ordem():
+    assert _ordem_com_boost([1.0, 1.2], 0.5, leis=()) == ["sec", "lei"]
+
+
+def test_sem_url_ignora_boost():
+    fontes = [fonte("a"), fonte("b")]
+    assert (
+        Reranker(Settings(reranker_url=None, rerank_legislation_boost=0.5)).reordenar("p", fontes)
+        == fontes
+    )
 
 
 def test_avisa_quando_sem_url(caplog):
