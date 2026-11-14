@@ -1,0 +1,84 @@
+{
+  "nome": "llm_pura",
+  "env": {
+    "COLLECTION_NAME": "knowledge_base_v2",
+    "QDRANT_URL": "http://127.0.0.1:6334",
+    "TOPOLOGIA": "llm_pura",
+    "OLLAMA_TIMEOUT": "600",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "repeticoes": 3,
+  "relatorio": "data\\benchmark\\topologias-2026-11-13\\llm_pura\\avaliacao\\reports\\a2f305d6453290f314848ff40bda249e7d4d16198ebd21ecaa55586f69e45c4d\\58d555e7287a951c370de779b2e1b0ceee676b2a0a70d46e2b9c9a4a4bf0278a\\results.json",
+  "avaliacao": {
+    "todos": {
+      "perguntas": 81,
+      "tentativas": 243,
+      "falhas": 0,
+      "rouge_l": 0.11766135839096391,
+      "bert_score": 0.5204125036935853,
+      "artigo_esperado": 0.0,
+      "citacao_suportada": 0.0,
+      "clarify": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.7551258000021335,
+      "lat_p95": 8.434703699997044,
+      "conc_resposta": 0.6954732510288059,
+      "conc_fontes": 1.0
+    },
+    "sem_recorte_completo": {
+      "perguntas": 74,
+      "tentativas": 222,
+      "falhas": 0,
+      "rouge_l": 0.11185706763535784,
+      "bert_score": 0.5150950181608399,
+      "artigo_esperado": 0.0,
+      "citacao_suportada": 0.0,
+      "clarify": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.819012650004879,
+      "lat_p95": 8.645894100001897,
+      "conc_resposta": 0.6981981981981976,
+      "conc_fontes": 1.0
+    }
+  }
+}

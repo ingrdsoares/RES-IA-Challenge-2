@@ -1,0 +1,453 @@
+{
+  "baseline": "base_v2",
+  "recortes": {
+    "todos": {
+      "base_v2": {
+        "respostas_boas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "respostas_erradas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "recusa_indevida": {
+          "valor": 0.0,
+          "texto": "0/183",
+          "ok": true,
+          "delta": null
+        },
+        "recusa_fora_acervo": {
+          "valor": 0.0,
+          "texto": "0/30",
+          "ok": false,
+          "delta": null
+        },
+        "rouge_l": {
+          "valor": 0.26029079585258197,
+          "texto": "0.260",
+          "ok": null,
+          "delta": null
+        },
+        "bert_score": {
+          "valor": 0.5993284430354833,
+          "texto": "0.599",
+          "ok": null,
+          "delta": null
+        },
+        "artigo_esperado": {
+          "valor": 0.7943262411347518,
+          "texto": "0.794",
+          "ok": false,
+          "delta": null
+        },
+        "citacao_suportada": {
+          "valor": 0.9933566433566433,
+          "texto": "0.993",
+          "ok": true,
+          "delta": null
+        },
+        "clarify": {
+          "valor": 0.1,
+          "texto": "3/30",
+          "ok": false,
+          "delta": null
+        },
+        "falso_positivo": {
+          "valor": 0.0,
+          "texto": "0/183",
+          "ok": true,
+          "delta": null
+        },
+        "recall8": {
+          "valor": 0.5738,
+          "texto": "0.574",
+          "ok": null,
+          "delta": null
+        },
+        "mrr8": {
+          "valor": 0.4399,
+          "texto": "0.440",
+          "ok": null,
+          "delta": null
+        },
+        "recall8_leniente": {
+          "valor": 0.6393,
+          "texto": "0.639",
+          "ok": false,
+          "delta": null
+        },
+        "mrr8_leniente": {
+          "valor": 0.4814,
+          "texto": "0.481",
+          "ok": false,
+          "delta": null
+        },
+        "lat_mediana": {
+          "valor": 2.012387900002068,
+          "texto": "2.012",
+          "ok": true,
+          "delta": null
+        },
+        "lat_p95": {
+          "valor": 3.855404500005534,
+          "texto": "3.855",
+          "ok": true,
+          "delta": null
+        },
+        "conc_resposta": {
+          "valor": 0.8847736625514404,
+          "texto": "0.885",
+          "ok": false,
+          "delta": null
+        },
+        "conc_fontes": {
+          "valor": 1.0,
+          "texto": "1.000",
+          "ok": true,
+          "delta": null
+        },
+        "_perguntas": 81
+      },
+      "final_guardrails": {
+        "respostas_boas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "respostas_erradas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "recusa_indevida": {
+          "valor": 0.08196721311475409,
+          "texto": "15/183",
+          "ok": false,
+          "delta": 0.08196721311475409
+        },
+        "recusa_fora_acervo": {
+          "valor": 0.9,
+          "texto": "27/30",
+          "ok": false,
+          "delta": 0.9
+        },
+        "rouge_l": {
+          "valor": 0.21717988216364928,
+          "texto": "0.217",
+          "ok": false,
+          "delta": -0.04311091368893269
+        },
+        "bert_score": {
+          "valor": 0.5481377349545558,
+          "texto": "0.548",
+          "ok": false,
+          "delta": -0.051190708080927516
+        },
+        "artigo_esperado": {
+          "valor": 0.7898550724637682,
+          "texto": "0.790",
+          "ok": false,
+          "delta": -0.004471168670983627
+        },
+        "citacao_suportada": {
+          "valor": 0.991695804195804,
+          "texto": "0.992",
+          "ok": true,
+          "delta": -0.0016608391608392559
+        },
+        "clarify": {
+          "valor": 1.0,
+          "texto": "30/30",
+          "ok": true,
+          "delta": 0.9
+        },
+        "falso_positivo": {
+          "valor": 0.08196721311475409,
+          "texto": "15/183",
+          "ok": false,
+          "delta": 0.08196721311475409
+        },
+        "recall8": {
+          "valor": 0.5738,
+          "texto": "0.574",
+          "ok": null,
+          "delta": 0.0
+        },
+        "mrr8": {
+          "valor": 0.4399,
+          "texto": "0.440",
+          "ok": null,
+          "delta": 0.0
+        },
+        "recall8_leniente": {
+          "valor": 0.6393,
+          "texto": "0.639",
+          "ok": false,
+          "delta": 0.0
+        },
+        "mrr8_leniente": {
+          "valor": 0.4814,
+          "texto": "0.481",
+          "ok": false,
+          "delta": 0.0
+        },
+        "lat_mediana": {
+          "valor": 2.220654300006572,
+          "texto": "2.221",
+          "ok": true,
+          "delta": 0.20826640000450425
+        },
+        "lat_p95": {
+          "valor": 12.618071800010512,
+          "texto": "12.618",
+          "ok": true,
+          "delta": 8.762667300004978
+        },
+        "conc_resposta": {
+          "valor": 0.9341563786008231,
+          "texto": "0.934",
+          "ok": true,
+          "delta": 0.04938271604938271
+        },
+        "conc_fontes": {
+          "valor": 1.0,
+          "texto": "1.000",
+          "ok": true,
+          "delta": 0.0
+        },
+        "_perguntas": 81
+      }
+    },
+    "sem_recorte_completo": {
+      "base_v2": {
+        "respostas_boas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "respostas_erradas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "recusa_indevida": {
+          "valor": 0.0,
+          "texto": "0/162",
+          "ok": true,
+          "delta": null
+        },
+        "recusa_fora_acervo": {
+          "valor": 0.0,
+          "texto": "0/30",
+          "ok": false,
+          "delta": null
+        },
+        "rouge_l": {
+          "valor": 0.2583845416817201,
+          "texto": "0.258",
+          "ok": null,
+          "delta": null
+        },
+        "bert_score": {
+          "valor": 0.5964901388780166,
+          "texto": "0.596",
+          "ok": null,
+          "delta": null
+        },
+        "artigo_esperado": {
+          "valor": 0.7868217054263567,
+          "texto": "0.787",
+          "ok": false,
+          "delta": null
+        },
+        "citacao_suportada": {
+          "valor": 0.9969183359013867,
+          "texto": "0.997",
+          "ok": true,
+          "delta": null
+        },
+        "clarify": {
+          "valor": 0.1,
+          "texto": "3/30",
+          "ok": false,
+          "delta": null
+        },
+        "falso_positivo": {
+          "valor": 0.0,
+          "texto": "0/162",
+          "ok": true,
+          "delta": null
+        },
+        "recall8": {
+          "valor": 0.5926,
+          "texto": "0.593",
+          "ok": null,
+          "delta": null
+        },
+        "mrr8": {
+          "valor": 0.4506,
+          "texto": "0.451",
+          "ok": null,
+          "delta": null
+        },
+        "recall8_leniente": {
+          "valor": 0.6667,
+          "texto": "0.667",
+          "ok": false,
+          "delta": null
+        },
+        "mrr8_leniente": {
+          "valor": 0.4975,
+          "texto": "0.497",
+          "ok": false,
+          "delta": null
+        },
+        "lat_mediana": {
+          "valor": 2.0325362000003224,
+          "texto": "2.033",
+          "ok": true,
+          "delta": null
+        },
+        "lat_p95": {
+          "valor": 3.8034723000018857,
+          "texto": "3.803",
+          "ok": true,
+          "delta": null
+        },
+        "conc_resposta": {
+          "valor": 0.8873873873873872,
+          "texto": "0.887",
+          "ok": false,
+          "delta": null
+        },
+        "conc_fontes": {
+          "valor": 1.0,
+          "texto": "1.000",
+          "ok": true,
+          "delta": null
+        },
+        "_perguntas": 74
+      },
+      "final_guardrails": {
+        "respostas_boas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "respostas_erradas": {
+          "valor": null,
+          "texto": "n/d",
+          "ok": null,
+          "delta": null
+        },
+        "recusa_indevida": {
+          "valor": 0.05555555555555555,
+          "texto": "9/162",
+          "ok": false,
+          "delta": 0.05555555555555555
+        },
+        "recusa_fora_acervo": {
+          "valor": 0.9,
+          "texto": "27/30",
+          "ok": false,
+          "delta": 0.9
+        },
+        "rouge_l": {
+          "valor": 0.21865822114897132,
+          "texto": "0.219",
+          "ok": false,
+          "delta": -0.03972632053274877
+        },
+        "bert_score": {
+          "valor": 0.548881606288152,
+          "texto": "0.549",
+          "ok": false,
+          "delta": -0.04760853258986464
+        },
+        "artigo_esperado": {
+          "valor": 0.7817460317460319,
+          "texto": "0.782",
+          "ok": false,
+          "delta": -0.005075673680324799
+        },
+        "citacao_suportada": {
+          "valor": 0.9961315280464216,
+          "texto": "0.996",
+          "ok": true,
+          "delta": -0.0007868078549650992
+        },
+        "clarify": {
+          "valor": 1.0,
+          "texto": "30/30",
+          "ok": true,
+          "delta": 0.9
+        },
+        "falso_positivo": {
+          "valor": 0.09259259259259259,
+          "texto": "15/162",
+          "ok": false,
+          "delta": 0.09259259259259259
+        },
+        "recall8": {
+          "valor": 0.5926,
+          "texto": "0.593",
+          "ok": null,
+          "delta": 0.0
+        },
+        "mrr8": {
+          "valor": 0.4506,
+          "texto": "0.451",
+          "ok": null,
+          "delta": 0.0
+        },
+        "recall8_leniente": {
+          "valor": 0.6667,
+          "texto": "0.667",
+          "ok": false,
+          "delta": 0.0
+        },
+        "mrr8_leniente": {
+          "valor": 0.4975,
+          "texto": "0.497",
+          "ok": false,
+          "delta": 0.0
+        },
+        "lat_mediana": {
+          "valor": 2.2497013499960303,
+          "texto": "2.250",
+          "ok": true,
+          "delta": 0.2171651499957079
+        },
+        "lat_p95": {
+          "valor": 13.724450299981982,
+          "texto": "13.724",
+          "ok": true,
+          "delta": 9.920977999980096
+        },
+        "conc_resposta": {
+          "valor": 0.936936936936937,
+          "texto": "0.937",
+          "ok": true,
+          "delta": 0.04954954954954982
+        },
+        "conc_fontes": {
+          "valor": 1.0,
+          "texto": "1.000",
+          "ok": true,
+          "delta": 0.0
+        },
+        "_perguntas": 74
+      }
+    }
+  }
+}

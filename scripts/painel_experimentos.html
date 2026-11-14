@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de experimentos RAG</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --tx:#1b1f24; --mut:#667085; --bd:#e3e6ea; --ok:#127a45; --bad:#b42318; --acc:#2456d6; --bar:#e8ecf3; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1318; --card:#171c23; --tx:#e6e9ee; --mut:#8c97a6; --bd:#262d37; --ok:#4cc38a; --bad:#f08a80; --acc:#7aa2ff; --bar:#232a35; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--tx); font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif; }
+  main { max-width:1180px; margin:0 auto; padding:20px 16px 48px; }
+  header { display:flex; flex-wrap:wrap; align-items:baseline; gap:12px; justify-content:space-between; margin-bottom:16px; }
+  h1 { font-size:20px; margin:0; } h2 { font-size:15px; margin:0 0 10px; }
+  .mut { color:var(--mut); } .live { color:var(--ok); font-weight:600; } .off { color:var(--bad); font-weight:600; }
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); margin-bottom:12px; }
+  .card { background:var(--card); border:1px solid var(--bd); border-radius:10px; padding:14px; }
+  .big { font-size:26px; font-weight:650; font-variant-numeric:tabular-nums; }
+  .bar { height:8px; border-radius:4px; background:var(--bar); overflow:hidden; margin-top:6px; }
+  .bar > i { display:block; height:100%; background:var(--acc); }
+  table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+  th, td { text-align:right; padding:6px 8px; border-bottom:1px solid var(--bd); white-space:nowrap; }
+  th:first-child, td:first-child { text-align:left; } th { color:var(--mut); font-weight:600; font-size:12px; }
+  tr.base td { font-weight:650; } .scroll { overflow-x:auto; }
+  .up { color:var(--ok); } .down { color:var(--bad); } .d { font-size:11px; margin-left:4px; }
+  .tag { font-size:11px; padding:1px 7px; border-radius:99px; background:var(--bar); }
+  .run { background:var(--acc); color:#fff; }
+  ul { margin:0; padding-left:18px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Painel de experimentos RAG</h1>
+    <div class="mut">atualizado <span id="agora">-</span> · <span id="conn" class="live">ao vivo</span></div>
+  </header>
+
+  <section class="grid" id="topo"></section>
+
+  <section class="card" style="margin-bottom:12px">
+    <h2>Coleções (Qdrant)</h2>
+    <div class="scroll"><table id="colecoes"></table></div>
+  </section>
+
+  <section class="card" style="margin-bottom:12px">
+    <h2>Experimentos de resposta <span class="mut">(81 perguntas × 3 repetições · Δ contra <span id="basenome"></span> · verde = melhor, vermelho = pior)</span></h2>
+    <div class="mut" style="margin-bottom:8px;font-size:12px">Cada linha mostra o modelo, a janela de contexto e a coleção usados, e o que mudou em relação à referência. ROUGE-L e BERTScore medem semelhança com a resposta de referência; Artigo = acerta o artigo esperado; Falso pos. = pergunta com resposta que o sistema trata como sem base.</div>
+    <div class="scroll"><table id="exp"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Recuperação nas coleções de teste <span class="mut">(20 perguntas · top 8 · Δ contra a referência)</span></h2>
+    <div class="mut" style="margin-bottom:8px;font-size:12px">Só a busca, sem LLM. Recall = fração das perguntas em que o documento certo aparece nos 8 primeiros; MRR = quão no topo ele aparece.</div>
+    <div class="scroll"><table id="rec"></table></div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (x, d=3) => x == null ? '–' : Number(x).toFixed(d).replace('.', ',');
+const hist = {};   // nome da coleção -> [t, pontos]
+
+// maior é melhor? (false: menor é melhor)
+const META = {
+  rouge:true, bert:true, artigo:true, citacao:true, clarify:true,
+  falso_positivo:false, recusa_indevida:false, lat_mediana:false, lat_p95:false, recall8:true, mrr8:true
+};
+function delta(v, ref, key, d=3) {
+  if (v == null || ref == null || v === ref) return '';
+  const dif = v - ref, bom = META[key] ? dif > 0 : dif < 0;
+  if (Math.abs(dif) < 5 * Math.pow(10, -d - 1)) return '';
+  return `<span class="d ${bom ? 'up' : 'down'}">${dif > 0 ? '+' : ''}${fmt(dif, d)}</span>`;
+}
+const cel = (l, ref, k, d=3) => `<td>${fmt(l[k], d)}${ref && l !== ref ? delta(l[k], ref[k], k, d) : ''}</td>`;
+
+function topo(s) {
+  const g = s.gpu, sv = s.servicos;
+  let h = '';
+  h += g ? `<div class="card"><div class="mut">GPU</div><div class="big">${g.uso}%</div>
+    <div class="bar"><i style="width:${g.uso}%"></i></div>
+    <div class="mut" style="margin-top:6px">VRAM ${(g.vram_mb/1024).toFixed(1)} de ${(g.vram_total_mb/1024).toFixed(1)} GB</div>
+    <div class="bar"><i style="width:${100*g.vram_mb/g.vram_total_mb}%"></i></div></div>`
+    : `<div class="card"><div class="mut">GPU</div><div class="off">indisponível</div></div>`;
+  const mod = sv.ollama == null ? '<span class="off">Ollama fora do ar</span>'
+    : sv.ollama.length ? '<ul>' + sv.ollama.map(m => `<li>${m.nome} <span class="mut">${m.vram_gb} GB na GPU de ${m.total_gb}</span></li>`).join('') + '</ul>'
+    : '<span class="mut">nenhum modelo carregado</span>';
+  h += `<div class="card"><div class="mut">Ollama</div><div style="margin-top:6px">${mod}</div></div>`;
+  h += `<div class="card"><div class="mut">Reranker</div><div class="big ${sv.reranker ? 'live' : 'off'}">${sv.reranker ? 'no ar' : 'parado'}</div>
+    <div class="mut">${sv.reranker ? sv.reranker.dispositivo : ''}</div></div>`;
+  $('topo').innerHTML = h;
+}
+
+const ALVOS = {knowledge_base_v2_emb4b: 155781};
+function colecoes(s) {
+  const agora = Date.now() / 1000;
+  let h = '<tr><th>Qdrant</th><th>Coleção</th><th>Pontos</th><th>Ritmo</th></tr>';
+  for (const [srv, lista] of Object.entries(s.servicos.colecoes)) {
+    if (lista == null) { h += `<tr><td>${srv}</td><td colspan="3" class="off">fora do ar</td></tr>`; continue; }
+    for (const c of lista) {
+      const k = srv + c.nome, a = hist[k] || (hist[k] = []);
+      a.push([agora, c.pontos]); while (a.length > 40) a.shift();
+      let ritmo = '';
+      const ini = a.find(p => agora - p[0] <= 60);
+      if (ini && agora - ini[0] > 5 && c.pontos !== ini[1]) {
+        const r = (c.pontos - ini[1]) / (agora - ini[0]);
+        ritmo = `<span class="${r > 0 ? 'up' : 'down'}">${r > 0 ? '+' : ''}${r.toFixed(1).replace('.', ',')} pts/s</span> <span class="tag run">carregando</span>`;
+      }
+      let prog = '';
+      const alvo = ALVOS[c.nome];
+      if (alvo) {
+        const pc = Math.min(100, 100 * c.pontos / alvo);
+        prog = `<div style="background:#0003;border-radius:4px;height:8px;margin-top:4px"><div style="width:${pc}%;height:8px;border-radius:4px;background:#4c9"></div></div>${pc.toFixed(1).replace('.', ',')}% de ${alvo.toLocaleString('pt-BR')}`;
+        const r = ini && agora - ini[0] > 5 ? (c.pontos - ini[1]) / (agora - ini[0]) : 0;
+        if (r > 0 && c.pontos < alvo) { const m = Math.round((alvo - c.pontos) / r / 60); prog += `, faltam ~${m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : m + ' min'}`; }
+      }
+      h += `<tr><td>${srv}</td><td>${c.nome}</td><td>${c.pontos.toLocaleString('pt-BR')}${prog}</td><td>${ritmo}</td></tr>`;
+    }
+  }
+  $('colecoes').innerHTML = h;
+}
+
+const curto = m => (m || '').replace('qwen3-embedding:', 'embedding ').replace('qwen3.5:', 'Qwen3.5 ').replace('qwen3:', 'Qwen3 ');
+const chip = (txt, cls='') => `<span class="tag ${cls}">${txt}</span> `;
+
+function exp(s) {
+  $('basenome').textContent = s.baseline;
+  const base = s.experimentos.find(e => e.nome === s.baseline && e.estado === 'pronto');
+  const cab = `<tr><th>Experimento · o que é</th><th>ROUGE-L</th><th>BERTScore</th><th>Artigo</th><th>Citação</th><th>Clarify</th>
+    <th>Falso pos.</th><th>Recusa ind.</th><th>Mediana s</th><th>p95 s</th><th>Recall@8</th><th>MRR@8</th></tr>`;
+  let h = '', pasta = null;
+  for (const e of s.experimentos) {
+    if (e.pasta !== pasta) { pasta = e.pasta; h += `<tr><td colspan="12" style="background:var(--bar);font-weight:600;text-align:left">${pasta}</td></tr>` + cab; }
+    if (e.estado === 'rodando') { h += `<tr><td>${e.nome} ${chip('rodando agora', 'run')}</td><td colspan="11"></td></tr>`; continue; }
+    const isBase = base && e === base;
+    const chips = chip(curto(e.llm)) + chip('janela ' + e.ctx) + chip(e.colecao)
+      + (isBase ? chip('referência', 'run') : e.muda.map(x => chip('muda: ' + x, 'run')).join(''));
+    h += `<tr${isBase ? ' class="base"' : ''}><td style="white-space:normal"><div>${e.nome}</div>
+      <div class="mut" style="font-weight:400;font-size:12px">${e.descricao || ''}</div><div style="margin-top:3px">${chips}</div></td>`
+      + cel(e, base, 'rouge') + cel(e, base, 'bert') + cel(e, base, 'artigo') + cel(e, base, 'citacao')
+      + cel(e, base, 'clarify', 2) + cel(e, base, 'falso_positivo', 3) + cel(e, base, 'recusa_indevida', 3)
+      + cel(e, base, 'lat_mediana', 1) + cel(e, base, 'lat_p95', 1) + cel(e, base, 'recall8') + cel(e, base, 'mrr8') + '</tr>';
+  }
+  $('exp').innerHTML = h;
+}
+
+const ROTULOS = {
+  exp_base_2000: 'Controle: embedding 0,6B, chunk 2000',
+  exp_base_2000_rep: 'Controle repetido hoje (0,6B, chunk 2000)',
+  exp_emb4b_2000: 'Embedding 4B, chunk 2000',
+  exp_limpo_2000: '0,6B, chunk 2000 + limpeza',
+  exp_limpo_4000: '0,6B, chunk 4000 + limpeza',
+};
+const NOMES_CAMADA = { densa: 'Só vetor denso', hibrida: 'Denso + BM25', hibrida_norma: 'Híbrida + norma citada', rerank_norma: 'Com reranker (o que a API usa)' };
+
+function rec(s) {
+  const camadas = ['densa', 'hibrida', 'hibrida_norma', 'rerank_norma'];
+  let h = '<tr><th>Coleção de teste · o que é</th><th>Pontos</th>' + camadas.map(c => `<th>${NOMES_CAMADA[c]}<br><span class="mut">Recall / MRR</span></th>`).join('') + '</tr>';
+  const ref = s.recuperacao[0];
+  for (const r of s.recuperacao) {
+    const rot = ROTULOS[r.colecao] || (curto(r.embedding) + ' · ' + r.colecao);
+    h += `<tr${r === ref ? ' class="base"' : ''}><td style="white-space:normal"><div>${rot}</div><div class="mut" style="font-weight:400;font-size:12px">${r.colecao} · ${curto(r.embedding)}${r === ref ? ' ' + chip('referência', 'run') : ''}</div></td><td>${r.pontos ?? '–'}</td>`;
+    for (const c of camadas) {
+      const x = r.camadas[c], y = ref && ref.camadas[c];
+      if (!x) { h += '<td>–</td>'; continue; }
+      const dr = y && r !== ref ? delta(x.recall, y.recall, 'recall8') : '', dm = y && r !== ref ? delta(x.mrr, y.mrr, 'mrr8') : '';
+      h += `<td>${fmt(x.recall)}${dr} / ${fmt(x.mrr)}${dm}</td>`;
+    }
+    h += '</tr>';
+  }
+  $('rec').innerHTML = h;
+}
+
+async function ciclo() {
+  try {
+    const s = await (await fetch('/api/estado', { cache: 'no-store' })).json();
+    $('agora').textContent = s.agora; $('conn').textContent = 'ao vivo'; $('conn').className = 'live';
+    topo(s); colecoes(s); exp(s); rec(s);
+  } catch (e) { $('conn').textContent = 'sem conexão'; $('conn').className = 'off'; }
+}
+ciclo(); setInterval(ciclo, 5000);
+</script>
+</body>
+</html>

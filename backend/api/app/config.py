@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     max_trechos_por_documento: int = Field(default=0, ge=0, le=10)
     # Pergunta em 1ª pessoa passa por uma chamada curta ao modelo que decide se faltam dados.
     esclarecimento_modelo: bool = False
+    # O classificador de esclarecimento raciocina antes de decidir (mais lento, menos falso positivo).
+    esclarecimento_raciocinio: bool = False
+    # Resposta que só recusa ou só pede dados vira insufficient_context / needs_clarification.
+    guardrails_texto: bool = False
+    # Com guardrails_texto: refaz a busca ampliada (candidate_k 100, top_k 10) antes de aceitar a recusa.
+    retry_recusa: bool = False
     # Acrescenta aviso listando norma/artigo citado que não está nas fontes entregues ao modelo.
     conferir_citacoes: bool = False
     # Peso dos sinônimos e siglas do glossário na busca esparsa; 0 desliga a expansão.
