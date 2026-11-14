@@ -5,6 +5,7 @@ from app.citacoes_normas import avisar_sem_suporte
 from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
+from app.guardrails import e_recusa, pede_dados
 from app.esclarecimento import caso_proprio, pedir_esclarecimento, texto_pedido
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
@@ -133,32 +134,7 @@ class RagService:
                     sources=[],
                 )
             vector = self.models.embed_question(question)
-            citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
-            citados = self.store.search_articles(vector, artigos_citados(question)) + citados
-            candidatos = combinar([], citados + self.store.search(vector, question), 1000)
-            ordem = self.reranker.reordenar(question, candidatos)
-            escolhidos = combinar(
-                citados,
-                ordem[:2] + self._por_parte(question) + ordem,
-                self.settings.top_k,
-                self.settings.max_trechos_por_documento,
-            )
-            if self.settings.context_window_chars:
-                vizinhos = self.store.vizinhos([f.id for f in escolhidos])
-                escolhidos = expandir_janela(
-                    escolhidos, vizinhos, self.settings.context_window_chars
-                )
-            else:
-                cortados = [f.id for f in escolhidos if f.text.rstrip().endswith(":")]
-                seguintes = self.store.continuacoes(cortados) if cortados else {}
-                escolhidos = juntar_continuacoes(escolhidos, seguintes)
-            sources = prepare_sources(
-                escolhidos,
-                self.settings.max_context_chars,
-                question=question,
-                num_ctx=self.settings.num_ctx,
-                num_predict=self.settings.num_predict,
-            )
+            sources, ausentes = self._contexto(question, vector)
             if not sources:
                 return QueryResponse(
                     status="insufficient_context",
@@ -171,11 +147,69 @@ class RagService:
             answer, _ = citacoes_validas(
                 self.models.answer(question, sources, ausentes), len(sources)
             )
+            if self.settings.guardrails_texto:
+                if e_recusa(answer) and self.settings.retry_recusa:
+                    sources, answer = self._tentar_ampliado(question, vector, sources, answer)
+                if e_recusa(answer):
+                    return QueryResponse(
+                        status="insufficient_context",
+                        answer=(
+                            "Não há contexto suficiente na base "
+                            "para fundamentar uma resposta à pergunta."
+                        ),
+                        sources=sources,
+                    )
+                if pede_dados(answer):
+                    return QueryResponse(status="needs_clarification", answer=answer, sources=[])
             if self.settings.conferir_citacoes:
                 answer, _ = avisar_sem_suporte(answer, sources)
             return QueryResponse(status="answered", answer=answer, sources=sources)
         finally:
             self._query_lock.release()
+
+    def _contexto(self, question: str, vector: list[float]):
+        """Fontes escolhidas para a pergunta (já cortadas ao orçamento) e normas ausentes."""
+        citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
+        citados = self.store.search_articles(vector, artigos_citados(question)) + citados
+        candidatos = combinar([], citados + self.store.search(vector, question), 1000)
+        ordem = self.reranker.reordenar(question, candidatos)
+        escolhidos = combinar(
+            citados,
+            ordem[:2] + self._por_parte(question) + ordem,
+            self.settings.top_k,
+            self.settings.max_trechos_por_documento,
+        )
+        if self.settings.context_window_chars:
+            vizinhos = self.store.vizinhos([f.id for f in escolhidos])
+            escolhidos = expandir_janela(escolhidos, vizinhos, self.settings.context_window_chars)
+        else:
+            cortados = [f.id for f in escolhidos if f.text.rstrip().endswith(":")]
+            seguintes = self.store.continuacoes(cortados) if cortados else {}
+            escolhidos = juntar_continuacoes(escolhidos, seguintes)
+        sources = prepare_sources(
+            escolhidos,
+            self.settings.max_context_chars,
+            question=question,
+            num_ctx=self.settings.num_ctx,
+            num_predict=self.settings.num_predict,
+        )
+        return sources, ausentes
+
+    def _tentar_ampliado(self, question, vector, sources, answer):
+        """Uma segunda tentativa com busca ampliada antes de aceitar a recusa do modelo."""
+        original = self.settings
+        ampliado = original.model_copy(
+            update={"candidate_k": max(original.candidate_k, 100), "top_k": 10}
+        )
+        self.settings = self.store.settings = ampliado
+        try:
+            novas, ausentes = self._contexto(question, vector)
+        finally:
+            self.settings = self.store.settings = original
+        if not novas:
+            return sources, answer
+        nova, _ = citacoes_validas(self.models.answer(question, novas, ausentes), len(novas))
+        return (sources, answer) if e_recusa(nova) else (novas, nova)
 
     def _por_parte(self, question: str) -> list[Source]:
         """Em pergunta composta, os melhores trechos de cada parte, alternados."""

@@ -1,0 +1,110 @@
+{
+  "nome": "emb4b_v2",
+  "descricao": "Embedding 4B (2560), mesma v2, qwen3:8b",
+  "env": {
+    "CANDIDATE_K": "30",
+    "LEGISLATION_BOOST": "0.2",
+    "RERANK_LEGISLATION_BOOST": "0",
+    "CONTEXT_WINDOW_CHARS": "0",
+    "MAX_TRECHOS_POR_DOCUMENTO": "0",
+    "ESCLARECIMENTO_MODELO": "false",
+    "CONFERIR_CITACOES": "false",
+    "PESO_EXPANSAO": "0.5",
+    "RERANKER_URL": "http://127.0.0.1:8080",
+    "QDRANT_URL": "http://127.0.0.1:6333",
+    "OLLAMA_TIMEOUT": "600",
+    "RERANKER_TIMEOUT": "120",
+    "QDRANT_TIMEOUT": "60",
+    "COLLECTION_NAME": "knowledge_base_v2_emb4b",
+    "EMBEDDING_MODEL": "qwen3-embedding:4b",
+    "EMBEDDING_DIMENSIONS": "2560"
+  },
+  "repeticoes": 3,
+  "relatorio": "data\\benchmark\\experimentos-2026-11-13-emb4b\\emb4b_v2\\avaliacao\\reports\\a2f305d6453290f314848ff40bda249e7d4d16198ebd21ecaa55586f69e45c4d\\17e23b1053ac545060ab603557ee02542745099693beccdc11f095f04acd9e01\\results.json",
+  "avaliacao": {
+    "todos": {
+      "perguntas": 81,
+      "tentativas": 243,
+      "falhas": 0,
+      "rouge_l": 0.2738898666885887,
+      "bert_score": 0.606677923351526,
+      "artigo_esperado": 0.7943262411347518,
+      "citacao_suportada": 0.9843073593073595,
+      "clarify": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.353409899995313,
+      "lat_p95": 5.411262699999497,
+      "conc_resposta": 0.8600823045267488,
+      "conc_fontes": 1.0
+    },
+    "sem_recorte_completo": {
+      "perguntas": 74,
+      "tentativas": 222,
+      "falhas": 0,
+      "rouge_l": 0.2748559590207182,
+      "bert_score": 0.6050213311360849,
+      "artigo_esperado": 0.8333333333333334,
+      "citacao_suportada": 0.9827380952380953,
+      "clarify": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.3516323499934515,
+      "lat_p95": 5.237607399991248,
+      "conc_resposta": 0.8558558558558556,
+      "conc_fontes": 1.0
+    }
+  },
+  "recuperacao": {
+    "todos": {
+      "recall8": 0.5574,
+      "mrr8": 0.4303,
+      "recall8_leniente": 0.6066,
+      "mrr8_leniente": 0.4664
+    },
+    "sem_recorte_completo": {
+      "recall8": 0.6296,
+      "mrr8": 0.4861,
+      "recall8_leniente": 0.6852,
+      "mrr8_leniente": 0.5269
+    }
+  }
+}

@@ -1,0 +1,5983 @@
+{
+  "colecao": "knowledge_base_v2",
+  "pontos": 155781,
+  "embedding": "qwen3-embedding:0.6b",
+  "perguntas": 61,
+  "configuracao_atual": {
+    "top_k": 8,
+    "score_threshold": 0.5,
+    "candidate_k": 30,
+    "citation_slots": 2
+  },
+  "rodadas": {
+    "densa": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.1803,
+        "mrr_estrita": 0.1448,
+        "n_estrita": 61,
+        "recall_mapeada": 0.1803,
+        "mrr_mapeada": 0.1448,
+        "recall_estrita_leniente": 0.1967,
+        "mrr_estrita_leniente": 0.153,
+        "recall_mapeada_leniente": 0.1967,
+        "mrr_mapeada_leniente": 0.153,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2787,
+        "mrr_estrita": 0.1781,
+        "n_estrita": 61,
+        "recall_mapeada": 0.2787,
+        "mrr_mapeada": 0.1781,
+        "recall_estrita_leniente": 0.3115,
+        "mrr_estrita_leniente": 0.1896,
+        "recall_mapeada_leniente": 0.3115,
+        "mrr_mapeada_leniente": 0.1896,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3607,
+        "mrr_estrita": 0.1947,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3607,
+        "mrr_mapeada": 0.1947,
+        "recall_estrita_leniente": 0.4098,
+        "mrr_estrita_leniente": 0.2094,
+        "recall_mapeada_leniente": 0.4098,
+        "mrr_mapeada_leniente": 0.2094,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3934,
+        "mrr_estrita": 0.1994,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3934,
+        "mrr_mapeada": 0.1994,
+        "recall_estrita_leniente": 0.459,
+        "mrr_estrita_leniente": 0.2165,
+        "recall_mapeada_leniente": 0.459,
+        "mrr_mapeada_leniente": 0.2165,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.541,
+        "mrr_estrita": 0.2163,
+        "n_estrita": 61,
+        "recall_mapeada": 0.541,
+        "mrr_mapeada": 0.2163,
+        "recall_estrita_leniente": 0.5738,
+        "mrr_estrita_leniente": 0.2297,
+        "recall_mapeada_leniente": 0.5738,
+        "mrr_mapeada_leniente": 0.2297,
+        "n_mapeada": 61
+      }
+    ],
+    "hibrida": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2131,
+        "mrr_estrita": 0.1612,
+        "n_estrita": 61,
+        "recall_mapeada": 0.2131,
+        "mrr_mapeada": 0.1612,
+        "recall_estrita_leniente": 0.2459,
+        "mrr_estrita_leniente": 0.194,
+        "recall_mapeada_leniente": 0.2459,
+        "mrr_mapeada_leniente": 0.194,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3115,
+        "mrr_estrita": 0.1926,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3115,
+        "mrr_mapeada": 0.1926,
+        "recall_estrita_leniente": 0.3443,
+        "mrr_estrita_leniente": 0.2254,
+        "recall_mapeada_leniente": 0.3443,
+        "mrr_mapeada_leniente": 0.2254,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3934,
+        "mrr_estrita": 0.2164,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3934,
+        "mrr_mapeada": 0.2164,
+        "recall_estrita_leniente": 0.4262,
+        "mrr_estrita_leniente": 0.2492,
+        "recall_mapeada_leniente": 0.4262,
+        "mrr_mapeada_leniente": 0.2492,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4262,
+        "mrr_estrita": 0.2208,
+        "n_estrita": 61,
+        "recall_mapeada": 0.4262,
+        "mrr_mapeada": 0.2208,
+        "recall_estrita_leniente": 0.459,
+        "mrr_estrita_leniente": 0.2536,
+        "recall_mapeada_leniente": 0.459,
+        "mrr_mapeada_leniente": 0.2536,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5574,
+        "mrr_estrita": 0.2397,
+        "n_estrita": 61,
+        "recall_mapeada": 0.5574,
+        "mrr_mapeada": 0.2397,
+        "recall_estrita_leniente": 0.623,
+        "mrr_estrita_leniente": 0.2768,
+        "recall_mapeada_leniente": 0.623,
+        "mrr_mapeada_leniente": 0.2768,
+        "n_mapeada": 61
+      }
+    ],
+    "hibrida_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2623,
+        "mrr_estrita": 0.2186,
+        "n_estrita": 61,
+        "recall_mapeada": 0.2623,
+        "mrr_mapeada": 0.2186,
+        "recall_estrita_leniente": 0.2951,
+        "mrr_estrita_leniente": 0.2514,
+        "recall_mapeada_leniente": 0.2951,
+        "mrr_mapeada_leniente": 0.2514,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3279,
+        "mrr_estrita": 0.2363,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3279,
+        "mrr_mapeada": 0.2363,
+        "recall_estrita_leniente": 0.3607,
+        "mrr_estrita_leniente": 0.2691,
+        "recall_mapeada_leniente": 0.3607,
+        "mrr_mapeada_leniente": 0.2691,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4098,
+        "mrr_estrita": 0.2601,
+        "n_estrita": 61,
+        "recall_mapeada": 0.4098,
+        "mrr_mapeada": 0.2601,
+        "recall_estrita_leniente": 0.4426,
+        "mrr_estrita_leniente": 0.2929,
+        "recall_mapeada_leniente": 0.4426,
+        "mrr_mapeada_leniente": 0.2929,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4426,
+        "mrr_estrita": 0.2645,
+        "n_estrita": 61,
+        "recall_mapeada": 0.4426,
+        "mrr_mapeada": 0.2645,
+        "recall_estrita_leniente": 0.4754,
+        "mrr_estrita_leniente": 0.2973,
+        "recall_mapeada_leniente": 0.4754,
+        "mrr_mapeada_leniente": 0.2973,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5738,
+        "mrr_estrita": 0.2834,
+        "n_estrita": 61,
+        "recall_mapeada": 0.5738,
+        "mrr_mapeada": 0.2834,
+        "recall_estrita_leniente": 0.6393,
+        "mrr_estrita_leniente": 0.3205,
+        "recall_mapeada_leniente": 0.6393,
+        "mrr_mapeada_leniente": 0.3205,
+        "n_mapeada": 61
+      }
+    ],
+    "rerank_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3443,
+        "mrr_estrita": 0.2678,
+        "n_estrita": 61,
+        "recall_mapeada": 0.3443,
+        "mrr_mapeada": 0.2678,
+        "recall_estrita_leniente": 0.3607,
+        "mrr_estrita_leniente": 0.2842,
+        "recall_mapeada_leniente": 0.3607,
+        "mrr_mapeada_leniente": 0.2842,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.459,
+        "mrr_estrita": 0.297,
+        "n_estrita": 61,
+        "recall_mapeada": 0.459,
+        "mrr_mapeada": 0.297,
+        "recall_estrita_leniente": 0.4918,
+        "mrr_estrita_leniente": 0.3167,
+        "recall_mapeada_leniente": 0.4918,
+        "mrr_mapeada_leniente": 0.3167,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5082,
+        "mrr_estrita": 0.3117,
+        "n_estrita": 61,
+        "recall_mapeada": 0.5082,
+        "mrr_mapeada": 0.3117,
+        "recall_estrita_leniente": 0.5738,
+        "mrr_estrita_leniente": 0.3423,
+        "recall_mapeada_leniente": 0.5738,
+        "mrr_mapeada_leniente": 0.3423,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.541,
+        "mrr_estrita": 0.3193,
+        "n_estrita": 61,
+        "recall_mapeada": 0.541,
+        "mrr_mapeada": 0.3193,
+        "recall_estrita_leniente": 0.6066,
+        "mrr_estrita_leniente": 0.3499,
+        "recall_mapeada_leniente": 0.6066,
+        "mrr_mapeada_leniente": 0.3499,
+        "n_mapeada": 61
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.623,
+        "mrr_estrita": 0.3335,
+        "n_estrita": 61,
+        "recall_mapeada": 0.623,
+        "mrr_mapeada": 0.3335,
+        "recall_estrita_leniente": 0.6885,
+        "mrr_estrita_leniente": 0.3645,
+        "recall_mapeada_leniente": 0.6885,
+        "mrr_mapeada_leniente": 0.3645,
+        "n_mapeada": 61
+      }
+    ]
+  },
+  "rodadas_sem_recorte_completo": {
+    "densa": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2037,
+        "mrr_estrita": 0.1636,
+        "n_estrita": 54,
+        "recall_mapeada": 0.2037,
+        "mrr_mapeada": 0.1636,
+        "recall_estrita_leniente": 0.2222,
+        "mrr_estrita_leniente": 0.1728,
+        "recall_mapeada_leniente": 0.2222,
+        "mrr_mapeada_leniente": 0.1728,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2593,
+        "mrr_estrita": 0.1765,
+        "n_estrita": 54,
+        "recall_mapeada": 0.2593,
+        "mrr_mapeada": 0.1765,
+        "recall_estrita_leniente": 0.2963,
+        "mrr_estrita_leniente": 0.1895,
+        "recall_mapeada_leniente": 0.2963,
+        "mrr_mapeada_leniente": 0.1895,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3519,
+        "mrr_estrita": 0.1952,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3519,
+        "mrr_mapeada": 0.1952,
+        "recall_estrita_leniente": 0.4074,
+        "mrr_estrita_leniente": 0.2119,
+        "recall_mapeada_leniente": 0.4074,
+        "mrr_mapeada_leniente": 0.2119,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3889,
+        "mrr_estrita": 0.2005,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3889,
+        "mrr_mapeada": 0.2005,
+        "recall_estrita_leniente": 0.463,
+        "mrr_estrita_leniente": 0.2198,
+        "recall_mapeada_leniente": 0.463,
+        "mrr_mapeada_leniente": 0.2198,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5556,
+        "mrr_estrita": 0.2196,
+        "n_estrita": 54,
+        "recall_mapeada": 0.5556,
+        "mrr_mapeada": 0.2196,
+        "recall_estrita_leniente": 0.5926,
+        "mrr_estrita_leniente": 0.2348,
+        "recall_mapeada_leniente": 0.5926,
+        "mrr_mapeada_leniente": 0.2348,
+        "n_mapeada": 54
+      }
+    ],
+    "hibrida": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2037,
+        "mrr_estrita": 0.1451,
+        "n_estrita": 54,
+        "recall_mapeada": 0.2037,
+        "mrr_mapeada": 0.1451,
+        "recall_estrita_leniente": 0.2407,
+        "mrr_estrita_leniente": 0.1821,
+        "recall_mapeada_leniente": 0.2407,
+        "mrr_mapeada_leniente": 0.1821,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3148,
+        "mrr_estrita": 0.1806,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3148,
+        "mrr_mapeada": 0.1806,
+        "recall_estrita_leniente": 0.3519,
+        "mrr_estrita_leniente": 0.2176,
+        "recall_mapeada_leniente": 0.3519,
+        "mrr_mapeada_leniente": 0.2176,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3889,
+        "mrr_estrita": 0.2012,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3889,
+        "mrr_mapeada": 0.2012,
+        "recall_estrita_leniente": 0.4259,
+        "mrr_estrita_leniente": 0.2383,
+        "recall_mapeada_leniente": 0.4259,
+        "mrr_mapeada_leniente": 0.2383,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4259,
+        "mrr_estrita": 0.2062,
+        "n_estrita": 54,
+        "recall_mapeada": 0.4259,
+        "mrr_mapeada": 0.2062,
+        "recall_estrita_leniente": 0.463,
+        "mrr_estrita_leniente": 0.2432,
+        "recall_mapeada_leniente": 0.463,
+        "mrr_mapeada_leniente": 0.2432,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5741,
+        "mrr_estrita": 0.2275,
+        "n_estrita": 54,
+        "recall_mapeada": 0.5741,
+        "mrr_mapeada": 0.2275,
+        "recall_estrita_leniente": 0.6481,
+        "mrr_estrita_leniente": 0.2695,
+        "recall_mapeada_leniente": 0.6481,
+        "mrr_mapeada_leniente": 0.2695,
+        "n_mapeada": 54
+      }
+    ],
+    "hibrida_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.2593,
+        "mrr_estrita": 0.2099,
+        "n_estrita": 54,
+        "recall_mapeada": 0.2593,
+        "mrr_mapeada": 0.2099,
+        "recall_estrita_leniente": 0.2963,
+        "mrr_estrita_leniente": 0.2469,
+        "recall_mapeada_leniente": 0.2963,
+        "mrr_mapeada_leniente": 0.2469,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3333,
+        "mrr_estrita": 0.2299,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3333,
+        "mrr_mapeada": 0.2299,
+        "recall_estrita_leniente": 0.3704,
+        "mrr_estrita_leniente": 0.267,
+        "recall_mapeada_leniente": 0.3704,
+        "mrr_mapeada_leniente": 0.267,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4074,
+        "mrr_estrita": 0.2506,
+        "n_estrita": 54,
+        "recall_mapeada": 0.4074,
+        "mrr_mapeada": 0.2506,
+        "recall_estrita_leniente": 0.4444,
+        "mrr_estrita_leniente": 0.2877,
+        "recall_mapeada_leniente": 0.4444,
+        "mrr_mapeada_leniente": 0.2877,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.4444,
+        "mrr_estrita": 0.2556,
+        "n_estrita": 54,
+        "recall_mapeada": 0.4444,
+        "mrr_mapeada": 0.2556,
+        "recall_estrita_leniente": 0.4815,
+        "mrr_estrita_leniente": 0.2926,
+        "recall_mapeada_leniente": 0.4815,
+        "mrr_mapeada_leniente": 0.2926,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5926,
+        "mrr_estrita": 0.2769,
+        "n_estrita": 54,
+        "recall_mapeada": 0.5926,
+        "mrr_mapeada": 0.2769,
+        "recall_estrita_leniente": 0.6667,
+        "mrr_estrita_leniente": 0.3189,
+        "recall_mapeada_leniente": 0.6667,
+        "mrr_mapeada_leniente": 0.3189,
+        "n_mapeada": 54
+      }
+    ],
+    "rerank_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.3333,
+        "mrr_estrita": 0.2469,
+        "n_estrita": 54,
+        "recall_mapeada": 0.3333,
+        "mrr_mapeada": 0.2469,
+        "recall_estrita_leniente": 0.3519,
+        "mrr_estrita_leniente": 0.2654,
+        "recall_mapeada_leniente": 0.3519,
+        "mrr_mapeada_leniente": 0.2654,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.463,
+        "mrr_estrita": 0.2799,
+        "n_estrita": 54,
+        "recall_mapeada": 0.463,
+        "mrr_mapeada": 0.2799,
+        "recall_estrita_leniente": 0.5,
+        "mrr_estrita_leniente": 0.3022,
+        "recall_mapeada_leniente": 0.5,
+        "mrr_mapeada_leniente": 0.3022,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5185,
+        "mrr_estrita": 0.2966,
+        "n_estrita": 54,
+        "recall_mapeada": 0.5185,
+        "mrr_mapeada": 0.2966,
+        "recall_estrita_leniente": 0.5926,
+        "mrr_estrita_leniente": 0.3312,
+        "recall_mapeada_leniente": 0.5926,
+        "mrr_mapeada_leniente": 0.3312,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.5556,
+        "mrr_estrita": 0.3051,
+        "n_estrita": 54,
+        "recall_mapeada": 0.5556,
+        "mrr_mapeada": 0.3051,
+        "recall_estrita_leniente": 0.6296,
+        "mrr_estrita_leniente": 0.3397,
+        "recall_mapeada_leniente": 0.6296,
+        "mrr_mapeada_leniente": 0.3397,
+        "n_mapeada": 54
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.6481,
+        "mrr_estrita": 0.3211,
+        "n_estrita": 54,
+        "recall_mapeada": 0.6481,
+        "mrr_mapeada": 0.3211,
+        "recall_estrita_leniente": 0.7222,
+        "mrr_estrita_leniente": 0.3562,
+        "recall_mapeada_leniente": 0.7222,
+        "mrr_mapeada_leniente": 0.3562,
+        "n_mapeada": 54
+      }
+    ]
+  },
+  "por_pergunta": [
+    {
+      "id": "ap01_simples_inicio_atividade",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "02024cf0cb",
+          0.7331
+        ],
+        [
+          "8d4398a7d9",
+          0.7868
+        ],
+        [
+          "8d4398a7d9",
+          0.5618
+        ],
+        [
+          "dec000615e",
+          0.6898
+        ],
+        [
+          "02024cf0cb",
+          0.6941
+        ],
+        [
+          "02024cf0cb",
+          0.6937
+        ],
+        [
+          "9c3abc476e",
+          0.6151
+        ],
+        [
+          "dec000615e",
+          0.689
+        ],
+        [
+          "8d4398a7d9",
+          0.6732
+        ],
+        [
+          "02024cf0cb",
+          0.707
+        ],
+        [
+          "02024cf0cb",
+          0.6926
+        ],
+        [
+          "dec000615e",
+          0.5967
+        ],
+        [
+          "dec000615e",
+          0.5955
+        ],
+        [
+          "dec000615e",
+          0.674
+        ],
+        [
+          "de5379c208",
+          0.55
+        ],
+        [
+          "dec000615e",
+          0.6008
+        ],
+        [
+          "9c3abc476e",
+          0.6024
+        ],
+        [
+          "dec000615e",
+          0.5912
+        ],
+        [
+          "9c3abc476e",
+          0.676
+        ],
+        [
+          "dec000615e",
+          0.5905
+        ]
+      ]
+    },
+    {
+      "id": "ap02_simples_capital_pj",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "02024cf0cb",
+          0.668
+        ],
+        [
+          "8d4398a7d9",
+          0.7366
+        ],
+        [
+          "9c3abc476e",
+          0.7708
+        ],
+        [
+          "8d4398a7d9",
+          0.6528
+        ],
+        [
+          "9c3abc476e",
+          0.7438
+        ],
+        [
+          "5eacf03492",
+          0.6982
+        ],
+        [
+          "8d4398a7d9",
+          0.68
+        ],
+        [
+          "5eacf03492",
+          0.6616
+        ],
+        [
+          "5eacf03492",
+          0.6716
+        ],
+        [
+          "9532a3223c",
+          0.6349
+        ],
+        [
+          "5eacf03492",
+          0.6919
+        ],
+        [
+          "8d4398a7d9",
+          0.7468
+        ],
+        [
+          "2bf65fd0b2",
+          0.708
+        ],
+        [
+          "8d4398a7d9",
+          0.7793
+        ],
+        [
+          "8d4398a7d9",
+          0.7503
+        ],
+        [
+          "5eacf03492",
+          0.5664
+        ],
+        [
+          "5eacf03492",
+          0.6748
+        ],
+        [
+          "dec000615e",
+          0.7552
+        ],
+        [
+          "9c3abc476e",
+          0.7504
+        ],
+        [
+          "9c3abc476e",
+          0.7419
+        ]
+      ]
+    },
+    {
+      "id": "ap03_simples_debito_art17",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "d71663a0cd",
+          0.5968
+        ],
+        [
+          "d71663a0cd",
+          0.5944
+        ],
+        [
+          "d71663a0cd",
+          0.651
+        ],
+        [
+          "d71663a0cd",
+          0.6424
+        ],
+        [
+          "a28a4b7f84",
+          0.661
+        ],
+        [
+          "97fd06100c",
+          0.5724
+        ],
+        [
+          "97fd06100c",
+          0.5349
+        ],
+        [
+          "1b780b8af1",
+          0.5542
+        ],
+        [
+          "97fd06100c",
+          0.5418
+        ],
+        [
+          "520a4cd311",
+          0.6614
+        ],
+        [
+          "520a4cd311",
+          0.6747
+        ],
+        [
+          "520a4cd311",
+          0.6813
+        ],
+        [
+          "520a4cd311",
+          0.6684
+        ],
+        [
+          "8947cac92d",
+          0.5154
+        ],
+        [
+          "63726d3e11",
+          0.6828
+        ],
+        [
+          "8becfc1be8",
+          0.695
+        ],
+        [
+          "134ab100fa",
+          0.5254
+        ],
+        [
+          "9e88dba804",
+          0.7083
+        ],
+        [
+          "e50c56517a",
+          0.665
+        ],
+        [
+          "8becfc1be8",
+          0.6713
+        ]
+      ]
+    },
+    {
+      "id": "ap04_simples_livro_caixa",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "4a09147c44",
+          0.6514
+        ],
+        [
+          "8d4398a7d9",
+          0.7661
+        ],
+        [
+          "8d4398a7d9",
+          0.6199
+        ],
+        [
+          "f2d9261fe1",
+          0.77
+        ],
+        [
+          "f2d9261fe1",
+          0.7695
+        ],
+        [
+          "f2d9261fe1",
+          0.7665
+        ],
+        [
+          "f2d9261fe1",
+          0.8089
+        ],
+        [
+          "f2d9261fe1",
+          0.7782
+        ],
+        [
+          "8d4398a7d9",
+          0.6615
+        ],
+        [
+          "b5d279c27e",
+          0.577
+        ],
+        [
+          "dec000615e",
+          0.7809
+        ],
+        [
+          "f2d9261fe1",
+          0.8078
+        ],
+        [
+          "f2d9261fe1",
+          0.7747
+        ],
+        [
+          "8d4398a7d9",
+          0.7636
+        ],
+        [
+          "dec000615e",
+          0.7664
+        ],
+        [
+          "dec000615e",
+          0.7693
+        ],
+        [
+          "9c3abc476e",
+          0.7796
+        ],
+        [
+          "dec000615e",
+          0.7686
+        ],
+        [
+          "dec000615e",
+          0.7681
+        ],
+        [
+          "dec000615e",
+          0.7651
+        ]
+      ]
+    },
+    {
+      "id": "ap05_fator_r_periodo",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.7413
+        ],
+        [
+          "9c3abc476e",
+          0.7546
+        ],
+        [
+          "8d4398a7d9",
+          0.8281
+        ],
+        [
+          "ac91457196",
+          0.7167
+        ],
+        [
+          "96d12fe9a0",
+          0.7425
+        ],
+        [
+          "e3127bcc3f",
+          0.7715
+        ],
+        [
+          "6b9499c42e",
+          0.7228
+        ],
+        [
+          "e3127bcc3f",
+          0.8143
+        ],
+        [
+          "e3127bcc3f",
+          0.7836
+        ],
+        [
+          "e3127bcc3f",
+          0.5867
+        ],
+        [
+          "5db17564d0",
+          0.7446
+        ],
+        [
+          "e3127bcc3f",
+          0.7484
+        ],
+        [
+          "ac91457196",
+          0.7484
+        ],
+        [
+          "e3127bcc3f",
+          0.7372
+        ],
+        [
+          "b5964c1de6",
+          0.736
+        ],
+        [
+          "f2a085e9bc",
+          0.527
+        ],
+        [
+          "b275bb7267",
+          0.7626
+        ],
+        [
+          "5db17564d0",
+          0.6359
+        ],
+        [
+          "7b66db4e5a",
+          0.6417
+        ],
+        [
+          "e3127bcc3f",
+          0.6852
+        ]
+      ]
+    },
+    {
+      "id": "ap06_simples_icms_iss_no_das",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "1bc651a142",
+          0.6895
+        ],
+        [
+          "1bc651a142",
+          0.6916
+        ],
+        [
+          "6c3204d122",
+          0.6943
+        ],
+        [
+          "f55d30dc9f",
+          0.6852
+        ],
+        [
+          "f55d30dc9f",
+          0.6897
+        ],
+        [
+          "7b66db4e5a",
+          0.6759
+        ],
+        [
+          "7b66db4e5a",
+          0.6496
+        ],
+        [
+          "8d4398a7d9",
+          0.6971
+        ],
+        [
+          "7b66db4e5a",
+          0.6742
+        ],
+        [
+          "8d4398a7d9",
+          0.7066
+        ],
+        [
+          "7b66db4e5a",
+          0.6397
+        ],
+        [
+          "80f8328a90",
+          0.6926
+        ],
+        [
+          "c7faf32d5e",
+          0.7316
+        ],
+        [
+          "8d4398a7d9",
+          0.7062
+        ],
+        [
+          "7b66db4e5a",
+          0.6515
+        ],
+        [
+          "7b66db4e5a",
+          0.7423
+        ],
+        [
+          "8d4398a7d9",
+          0.5978
+        ],
+        [
+          "7b66db4e5a",
+          0.6909
+        ],
+        [
+          "8d4398a7d9",
+          0.6621
+        ],
+        [
+          "e50c56517a",
+          0.6976
+        ]
+      ]
+    },
+    {
+      "id": "ap07_defis_confissao",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "f2d9261fe1",
+          0.6843
+        ],
+        [
+          "f2d9261fe1",
+          0.685
+        ],
+        [
+          "dec000615e",
+          0.7223
+        ],
+        [
+          "dec000615e",
+          0.7123
+        ],
+        [
+          "d71663a0cd",
+          0.6658
+        ],
+        [
+          "7b66db4e5a",
+          0.6402
+        ],
+        [
+          "9c3abc476e",
+          0.6278
+        ],
+        [
+          "dec000615e",
+          0.6059
+        ],
+        [
+          "8d4398a7d9",
+          0.5661
+        ],
+        [
+          "dec000615e",
+          0.6258
+        ],
+        [
+          "dec000615e",
+          0.6095
+        ],
+        [
+          "315c6fbd66",
+          0.5356
+        ],
+        [
+          "dec000615e",
+          0.689
+        ],
+        [
+          "9c3abc476e",
+          0.7154
+        ],
+        [
+          "dec000615e",
+          0.6798
+        ],
+        [
+          "dec000615e",
+          0.6855
+        ],
+        [
+          "dec000615e",
+          0.6847
+        ],
+        [
+          "9c3abc476e",
+          0.6836
+        ],
+        [
+          "9c3abc476e",
+          0.7194
+        ],
+        [
+          "dec000615e",
+          0.6823
+        ]
+      ]
+    },
+    {
+      "id": "ap08_pgdas_maed",
+      "esperados": [
+        "7b66db4e5a"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.6067
+        ],
+        [
+          "dec000615e",
+          0.6067
+        ],
+        [
+          "dec000615e",
+          0.6024
+        ],
+        [
+          "216178af37",
+          0.6132
+        ],
+        [
+          "7b66db4e5a",
+          0.6887
+        ],
+        [
+          "8d4398a7d9",
+          0.6532
+        ],
+        [
+          "7b66db4e5a",
+          0.6252
+        ],
+        [
+          "7b66db4e5a",
+          0.6329
+        ],
+        [
+          "8d4398a7d9",
+          0.5071
+        ],
+        [
+          "7b66db4e5a",
+          0.5764
+        ],
+        [
+          "30272b7cf1",
+          0.6196
+        ],
+        [
+          "8d4398a7d9",
+          0.642
+        ],
+        [
+          "7b66db4e5a",
+          0.6094
+        ],
+        [
+          "83984a6923",
+          0.524
+        ],
+        [
+          "7b66db4e5a",
+          0.6659
+        ],
+        [
+          "30272b7cf1",
+          0.5454
+        ],
+        [
+          "7b66db4e5a",
+          0.608
+        ],
+        [
+          "7b66db4e5a",
+          0.6238
+        ],
+        [
+          "5287a71e67",
+          0.5076
+        ],
+        [
+          "7b66db4e5a",
+          0.6052
+        ]
+      ]
+    },
+    {
+      "id": "ap09_exclusao_sem_comunicacao",
+      "esperados": [
+        "9c3abc476e"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "0d1dfdd776",
+          0.8986
+        ],
+        [
+          "0d1dfdd776",
+          0.8993
+        ],
+        [
+          "9c3abc476e",
+          0.8822
+        ],
+        [
+          "dec000615e",
+          0.8883
+        ],
+        [
+          "dec000615e",
+          0.8842
+        ],
+        [
+          "20285f142d",
+          0.8537
+        ],
+        [
+          "a0e3d73626",
+          0.8963
+        ],
+        [
+          "a0e3d73626",
+          0.887
+        ],
+        [
+          "dec000615e",
+          0.8367
+        ],
+        [
+          "dec000615e",
+          0.8383
+        ],
+        [
+          "9c3abc476e",
+          0.833
+        ],
+        [
+          "dec000615e",
+          0.8205
+        ],
+        [
+          "dec000615e",
+          0.8253
+        ],
+        [
+          "dec000615e",
+          0.8248
+        ],
+        [
+          "8d4398a7d9",
+          0.753
+        ],
+        [
+          "9c3abc476e",
+          0.8173
+        ],
+        [
+          "dec000615e",
+          0.8207
+        ],
+        [
+          "8d4398a7d9",
+          0.8221
+        ],
+        [
+          "7dbb5256a4",
+          0.8451
+        ],
+        [
+          "8d4398a7d9",
+          0.7381
+        ]
+      ]
+    },
+    {
+      "id": "ap10_exclusao_de_oficio",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "a0e3d73626",
+          0.7578
+        ],
+        [
+          "a0e3d73626",
+          0.7568
+        ],
+        [
+          "dec000615e",
+          0.7993
+        ],
+        [
+          "dec000615e",
+          0.7991
+        ],
+        [
+          "a0e3d73626",
+          0.8126
+        ],
+        [
+          "a0e3d73626",
+          0.8056
+        ],
+        [
+          "8d4398a7d9",
+          0.8105
+        ],
+        [
+          "8d4398a7d9",
+          0.7773
+        ],
+        [
+          "a0e3d73626",
+          0.823
+        ],
+        [
+          "a0e3d73626",
+          0.8164
+        ],
+        [
+          "c97a9e19e6",
+          0.8049
+        ],
+        [
+          "a0e3d73626",
+          0.8172
+        ],
+        [
+          "dec000615e",
+          0.8011
+        ],
+        [
+          "c97a9e19e6",
+          0.8257
+        ],
+        [
+          "d71663a0cd",
+          0.7859
+        ],
+        [
+          "dec000615e",
+          0.8129
+        ],
+        [
+          "d71663a0cd",
+          0.8257
+        ],
+        [
+          "d71663a0cd",
+          0.8068
+        ],
+        [
+          "a28a4b7f84",
+          0.7383
+        ],
+        [
+          "f045cb66ae",
+          0.8468
+        ]
+      ]
+    },
+    {
+      "id": "mei01_limite_inicio_atividade",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "44dfbab041",
+          0.6249
+        ],
+        [
+          "44dfbab041",
+          0.5942
+        ],
+        [
+          "44dfbab041",
+          0.5974
+        ],
+        [
+          "44dfbab041",
+          0.5442
+        ],
+        [
+          "9bf7b52dae",
+          0.5736
+        ],
+        [
+          "324686735a",
+          0.6229
+        ],
+        [
+          "914f11ba7a",
+          0.6415
+        ],
+        [
+          "8d4398a7d9",
+          0.6521
+        ],
+        [
+          "914f11ba7a",
+          0.6475
+        ],
+        [
+          "e94ee4636c",
+          0.6015
+        ],
+        [
+          "324686735a",
+          0.5908
+        ],
+        [
+          "44dfbab041",
+          0.5124
+        ],
+        [
+          "44dfbab041",
+          0.6231
+        ],
+        [
+          "f9ceafb5d0",
+          0.6076
+        ],
+        [
+          "9c3abc476e",
+          0.6348
+        ],
+        [
+          "335b0fd853",
+          0.6015
+        ],
+        [
+          "87c14a9eb7",
+          0.6344
+        ],
+        [
+          "dec000615e",
+          0.6318
+        ],
+        [
+          "d71663a0cd",
+          0.6118
+        ],
+        [
+          "335b0fd853",
+          0.6076
+        ]
+      ]
+    },
+    {
+      "id": "mei02_vedacoes_opcao",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "d71663a0cd",
+          0.6576
+        ],
+        [
+          "d71663a0cd",
+          0.657
+        ],
+        [
+          "914f11ba7a",
+          0.667
+        ],
+        [
+          "914f11ba7a",
+          0.6654
+        ],
+        [
+          "914f11ba7a",
+          0.6628
+        ],
+        [
+          "dec000615e",
+          0.654
+        ],
+        [
+          "dec000615e",
+          0.6529
+        ],
+        [
+          "d71663a0cd",
+          0.6478
+        ],
+        [
+          "d71663a0cd",
+          0.6122
+        ],
+        [
+          "9c3abc476e",
+          0.6467
+        ],
+        [
+          "d71663a0cd",
+          0.655
+        ],
+        [
+          "d71663a0cd",
+          0.6222
+        ],
+        [
+          "914f11ba7a",
+          0.6422
+        ],
+        [
+          "d71663a0cd",
+          0.63
+        ],
+        [
+          "d71663a0cd",
+          0.636
+        ],
+        [
+          "d71663a0cd",
+          0.6272
+        ],
+        [
+          "d71663a0cd",
+          0.6386
+        ],
+        [
+          "d71663a0cd",
+          0.6416
+        ],
+        [
+          "914f11ba7a",
+          0.64
+        ],
+        [
+          "d71663a0cd",
+          0.6336
+        ]
+      ]
+    },
+    {
+      "id": "mei03_empregado",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "dec000615e",
+          0.6728
+        ],
+        [
+          "914f11ba7a",
+          0.6738
+        ],
+        [
+          "dec000615e",
+          0.6399
+        ],
+        [
+          "9c3abc476e",
+          0.6381
+        ],
+        [
+          "9c3abc476e",
+          0.622
+        ],
+        [
+          "914f11ba7a",
+          0.6527
+        ],
+        [
+          "dec000615e",
+          0.6669
+        ],
+        [
+          "9c3abc476e",
+          0.6059
+        ],
+        [
+          "dec000615e",
+          0.5987
+        ],
+        [
+          "dec000615e",
+          0.6172
+        ],
+        [
+          "9c3abc476e",
+          0.6537
+        ],
+        [
+          "9c3abc476e",
+          0.6415
+        ],
+        [
+          "dec000615e",
+          0.6445
+        ],
+        [
+          "44dfbab041",
+          0.662
+        ],
+        [
+          "44dfbab041",
+          0.6193
+        ],
+        [
+          "0d5e582e2e",
+          0.6305
+        ],
+        [
+          "03bdcae23f",
+          0.5938
+        ],
+        [
+          "170ed5103c",
+          0.6733
+        ],
+        [
+          "170ed5103c",
+          0.6128
+        ],
+        [
+          "44dfbab041",
+          0.6645
+        ]
+      ]
+    },
+    {
+      "id": "mei04_ocupacoes_quantidade",
+      "esperados": [
+        "c60a2972ca"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "44dfbab041",
+          0.6871
+        ],
+        [
+          "c60a2972ca",
+          0.7312
+        ],
+        [
+          "44dfbab041",
+          0.6502
+        ],
+        [
+          "273ed7b3ea",
+          0.6305
+        ],
+        [
+          "273ed7b3ea",
+          0.5586
+        ],
+        [
+          "44dfbab041",
+          0.6365
+        ],
+        [
+          "44dfbab041",
+          0.6399
+        ],
+        [
+          "81cc5f534e",
+          0.6427
+        ],
+        [
+          "188fac4722",
+          0.5238
+        ],
+        [
+          "188fac4722",
+          0.5219
+        ],
+        [
+          "324686735a",
+          0.5597
+        ],
+        [
+          "dec000615e",
+          0.5745
+        ],
+        [
+          "9c3abc476e",
+          0.655
+        ],
+        [
+          "9c3abc476e",
+          0.6536
+        ],
+        [
+          "44dfbab041",
+          0.5998
+        ],
+        [
+          "9c3abc476e",
+          0.6488
+        ],
+        [
+          "9c3abc476e",
+          0.6616
+        ],
+        [
+          "9c3abc476e",
+          0.6713
+        ],
+        [
+          "9c3abc476e",
+          0.6602
+        ],
+        [
+          "188fac4722",
+          0.6466
+        ]
+      ]
+    },
+    {
+      "id": "mei05_dasn_extincao",
+      "esperados": [
+        "30272b7cf1"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "6508d2e981",
+          0.7212
+        ],
+        [
+          "9c3abc476e",
+          0.7597
+        ],
+        [
+          "6508d2e981",
+          0.7235
+        ],
+        [
+          "9c3abc476e",
+          0.7429
+        ],
+        [
+          "9c3abc476e",
+          0.7468
+        ],
+        [
+          "9c3abc476e",
+          0.7485
+        ],
+        [
+          "9c3abc476e",
+          0.7008
+        ],
+        [
+          "9c3abc476e",
+          0.6944
+        ],
+        [
+          "9c3abc476e",
+          0.6933
+        ],
+        [
+          "9c3abc476e",
+          0.6956
+        ],
+        [
+          "30272b7cf1",
+          0.8062
+        ],
+        [
+          "44dfbab041",
+          0.763
+        ],
+        [
+          "30272b7cf1",
+          0.8269
+        ],
+        [
+          "914f11ba7a",
+          0.6789
+        ],
+        [
+          "324686735a",
+          0.6645
+        ],
+        [
+          "914f11ba7a",
+          0.6796
+        ],
+        [
+          "30272b7cf1",
+          0.7161
+        ],
+        [
+          "324686735a",
+          0.7599
+        ],
+        [
+          "30272b7cf1",
+          0.7576
+        ],
+        [
+          "42eb22d307",
+          0.7311
+        ]
+      ]
+    },
+    {
+      "id": "mei06_valor_mes_da_baixa",
+      "esperados": [
+        "9bf7b52dae"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9bf7b52dae",
+          0.506
+        ],
+        [
+          "44dfbab041",
+          0.574
+        ],
+        [
+          "44dfbab041",
+          0.5492
+        ],
+        [
+          "188fac4722",
+          0.5126
+        ],
+        [
+          "188fac4722",
+          0.5336
+        ],
+        [
+          "81e7827826",
+          0.5226
+        ],
+        [
+          "44dfbab041",
+          0.5158
+        ],
+        [
+          "44dfbab041",
+          0.501
+        ],
+        [
+          "44dfbab041",
+          0.5012
+        ],
+        [
+          "a20621639b",
+          0.5069
+        ]
+      ]
+    },
+    {
+      "id": "mei07_beneficios_formalizacao",
+      "esperados": [
+        "7fd56d4b01"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "7fd56d4b01",
+          0.7505
+        ],
+        [
+          "44dfbab041",
+          0.7254
+        ],
+        [
+          "44dfbab041",
+          0.7552
+        ],
+        [
+          "44dfbab041",
+          0.6882
+        ],
+        [
+          "44dfbab041",
+          0.7034
+        ],
+        [
+          "44dfbab041",
+          0.7064
+        ],
+        [
+          "44dfbab041",
+          0.5825
+        ],
+        [
+          "44dfbab041",
+          0.6975
+        ],
+        [
+          "44dfbab041",
+          0.6904
+        ],
+        [
+          "44dfbab041",
+          0.6563
+        ],
+        [
+          "44dfbab041",
+          0.5973
+        ],
+        [
+          "44dfbab041",
+          0.6523
+        ],
+        [
+          "44dfbab041",
+          0.6334
+        ],
+        [
+          "44dfbab041",
+          0.6649
+        ],
+        [
+          "44dfbab041",
+          0.5843
+        ],
+        [
+          "906d08674c",
+          0.6152
+        ],
+        [
+          "9bf7b52dae",
+          0.554
+        ],
+        [
+          "188fac4722",
+          0.6199
+        ],
+        [
+          "161366af2d",
+          0.6522
+        ],
+        [
+          "44dfbab041",
+          0.6264
+        ]
+      ]
+    },
+    {
+      "id": "mei08_restituicao_inss_beneficio",
+      "esperados": [
+        "324686735a"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "324686735a",
+          0.7259
+        ],
+        [
+          "44dfbab041",
+          0.6279
+        ],
+        [
+          "324686735a",
+          0.5953
+        ],
+        [
+          "44dfbab041",
+          0.5784
+        ],
+        [
+          "324686735a",
+          0.5903
+        ],
+        [
+          "7be8a9ec3d",
+          0.6618
+        ],
+        [
+          "7be8a9ec3d",
+          0.6427
+        ],
+        [
+          "5998f8b6f1",
+          0.6928
+        ],
+        [
+          "5998f8b6f1",
+          0.6409
+        ],
+        [
+          "1bd2775163",
+          0.6756
+        ],
+        [
+          "c71e2eb819",
+          0.6686
+        ],
+        [
+          "bc98a6cba6",
+          0.5795
+        ],
+        [
+          "2bd5eac03b",
+          0.673
+        ],
+        [
+          "bc98a6cba6",
+          0.5257
+        ],
+        [
+          "d069cd6d42",
+          0.6
+        ],
+        [
+          "d069cd6d42",
+          0.5856
+        ],
+        [
+          "44dfbab041",
+          0.6612
+        ],
+        [
+          "9bf7b52dae",
+          0.6574
+        ],
+        [
+          "44dfbab041",
+          0.571
+        ],
+        [
+          "315c6fbd66",
+          0.6391
+        ]
+      ]
+    },
+    {
+      "id": "jur01_carf_mei_cnae",
+      "esperados": [
+        "929f513a61"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "273ed7b3ea",
+          0.544
+        ],
+        [
+          "44dfbab041",
+          0.508
+        ],
+        [
+          "81cc5f534e",
+          0.5301
+        ],
+        [
+          "399a8a740a",
+          0.5741
+        ],
+        [
+          "6741da2288",
+          0.5728
+        ],
+        [
+          "a6d052e50e",
+          0.5004
+        ],
+        [
+          "9c3abc476e",
+          0.5741
+        ],
+        [
+          "399a8a740a",
+          0.5903
+        ],
+        [
+          "9c3abc476e",
+          0.6112
+        ],
+        [
+          "399a8a740a",
+          0.5197
+        ],
+        [
+          "a6d052e50e",
+          0.5036
+        ],
+        [
+          "9c3abc476e",
+          0.5807
+        ],
+        [
+          "9c3abc476e",
+          0.6509
+        ],
+        [
+          "c60a2972ca",
+          0.5998
+        ],
+        [
+          "9c3abc476e",
+          0.5758
+        ],
+        [
+          "9c3abc476e",
+          0.6281
+        ],
+        [
+          "9c3abc476e",
+          0.5985
+        ],
+        [
+          "3d468e6a8f",
+          0.6209
+        ],
+        [
+          "9c3abc476e",
+          0.6234
+        ],
+        [
+          "75de9d95a6",
+          0.5262
+        ]
+      ]
+    },
+    {
+      "id": "jur02_carf_stf_art17v",
+      "esperados": [
+        "6888da5610"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "d71663a0cd",
+          0.4197
+        ],
+        [
+          "d71663a0cd",
+          0.4082
+        ],
+        [
+          "d71663a0cd",
+          0.5673
+        ],
+        [
+          "d71663a0cd",
+          0.5561
+        ],
+        [
+          "8becfc1be8",
+          0.5091
+        ],
+        [
+          "55e9e45497",
+          0.6399
+        ],
+        [
+          "338ebc33f0",
+          0.6185
+        ],
+        [
+          "338ebc33f0",
+          0.5734
+        ],
+        [
+          "719b447883",
+          0.5821
+        ],
+        [
+          "3a14208c57",
+          0.5926
+        ],
+        [
+          "3a14208c57",
+          0.5755
+        ],
+        [
+          "3a14208c57",
+          0.5698
+        ],
+        [
+          "3a14208c57",
+          0.5881
+        ],
+        [
+          "e50c56517a",
+          0.5689
+        ],
+        [
+          "3a14208c57",
+          0.5913
+        ],
+        [
+          "7d392c0fba",
+          0.5425
+        ],
+        [
+          "3a14208c57",
+          0.5852
+        ],
+        [
+          "3a14208c57",
+          0.5768
+        ],
+        [
+          "3a14208c57",
+          0.5799
+        ],
+        [
+          "fd98650492",
+          0.5833
+        ]
+      ]
+    },
+    {
+      "id": "jur03_carf_debitos_simples_federal",
+      "esperados": [
+        "9e0c2f0adf"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.6273
+        ],
+        [
+          "dec000615e",
+          0.6825
+        ],
+        [
+          "02024cf0cb",
+          0.6578
+        ],
+        [
+          "dec000615e",
+          0.5696
+        ],
+        [
+          "52bc10d5d7",
+          0.6754
+        ],
+        [
+          "4976d5ec49",
+          0.7416
+        ],
+        [
+          "cca5eb93b4",
+          0.7166
+        ],
+        [
+          "4976d5ec49",
+          0.7226
+        ],
+        [
+          "b3ccbce000",
+          0.6873
+        ],
+        [
+          "8d4398a7d9",
+          0.7181
+        ],
+        [
+          "8d4398a7d9",
+          0.716
+        ],
+        [
+          "48afc9af1e",
+          0.7098
+        ],
+        [
+          "8becfc1be8",
+          0.7134
+        ],
+        [
+          "b3ccbce000",
+          0.6853
+        ],
+        [
+          "ea94df641a",
+          0.5114
+        ],
+        [
+          "6f7d10050c",
+          0.5647
+        ],
+        [
+          "6f7d10050c",
+          0.5661
+        ],
+        [
+          "48afc9af1e",
+          0.7294
+        ],
+        [
+          "dec000615e",
+          0.7409
+        ],
+        [
+          "63726d3e11",
+          0.7108
+        ]
+      ]
+    },
+    {
+      "id": "iss01_relacao_emprego",
+      "esperados": [
+        "1e21025194"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.5497
+        ],
+        [
+          "39235835ae",
+          0.5446
+        ],
+        [
+          "7be8a9ec3d",
+          0.5832
+        ],
+        [
+          "7be8a9ec3d",
+          0.5508
+        ],
+        [
+          "7be8a9ec3d",
+          0.5327
+        ],
+        [
+          "9f965da5ec",
+          0.5255
+        ],
+        [
+          "7be8a9ec3d",
+          0.5278
+        ],
+        [
+          "7be8a9ec3d",
+          0.553
+        ],
+        [
+          "89a37f0a09",
+          0.5266
+        ],
+        [
+          "89a37f0a09",
+          0.5387
+        ],
+        [
+          "9f965da5ec",
+          0.5217
+        ],
+        [
+          "906d08674c",
+          0.5245
+        ],
+        [
+          "89a37f0a09",
+          0.5513
+        ],
+        [
+          "7be8a9ec3d",
+          0.5166
+        ],
+        [
+          "0ac75e297f",
+          0.5412
+        ],
+        [
+          "89a37f0a09",
+          0.5394
+        ],
+        [
+          "7be8a9ec3d",
+          0.5198
+        ],
+        [
+          "906d08674c",
+          0.5173
+        ],
+        [
+          "bff4ccc847",
+          0.5185
+        ],
+        [
+          "7be8a9ec3d",
+          0.5401
+        ]
+      ]
+    },
+    {
+      "id": "iss02_responsavel_sem_retencao",
+      "esperados": [
+        "1e21025194"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.7404
+        ],
+        [
+          "5ac23ac3b6",
+          0.7491
+        ],
+        [
+          "5ac23ac3b6",
+          0.6673
+        ],
+        [
+          "db40e91463",
+          0.6989
+        ],
+        [
+          "e9d484450a",
+          0.6657
+        ],
+        [
+          "5ac23ac3b6",
+          0.6959
+        ],
+        [
+          "99eda70cb9",
+          0.6613
+        ],
+        [
+          "16703deaf0",
+          0.6767
+        ],
+        [
+          "d23c315ee3",
+          0.6606
+        ],
+        [
+          "8cf1f8b99b",
+          0.6772
+        ],
+        [
+          "7b620f8526",
+          0.6604
+        ],
+        [
+          "11805e6b73",
+          0.721
+        ],
+        [
+          "db40e91463",
+          0.7032
+        ],
+        [
+          "39235835ae",
+          0.6865
+        ],
+        [
+          "39235835ae",
+          0.6686
+        ],
+        [
+          "db40e91463",
+          0.6507
+        ],
+        [
+          "39235835ae",
+          0.6839
+        ],
+        [
+          "df992d2476",
+          0.6841
+        ],
+        [
+          "db40e91463",
+          0.6789
+        ],
+        [
+          "99eda70cb9",
+          0.6768
+        ]
+      ]
+    },
+    {
+      "id": "iss03_df_hotel_aliquota",
+      "esperados": [
+        "39235835ae"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.6632
+        ],
+        [
+          "aba72d669b",
+          0.6128
+        ],
+        [
+          "2ea4c98fd1",
+          0.7586
+        ],
+        [
+          "2ea4c98fd1",
+          0.6934
+        ],
+        [
+          "2ea4c98fd1",
+          0.645
+        ],
+        [
+          "2ea4c98fd1",
+          0.6796
+        ],
+        [
+          "2ea4c98fd1",
+          0.5996
+        ],
+        [
+          "2ea4c98fd1",
+          0.6262
+        ],
+        [
+          "2ea4c98fd1",
+          0.6556
+        ],
+        [
+          "db40e91463",
+          0.5735
+        ],
+        [
+          "2ea4c98fd1",
+          0.6167
+        ],
+        [
+          "39235835ae",
+          0.6474
+        ],
+        [
+          "0d2442a36e",
+          0.5609
+        ],
+        [
+          "36223afea4",
+          0.6343
+        ],
+        [
+          "db40e91463",
+          0.5049
+        ],
+        [
+          "2a4068aa24",
+          0.5837
+        ],
+        [
+          "dd5f90b033",
+          0.5907
+        ],
+        [
+          "a12e7db51b",
+          0.5996
+        ],
+        [
+          "236ae8a37d",
+          0.584
+        ],
+        [
+          "39235835ae",
+          0.5878
+        ]
+      ]
+    },
+    {
+      "id": "iss04_df_vencimento_retido",
+      "esperados": [
+        "804f4255b4"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "0ac75e297f",
+          0.5872
+        ],
+        [
+          "39235835ae",
+          0.5803
+        ],
+        [
+          "0ac75e297f",
+          0.5826
+        ],
+        [
+          "39235835ae",
+          0.5895
+        ],
+        [
+          "0ac75e297f",
+          0.5843
+        ],
+        [
+          "db40e91463",
+          0.6105
+        ],
+        [
+          "39235835ae",
+          0.5742
+        ],
+        [
+          "db40e91463",
+          0.5882
+        ],
+        [
+          "db40e91463",
+          0.5581
+        ],
+        [
+          "8ffcf3a7e0",
+          0.573
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5706
+        ],
+        [
+          "db40e91463",
+          0.5007
+        ],
+        [
+          "db40e91463",
+          0.5653
+        ],
+        [
+          "39235835ae",
+          0.5757
+        ],
+        [
+          "99eda70cb9",
+          0.5726
+        ],
+        [
+          "7b620f8526",
+          0.5708
+        ],
+        [
+          "d23c315ee3",
+          0.5329
+        ],
+        [
+          "db40e91463",
+          0.5992
+        ],
+        [
+          "db40e91463",
+          0.5965
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6084
+        ]
+      ]
+    },
+    {
+      "id": "iss05_df_tomador_pf_nfse",
+      "esperados": [
+        "0ac75e297f"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "0ac75e297f",
+          0.6119
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6547
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6577
+        ],
+        [
+          "55982349e8",
+          0.566
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6173
+        ],
+        [
+          "55982349e8",
+          0.5685
+        ],
+        [
+          "0ac75e297f",
+          0.566
+        ],
+        [
+          "3768951195",
+          0.6188
+        ],
+        [
+          "9c3abc476e",
+          0.5327
+        ],
+        [
+          "0ac75e297f",
+          0.5126
+        ],
+        [
+          "55982349e8",
+          0.5686
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5374
+        ],
+        [
+          "9c3abc476e",
+          0.6013
+        ],
+        [
+          "1c43149333",
+          0.5839
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5578
+        ],
+        [
+          "db40e91463",
+          0.5536
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5118
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5642
+        ],
+        [
+          "db40e91463",
+          0.5559
+        ],
+        [
+          "0ac75e297f",
+          0.5185
+        ]
+      ]
+    },
+    {
+      "id": "icms01_importacao_pf",
+      "esperados": [
+        "010f7c42ad"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "a33da7b26d",
+          0.6493
+        ],
+        [
+          "a613e7b644",
+          0.6619
+        ],
+        [
+          "010f7c42ad",
+          0.502
+        ],
+        [
+          "06c0c21656",
+          0.6188
+        ],
+        [
+          "bebc06b195",
+          0.6709
+        ],
+        [
+          "0c4cb77bc1",
+          0.6308
+        ],
+        [
+          "0c4cb77bc1",
+          0.6807
+        ],
+        [
+          "1974252cdc",
+          0.6599
+        ],
+        [
+          "9df11d6985",
+          0.6168
+        ],
+        [
+          "881d111040",
+          0.6304
+        ],
+        [
+          "96da8d2497",
+          0.6465
+        ],
+        [
+          "83085b057d",
+          0.6021
+        ],
+        [
+          "ba47ff96cf",
+          0.6408
+        ],
+        [
+          "0636b3829e",
+          0.5769
+        ],
+        [
+          "d3453cad60",
+          0.6446
+        ],
+        [
+          "0c4cb77bc1",
+          0.7043
+        ],
+        [
+          "c2ff3ad105",
+          0.6677
+        ],
+        [
+          "9693e1e773",
+          0.5646
+        ],
+        [
+          "1974252cdc",
+          0.6583
+        ],
+        [
+          "3c80d2946a",
+          0.5814
+        ]
+      ]
+    },
+    {
+      "id": "icms02_credito_veiculo_pessoal",
+      "esperados": [
+        "010f7c42ad"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "dec000615e",
+          0.5778
+        ],
+        [
+          "f2d9261fe1",
+          0.5514
+        ],
+        [
+          "010f7c42ad",
+          0.6119
+        ],
+        [
+          "241efc649e",
+          0.6443
+        ],
+        [
+          "2f7b89068e",
+          0.6125
+        ],
+        [
+          "241efc649e",
+          0.645
+        ],
+        [
+          "241efc649e",
+          0.6539
+        ],
+        [
+          "3ae152063f",
+          0.5245
+        ],
+        [
+          "c11b304330",
+          0.6567
+        ],
+        [
+          "d8df44ac60",
+          0.666
+        ],
+        [
+          "2637acc005",
+          0.5445
+        ],
+        [
+          "a8cf24c005",
+          0.6867
+        ],
+        [
+          "7e387f9a93",
+          0.6605
+        ],
+        [
+          "241efc649e",
+          0.6602
+        ],
+        [
+          "7e387f9a93",
+          0.6726
+        ],
+        [
+          "5c370b3d50",
+          0.6889
+        ],
+        [
+          "241efc649e",
+          0.6742
+        ],
+        [
+          "4ee4501205",
+          0.5304
+        ],
+        [
+          "241efc649e",
+          0.6871
+        ],
+        [
+          "d8df44ac60",
+          0.6902
+        ]
+      ]
+    },
+    {
+      "id": "icms03_restaurante",
+      "esperados": [
+        "010f7c42ad"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "be317ce947",
+          0.7004
+        ],
+        [
+          "d19c88a4dc",
+          0.7385
+        ],
+        [
+          "d19c88a4dc",
+          0.5932
+        ],
+        [
+          "b0daf3dd95",
+          0.7018
+        ],
+        [
+          "d19c88a4dc",
+          0.7128
+        ],
+        [
+          "e64c360de5",
+          0.6728
+        ],
+        [
+          "b0daf3dd95",
+          0.74
+        ],
+        [
+          "7686b2cbba",
+          0.6063
+        ],
+        [
+          "d19c88a4dc",
+          0.6684
+        ],
+        [
+          "5bc7814653",
+          0.7293
+        ],
+        [
+          "6d9cd640b9",
+          0.501
+        ],
+        [
+          "6207f6accf",
+          0.7139
+        ],
+        [
+          "a4e328ec67",
+          0.7309
+        ],
+        [
+          "d19c88a4dc",
+          0.6972
+        ],
+        [
+          "214d7f58e6",
+          0.6903
+        ],
+        [
+          "e64c360de5",
+          0.667
+        ],
+        [
+          "e64c360de5",
+          0.6919
+        ],
+        [
+          "b0daf3dd95",
+          0.7022
+        ],
+        [
+          "e64c360de5",
+          0.67
+        ],
+        [
+          "7686b2cbba",
+          0.6272
+        ]
+      ]
+    },
+    {
+      "id": "icms04_nfe_substitui",
+      "esperados": [
+        "7ad468bb99"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.6941
+        ],
+        [
+          "257f8d5dea",
+          0.6367
+        ],
+        [
+          "e7bbb16ad5",
+          0.6163
+        ],
+        [
+          "39235835ae",
+          0.6371
+        ],
+        [
+          "dec000615e",
+          0.6995
+        ],
+        [
+          "7ad468bb99",
+          0.7084
+        ],
+        [
+          "9df11d6985",
+          0.6806
+        ],
+        [
+          "064ea90c6c",
+          0.6847
+        ],
+        [
+          "b84506f2df",
+          0.6728
+        ],
+        [
+          "0c4cb77bc1",
+          0.7133
+        ],
+        [
+          "b84506f2df",
+          0.7864
+        ],
+        [
+          "b84506f2df",
+          0.7454
+        ],
+        [
+          "b667bce696",
+          0.7433
+        ],
+        [
+          "1974252cdc",
+          0.6474
+        ],
+        [
+          "dec000615e",
+          0.6973
+        ],
+        [
+          "34477a9d43",
+          0.6752
+        ],
+        [
+          "b667bce696",
+          0.6851
+        ],
+        [
+          "588e697497",
+          0.6345
+        ],
+        [
+          "c404ceab91",
+          0.6838
+        ],
+        [
+          "bb03e1b123",
+          0.7364
+        ]
+      ]
+    },
+    {
+      "id": "icms05_df_energia_residencial",
+      "esperados": [
+        "c73cd99fd1"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "c73cd99fd1",
+          0.755
+        ],
+        [
+          "7430984975",
+          0.7119
+        ],
+        [
+          "7e4455ea78",
+          0.6767
+        ],
+        [
+          "c2de537562",
+          0.765
+        ],
+        [
+          "c2de537562",
+          0.6934
+        ],
+        [
+          "c2de537562",
+          0.7088
+        ],
+        [
+          "d763af624f",
+          0.6905
+        ],
+        [
+          "582685e052",
+          0.6277
+        ],
+        [
+          "445f632acd",
+          0.6213
+        ],
+        [
+          "7e4455ea78",
+          0.6302
+        ],
+        [
+          "c2de537562",
+          0.6549
+        ],
+        [
+          "c2de537562",
+          0.6664
+        ],
+        [
+          "c2de537562",
+          0.7072
+        ],
+        [
+          "445f632acd",
+          0.6075
+        ],
+        [
+          "c2de537562",
+          0.7326
+        ],
+        [
+          "d763af624f",
+          0.5764
+        ],
+        [
+          "445f632acd",
+          0.5542
+        ],
+        [
+          "c2de537562",
+          0.6782
+        ],
+        [
+          "d763af624f",
+          0.5718
+        ],
+        [
+          "7e4455ea78",
+          0.6094
+        ]
+      ]
+    },
+    {
+      "id": "lp01_presuncao_combustivel",
+      "esperados": [
+        "6534b72296"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.6624
+        ],
+        [
+          "1846bb7f94",
+          0.6464
+        ],
+        [
+          "e1eac0804e",
+          0.6604
+        ],
+        [
+          "8853a09a3c",
+          0.67
+        ],
+        [
+          "e9d484450a",
+          0.6501
+        ],
+        [
+          "52487b5926",
+          0.6227
+        ],
+        [
+          "74b712b843",
+          0.5083
+        ],
+        [
+          "4c423d4ba9",
+          0.6426
+        ],
+        [
+          "1846bb7f94",
+          0.645
+        ],
+        [
+          "1c80a1c332",
+          0.6241
+        ],
+        [
+          "7bee731c66",
+          0.6146
+        ],
+        [
+          "7bee731c66",
+          0.6105
+        ],
+        [
+          "c7add3fd0c",
+          0.5785
+        ],
+        [
+          "d3790a0599",
+          0.5871
+        ],
+        [
+          "345e2c465f",
+          0.6481
+        ],
+        [
+          "e0b5044dfa",
+          0.626
+        ],
+        [
+          "0767f8d12c",
+          0.6523
+        ],
+        [
+          "c7add3fd0c",
+          0.6225
+        ],
+        [
+          "fbf12eb737",
+          0.6251
+        ],
+        [
+          "d3790a0599",
+          0.5301
+        ]
+      ]
+    },
+    {
+      "id": "lp02_csll_comercio",
+      "esperados": [
+        "6534b72296"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.7797
+        ],
+        [
+          "8149449cbf",
+          0.5812
+        ],
+        [
+          "8149449cbf",
+          0.7606
+        ],
+        [
+          "a30b367203",
+          0.5962
+        ],
+        [
+          "e1eac0804e",
+          0.7512
+        ],
+        [
+          "345e2c465f",
+          0.5989
+        ],
+        [
+          "1c80a1c332",
+          0.6356
+        ],
+        [
+          "5d1f90c299",
+          0.53
+        ],
+        [
+          "8149449cbf",
+          0.6099
+        ],
+        [
+          "a751195337",
+          0.6205
+        ],
+        [
+          "5d1f90c299",
+          0.5758
+        ],
+        [
+          "3885bf794e",
+          0.7305
+        ],
+        [
+          "a751195337",
+          0.6093
+        ],
+        [
+          "20a6d93d7f",
+          0.724
+        ],
+        [
+          "7bee731c66",
+          0.7419
+        ],
+        [
+          "6d554f485f",
+          0.7319
+        ],
+        [
+          "657a3abb51",
+          0.6553
+        ],
+        [
+          "34eafbbfa6",
+          0.7299
+        ],
+        [
+          "473203b19a",
+          0.7523
+        ],
+        [
+          "657a3abb51",
+          0.6576
+        ]
+      ]
+    },
+    {
+      "id": "lp03_lucro_arbitrado",
+      "esperados": [
+        "6534b72296"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "77654f855d",
+          0.8068
+        ],
+        [
+          "e0b5044dfa",
+          0.7916
+        ],
+        [
+          "77654f855d",
+          0.7999
+        ],
+        [
+          "77654f855d",
+          0.7868
+        ],
+        [
+          "77654f855d",
+          0.7976
+        ],
+        [
+          "77654f855d",
+          0.8253
+        ],
+        [
+          "77654f855d",
+          0.7938
+        ],
+        [
+          "77654f855d",
+          0.8111
+        ],
+        [
+          "77654f855d",
+          0.795
+        ],
+        [
+          "77654f855d",
+          0.7132
+        ],
+        [
+          "77654f855d",
+          0.7264
+        ],
+        [
+          "e0b5044dfa",
+          0.7724
+        ],
+        [
+          "77654f855d",
+          0.7137
+        ],
+        [
+          "e0b5044dfa",
+          0.7015
+        ],
+        [
+          "77654f855d",
+          0.7635
+        ],
+        [
+          "e0b5044dfa",
+          0.7784
+        ],
+        [
+          "e0b5044dfa",
+          0.804
+        ],
+        [
+          "e0b5044dfa",
+          0.7135
+        ],
+        [
+          "77654f855d",
+          0.706
+        ],
+        [
+          "e0b5044dfa",
+          0.7116
+        ]
+      ]
+    },
+    {
+      "id": "lp04_lucro_real_obrigatorio",
+      "esperados": [
+        "e9d484450a"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.5608
+        ],
+        [
+          "77654f855d",
+          0.611
+        ],
+        [
+          "77654f855d",
+          0.58
+        ],
+        [
+          "e0b5044dfa",
+          0.5198
+        ],
+        [
+          "77654f855d",
+          0.634
+        ],
+        [
+          "e0b5044dfa",
+          0.5454
+        ],
+        [
+          "77654f855d",
+          0.653
+        ],
+        [
+          "77654f855d",
+          0.6395
+        ],
+        [
+          "e9d484450a",
+          0.5811
+        ],
+        [
+          "1846bb7f94",
+          0.5964
+        ],
+        [
+          "18c6b5b343",
+          0.6073
+        ],
+        [
+          "835dab7d73",
+          0.5503
+        ],
+        [
+          "a13cdfdbc4",
+          0.5555
+        ],
+        [
+          "1be7d05e4c",
+          0.5981
+        ],
+        [
+          "18c6b5b343",
+          0.5468
+        ],
+        [
+          "ca1e79698f",
+          0.6096
+        ],
+        [
+          "74b712b843",
+          0.5258
+        ],
+        [
+          "ba9931fe05",
+          0.5615
+        ],
+        [
+          "a13cdfdbc4",
+          0.5898
+        ],
+        [
+          "e9d484450a",
+          0.5444
+        ]
+      ]
+    },
+    {
+      "id": "lp05_limite_proporcional",
+      "esperados": [
+        "e9d484450a"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "77654f855d",
+          0.7273
+        ],
+        [
+          "77654f855d",
+          0.7179
+        ],
+        [
+          "e0b5044dfa",
+          0.7111
+        ],
+        [
+          "a13cdfdbc4",
+          0.724
+        ],
+        [
+          "e9d484450a",
+          0.7063
+        ],
+        [
+          "ba9931fe05",
+          0.7278
+        ],
+        [
+          "3159e3712e",
+          0.692
+        ],
+        [
+          "e1e91114b1",
+          0.7075
+        ],
+        [
+          "e1e91114b1",
+          0.6441
+        ],
+        [
+          "886134a32c",
+          0.7442
+        ],
+        [
+          "8d4398a7d9",
+          0.5715
+        ],
+        [
+          "e0b5044dfa",
+          0.7115
+        ],
+        [
+          "ba9931fe05",
+          0.6611
+        ],
+        [
+          "a13cdfdbc4",
+          0.639
+        ],
+        [
+          "e1e91114b1",
+          0.6397
+        ],
+        [
+          "17f64788fa",
+          0.7031
+        ],
+        [
+          "a13cdfdbc4",
+          0.7114
+        ],
+        [
+          "17f64788fa",
+          0.5546
+        ],
+        [
+          "e1e91114b1",
+          0.6602
+        ],
+        [
+          "835dab7d73",
+          0.7056
+        ]
+      ]
+    },
+    {
+      "id": "lp06_irpj_quotas",
+      "esperados": [
+        "3a94bf5d71"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.7182
+        ],
+        [
+          "77654f855d",
+          0.6727
+        ],
+        [
+          "74b712b843",
+          0.5729
+        ],
+        [
+          "e0b5044dfa",
+          0.7078
+        ],
+        [
+          "74b712b843",
+          0.5502
+        ],
+        [
+          "92b5f9708f",
+          0.661
+        ],
+        [
+          "74b712b843",
+          0.6792
+        ],
+        [
+          "74b712b843",
+          0.5821
+        ],
+        [
+          "e9d484450a",
+          0.6479
+        ],
+        [
+          "e0b5044dfa",
+          0.6759
+        ],
+        [
+          "e9d484450a",
+          0.623
+        ],
+        [
+          "541e8b8b15",
+          0.5574
+        ],
+        [
+          "c5255910ca",
+          0.5886
+        ],
+        [
+          "3a94bf5d71",
+          0.6276
+        ],
+        [
+          "e0b5044dfa",
+          0.6254
+        ],
+        [
+          "74b712b843",
+          0.5485
+        ],
+        [
+          "e0b5044dfa",
+          0.6453
+        ],
+        [
+          "a32f797896",
+          0.5714
+        ],
+        [
+          "c5255910ca",
+          0.5425
+        ],
+        [
+          "886134a32c",
+          0.6249
+        ]
+      ]
+    },
+    {
+      "id": "ct01_acessoria_vira_principal",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "bff4ccc847",
+          0.6399
+        ],
+        [
+          "906d08674c",
+          0.7529
+        ],
+        [
+          "7be8a9ec3d",
+          0.749
+        ],
+        [
+          "fd0449ade0",
+          0.6397
+        ],
+        [
+          "0b55012c92",
+          0.6533
+        ],
+        [
+          "593c19d861",
+          0.6686
+        ],
+        [
+          "0b55012c92",
+          0.639
+        ],
+        [
+          "fd0449ade0",
+          0.664
+        ],
+        [
+          "593c19d861",
+          0.7152
+        ],
+        [
+          "593c19d861",
+          0.6391
+        ],
+        [
+          "0b55012c92",
+          0.6647
+        ],
+        [
+          "593c19d861",
+          0.6387
+        ],
+        [
+          "fd0449ade0",
+          0.6753
+        ],
+        [
+          "593c19d861",
+          0.664
+        ],
+        [
+          "593c19d861",
+          0.6533
+        ],
+        [
+          "e684da8f37",
+          0.5122
+        ],
+        [
+          "aba72d669b",
+          0.5559
+        ],
+        [
+          "e9d484450a",
+          0.6736
+        ],
+        [
+          "70d4510362",
+          0.5268
+        ],
+        [
+          "fc91749e07",
+          0.6446
+        ]
+      ]
+    },
+    {
+      "id": "ct02_guarda_livros",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.672
+        ],
+        [
+          "aba72d669b",
+          0.6985
+        ],
+        [
+          "d28a852ba8",
+          0.7307
+        ],
+        [
+          "97ec5db500",
+          0.619
+        ],
+        [
+          "c67b08e8a8",
+          0.5646
+        ],
+        [
+          "ae00e17db3",
+          0.7294
+        ],
+        [
+          "154baabab5",
+          0.6356
+        ],
+        [
+          "3a94bf5d71",
+          0.5704
+        ],
+        [
+          "d28a852ba8",
+          0.5531
+        ],
+        [
+          "9c3abc476e",
+          0.696
+        ],
+        [
+          "f2d9261fe1",
+          0.6961
+        ],
+        [
+          "dec000615e",
+          0.6944
+        ],
+        [
+          "dec000615e",
+          0.689
+        ],
+        [
+          "f2d9261fe1",
+          0.7006
+        ],
+        [
+          "e9d484450a",
+          0.5658
+        ],
+        [
+          "aba72d669b",
+          0.5978
+        ],
+        [
+          "c303a95ec9",
+          0.5974
+        ],
+        [
+          "7be8a9ec3d",
+          0.6052
+        ],
+        [
+          "643978a4a9",
+          0.5964
+        ],
+        [
+          "39235835ae",
+          0.644
+        ]
+      ]
+    },
+    {
+      "id": "ct03_restituicao_encargo",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "1d505e19eb",
+          0.57
+        ],
+        [
+          "da71eae96c",
+          0.7039
+        ],
+        [
+          "b14d73562a",
+          0.6795
+        ],
+        [
+          "8becfc1be8",
+          0.6731
+        ],
+        [
+          "1bd2775163",
+          0.6618
+        ],
+        [
+          "c8d47dc487",
+          0.6644
+        ],
+        [
+          "1bd2775163",
+          0.6607
+        ],
+        [
+          "c8d47dc487",
+          0.702
+        ],
+        [
+          "e671d9dbcd",
+          0.6501
+        ],
+        [
+          "97ec5db500",
+          0.6737
+        ],
+        [
+          "153adbff1a",
+          0.5211
+        ],
+        [
+          "2bd5eac03b",
+          0.6588
+        ],
+        [
+          "c5a1441fbe",
+          0.6574
+        ],
+        [
+          "154baabab5",
+          0.6565
+        ],
+        [
+          "033839d195",
+          0.5248
+        ],
+        [
+          "ff2c63528d",
+          0.611
+        ],
+        [
+          "1bd2775163",
+          0.6562
+        ],
+        [
+          "1bd2775163",
+          0.6701
+        ],
+        [
+          "ff2c63528d",
+          0.6551
+        ],
+        [
+          "7880888e6c",
+          0.5172
+        ]
+      ]
+    },
+    {
+      "id": "ct04_interrupcao_prescricao",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "7be8a9ec3d",
+          0.7515
+        ],
+        [
+          "aba72d669b",
+          0.706
+        ],
+        [
+          "6f9fd021eb",
+          0.6942
+        ],
+        [
+          "e9d484450a",
+          0.7044
+        ],
+        [
+          "97ec5db500",
+          0.7267
+        ],
+        [
+          "97ec5db500",
+          0.7548
+        ],
+        [
+          "798a858db6",
+          0.5998
+        ],
+        [
+          "97ec5db500",
+          0.6808
+        ],
+        [
+          "7be8a9ec3d",
+          0.7068
+        ],
+        [
+          "2bd5eac03b",
+          0.5226
+        ],
+        [
+          "c71e2eb819",
+          0.5185
+        ],
+        [
+          "1bd2775163",
+          0.5385
+        ],
+        [
+          "1d4da706a9",
+          0.5354
+        ],
+        [
+          "97ec5db500",
+          0.6936
+        ],
+        [
+          "e0b4f1d6bd",
+          0.7031
+        ],
+        [
+          "97ec5db500",
+          0.5361
+        ],
+        [
+          "c499269e21",
+          0.5232
+        ],
+        [
+          "7a0216e310",
+          0.5074
+        ],
+        [
+          "7a0216e310",
+          0.5071
+        ],
+        [
+          "06de612e21",
+          0.5046
+        ]
+      ]
+    },
+    {
+      "id": "rf01_extincao_icms_iss",
+      "esperados": [
+        "51a26c2b2b"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "8d4398a7d9",
+          0.6149
+        ],
+        [
+          "c0b28fe4c7",
+          0.649
+        ],
+        [
+          "dec000615e",
+          0.6258
+        ],
+        [
+          "dec000615e",
+          0.6254
+        ],
+        [
+          "7b66db4e5a",
+          0.5379
+        ],
+        [
+          "020a3a54eb",
+          0.638
+        ],
+        [
+          "020a3a54eb",
+          0.6375
+        ],
+        [
+          "8d4398a7d9",
+          0.515
+        ],
+        [
+          "8d4398a7d9",
+          0.5472
+        ],
+        [
+          "c0b28fe4c7",
+          0.5479
+        ],
+        [
+          "f5a5b1b44d",
+          0.5996
+        ],
+        [
+          "f5a5b1b44d",
+          0.5948
+        ],
+        [
+          "7b66db4e5a",
+          0.5128
+        ],
+        [
+          "335b0fd853",
+          0.624
+        ],
+        [
+          "8d4398a7d9",
+          0.5279
+        ],
+        [
+          "7b66db4e5a",
+          0.564
+        ],
+        [
+          "7b66db4e5a",
+          0.6034
+        ],
+        [
+          "87c14a9eb7",
+          0.6214
+        ],
+        [
+          "6e7af22508",
+          0.6426
+        ],
+        [
+          "dbdaf2932b",
+          0.6602
+        ]
+      ]
+    },
+    {
+      "id": "rf02_reducao_icms_2030",
+      "esperados": [
+        "51a26c2b2b"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "51a26c2b2b",
+          0.5919
+        ],
+        [
+          "51a26c2b2b",
+          0.5891
+        ],
+        [
+          "51a26c2b2b",
+          0.5474
+        ],
+        [
+          "257f8d5dea",
+          0.5763
+        ],
+        [
+          "51a26c2b2b",
+          0.5
+        ],
+        [
+          "1e21025194",
+          0.5715
+        ],
+        [
+          "f5a5b1b44d",
+          0.5814
+        ],
+        [
+          "51a26c2b2b",
+          0.5478
+        ],
+        [
+          "473d9872f1",
+          0.6088
+        ],
+        [
+          "51a26c2b2b",
+          0.5243
+        ],
+        [
+          "f5a5b1b44d",
+          0.6902
+        ],
+        [
+          "f5a5b1b44d",
+          0.6527
+        ],
+        [
+          "c0b28fe4c7",
+          0.5451
+        ],
+        [
+          "dbdaf2932b",
+          0.6239
+        ],
+        [
+          "51a26c2b2b",
+          0.51
+        ],
+        [
+          "51a26c2b2b",
+          0.546
+        ],
+        [
+          "51a26c2b2b",
+          0.5162
+        ],
+        [
+          "f5a5b1b44d",
+          0.6064
+        ],
+        [
+          "f5a5b1b44d",
+          0.6129
+        ],
+        [
+          "f5a5b1b44d",
+          0.6073
+        ]
+      ]
+    },
+    {
+      "id": "rf03_vedado_sair_regime_regular",
+      "esperados": [
+        "c0b28fe4c7"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "c0b28fe4c7",
+          0.7991
+        ],
+        [
+          "257f8d5dea",
+          0.7177
+        ],
+        [
+          "f5a5b1b44d",
+          0.5945
+        ],
+        [
+          "c0b28fe4c7",
+          0.7786
+        ],
+        [
+          "f5a5b1b44d",
+          0.6821
+        ],
+        [
+          "f60452390b",
+          0.7112
+        ],
+        [
+          "c0b28fe4c7",
+          0.6994
+        ],
+        [
+          "8d4398a7d9",
+          0.717
+        ],
+        [
+          "c0b28fe4c7",
+          0.735
+        ],
+        [
+          "f60452390b",
+          0.7363
+        ],
+        [
+          "c0b28fe4c7",
+          0.7437
+        ],
+        [
+          "c0b28fe4c7",
+          0.6789
+        ],
+        [
+          "257f8d5dea",
+          0.6436
+        ],
+        [
+          "c0b28fe4c7",
+          0.6808
+        ],
+        [
+          "f5a5b1b44d",
+          0.7297
+        ],
+        [
+          "c0b28fe4c7",
+          0.6507
+        ],
+        [
+          "0e1726865e",
+          0.6433
+        ],
+        [
+          "257f8d5dea",
+          0.6811
+        ],
+        [
+          "5a09e714bc",
+          0.6733
+        ],
+        [
+          "c0b28fe4c7",
+          0.643
+        ]
+      ]
+    },
+    {
+      "id": "ob01_mei_dispensa_nota",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.6532
+        ],
+        [
+          "dec000615e",
+          0.6527
+        ],
+        [
+          "c0b28fe4c7",
+          0.7391
+        ],
+        [
+          "dec000615e",
+          0.678
+        ],
+        [
+          "324686735a",
+          0.7433
+        ],
+        [
+          "dec000615e",
+          0.6591
+        ],
+        [
+          "9c3abc476e",
+          0.6974
+        ],
+        [
+          "d71663a0cd",
+          0.6475
+        ],
+        [
+          "44dfbab041",
+          0.5697
+        ],
+        [
+          "d71663a0cd",
+          0.6522
+        ],
+        [
+          "44dfbab041",
+          0.7272
+        ],
+        [
+          "44dfbab041",
+          0.6733
+        ],
+        [
+          "324686735a",
+          0.5524
+        ],
+        [
+          "44dfbab041",
+          0.6239
+        ],
+        [
+          "44dfbab041",
+          0.6486
+        ],
+        [
+          "324686735a",
+          0.6356
+        ],
+        [
+          "aba72d669b",
+          0.6691
+        ],
+        [
+          "dec000615e",
+          0.6534
+        ],
+        [
+          "dec000615e",
+          0.6706
+        ],
+        [
+          "dec000615e",
+          0.6482
+        ]
+      ]
+    },
+    {
+      "id": "ob02_ecf_extincao",
+      "esperados": [
+        "74b712b843"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "74b712b843",
+          0.6719
+        ],
+        [
+          "b2428e133b",
+          0.708
+        ],
+        [
+          "b2428e133b",
+          0.7116
+        ],
+        [
+          "74b712b843",
+          0.6168
+        ],
+        [
+          "74b712b843",
+          0.6682
+        ],
+        [
+          "74b712b843",
+          0.6202
+        ],
+        [
+          "9fc18961ed",
+          0.5922
+        ],
+        [
+          "b2428e133b",
+          0.7001
+        ],
+        [
+          "b2428e133b",
+          0.7001
+        ],
+        [
+          "74b712b843",
+          0.6334
+        ],
+        [
+          "b2428e133b",
+          0.6648
+        ],
+        [
+          "5be4df5890",
+          0.6241
+        ],
+        [
+          "b2428e133b",
+          0.6677
+        ],
+        [
+          "b2428e133b",
+          0.6614
+        ],
+        [
+          "b2428e133b",
+          0.6614
+        ],
+        [
+          "b2428e133b",
+          0.666
+        ],
+        [
+          "b2428e133b",
+          0.6647
+        ],
+        [
+          "b2428e133b",
+          0.6665
+        ],
+        [
+          "b2428e133b",
+          0.6658
+        ],
+        [
+          "74b712b843",
+          0.6088
+        ]
+      ]
+    },
+    {
+      "id": "co01_iss_exportacao_excecao",
+      "esperados": [
+        "1e21025194"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.6117
+        ],
+        [
+          "39235835ae",
+          0.635
+        ],
+        [
+          "5567bb7881",
+          0.6355
+        ],
+        [
+          "db40e91463",
+          0.61
+        ],
+        [
+          "1e21025194",
+          0.5447
+        ],
+        [
+          "c8c3c178a6",
+          0.6388
+        ],
+        [
+          "ed97269cb7",
+          0.6277
+        ],
+        [
+          "34101e3bf0",
+          0.6614
+        ],
+        [
+          "a501ed5f97",
+          0.6628
+        ],
+        [
+          "2e6242ca51",
+          0.6355
+        ],
+        [
+          "34101e3bf0",
+          0.623
+        ],
+        [
+          "eb1a0e4b6a",
+          0.5682
+        ],
+        [
+          "e027d92a6f",
+          0.6767
+        ],
+        [
+          "7686b2cbba",
+          0.6472
+        ],
+        [
+          "e027d92a6f",
+          0.6643
+        ],
+        [
+          "a501ed5f97",
+          0.672
+        ],
+        [
+          "041ddb60a7",
+          0.6405
+        ],
+        [
+          "06db10f7ed",
+          0.6301
+        ],
+        [
+          "041ddb60a7",
+          0.6225
+        ],
+        [
+          "eb1a0e4b6a",
+          0.6219
+        ]
+      ]
+    },
+    {
+      "id": "co02_iss_minima_incentivos",
+      "esperados": [
+        "1e21025194"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.6299
+        ],
+        [
+          "dec000615e",
+          0.6242
+        ],
+        [
+          "1e21025194",
+          0.6447
+        ],
+        [
+          "9c3abc476e",
+          0.6186
+        ],
+        [
+          "7b66db4e5a",
+          0.5954
+        ],
+        [
+          "f8d55d3e94",
+          0.5883
+        ],
+        [
+          "8d4398a7d9",
+          0.5284
+        ],
+        [
+          "7b66db4e5a",
+          0.7117
+        ],
+        [
+          "dec000615e",
+          0.6041
+        ],
+        [
+          "e50c56517a",
+          0.6043
+        ],
+        [
+          "dec000615e",
+          0.6059
+        ],
+        [
+          "dec000615e",
+          0.5998
+        ],
+        [
+          "dec000615e",
+          0.5935
+        ],
+        [
+          "e50c56517a",
+          0.5972
+        ],
+        [
+          "dec000615e",
+          0.5935
+        ],
+        [
+          "dec000615e",
+          0.5941
+        ],
+        [
+          "f8d55d3e94",
+          0.5617
+        ],
+        [
+          "7b66db4e5a",
+          0.6433
+        ],
+        [
+          "dec000615e",
+          0.6359
+        ],
+        [
+          "9c3abc476e",
+          0.6455
+        ]
+      ]
+    },
+    {
+      "id": "co03_iss_base_materiais",
+      "esperados": [
+        "1e21025194"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "39235835ae",
+          0.6026
+        ],
+        [
+          "39235835ae",
+          0.5263
+        ],
+        [
+          "39235835ae",
+          0.5293
+        ],
+        [
+          "39235835ae",
+          0.5379
+        ],
+        [
+          "39235835ae",
+          0.5156
+        ],
+        [
+          "39235835ae",
+          0.5352
+        ],
+        [
+          "39235835ae",
+          0.5051
+        ],
+        [
+          "1e21025194",
+          0.521
+        ],
+        [
+          "39235835ae",
+          0.5765
+        ],
+        [
+          "39235835ae",
+          0.5695
+        ],
+        [
+          "db40e91463",
+          0.5011
+        ],
+        [
+          "39235835ae",
+          0.5386
+        ],
+        [
+          "5aa5fdaf39",
+          0.5471
+        ],
+        [
+          "39235835ae",
+          0.5444
+        ],
+        [
+          "928b7b8754",
+          0.5324
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5334
+        ],
+        [
+          "e70a6ee4e7",
+          0.5446
+        ],
+        [
+          "39235835ae",
+          0.5435
+        ],
+        [
+          "db40e91463",
+          0.5881
+        ],
+        [
+          "db40e91463",
+          0.5017
+        ]
+      ]
+    },
+    {
+      "id": "co04_simples_opcao_receita_base",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "8d4398a7d9",
+          0.5547
+        ],
+        [
+          "8d4398a7d9",
+          0.6593
+        ],
+        [
+          "8d4398a7d9",
+          0.6144
+        ],
+        [
+          "dec000615e",
+          0.6891
+        ],
+        [
+          "291e565457",
+          0.5817
+        ],
+        [
+          "dec000615e",
+          0.6874
+        ],
+        [
+          "02024cf0cb",
+          0.6788
+        ],
+        [
+          "de5379c208",
+          0.5862
+        ],
+        [
+          "02024cf0cb",
+          0.6681
+        ],
+        [
+          "9c3abc476e",
+          0.7049
+        ],
+        [
+          "7b66db4e5a",
+          0.5809
+        ],
+        [
+          "d71663a0cd",
+          0.5404
+        ],
+        [
+          "8d4398a7d9",
+          0.6491
+        ],
+        [
+          "7b66db4e5a",
+          0.6255
+        ],
+        [
+          "02024cf0cb",
+          0.6874
+        ],
+        [
+          "02024cf0cb",
+          0.6926
+        ],
+        [
+          "9c3abc476e",
+          0.6947
+        ],
+        [
+          "02024cf0cb",
+          0.6851
+        ],
+        [
+          "8d4398a7d9",
+          0.5562
+        ],
+        [
+          "dec000615e",
+          0.6869
+        ]
+      ]
+    },
+    {
+      "id": "co05_simples_exclusao_opcao_prazo_efeito",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "8d4398a7d9",
+          0.6898
+        ],
+        [
+          "9c3abc476e",
+          0.6796
+        ],
+        [
+          "9e8e3f4621",
+          0.6391
+        ],
+        [
+          "02024cf0cb",
+          0.6817
+        ],
+        [
+          "8d4398a7d9",
+          0.6244
+        ],
+        [
+          "9c3abc476e",
+          0.7061
+        ],
+        [
+          "a28a4b7f84",
+          0.7144
+        ],
+        [
+          "dec000615e",
+          0.7115
+        ],
+        [
+          "02024cf0cb",
+          0.6235
+        ],
+        [
+          "02024cf0cb",
+          0.6073
+        ],
+        [
+          "dec000615e",
+          0.7139
+        ],
+        [
+          "914f11ba7a",
+          0.5602
+        ],
+        [
+          "9c3abc476e",
+          0.6784
+        ],
+        [
+          "da2aee1fe0",
+          0.7188
+        ],
+        [
+          "9c3abc476e",
+          0.6379
+        ],
+        [
+          "32ed4a2ca7",
+          0.6903
+        ],
+        [
+          "8d4398a7d9",
+          0.7416
+        ],
+        [
+          "dec000615e",
+          0.709
+        ],
+        [
+          "8d4398a7d9",
+          0.6436
+        ],
+        [
+          "9c3abc476e",
+          0.6955
+        ]
+      ]
+    },
+    {
+      "id": "co06_sublimite_excesso_20",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "02024cf0cb",
+          0.784
+        ],
+        [
+          "dec000615e",
+          0.7804
+        ],
+        [
+          "dec000615e",
+          0.7787
+        ],
+        [
+          "dec000615e",
+          0.8088
+        ],
+        [
+          "dec000615e",
+          0.807
+        ],
+        [
+          "dec000615e",
+          0.7796
+        ],
+        [
+          "dec000615e",
+          0.7786
+        ],
+        [
+          "dec000615e",
+          0.7544
+        ],
+        [
+          "9c3abc476e",
+          0.7531
+        ],
+        [
+          "02024cf0cb",
+          0.7674
+        ],
+        [
+          "dec000615e",
+          0.7564
+        ],
+        [
+          "dec000615e",
+          0.7565
+        ],
+        [
+          "dec000615e",
+          0.7864
+        ],
+        [
+          "dec000615e",
+          0.7489
+        ],
+        [
+          "dec000615e",
+          0.7494
+        ],
+        [
+          "dec000615e",
+          0.7856
+        ],
+        [
+          "dec000615e",
+          0.7736
+        ],
+        [
+          "dec000615e",
+          0.7755
+        ],
+        [
+          "dec000615e",
+          0.7648
+        ],
+        [
+          "dec000615e",
+          0.757
+        ]
+      ]
+    },
+    {
+      "id": "co07_ctn_homologacao_dolo",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b4f1d6bd",
+          0.6101
+        ],
+        [
+          "df7cba6886",
+          0.6248
+        ],
+        [
+          "97ec5db500",
+          0.6227
+        ],
+        [
+          "f211db8c9b",
+          0.6302
+        ],
+        [
+          "1d4da706a9",
+          0.61
+        ],
+        [
+          "4c423d4ba9",
+          0.5122
+        ],
+        [
+          "97ec5db500",
+          0.525
+        ],
+        [
+          "b6dd2595c0",
+          0.5744
+        ],
+        [
+          "aba72d669b",
+          0.5346
+        ],
+        [
+          "c0b28fe4c7",
+          0.5893
+        ],
+        [
+          "0767f8d12c",
+          0.6242
+        ],
+        [
+          "0767f8d12c",
+          0.6194
+        ],
+        [
+          "f60452390b",
+          0.5872
+        ],
+        [
+          "c0b28fe4c7",
+          0.6144
+        ],
+        [
+          "77654f855d",
+          0.6027
+        ],
+        [
+          "a4eba9e857",
+          0.6015
+        ],
+        [
+          "e0b5044dfa",
+          0.6158
+        ],
+        [
+          "1d4da706a9",
+          0.6249
+        ],
+        [
+          "153adbff1a",
+          0.606
+        ],
+        [
+          "fa5fd6c492",
+          0.6051
+        ]
+      ]
+    },
+    {
+      "id": "co08_presuncao_transporte",
+      "esperados": [
+        "6534b72296"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.7058
+        ],
+        [
+          "f7a4c9f4d5",
+          0.617
+        ],
+        [
+          "83e47c1f41",
+          0.6234
+        ],
+        [
+          "87d4d13813",
+          0.7949
+        ],
+        [
+          "f7a4c9f4d5",
+          0.6995
+        ],
+        [
+          "f7a4c9f4d5",
+          0.6361
+        ],
+        [
+          "8cbafb8458",
+          0.7053
+        ],
+        [
+          "87d4d13813",
+          0.7827
+        ],
+        [
+          "83e47c1f41",
+          0.6914
+        ],
+        [
+          "f7a4c9f4d5",
+          0.7119
+        ],
+        [
+          "8cbafb8458",
+          0.7228
+        ],
+        [
+          "8cbafb8458",
+          0.7077
+        ],
+        [
+          "44cbc0695a",
+          0.5672
+        ],
+        [
+          "f7a4c9f4d5",
+          0.6757
+        ],
+        [
+          "f7a4c9f4d5",
+          0.699
+        ],
+        [
+          "927bbc79e8",
+          0.66
+        ],
+        [
+          "006063357b",
+          0.6027
+        ],
+        [
+          "f7a4c9f4d5",
+          0.6908
+        ],
+        [
+          "83e47c1f41",
+          0.6688
+        ],
+        [
+          "e9d484450a",
+          0.649
+        ]
+      ]
+    },
+    {
+      "id": "co09_icms_arrendamento",
+      "esperados": [
+        "010f7c42ad"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "c0b28fe4c7",
+          0.6588
+        ],
+        [
+          "c0b28fe4c7",
+          0.6152
+        ],
+        [
+          "010f7c42ad",
+          0.5375
+        ],
+        [
+          "010f7c42ad",
+          0.5792
+        ],
+        [
+          "1971694def",
+          0.597
+        ],
+        [
+          "77654f855d",
+          0.6187
+        ],
+        [
+          "dc9af03255",
+          0.6254
+        ],
+        [
+          "77654f855d",
+          0.5539
+        ],
+        [
+          "c0b28fe4c7",
+          0.6608
+        ],
+        [
+          "dc9af03255",
+          0.5395
+        ],
+        [
+          "ae00e17db3",
+          0.6466
+        ],
+        [
+          "257f8d5dea",
+          0.6346
+        ],
+        [
+          "c0b28fe4c7",
+          0.6127
+        ],
+        [
+          "e9d484450a",
+          0.669
+        ],
+        [
+          "257f8d5dea",
+          0.5669
+        ],
+        [
+          "77654f855d",
+          0.5791
+        ],
+        [
+          "1971694def",
+          0.5605
+        ],
+        [
+          "dc9af03255",
+          0.6324
+        ],
+        [
+          "e0b5044dfa",
+          0.6412
+        ],
+        [
+          "a1456fb6ff",
+          0.6529
+        ]
+      ]
+    },
+    {
+      "id": "co10_dasn_prazos",
+      "esperados": [
+        "30272b7cf1"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "6da33be3b9",
+          0.6523
+        ],
+        [
+          "216178af37",
+          0.6718
+        ],
+        [
+          "dec000615e",
+          0.6194
+        ],
+        [
+          "30272b7cf1",
+          0.7093
+        ],
+        [
+          "30272b7cf1",
+          0.7529
+        ],
+        [
+          "30272b7cf1",
+          0.8107
+        ],
+        [
+          "324686735a",
+          0.5248
+        ],
+        [
+          "9c3abc476e",
+          0.6681
+        ],
+        [
+          "9c3abc476e",
+          0.6753
+        ],
+        [
+          "9c3abc476e",
+          0.6824
+        ],
+        [
+          "9c3abc476e",
+          0.6729
+        ],
+        [
+          "30272b7cf1",
+          0.6901
+        ],
+        [
+          "30272b7cf1",
+          0.8347
+        ],
+        [
+          "324686735a",
+          0.6959
+        ],
+        [
+          "6508d2e981",
+          0.6534
+        ],
+        [
+          "6508d2e981",
+          0.6485
+        ],
+        [
+          "44dfbab041",
+          0.6728
+        ],
+        [
+          "9c3abc476e",
+          0.6483
+        ],
+        [
+          "30272b7cf1",
+          0.6431
+        ],
+        [
+          "9c3abc476e",
+          0.7256
+        ]
+      ]
+    },
+    {
+      "id": "tr01_icms_df_18_para_20",
+      "esperados": [
+        "33bf4c66ed"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "33bf4c66ed",
+          0.7149
+        ],
+        [
+          "77dd199e2d",
+          0.6904
+        ],
+        [
+          "1f854b9fcf",
+          0.7214
+        ],
+        [
+          "5992db017e",
+          0.7407
+        ],
+        [
+          "e1714b2188",
+          0.7507
+        ],
+        [
+          "2a4068aa24",
+          0.6967
+        ],
+        [
+          "5927c8ca2b",
+          0.5077
+        ],
+        [
+          "504a2e9204",
+          0.631
+        ],
+        [
+          "ca714861ed",
+          0.742
+        ],
+        [
+          "ca714861ed",
+          0.7448
+        ],
+        [
+          "b16c277571",
+          0.6485
+        ],
+        [
+          "2a4068aa24",
+          0.7639
+        ],
+        [
+          "c73cd99fd1",
+          0.7198
+        ],
+        [
+          "1f854b9fcf",
+          0.717
+        ],
+        [
+          "c2ff3ad105",
+          0.7512
+        ],
+        [
+          "33bf4c66ed",
+          0.7167
+        ],
+        [
+          "d4b7ee9e17",
+          0.7189
+        ],
+        [
+          "816c513a00",
+          0.7555
+        ],
+        [
+          "bd59e35481",
+          0.7345
+        ],
+        [
+          "2a4068aa24",
+          0.7434
+        ]
+      ]
+    },
+    {
+      "id": "tr02_epp_limite_antigo",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "dec000615e",
+          0.7859
+        ],
+        [
+          "dec000615e",
+          0.8033
+        ],
+        [
+          "dec000615e",
+          0.8026
+        ],
+        [
+          "dec000615e",
+          0.8012
+        ],
+        [
+          "f8d55d3e94",
+          0.7288
+        ],
+        [
+          "f8d55d3e94",
+          0.7434
+        ],
+        [
+          "f8d55d3e94",
+          0.7276
+        ],
+        [
+          "8d4398a7d9",
+          0.7512
+        ],
+        [
+          "7b66db4e5a",
+          0.6848
+        ],
+        [
+          "7b66db4e5a",
+          0.737
+        ],
+        [
+          "de5379c208",
+          0.7297
+        ],
+        [
+          "de5379c208",
+          0.7507
+        ],
+        [
+          "8d4398a7d9",
+          0.7942
+        ],
+        [
+          "8d4398a7d9",
+          0.7218
+        ],
+        [
+          "4ffc49cf2e",
+          0.8166
+        ],
+        [
+          "9c3abc476e",
+          0.7566
+        ],
+        [
+          "8d4398a7d9",
+          0.6391
+        ],
+        [
+          "de5379c208",
+          0.7597
+        ],
+        [
+          "8d4398a7d9",
+          0.7136
+        ],
+        [
+          "8d4398a7d9",
+          0.6806
+        ]
+      ]
+    },
+    {
+      "id": "tr03_ctn_151_hipoteses",
+      "esperados": [
+        "97ec5db500"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "97ec5db500",
+          0.7476
+        ],
+        [
+          "97ec5db500",
+          0.747
+        ],
+        [
+          "4d91443f18",
+          0.6503
+        ],
+        [
+          "747de56323",
+          0.6826
+        ],
+        [
+          "747de56323",
+          0.6831
+        ],
+        [
+          "747de56323",
+          0.6818
+        ],
+        [
+          "747de56323",
+          0.6915
+        ],
+        [
+          "40ae09a3c9",
+          0.6667
+        ],
+        [
+          "9e88dba804",
+          0.6659
+        ],
+        [
+          "777b6c4c40",
+          0.524
+        ],
+        [
+          "09954bb508",
+          0.6671
+        ],
+        [
+          "09954bb508",
+          0.6575
+        ],
+        [
+          "09954bb508",
+          0.6564
+        ],
+        [
+          "09954bb508",
+          0.7513
+        ],
+        [
+          "97ec5db500",
+          0.7255
+        ],
+        [
+          "97ec5db500",
+          0.7433
+        ],
+        [
+          "936fe2c337",
+          0.6495
+        ],
+        [
+          "97ec5db500",
+          0.7218
+        ],
+        [
+          "09954bb508",
+          0.5735
+        ],
+        [
+          "09954bb508",
+          0.5906
+        ]
+      ]
+    },
+    {
+      "id": "tr04_ibs_cbs_2026_teste",
+      "esperados": [
+        "c0b28fe4c7"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "5a09e714bc",
+          0.7652
+        ],
+        [
+          "5a09e714bc",
+          0.7563
+        ],
+        [
+          "c0b28fe4c7",
+          0.7027
+        ],
+        [
+          "e7bbb16ad5",
+          0.7063
+        ],
+        [
+          "5a09e714bc",
+          0.7035
+        ],
+        [
+          "c0b28fe4c7",
+          0.6936
+        ],
+        [
+          "257f8d5dea",
+          0.7128
+        ],
+        [
+          "f60452390b",
+          0.7112
+        ],
+        [
+          "c0b28fe4c7",
+          0.7362
+        ],
+        [
+          "c0b28fe4c7",
+          0.618
+        ],
+        [
+          "c0b28fe4c7",
+          0.7177
+        ],
+        [
+          "f60452390b",
+          0.7649
+        ],
+        [
+          "f60452390b",
+          0.6963
+        ],
+        [
+          "8d4398a7d9",
+          0.6749
+        ],
+        [
+          "473d9872f1",
+          0.7479
+        ],
+        [
+          "473d9872f1",
+          0.6672
+        ],
+        [
+          "5a09e714bc",
+          0.6017
+        ],
+        [
+          "473d9872f1",
+          0.6723
+        ],
+        [
+          "c0b28fe4c7",
+          0.5019
+        ],
+        [
+          "f5a5b1b44d",
+          0.6395
+        ]
+      ]
+    },
+    {
+      "id": "tr05_mei_limite_confuso",
+      "esperados": [
+        "d71663a0cd"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "dec000615e",
+          0.6195
+        ],
+        [
+          "44dfbab041",
+          0.6927
+        ],
+        [
+          "44dfbab041",
+          0.6995
+        ],
+        [
+          "44dfbab041",
+          0.5912
+        ],
+        [
+          "f9ceafb5d0",
+          0.6026
+        ],
+        [
+          "e94ee4636c",
+          0.6142
+        ],
+        [
+          "30272b7cf1",
+          0.6543
+        ],
+        [
+          "44dfbab041",
+          0.62
+        ],
+        [
+          "e94ee4636c",
+          0.6667
+        ],
+        [
+          "e94ee4636c",
+          0.6636
+        ],
+        [
+          "e94ee4636c",
+          0.6651
+        ],
+        [
+          "e94ee4636c",
+          0.5555
+        ],
+        [
+          "e94ee4636c",
+          0.6403
+        ],
+        [
+          "e94ee4636c",
+          0.5752
+        ],
+        [
+          "42c521b11e",
+          0.5174
+        ],
+        [
+          "44dfbab041",
+          0.6702
+        ],
+        [
+          "9c3abc476e",
+          0.6512
+        ],
+        [
+          "e94ee4636c",
+          0.6219
+        ],
+        [
+          "30272b7cf1",
+          0.6759
+        ],
+        [
+          "42c521b11e",
+          0.6565
+        ]
+      ]
+    }
+  ]
+}

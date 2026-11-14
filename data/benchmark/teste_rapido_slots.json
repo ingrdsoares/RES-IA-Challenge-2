@@ -1,0 +1,1124 @@
+{
+ "referencia": {
+  "falso_positivo": "5/32",
+  "recusa_indevida": "5/32",
+  "clarify": "10/10",
+  "abstencao": "9/10",
+  "artigo_esperado": 0.625,
+  "mediana_s": 3.16,
+  "linhas": [
+   {
+    "id": "ap03_simples_debito_art17",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 4.5276858000142965,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap04_simples_livro_caixa",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.5937762999965344,
+    "artigo": 0.0
+   },
+   {
+    "id": "ap06_simples_icms_iss_no_das",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 109.0245547000086,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap07_defis_confissao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.227709300001152,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei02_vedacoes_opcao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.356951800000388,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei03_empregado",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 7.2719547000015154,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei04_ocupacoes_quantidade",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.4094339000002947,
+    "artigo": null
+   },
+   {
+    "id": "mei05_dasn_extincao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 8.843615300022066,
+    "artigo": null
+   },
+   {
+    "id": "mei06_valor_mes_da_baixa",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.3556947000033688,
+    "artigo": null
+   },
+   {
+    "id": "mei07_beneficios_formalizacao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.28385760000674054,
+    "artigo": null
+   },
+   {
+    "id": "mei08_restituicao_inss_beneficio",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.31745450000744313,
+    "artigo": null
+   },
+   {
+    "id": "jur01_carf_mei_cnae",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 8.230606299999636,
+    "artigo": null
+   },
+   {
+    "id": "jur02_carf_stf_art17v",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 4.779974500008393,
+    "artigo": 1.0
+   },
+   {
+    "id": "jur03_carf_debitos_simples_federal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 6.674204000009922,
+    "artigo": 0.5
+   },
+   {
+    "id": "iss01_relacao_emprego",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 2.2047256999940146,
+    "artigo": 0.0
+   },
+   {
+    "id": "iss02_responsavel_sem_retencao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.5170312999980524,
+    "artigo": 1.0
+   },
+   {
+    "id": "icms02_credito_veiculo_pessoal",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 4.778072300017811,
+    "artigo": null
+   },
+   {
+    "id": "icms03_restaurante",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 8.292233799991664,
+    "artigo": 0.0
+   },
+   {
+    "id": "icms05_df_energia_residencial",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.05008970000199,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp01_presuncao_combustivel",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.470026200026041,
+    "artigo": 0.0
+   },
+   {
+    "id": "lp04_lucro_real_obrigatorio",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.707880900008604,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp06_irpj_quotas",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 13.874430199997732,
+    "artigo": 1.0
+   },
+   {
+    "id": "ct01_acessoria_vira_principal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 11.269975100003649,
+    "artigo": 0.0
+   },
+   {
+    "id": "ct04_interrupcao_prescricao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.01821259999997,
+    "artigo": 1.0
+   },
+   {
+    "id": "rf01_extincao_icms_iss",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 2.6745567999896593,
+    "artigo": 0.0
+   },
+   {
+    "id": "ob02_ecf_extincao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.965461599989794,
+    "artigo": null
+   },
+   {
+    "id": "co01_iss_exportacao_excecao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 5.161234600003809,
+    "artigo": 0.0
+   },
+   {
+    "id": "co03_iss_base_materiais",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.092478900012793,
+    "artigo": 1.0
+   },
+   {
+    "id": "co05_simples_exclusao_opcao_prazo_efeito",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 12.851852199994028,
+    "artigo": 1.0
+   },
+   {
+    "id": "co09_icms_arrendamento",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 9.110232700011693,
+    "artigo": 1.0
+   },
+   {
+    "id": "tr04_ibs_cbs_2026_teste",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.360373700008495,
+    "artigo": 0.0
+   },
+   {
+    "id": "tr05_mei_limite_confuso",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.117870199988829,
+    "artigo": 0.5
+   },
+   {
+    "id": "cl01_anexo_consultoria",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 2.649999805726111e-05,
+    "artigo": null
+   },
+   {
+    "id": "cl02_mei_continuar",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 4.902112799987663,
+    "artigo": null
+   },
+   {
+    "id": "cl03_lucro_presumido_trimestre",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3703308000112884,
+    "artigo": null
+   },
+   {
+    "id": "cl04_exclusao_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.44409249999444,
+    "artigo": null
+   },
+   {
+    "id": "cl05_atividade_pode_ser_mei",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.2709413999982644,
+    "artigo": null
+   },
+   {
+    "id": "cl06_icms_venda",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.374977300001774,
+    "artigo": null
+   },
+   {
+    "id": "cl07_simples_ou_presumido",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.38704659999348223,
+    "artigo": null
+   },
+   {
+    "id": "cl08_mei_estouro_limite",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.32927289998042397,
+    "artigo": null
+   },
+   {
+    "id": "cl09_presumido_para_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3926217000116594,
+    "artigo": null
+   },
+   {
+    "id": "cl10_defis_obrigatoriedade",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3773159999982454,
+    "artigo": null
+   },
+   {
+    "id": "ab01_aviso_previo_proporcional",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 7.730750100017758,
+    "artigo": null
+   },
+   {
+    "id": "ab02_multa_fgts",
+    "esperado": "abstain",
+    "status": "answered",
+    "seg": 4.019027699978324,
+    "artigo": null
+   },
+   {
+    "id": "ab03_adicional_noturno",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.889566800004104,
+    "artigo": null
+   },
+   {
+    "id": "ab04_intervalo_intrajornada",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 1.7022387000033632,
+    "artigo": null
+   },
+   {
+    "id": "ab05_iss_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.6017015999823343,
+    "artigo": null
+   },
+   {
+    "id": "ab06_icms_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.6550281000090763,
+    "artigo": null
+   },
+   {
+    "id": "ab07_ipva_goias",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.8434412999777123,
+    "artigo": null
+   },
+   {
+    "id": "ab08_corporate_tax_eua",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 0.9316350999870338,
+    "artigo": null
+   },
+   {
+    "id": "ab09_acordao_carf_inexistente",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.9160373999911826,
+    "artigo": null
+   },
+   {
+    "id": "ab10_imposto_grandes_fortunas",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.6395566999854054,
+    "artigo": null
+   }
+  ]
+ },
+ "slots6": {
+  "falso_positivo": "5/32",
+  "recusa_indevida": "4/32",
+  "clarify": "10/10",
+  "abstencao": "9/10",
+  "artigo_esperado": 0.625,
+  "mediana_s": 2.84,
+  "linhas": [
+   {
+    "id": "ap03_simples_debito_art17",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 5.507515500008594,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap04_simples_livro_caixa",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.091659099998651,
+    "artigo": 0.0
+   },
+   {
+    "id": "ap06_simples_icms_iss_no_das",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.347607400006382,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap07_defis_confissao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.001271099987207,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei02_vedacoes_opcao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.37523250002414,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei03_empregado",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.211249299987685,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei04_ocupacoes_quantidade",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.269259199994849,
+    "artigo": null
+   },
+   {
+    "id": "mei05_dasn_extincao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 6.648858400003519,
+    "artigo": null
+   },
+   {
+    "id": "mei06_valor_mes_da_baixa",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.37991959997452796,
+    "artigo": null
+   },
+   {
+    "id": "mei07_beneficios_formalizacao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.2609332000138238,
+    "artigo": null
+   },
+   {
+    "id": "mei08_restituicao_inss_beneficio",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.46262299999943934,
+    "artigo": null
+   },
+   {
+    "id": "jur01_carf_mei_cnae",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 8.23782310000388,
+    "artigo": null
+   },
+   {
+    "id": "jur02_carf_stf_art17v",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 4.067113700002665,
+    "artigo": 1.0
+   },
+   {
+    "id": "jur03_carf_debitos_simples_federal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 6.338432399992598,
+    "artigo": 0.5
+   },
+   {
+    "id": "iss01_relacao_emprego",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 2.0366912000172306,
+    "artigo": 0.0
+   },
+   {
+    "id": "iss02_responsavel_sem_retencao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.5332938999927137,
+    "artigo": 1.0
+   },
+   {
+    "id": "icms02_credito_veiculo_pessoal",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 4.526504000008572,
+    "artigo": null
+   },
+   {
+    "id": "icms03_restaurante",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 8.516627799981507,
+    "artigo": 0.0
+   },
+   {
+    "id": "icms05_df_energia_residencial",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.028733799990732,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp01_presuncao_combustivel",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.976585900003556,
+    "artigo": 0.0
+   },
+   {
+    "id": "lp04_lucro_real_obrigatorio",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.687958599999547,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp06_irpj_quotas",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 13.271413400012534,
+    "artigo": 1.0
+   },
+   {
+    "id": "ct01_acessoria_vira_principal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 10.971842600003583,
+    "artigo": 0.0
+   },
+   {
+    "id": "ct04_interrupcao_prescricao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.7089105999912135,
+    "artigo": 1.0
+   },
+   {
+    "id": "rf01_extincao_icms_iss",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 2.838667500007432,
+    "artigo": 0.0
+   },
+   {
+    "id": "ob02_ecf_extincao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.8327621999778785,
+    "artigo": null
+   },
+   {
+    "id": "co01_iss_exportacao_excecao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.853972000011709,
+    "artigo": 0.0
+   },
+   {
+    "id": "co03_iss_base_materiais",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.766623700008495,
+    "artigo": 1.0
+   },
+   {
+    "id": "co05_simples_exclusao_opcao_prazo_efeito",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 13.114766299986513,
+    "artigo": 1.0
+   },
+   {
+    "id": "co09_icms_arrendamento",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 7.40196359998663,
+    "artigo": 1.0
+   },
+   {
+    "id": "tr04_ibs_cbs_2026_teste",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.369400199997472,
+    "artigo": 0.0
+   },
+   {
+    "id": "tr05_mei_limite_confuso",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.857993700017687,
+    "artigo": 0.5
+   },
+   {
+    "id": "cl01_anexo_consultoria",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 1.6200006939470768e-05,
+    "artigo": null
+   },
+   {
+    "id": "cl02_mei_continuar",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 4.557509000005666,
+    "artigo": null
+   },
+   {
+    "id": "cl03_lucro_presumido_trimestre",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.37598349998006597,
+    "artigo": null
+   },
+   {
+    "id": "cl04_exclusao_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.43580669999937527,
+    "artigo": null
+   },
+   {
+    "id": "cl05_atividade_pode_ser_mei",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3052173999894876,
+    "artigo": null
+   },
+   {
+    "id": "cl06_icms_venda",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.41520330001367256,
+    "artigo": null
+   },
+   {
+    "id": "cl07_simples_ou_presumido",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.41024240001570433,
+    "artigo": null
+   },
+   {
+    "id": "cl08_mei_estouro_limite",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3448830999841448,
+    "artigo": null
+   },
+   {
+    "id": "cl09_presumido_para_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3320382999954745,
+    "artigo": null
+   },
+   {
+    "id": "cl10_defis_obrigatoriedade",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.37595700001111254,
+    "artigo": null
+   },
+   {
+    "id": "ab01_aviso_previo_proporcional",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 7.7429696999897715,
+    "artigo": null
+   },
+   {
+    "id": "ab02_multa_fgts",
+    "esperado": "abstain",
+    "status": "answered",
+    "seg": 3.888109199993778,
+    "artigo": null
+   },
+   {
+    "id": "ab03_adicional_noturno",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.72730469997623,
+    "artigo": null
+   },
+   {
+    "id": "ab04_intervalo_intrajornada",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 1.6148929000191856,
+    "artigo": null
+   },
+   {
+    "id": "ab05_iss_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.4678761000104714,
+    "artigo": null
+   },
+   {
+    "id": "ab06_icms_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.652509799983818,
+    "artigo": null
+   },
+   {
+    "id": "ab07_ipva_goias",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.667446299979929,
+    "artigo": null
+   },
+   {
+    "id": "ab08_corporate_tax_eua",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 0.8673706999979913,
+    "artigo": null
+   },
+   {
+    "id": "ab09_acordao_carf_inexistente",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.6730469999893103,
+    "artigo": null
+   },
+   {
+    "id": "ab10_imposto_grandes_fortunas",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.2757990999962203,
+    "artigo": null
+   }
+  ]
+ },
+ "slots10": {
+  "falso_positivo": "5/32",
+  "recusa_indevida": "4/32",
+  "clarify": "10/10",
+  "abstencao": "9/10",
+  "artigo_esperado": 0.625,
+  "mediana_s": 2.89,
+  "linhas": [
+   {
+    "id": "ap03_simples_debito_art17",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 5.809043200017186,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap04_simples_livro_caixa",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.1298383999965154,
+    "artigo": 0.0
+   },
+   {
+    "id": "ap06_simples_icms_iss_no_das",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.297336499992525,
+    "artigo": 1.0
+   },
+   {
+    "id": "ap07_defis_confissao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.0136167999880854,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei02_vedacoes_opcao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.3005237999896053,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei03_empregado",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.578664000000572,
+    "artigo": 1.0
+   },
+   {
+    "id": "mei04_ocupacoes_quantidade",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.336201500002062,
+    "artigo": null
+   },
+   {
+    "id": "mei05_dasn_extincao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 5.48358920001192,
+    "artigo": null
+   },
+   {
+    "id": "mei06_valor_mes_da_baixa",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.33737789999577217,
+    "artigo": null
+   },
+   {
+    "id": "mei07_beneficios_formalizacao",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.25740530001348816,
+    "artigo": null
+   },
+   {
+    "id": "mei08_restituicao_inss_beneficio",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 0.2894316000165418,
+    "artigo": null
+   },
+   {
+    "id": "jur01_carf_mei_cnae",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 8.12419870001031,
+    "artigo": null
+   },
+   {
+    "id": "jur02_carf_stf_art17v",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 4.142796799977077,
+    "artigo": 1.0
+   },
+   {
+    "id": "jur03_carf_debitos_simples_federal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 6.0893652999948245,
+    "artigo": 0.5
+   },
+   {
+    "id": "iss01_relacao_emprego",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 1.9481557999970391,
+    "artigo": 0.0
+   },
+   {
+    "id": "iss02_responsavel_sem_retencao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.0908300999726634,
+    "artigo": 1.0
+   },
+   {
+    "id": "icms02_credito_veiculo_pessoal",
+    "esperado": "answer",
+    "status": "needs_clarification",
+    "seg": 4.762451100017643,
+    "artigo": null
+   },
+   {
+    "id": "icms03_restaurante",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 8.42900709999958,
+    "artigo": 0.0
+   },
+   {
+    "id": "icms05_df_energia_residencial",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.9358046999841463,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp01_presuncao_combustivel",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.012915700004669,
+    "artigo": 0.0
+   },
+   {
+    "id": "lp04_lucro_real_obrigatorio",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.4987444000144023,
+    "artigo": 1.0
+   },
+   {
+    "id": "lp06_irpj_quotas",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 13.69794029998593,
+    "artigo": 1.0
+   },
+   {
+    "id": "ct01_acessoria_vira_principal",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 11.765470400016056,
+    "artigo": 0.0
+   },
+   {
+    "id": "ct04_interrupcao_prescricao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.827851300011389,
+    "artigo": 1.0
+   },
+   {
+    "id": "rf01_extincao_icms_iss",
+    "esperado": "answer",
+    "status": "insufficient_context",
+    "seg": 2.7057186999882106,
+    "artigo": 0.0
+   },
+   {
+    "id": "ob02_ecf_extincao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.944901699986076,
+    "artigo": null
+   },
+   {
+    "id": "co01_iss_exportacao_excecao",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.763860599981854,
+    "artigo": 0.0
+   },
+   {
+    "id": "co03_iss_base_materiais",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 2.8422814999939874,
+    "artigo": 1.0
+   },
+   {
+    "id": "co05_simples_exclusao_opcao_prazo_efeito",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 12.715666800009785,
+    "artigo": 1.0
+   },
+   {
+    "id": "co09_icms_arrendamento",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 8.416852199996356,
+    "artigo": 1.0
+   },
+   {
+    "id": "tr04_ibs_cbs_2026_teste",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 4.789077199995518,
+    "artigo": 0.0
+   },
+   {
+    "id": "tr05_mei_limite_confuso",
+    "esperado": "answer",
+    "status": "answered",
+    "seg": 3.9090730999887455,
+    "artigo": 0.5
+   },
+   {
+    "id": "cl01_anexo_consultoria",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 1.7300015315413475e-05,
+    "artigo": null
+   },
+   {
+    "id": "cl02_mei_continuar",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 4.8572358999808785,
+    "artigo": null
+   },
+   {
+    "id": "cl03_lucro_presumido_trimestre",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3757225000008475,
+    "artigo": null
+   },
+   {
+    "id": "cl04_exclusao_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.40440680002211593,
+    "artigo": null
+   },
+   {
+    "id": "cl05_atividade_pode_ser_mei",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.2687352000211831,
+    "artigo": null
+   },
+   {
+    "id": "cl06_icms_venda",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.38170860000536777,
+    "artigo": null
+   },
+   {
+    "id": "cl07_simples_ou_presumido",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.40230039999005385,
+    "artigo": null
+   },
+   {
+    "id": "cl08_mei_estouro_limite",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.3259933999797795,
+    "artigo": null
+   },
+   {
+    "id": "cl09_presumido_para_simples",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.31999509999877773,
+    "artigo": null
+   },
+   {
+    "id": "cl10_defis_obrigatoriedade",
+    "esperado": "clarify",
+    "status": "needs_clarification",
+    "seg": 0.392691700020805,
+    "artigo": null
+   },
+   {
+    "id": "ab01_aviso_previo_proporcional",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 7.537106500007212,
+    "artigo": null
+   },
+   {
+    "id": "ab02_multa_fgts",
+    "esperado": "abstain",
+    "status": "answered",
+    "seg": 4.645284099999117,
+    "artigo": null
+   },
+   {
+    "id": "ab03_adicional_noturno",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.628991599980509,
+    "artigo": null
+   },
+   {
+    "id": "ab04_intervalo_intrajornada",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 1.6351598000037484,
+    "artigo": null
+   },
+   {
+    "id": "ab05_iss_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.548589099984383,
+    "artigo": null
+   },
+   {
+    "id": "ab06_icms_sao_paulo",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.662801500002388,
+    "artigo": null
+   },
+   {
+    "id": "ab07_ipva_goias",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.633438399992883,
+    "artigo": null
+   },
+   {
+    "id": "ab08_corporate_tax_eua",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 0.825364799995441,
+    "artigo": null
+   },
+   {
+    "id": "ab09_acordao_carf_inexistente",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.750419999996666,
+    "artigo": null
+   },
+   {
+    "id": "ab10_imposto_grandes_fortunas",
+    "esperado": "abstain",
+    "status": "insufficient_context",
+    "seg": 2.3254443999903742,
+    "artigo": null
+   }
+  ]
+ }
+}
