@@ -1,0 +1,36 @@
+.company-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.company-control > svg {
+  position: absolute;
+  left: 14px;
+  color: #58786b;
+  pointer-events: none;
+}
+.company-form .company-control input,
+.company-form .company-control select {
+  padding-left: 42px;
+  min-height: 46px;
+  min-width: 0;
+}
+.company-form .company-control select {
+  padding-right: 24px;
+  text-overflow: ellipsis;
+}
+.company-control:focus-within > svg {
+  color: #08634f;
+}
+.company-form .company-control select:disabled {
+  background: #f1f5f3;
+  color: #687d74;
+  cursor: not-allowed;
+}
+.company-form .company-control input[aria-invalid='true'],
+.company-form .company-control select[aria-invalid='true'] {
+  border-color: #b9432a;
+}
+.company-form .field label {
+  width: fit-content;
+}
