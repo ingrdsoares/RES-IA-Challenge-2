@@ -1,0 +1,109 @@
+{
+  "nome": "guardrails_esclarecimento",
+  "descricao": "Guardrails de texto + regra de esclarecimento do modelo",
+  "env": {
+    "CANDIDATE_K": "30",
+    "LEGISLATION_BOOST": "0.2",
+    "RERANK_LEGISLATION_BOOST": "0",
+    "CONTEXT_WINDOW_CHARS": "0",
+    "MAX_TRECHOS_POR_DOCUMENTO": "0",
+    "ESCLARECIMENTO_MODELO": "true",
+    "CONFERIR_CITACOES": "false",
+    "PESO_EXPANSAO": "0.5",
+    "RERANKER_URL": "http://127.0.0.1:8080",
+    "QDRANT_URL": "http://127.0.0.1:6334",
+    "OLLAMA_TIMEOUT": "600",
+    "RERANKER_TIMEOUT": "120",
+    "QDRANT_TIMEOUT": "60",
+    "COLLECTION_NAME": "knowledge_base_v2",
+    "GUARDRAILS_TEXTO": "true"
+  },
+  "repeticoes": 3,
+  "relatorio": "data\\benchmark\\experimentos-2026-11-13-guard\\guardrails_esclarecimento\\avaliacao\\reports\\a2f305d6453290f314848ff40bda249e7d4d16198ebd21ecaa55586f69e45c4d\\c79d286ea93443d60a46b038bace0bdfa29ea7947b5eee9e6fd12ef7e6b872e3\\results.json",
+  "avaliacao": {
+    "todos": {
+      "perguntas": 81,
+      "tentativas": 243,
+      "falhas": 0,
+      "rouge_l": 0.21789287806392285,
+      "bert_score": 0.5486038214216629,
+      "artigo_esperado": 0.746376811594203,
+      "citacao_suportada": 0.991695804195804,
+      "clarify": {
+        "n": 30,
+        "total": 30,
+        "taxa": 1.0
+      },
+      "falso_positivo": {
+        "n": 15,
+        "total": 183,
+        "taxa": 0.08196721311475409
+      },
+      "recusa_fora_acervo": {
+        "n": 27,
+        "total": 30,
+        "taxa": 0.9
+      },
+      "recusa_indevida": {
+        "n": 15,
+        "total": 183,
+        "taxa": 0.08196721311475409
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 1.8121738000045298,
+      "lat_p95": 12.357065700009116,
+      "conc_resposta": 0.9300411522633745,
+      "conc_fontes": 1.0
+    },
+    "sem_recorte_completo": {
+      "perguntas": 74,
+      "tentativas": 222,
+      "falhas": 0,
+      "rouge_l": 0.2194386626073789,
+      "bert_score": 0.5493923859781324,
+      "artigo_esperado": 0.757936507936508,
+      "citacao_suportada": 0.9961315280464216,
+      "clarify": {
+        "n": 30,
+        "total": 30,
+        "taxa": 1.0
+      },
+      "falso_positivo": {
+        "n": 15,
+        "total": 162,
+        "taxa": 0.09259259259259259
+      },
+      "recusa_fora_acervo": {
+        "n": 27,
+        "total": 30,
+        "taxa": 0.9
+      },
+      "recusa_indevida": {
+        "n": 9,
+        "total": 162,
+        "taxa": 0.05555555555555555
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 1.8314108999984455,
+      "lat_p95": 12.545306999993045,
+      "conc_resposta": 0.9324324324324325,
+      "conc_fontes": 1.0
+    }
+  },
+  "recuperacao": {
+    "todos": {
+      "recall8": 0.5738,
+      "mrr8": 0.4399,
+      "recall8_leniente": 0.6393,
+      "mrr8_leniente": 0.4814
+    },
+    "sem_recorte_completo": {
+      "recall8": 0.5926,
+      "mrr8": 0.4506,
+      "recall8_leniente": 0.6667,
+      "mrr8_leniente": 0.4975
+    }
+  }
+}

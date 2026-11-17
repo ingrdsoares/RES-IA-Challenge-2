@@ -1,0 +1,2320 @@
+{
+  "colecao": "exp_base_2000",
+  "pontos": 23822,
+  "embedding": "qwen3-embedding:0.6b",
+  "perguntas": 20,
+  "configuracao_atual": {
+    "top_k": 8,
+    "score_threshold": 0.5,
+    "candidate_k": 30,
+    "citation_slots": 2
+  },
+  "rodadas": {
+    "densa": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.45,
+        "mrr_estrita": 0.4917,
+        "n_estrita": 20,
+        "recall_mapeada": 0.45,
+        "mrr_mapeada": 0.4917,
+        "recall_estrita_leniente": 0.475,
+        "mrr_estrita_leniente": 0.5167,
+        "recall_mapeada_leniente": 0.475,
+        "mrr_mapeada_leniente": 0.5167,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.5354,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.5354,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.5604,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.5604,
+        "n_mapeada": 20
+      }
+    ],
+    "hibrida": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.475,
+        "mrr_estrita": 0.5167,
+        "n_estrita": 20,
+        "recall_mapeada": 0.475,
+        "mrr_mapeada": 0.5167,
+        "recall_estrita_leniente": 0.5,
+        "mrr_estrita_leniente": 0.55,
+        "recall_mapeada_leniente": 0.5,
+        "mrr_mapeada_leniente": 0.55,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5167,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5167,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.55,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.55,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5292,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5292,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5625,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5625,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5347,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5347,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5681,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5681,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.725,
+        "mrr_estrita": 0.5594,
+        "n_estrita": 20,
+        "recall_mapeada": 0.725,
+        "mrr_mapeada": 0.5594,
+        "recall_estrita_leniente": 0.725,
+        "mrr_estrita_leniente": 0.5927,
+        "recall_mapeada_leniente": 0.725,
+        "mrr_mapeada_leniente": 0.5927,
+        "n_mapeada": 20
+      }
+    ],
+    "hibrida_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.475,
+        "mrr_estrita": 0.5417,
+        "n_estrita": 20,
+        "recall_mapeada": 0.475,
+        "mrr_mapeada": 0.5417,
+        "recall_estrita_leniente": 0.5,
+        "mrr_estrita_leniente": 0.575,
+        "recall_mapeada_leniente": 0.5,
+        "mrr_mapeada_leniente": 0.575,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5417,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5417,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.575,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.575,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5542,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5542,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5875,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5875,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5542,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5542,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5875,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5875,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.725,
+        "mrr_estrita": 0.5844,
+        "n_estrita": 20,
+        "recall_mapeada": 0.725,
+        "mrr_mapeada": 0.5844,
+        "recall_estrita_leniente": 0.725,
+        "mrr_estrita_leniente": 0.6177,
+        "recall_mapeada_leniente": 0.725,
+        "mrr_mapeada_leniente": 0.6177,
+        "n_mapeada": 20
+      }
+    ],
+    "rerank_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.45,
+        "mrr_estrita": 0.575,
+        "n_estrita": 20,
+        "recall_mapeada": 0.45,
+        "mrr_mapeada": 0.575,
+        "recall_estrita_leniente": 0.475,
+        "mrr_estrita_leniente": 0.6,
+        "recall_mapeada_leniente": 0.475,
+        "mrr_mapeada_leniente": 0.6,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.6,
+        "mrr_estrita": 0.5917,
+        "n_estrita": 20,
+        "recall_mapeada": 0.6,
+        "mrr_mapeada": 0.5917,
+        "recall_estrita_leniente": 0.6,
+        "mrr_estrita_leniente": 0.6167,
+        "recall_mapeada_leniente": 0.6,
+        "mrr_mapeada_leniente": 0.6167,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.6042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.6042,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.6292,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.6292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.6042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.6042,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.6292,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.6292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.675,
+        "mrr_estrita": 0.6225,
+        "n_estrita": 20,
+        "recall_mapeada": 0.675,
+        "mrr_mapeada": 0.6225,
+        "recall_estrita_leniente": 0.675,
+        "mrr_estrita_leniente": 0.6475,
+        "recall_mapeada_leniente": 0.675,
+        "mrr_mapeada_leniente": 0.6475,
+        "n_mapeada": 20
+      }
+    ]
+  },
+  "rodadas_sem_recorte_completo": {
+    "densa": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.45,
+        "mrr_estrita": 0.4917,
+        "n_estrita": 20,
+        "recall_mapeada": 0.45,
+        "mrr_mapeada": 0.4917,
+        "recall_estrita_leniente": 0.475,
+        "mrr_estrita_leniente": 0.5167,
+        "recall_mapeada_leniente": 0.475,
+        "mrr_mapeada_leniente": 0.5167,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5042,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5292,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.5354,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.5354,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.5604,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.5604,
+        "n_mapeada": 20
+      }
+    ],
+    "hibrida": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.475,
+        "mrr_estrita": 0.5167,
+        "n_estrita": 20,
+        "recall_mapeada": 0.475,
+        "mrr_mapeada": 0.5167,
+        "recall_estrita_leniente": 0.5,
+        "mrr_estrita_leniente": 0.55,
+        "recall_mapeada_leniente": 0.5,
+        "mrr_mapeada_leniente": 0.55,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5167,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5167,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.55,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.55,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5292,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5292,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5625,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5625,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.575,
+        "mrr_estrita": 0.5347,
+        "n_estrita": 20,
+        "recall_mapeada": 0.575,
+        "mrr_mapeada": 0.5347,
+        "recall_estrita_leniente": 0.575,
+        "mrr_estrita_leniente": 0.5681,
+        "recall_mapeada_leniente": 0.575,
+        "mrr_mapeada_leniente": 0.5681,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.725,
+        "mrr_estrita": 0.5594,
+        "n_estrita": 20,
+        "recall_mapeada": 0.725,
+        "mrr_mapeada": 0.5594,
+        "recall_estrita_leniente": 0.725,
+        "mrr_estrita_leniente": 0.5927,
+        "recall_mapeada_leniente": 0.725,
+        "mrr_mapeada_leniente": 0.5927,
+        "n_mapeada": 20
+      }
+    ],
+    "hibrida_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.475,
+        "mrr_estrita": 0.5417,
+        "n_estrita": 20,
+        "recall_mapeada": 0.475,
+        "mrr_mapeada": 0.5417,
+        "recall_estrita_leniente": 0.5,
+        "mrr_estrita_leniente": 0.575,
+        "recall_mapeada_leniente": 0.5,
+        "mrr_mapeada_leniente": 0.575,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.525,
+        "mrr_estrita": 0.5417,
+        "n_estrita": 20,
+        "recall_mapeada": 0.525,
+        "mrr_mapeada": 0.5417,
+        "recall_estrita_leniente": 0.525,
+        "mrr_estrita_leniente": 0.575,
+        "recall_mapeada_leniente": 0.525,
+        "mrr_mapeada_leniente": 0.575,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5542,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5542,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5875,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5875,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.55,
+        "mrr_estrita": 0.5542,
+        "n_estrita": 20,
+        "recall_mapeada": 0.55,
+        "mrr_mapeada": 0.5542,
+        "recall_estrita_leniente": 0.55,
+        "mrr_estrita_leniente": 0.5875,
+        "recall_mapeada_leniente": 0.55,
+        "mrr_mapeada_leniente": 0.5875,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.725,
+        "mrr_estrita": 0.5844,
+        "n_estrita": 20,
+        "recall_mapeada": 0.725,
+        "mrr_mapeada": 0.5844,
+        "recall_estrita_leniente": 0.725,
+        "mrr_estrita_leniente": 0.6177,
+        "recall_mapeada_leniente": 0.725,
+        "mrr_mapeada_leniente": 0.6177,
+        "n_mapeada": 20
+      }
+    ],
+    "rerank_norma": [
+      {
+        "top_k": 3,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.45,
+        "mrr_estrita": 0.575,
+        "n_estrita": 20,
+        "recall_mapeada": 0.45,
+        "mrr_mapeada": 0.575,
+        "recall_estrita_leniente": 0.475,
+        "mrr_estrita_leniente": 0.6,
+        "recall_mapeada_leniente": 0.475,
+        "mrr_mapeada_leniente": 0.6,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 5,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.6,
+        "mrr_estrita": 0.5917,
+        "n_estrita": 20,
+        "recall_mapeada": 0.6,
+        "mrr_mapeada": 0.5917,
+        "recall_estrita_leniente": 0.6,
+        "mrr_estrita_leniente": 0.6167,
+        "recall_mapeada_leniente": 0.6,
+        "mrr_mapeada_leniente": 0.6167,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 8,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.6042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.6042,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.6292,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.6292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 10,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.625,
+        "mrr_estrita": 0.6042,
+        "n_estrita": 20,
+        "recall_mapeada": 0.625,
+        "mrr_mapeada": 0.6042,
+        "recall_estrita_leniente": 0.625,
+        "mrr_estrita_leniente": 0.6292,
+        "recall_mapeada_leniente": 0.625,
+        "mrr_mapeada_leniente": 0.6292,
+        "n_mapeada": 20
+      },
+      {
+        "top_k": 20,
+        "score_threshold": 0.0,
+        "recall_estrita": 0.675,
+        "mrr_estrita": 0.6225,
+        "n_estrita": 20,
+        "recall_mapeada": 0.675,
+        "mrr_mapeada": 0.6225,
+        "recall_estrita_leniente": 0.675,
+        "mrr_estrita_leniente": 0.6475,
+        "recall_mapeada_leniente": 0.675,
+        "mrr_mapeada_leniente": 0.6475,
+        "n_mapeada": 20
+      }
+    ]
+  },
+  "por_pergunta": [
+    {
+      "id": "q01_mei_limite_geral",
+      "esperados": [
+        "d71663a0cd",
+        "324686735a"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "30272b7cf1",
+          0.656
+        ],
+        [
+          "324686735a",
+          0.6156
+        ],
+        [
+          "30272b7cf1",
+          0.6627
+        ],
+        [
+          "d71663a0cd",
+          0.6751
+        ],
+        [
+          "9c3abc476e",
+          0.6636
+        ],
+        [
+          "30272b7cf1",
+          0.5633
+        ],
+        [
+          "d71663a0cd",
+          0.6131
+        ],
+        [
+          "324686735a",
+          0.5768
+        ],
+        [
+          "324686735a",
+          0.6789
+        ],
+        [
+          "324686735a",
+          0.6051
+        ],
+        [
+          "f8d55d3e94",
+          0.5058
+        ],
+        [
+          "324686735a",
+          0.6204
+        ],
+        [
+          "f8d55d3e94",
+          0.5002
+        ],
+        [
+          "f8d55d3e94",
+          0.5487
+        ],
+        [
+          "f8d55d3e94",
+          0.5566
+        ],
+        [
+          "f8d55d3e94",
+          0.5057
+        ],
+        [
+          "9c3abc476e",
+          0.5985
+        ],
+        [
+          "30272b7cf1",
+          0.7014
+        ],
+        [
+          "f8d55d3e94",
+          0.5361
+        ],
+        [
+          "9c3abc476e",
+          0.5953
+        ]
+      ]
+    },
+    {
+      "id": "q02_fator_r_calculo_software",
+      "esperados": [
+        "d71663a0cd",
+        "184293b40a"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "96d12fe9a0",
+          0.7793
+        ],
+        [
+          "5db17564d0",
+          0.7716
+        ],
+        [
+          "b5964c1de6",
+          0.6766
+        ],
+        [
+          "ac91457196",
+          0.7335
+        ],
+        [
+          "7b66db4e5a",
+          0.6138
+        ],
+        [
+          "b5964c1de6",
+          0.7171
+        ],
+        [
+          "b5964c1de6",
+          0.5125
+        ],
+        [
+          "b5964c1de6",
+          0.7195
+        ],
+        [
+          "5db17564d0",
+          0.6349
+        ],
+        [
+          "96d12fe9a0",
+          0.682
+        ],
+        [
+          "96d12fe9a0",
+          0.5707
+        ],
+        [
+          "96d12fe9a0",
+          0.5896
+        ],
+        [
+          "96d12fe9a0",
+          0.6345
+        ],
+        [
+          "9c3abc476e",
+          0.708
+        ],
+        [
+          "5db17564d0",
+          0.72
+        ],
+        [
+          "ac91457196",
+          0.7121
+        ],
+        [
+          "96d12fe9a0",
+          0.6942
+        ],
+        [
+          "b5964c1de6",
+          0.7107
+        ],
+        [
+          "96d12fe9a0",
+          0.7169
+        ],
+        [
+          "9c3abc476e",
+          0.7154
+        ]
+      ]
+    },
+    {
+      "id": "q03_dasn_simei_prazo_multa",
+      "esperados": [
+        "9c3abc476e",
+        "30272b7cf1"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "30272b7cf1",
+          0.8531
+        ],
+        [
+          "30272b7cf1",
+          0.8199
+        ],
+        [
+          "324686735a",
+          0.7439
+        ],
+        [
+          "324686735a",
+          0.6674
+        ],
+        [
+          "9c3abc476e",
+          0.749
+        ],
+        [
+          "30272b7cf1",
+          0.7759
+        ],
+        [
+          "30272b7cf1",
+          0.7002
+        ],
+        [
+          "9c3abc476e",
+          0.7042
+        ],
+        [
+          "9c3abc476e",
+          0.6345
+        ],
+        [
+          "30272b7cf1",
+          0.7116
+        ],
+        [
+          "9c3abc476e",
+          0.7195
+        ],
+        [
+          "30272b7cf1",
+          0.7157
+        ],
+        [
+          "30272b7cf1",
+          0.7574
+        ],
+        [
+          "30272b7cf1",
+          0.7223
+        ],
+        [
+          "9c3abc476e",
+          0.7249
+        ],
+        [
+          "9c3abc476e",
+          0.7337
+        ],
+        [
+          "9c3abc476e",
+          0.7073
+        ],
+        [
+          "9c3abc476e",
+          0.7138
+        ],
+        [
+          "30272b7cf1",
+          0.7548
+        ],
+        [
+          "324686735a",
+          0.6798
+        ]
+      ]
+    },
+    {
+      "id": "q04_cpen_parcelamento_regularidade",
+      "esperados": [
+        "97ec5db500",
+        "8d4398a7d9"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "6f9fd021eb",
+          0.6306
+        ],
+        [
+          "edadabd625",
+          0.5454
+        ],
+        [
+          "f211db8c9b",
+          0.5025
+        ]
+      ]
+    },
+    {
+      "id": "q05_iss_aliquota_distrito_federal",
+      "esperados": [
+        "39235835ae",
+        "1e21025194"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "39235835ae",
+          0.778
+        ],
+        [
+          "39235835ae",
+          0.7752
+        ],
+        [
+          "7ef965e7ec",
+          0.6706
+        ],
+        [
+          "39235835ae",
+          0.7323
+        ],
+        [
+          "39235835ae",
+          0.703
+        ],
+        [
+          "39235835ae",
+          0.6758
+        ],
+        [
+          "39235835ae",
+          0.6887
+        ],
+        [
+          "39235835ae",
+          0.6039
+        ],
+        [
+          "c30b25ccf6",
+          0.5862
+        ],
+        [
+          "39235835ae",
+          0.5684
+        ],
+        [
+          "39235835ae",
+          0.554
+        ],
+        [
+          "39235835ae",
+          0.7505
+        ],
+        [
+          "39235835ae",
+          0.6414
+        ],
+        [
+          "bdd315de58",
+          0.7092
+        ],
+        [
+          "39235835ae",
+          0.6745
+        ],
+        [
+          "bdd315de58",
+          0.568
+        ],
+        [
+          "39235835ae",
+          0.7118
+        ],
+        [
+          "83f6be016d",
+          0.6917
+        ],
+        [
+          "39235835ae",
+          0.6993
+        ],
+        [
+          "39235835ae",
+          0.7003
+        ]
+      ]
+    },
+    {
+      "id": "q06_icms_aliquota_interna_df",
+      "esperados": [
+        "33bf4c66ed",
+        "d71663a0cd"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "0ac75e297f",
+          0.608
+        ],
+        [
+          "0ac75e297f",
+          0.6012
+        ],
+        [
+          "8d4398a7d9",
+          0.6831
+        ],
+        [
+          "7b66db4e5a",
+          0.6901
+        ],
+        [
+          "8d4398a7d9",
+          0.6182
+        ],
+        [
+          "9c3abc476e",
+          0.7092
+        ],
+        [
+          "db40e91463",
+          0.5402
+        ],
+        [
+          "7b66db4e5a",
+          0.6517
+        ],
+        [
+          "7b66db4e5a",
+          0.6873
+        ],
+        [
+          "7b66db4e5a",
+          0.6161
+        ],
+        [
+          "33bf4c66ed",
+          0.5975
+        ],
+        [
+          "7b66db4e5a",
+          0.6253
+        ],
+        [
+          "49987f588a",
+          0.646
+        ],
+        [
+          "c73cd99fd1",
+          0.8
+        ],
+        [
+          "7b66db4e5a",
+          0.572
+        ],
+        [
+          "7b66db4e5a",
+          0.6512
+        ],
+        [
+          "33bf4c66ed",
+          0.7154
+        ],
+        [
+          "33bf4c66ed",
+          0.6372
+        ],
+        [
+          "c2de537562",
+          0.6334
+        ],
+        [
+          "184293b40a",
+          0.6514
+        ]
+      ]
+    },
+    {
+      "id": "q07_nfse_mei_padrao_nacional",
+      "esperados": [
+        "9c3abc476e"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "8ffcf3a7e0",
+          0.6749
+        ],
+        [
+          "0ac75e297f",
+          0.6703
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6485
+        ],
+        [
+          "9c3abc476e",
+          0.7061
+        ],
+        [
+          "c0b28fe4c7",
+          0.6857
+        ],
+        [
+          "9c3abc476e",
+          0.656
+        ],
+        [
+          "8ffcf3a7e0",
+          0.6393
+        ],
+        [
+          "324686735a",
+          0.6801
+        ],
+        [
+          "324686735a",
+          0.7476
+        ],
+        [
+          "8ffcf3a7e0",
+          0.5769
+        ],
+        [
+          "39235835ae",
+          0.6264
+        ],
+        [
+          "39235835ae",
+          0.6727
+        ],
+        [
+          "39235835ae",
+          0.6576
+        ],
+        [
+          "8ffcf3a7e0",
+          0.541
+        ],
+        [
+          "8d4398a7d9",
+          0.6349
+        ],
+        [
+          "d71663a0cd",
+          0.676
+        ],
+        [
+          "588e697497",
+          0.6195
+        ],
+        [
+          "39235835ae",
+          0.6437
+        ],
+        [
+          "d71663a0cd",
+          0.6728
+        ],
+        [
+          "0ac75e297f",
+          0.5967
+        ]
+      ]
+    },
+    {
+      "id": "q08_lucro_presumido_aliquota_servicos",
+      "esperados": [
+        "6534b72296",
+        "e0b5044dfa"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "76926ea06e",
+          0.6292
+        ],
+        [
+          "b1fd403a4a",
+          0.737
+        ],
+        [
+          "b1fd403a4a",
+          0.7418
+        ],
+        [
+          "b1fd403a4a",
+          0.6667
+        ],
+        [
+          "215ae21b4b",
+          0.6233
+        ],
+        [
+          "b1fd403a4a",
+          0.7551
+        ],
+        [
+          "981109d8aa",
+          0.7637
+        ],
+        [
+          "1cc3786cac",
+          0.6425
+        ],
+        [
+          "b1fd403a4a",
+          0.7309
+        ],
+        [
+          "74b712b843",
+          0.7441
+        ],
+        [
+          "b1fd403a4a",
+          0.5725
+        ],
+        [
+          "e1eac0804e",
+          0.6964
+        ],
+        [
+          "215ae21b4b",
+          0.6569
+        ],
+        [
+          "981109d8aa",
+          0.5624
+        ],
+        [
+          "b1fd403a4a",
+          0.7858
+        ],
+        [
+          "215ae21b4b",
+          0.6931
+        ],
+        [
+          "981109d8aa",
+          0.7619
+        ],
+        [
+          "215ae21b4b",
+          0.5982
+        ],
+        [
+          "1846bb7f94",
+          0.733
+        ],
+        [
+          "b1fd403a4a",
+          0.7337
+        ]
+      ]
+    },
+    {
+      "id": "q09_lucro_presumido_limite_receita",
+      "esperados": [
+        "e9d484450a"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e9d484450a",
+          0.754
+        ],
+        [
+          "1846bb7f94",
+          0.6799
+        ],
+        [
+          "3159e3712e",
+          0.7363
+        ],
+        [
+          "e0b5044dfa",
+          0.6606
+        ],
+        [
+          "e0b5044dfa",
+          0.6519
+        ],
+        [
+          "74b712b843",
+          0.6583
+        ],
+        [
+          "e0b5044dfa",
+          0.7048
+        ],
+        [
+          "e0b5044dfa",
+          0.6595
+        ],
+        [
+          "e0b5044dfa",
+          0.6819
+        ],
+        [
+          "74b712b843",
+          0.6352
+        ],
+        [
+          "1846bb7f94",
+          0.5589
+        ],
+        [
+          "1846bb7f94",
+          0.566
+        ],
+        [
+          "8d4398a7d9",
+          0.6756
+        ],
+        [
+          "74b712b843",
+          0.6721
+        ],
+        [
+          "8d4398a7d9",
+          0.6692
+        ],
+        [
+          "74b712b843",
+          0.5707
+        ],
+        [
+          "74b712b843",
+          0.6699
+        ],
+        [
+          "e0b5044dfa",
+          0.6381
+        ],
+        [
+          "3a94bf5d71",
+          0.6627
+        ],
+        [
+          "d71663a0cd",
+          0.5402
+        ]
+      ]
+    },
+    {
+      "id": "q10_calendario_vencimento_das",
+      "esperados": [
+        "9bf7b52dae"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "9bf7b52dae",
+          0.684
+        ],
+        [
+          "324686735a",
+          0.707
+        ],
+        [
+          "30272b7cf1",
+          0.642
+        ],
+        [
+          "8d4398a7d9",
+          0.7291
+        ],
+        [
+          "324686735a",
+          0.5772
+        ],
+        [
+          "9bf7b52dae",
+          0.6202
+        ],
+        [
+          "9bf7b52dae",
+          0.6844
+        ],
+        [
+          "30272b7cf1",
+          0.6682
+        ],
+        [
+          "30272b7cf1",
+          0.6581
+        ],
+        [
+          "9c3abc476e",
+          0.736
+        ],
+        [
+          "8d4398a7d9",
+          0.5689
+        ],
+        [
+          "30272b7cf1",
+          0.6312
+        ],
+        [
+          "30272b7cf1",
+          0.6275
+        ],
+        [
+          "8d4398a7d9",
+          0.7138
+        ],
+        [
+          "324686735a",
+          0.61
+        ],
+        [
+          "9bf7b52dae",
+          0.7036
+        ],
+        [
+          "9c3abc476e",
+          0.6445
+        ],
+        [
+          "9bf7b52dae",
+          0.6857
+        ],
+        [
+          "7b66db4e5a",
+          0.678
+        ],
+        [
+          "9c3abc476e",
+          0.7738
+        ]
+      ]
+    },
+    {
+      "id": "q13_desenquadramento_retroativo_mei",
+      "esperados": [
+        "d71663a0cd",
+        "324686735a"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "d71663a0cd",
+          0.7091
+        ],
+        [
+          "324686735a",
+          0.6874
+        ],
+        [
+          "d71663a0cd",
+          0.6954
+        ],
+        [
+          "324686735a",
+          0.6964
+        ],
+        [
+          "324686735a",
+          0.6439
+        ],
+        [
+          "324686735a",
+          0.6089
+        ],
+        [
+          "d71663a0cd",
+          0.6969
+        ],
+        [
+          "d71663a0cd",
+          0.6829
+        ],
+        [
+          "30272b7cf1",
+          0.5572
+        ],
+        [
+          "d71663a0cd",
+          0.6834
+        ],
+        [
+          "d71663a0cd",
+          0.6663
+        ],
+        [
+          "d71663a0cd",
+          0.6672
+        ],
+        [
+          "30272b7cf1",
+          0.5565
+        ],
+        [
+          "d71663a0cd",
+          0.6948
+        ],
+        [
+          "30272b7cf1",
+          0.522
+        ],
+        [
+          "324686735a",
+          0.6213
+        ],
+        [
+          "2ef41db92d",
+          0.661
+        ],
+        [
+          "d71663a0cd",
+          0.7018
+        ],
+        [
+          "9c3abc476e",
+          0.5615
+        ],
+        [
+          "324686735a",
+          0.6493
+        ]
+      ]
+    },
+    {
+      "id": "q14_dispensa_ecd_simples_nacional",
+      "esperados": [
+        "9fc18961ed",
+        "d71663a0cd"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "9fc18961ed",
+          0.686
+        ],
+        [
+          "423a34686e",
+          0.7209
+        ],
+        [
+          "d71663a0cd",
+          0.7662
+        ],
+        [
+          "d71663a0cd",
+          0.745
+        ],
+        [
+          "d71663a0cd",
+          0.731
+        ],
+        [
+          "9c3abc476e",
+          0.7404
+        ],
+        [
+          "9fc18961ed",
+          0.6736
+        ],
+        [
+          "d71663a0cd",
+          0.7119
+        ],
+        [
+          "d71663a0cd",
+          0.6898
+        ],
+        [
+          "d71663a0cd",
+          0.6955
+        ],
+        [
+          "74b712b843",
+          0.5825
+        ],
+        [
+          "9c3abc476e",
+          0.6895
+        ],
+        [
+          "9c3abc476e",
+          0.7108
+        ],
+        [
+          "8dd6d3dcf3",
+          0.7552
+        ],
+        [
+          "9c3abc476e",
+          0.6877
+        ],
+        [
+          "8d4398a7d9",
+          0.7201
+        ],
+        [
+          "9c3abc476e",
+          0.6853
+        ],
+        [
+          "9fc18961ed",
+          0.6572
+        ],
+        [
+          "d71663a0cd",
+          0.7086
+        ],
+        [
+          "9c3abc476e",
+          0.6955
+        ]
+      ]
+    },
+    {
+      "id": "q15_dispensa_ecf_defis",
+      "esperados": [
+        "74b712b843",
+        "7b66db4e5a"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "9c3abc476e",
+          0.6937
+        ],
+        [
+          "9c3abc476e",
+          0.6833
+        ],
+        [
+          "a8d7ae0ecd",
+          0.7015
+        ],
+        [
+          "d71663a0cd",
+          0.7104
+        ],
+        [
+          "9c3abc476e",
+          0.6816
+        ],
+        [
+          "9c3abc476e",
+          0.6891
+        ],
+        [
+          "d71663a0cd",
+          0.6885
+        ],
+        [
+          "d71663a0cd",
+          0.6991
+        ],
+        [
+          "8d4398a7d9",
+          0.6068
+        ],
+        [
+          "d71663a0cd",
+          0.7136
+        ],
+        [
+          "d71663a0cd",
+          0.696
+        ],
+        [
+          "d71663a0cd",
+          0.696
+        ],
+        [
+          "d71663a0cd",
+          0.7054
+        ],
+        [
+          "d71663a0cd",
+          0.6953
+        ],
+        [
+          "7b66db4e5a",
+          0.6287
+        ],
+        [
+          "d71663a0cd",
+          0.7027
+        ],
+        [
+          "d71663a0cd",
+          0.6794
+        ],
+        [
+          "d71663a0cd",
+          0.6808
+        ],
+        [
+          "d71663a0cd",
+          0.7153
+        ],
+        [
+          "d71663a0cd",
+          0.6869
+        ]
+      ]
+    },
+    {
+      "id": "q16_ocupacao_vedada_desenvolvedor_ti",
+      "esperados": [
+        "c60a2972ca",
+        "7fd56d4b01"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "2ef41db92d",
+          0.5641
+        ],
+        [
+          "2ef41db92d",
+          0.5432
+        ],
+        [
+          "3d468e6a8f",
+          0.5783
+        ],
+        [
+          "8d4398a7d9",
+          0.5623
+        ],
+        [
+          "2ef41db92d",
+          0.5468
+        ],
+        [
+          "c60a2972ca",
+          0.5903
+        ],
+        [
+          "d71663a0cd",
+          0.5915
+        ],
+        [
+          "2ef41db92d",
+          0.5026
+        ],
+        [
+          "9c3abc476e",
+          0.5558
+        ],
+        [
+          "3d468e6a8f",
+          0.5664
+        ],
+        [
+          "324686735a",
+          0.5654
+        ],
+        [
+          "9c3abc476e",
+          0.5584
+        ],
+        [
+          "1d89c957f2",
+          0.582
+        ],
+        [
+          "324686735a",
+          0.5252
+        ],
+        [
+          "324686735a",
+          0.6004
+        ],
+        [
+          "30272b7cf1",
+          0.5538
+        ],
+        [
+          "30272b7cf1",
+          0.5963
+        ],
+        [
+          "9bf7b52dae",
+          0.5776
+        ],
+        [
+          "9c3abc476e",
+          0.5675
+        ],
+        [
+          "324686735a",
+          0.5988
+        ]
+      ]
+    },
+    {
+      "id": "q17_retencao_iss_responsabilidade_df",
+      "esperados": [
+        "af733a9d88",
+        "db40e91463"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "db40e91463",
+          0.5904
+        ],
+        [
+          "db40e91463",
+          0.6472
+        ],
+        [
+          "39235835ae",
+          0.7552
+        ],
+        [
+          "90ea13c9bf",
+          0.6646
+        ],
+        [
+          "db40e91463",
+          0.6406
+        ],
+        [
+          "db40e91463",
+          0.6028
+        ],
+        [
+          "39235835ae",
+          0.7411
+        ],
+        [
+          "39235835ae",
+          0.6903
+        ],
+        [
+          "39235835ae",
+          0.7403
+        ],
+        [
+          "39235835ae",
+          0.6828
+        ],
+        [
+          "8ffcf3a7e0",
+          0.689
+        ],
+        [
+          "39235835ae",
+          0.7382
+        ],
+        [
+          "39235835ae",
+          0.7218
+        ],
+        [
+          "39235835ae",
+          0.7411
+        ],
+        [
+          "39235835ae",
+          0.6832
+        ],
+        [
+          "0ac75e297f",
+          0.607
+        ],
+        [
+          "db40e91463",
+          0.6983
+        ],
+        [
+          "39235835ae",
+          0.7455
+        ],
+        [
+          "39235835ae",
+          0.6953
+        ],
+        [
+          "39235835ae",
+          0.7063
+        ]
+      ]
+    },
+    {
+      "id": "q18_composicao_guia_fixa_mei",
+      "esperados": [
+        "9c3abc476e",
+        "9bf7b52dae"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "9bf7b52dae",
+          0.7416
+        ],
+        [
+          "30272b7cf1",
+          0.6668
+        ],
+        [
+          "324686735a",
+          0.6659
+        ],
+        [
+          "30272b7cf1",
+          0.6953
+        ],
+        [
+          "9c3abc476e",
+          0.694
+        ],
+        [
+          "9bf7b52dae",
+          0.6523
+        ],
+        [
+          "30272b7cf1",
+          0.5609
+        ],
+        [
+          "9c3abc476e",
+          0.6386
+        ],
+        [
+          "9bf7b52dae",
+          0.692
+        ],
+        [
+          "9bf7b52dae",
+          0.6908
+        ],
+        [
+          "30272b7cf1",
+          0.6751
+        ],
+        [
+          "9c3abc476e",
+          0.6576
+        ],
+        [
+          "9bf7b52dae",
+          0.6454
+        ],
+        [
+          "9c3abc476e",
+          0.6439
+        ],
+        [
+          "9c3abc476e",
+          0.6612
+        ],
+        [
+          "324686735a",
+          0.6431
+        ],
+        [
+          "324686735a",
+          0.6429
+        ],
+        [
+          "9c3abc476e",
+          0.6804
+        ],
+        [
+          "9bf7b52dae",
+          0.6517
+        ],
+        [
+          "9bf7b52dae",
+          0.6491
+        ]
+      ]
+    },
+    {
+      "id": "q19_adicional_irpj_lucro_presumido",
+      "esperados": [
+        "3a94bf5d71"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "e0b5044dfa",
+          0.7229
+        ],
+        [
+          "2c3a957e58",
+          0.672
+        ],
+        [
+          "e0b5044dfa",
+          0.6521
+        ],
+        [
+          "74b712b843",
+          0.5985
+        ],
+        [
+          "74b712b843",
+          0.5637
+        ],
+        [
+          "74b712b843",
+          0.7486
+        ],
+        [
+          "1846bb7f94",
+          0.6927
+        ],
+        [
+          "74b712b843",
+          0.5964
+        ],
+        [
+          "e0b5044dfa",
+          0.6495
+        ],
+        [
+          "74b712b843",
+          0.5857
+        ],
+        [
+          "215ae21b4b",
+          0.6524
+        ],
+        [
+          "1846bb7f94",
+          0.7242
+        ],
+        [
+          "74b712b843",
+          0.5627
+        ],
+        [
+          "981109d8aa",
+          0.6748
+        ],
+        [
+          "1cc3786cac",
+          0.6435
+        ],
+        [
+          "e9d484450a",
+          0.5126
+        ],
+        [
+          "e0b5044dfa",
+          0.6407
+        ],
+        [
+          "981109d8aa",
+          0.6411
+        ],
+        [
+          "1846bb7f94",
+          0.6848
+        ],
+        [
+          "74b712b843",
+          0.6874
+        ]
+      ]
+    },
+    {
+      "id": "q20_transicao_reforma_tributaria_mei",
+      "esperados": [
+        "51a26c2b2b",
+        "c0b28fe4c7"
+      ],
+      "total_esperado": 2,
+      "hits": [
+        [
+          "51a26c2b2b",
+          0.6141
+        ],
+        [
+          "51a26c2b2b",
+          0.6081
+        ],
+        [
+          "51a26c2b2b",
+          0.5877
+        ],
+        [
+          "c0b28fe4c7",
+          0.5203
+        ],
+        [
+          "51a26c2b2b",
+          0.5262
+        ],
+        [
+          "51a26c2b2b",
+          0.5404
+        ],
+        [
+          "9c3abc476e",
+          0.6575
+        ],
+        [
+          "51a26c2b2b",
+          0.5226
+        ],
+        [
+          "51a26c2b2b",
+          0.5029
+        ],
+        [
+          "8d4398a7d9",
+          0.66
+        ],
+        [
+          "c0b28fe4c7",
+          0.6507
+        ],
+        [
+          "9c3abc476e",
+          0.6617
+        ],
+        [
+          "8d4398a7d9",
+          0.6524
+        ],
+        [
+          "9c3abc476e",
+          0.6497
+        ],
+        [
+          "8d4398a7d9",
+          0.6643
+        ],
+        [
+          "184293b40a",
+          0.6704
+        ],
+        [
+          "9c3abc476e",
+          0.6604
+        ],
+        [
+          "3f2dfb2e2a",
+          0.6471
+        ],
+        [
+          "9c3abc476e",
+          0.6538
+        ],
+        [
+          "184293b40a",
+          0.6731
+        ]
+      ]
+    },
+    {
+      "id": "q21_lei_kandir_nao_cumulatividade_icms",
+      "esperados": [
+        "010f7c42ad"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "010f7c42ad",
+          0.7039
+        ],
+        [
+          "010f7c42ad",
+          0.7025
+        ],
+        [
+          "010f7c42ad",
+          0.6543
+        ],
+        [
+          "010f7c42ad",
+          0.641
+        ],
+        [
+          "010f7c42ad",
+          0.6942
+        ],
+        [
+          "010f7c42ad",
+          0.6419
+        ],
+        [
+          "010f7c42ad",
+          0.6838
+        ],
+        [
+          "010f7c42ad",
+          0.6923
+        ],
+        [
+          "010f7c42ad",
+          0.6769
+        ],
+        [
+          "010f7c42ad",
+          0.669
+        ],
+        [
+          "010f7c42ad",
+          0.661
+        ],
+        [
+          "33bf4c66ed",
+          0.6627
+        ],
+        [
+          "010f7c42ad",
+          0.6312
+        ],
+        [
+          "010f7c42ad",
+          0.6585
+        ],
+        [
+          "010f7c42ad",
+          0.6387
+        ],
+        [
+          "010f7c42ad",
+          0.6236
+        ],
+        [
+          "010f7c42ad",
+          0.6954
+        ],
+        [
+          "010f7c42ad",
+          0.5985
+        ],
+        [
+          "010f7c42ad",
+          0.6379
+        ],
+        [
+          "010f7c42ad",
+          0.5936
+        ]
+      ]
+    },
+    {
+      "id": "q22_transparencia_imposto_na_nota",
+      "esperados": [
+        "5d94b1e8d4"
+      ],
+      "total_esperado": 1,
+      "hits": [
+        [
+          "5d94b1e8d4",
+          0.7103
+        ],
+        [
+          "5d94b1e8d4",
+          0.6203
+        ],
+        [
+          "5d94b1e8d4",
+          0.6041
+        ],
+        [
+          "5d94b1e8d4",
+          0.5069
+        ],
+        [
+          "5d94b1e8d4",
+          0.5785
+        ],
+        [
+          "5d94b1e8d4",
+          0.6051
+        ],
+        [
+          "5d94b1e8d4",
+          0.613
+        ],
+        [
+          "5d94b1e8d4",
+          0.6135
+        ],
+        [
+          "5d94b1e8d4",
+          0.5455
+        ],
+        [
+          "c30b25ccf6",
+          0.5677
+        ],
+        [
+          "c30b25ccf6",
+          0.5199
+        ],
+        [
+          "18e02fe02a",
+          0.5003
+        ],
+        [
+          "18e02fe02a",
+          0.5522
+        ],
+        [
+          "18e02fe02a",
+          0.5544
+        ],
+        [
+          "010f7c42ad",
+          0.5393
+        ],
+        [
+          "c0b28fe4c7",
+          0.5725
+        ],
+        [
+          "c0b28fe4c7",
+          0.555
+        ],
+        [
+          "698aa44c24",
+          0.5158
+        ],
+        [
+          "010f7c42ad",
+          0.5564
+        ],
+        [
+          "18e02fe02a",
+          0.5773
+        ]
+      ]
+    }
+  ]
+}

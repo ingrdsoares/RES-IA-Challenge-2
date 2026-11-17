@@ -220,9 +220,14 @@ class LocalModels:
                     {"role": "user", "content": question},
                 ],
                 stream=False,
-                think=False,
+                think=self.settings.esclarecimento_raciocinio,
                 format=_FORMATO_ESCLARECIMENTO,
-                options={"num_ctx": 2048, "num_predict": 128, "temperature": 0, "seed": 42},
+                options={
+                    "num_ctx": 2048,
+                    "num_predict": 1024 if self.settings.esclarecimento_raciocinio else 128,
+                    "temperature": 0,
+                    "seed": 42,
+                },
             )
             dados = json.loads(response.message.content or "")
         except (
