@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Query
+from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,7 @@ from app.companies.service import require_company
 from app.db import get_db
 from app.dependencies import require_account
 from app.pagination import page
+from app.rate_limit import RateLimiter
 
 router = APIRouter(tags=["Assistente"])
 
@@ -77,17 +78,29 @@ def messages(
     )
 
 
-@router.post("/conversas/{conversation_id}/mensagens", status_code=202)
+@router.post(
+    "/conversas/{conversation_id}/mensagens",
+    status_code=202,
+    dependencies=[Depends(RateLimiter(namespace="ai_rag"))],
+)
 def send(
     conversation_id: UUID,
     data: MessageInput,
+    request: Request,
     idempotency_key: str = Header(..., min_length=1, max_length=128),
     db: Session = Depends(get_db),
     account: Account = Depends(require_account),
 ):
-    operation = submit_message(db, account.id, conversation_id, data, idempotency_key)
+    operation = submit_message(
+        db, account.id, conversation_id, data, idempotency_key, settings=request.app.state.settings
+    )
+    from app.assistant.agents.models import AgentRun
+
+    run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation.id))
     db.commit()
     return {
+        "run_id": run.id if run else None,
+        "trace_id": run.trace_id if run else None,
         "operation_id": operation.id,
         "status": operation.status,
         "status_url": f"/operacoes/{operation.id}",

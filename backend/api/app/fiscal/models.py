@@ -28,6 +28,7 @@ class Calculation(Base):
     __tablename__ = "calculations"
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     company_id: Mapped[UUID] = mapped_column(ForeignKey("companies.id"), index=True)
+    agent_step_id: Mapped[UUID | None] = mapped_column(ForeignKey("agent_steps.id"), unique=True)
     rule_id: Mapped[UUID | None] = mapped_column(ForeignKey("fiscal_rules.id"))
     status: Mapped[str] = mapped_column(String(30))
     request: Mapped[dict] = mapped_column(JSON)

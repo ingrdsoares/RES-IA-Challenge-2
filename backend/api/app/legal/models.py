@@ -1,7 +1,7 @@
 from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, Date, DateTime, ForeignKey, Index, String, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -36,6 +36,27 @@ class NormVersion(Base):
     anchors: Mapped[list] = mapped_column(JSON, default=list)
     media_type: Mapped[str] = mapped_column(String(80))
     status: Mapped[str] = mapped_column(String(30), default="received")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+
+
+class LegalIndexGeneration(Base):
+    __tablename__ = "legal_index_generations"
+    __table_args__ = (
+        Index(
+            "uq_legal_active_generation",
+            "status",
+            unique=True,
+            postgresql_where=text("status = 'active'"),
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    collection: Mapped[str] = mapped_column(String(120), unique=True)
+    catalog_hash: Mapped[str] = mapped_column(String(64))
+    points: Mapped[int]
+    dimensions: Mapped[int]
+    status: Mapped[str] = mapped_column(String(20), default="ready")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )

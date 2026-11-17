@@ -67,7 +67,15 @@ def run_operation(operation_id: str) -> None:
     settings = Settings()
     factory = session_factory(settings.database_url)
     try:
-        execute(factory, UUID(operation_id), HANDLERS)
+        with factory() as db:
+            operation = db.get(Operation, UUID(operation_id))
+            is_assistant = operation is not None and operation.kind == "assistant.answer"
+        if is_assistant:
+            from app.assistant.agents.executor import execute_run
+
+            execute_run(factory, UUID(operation_id), settings=settings)
+        else:
+            execute(factory, UUID(operation_id), HANDLERS)
     finally:
         factory.kw["bind"].dispose()
 

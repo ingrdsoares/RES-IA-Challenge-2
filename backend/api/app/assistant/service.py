@@ -7,6 +7,7 @@ from app.assistant.context import resolve_context
 from app.assistant.models import Conversation, Message
 from app.assistant.schemas import MessageInput
 from app.companies.service import require_company, snapshot
+from app.config import Settings
 from app.jobs.models import Operation
 from app.jobs.service import enqueue
 
@@ -23,8 +24,9 @@ def require_conversation(db, account_id, conversation_id, lock=False):
 
 
 def submit_message(
-    db, account_id: UUID, conversation_id: UUID, request: MessageInput, key: str
+    db, account_id: UUID, conversation_id: UUID, request: MessageInput, key: str, settings=None
 ) -> Operation:
+    settings = settings or Settings()
     conversation, company = require_conversation(db, account_id, conversation_id, lock=True)
     # Immutable request body is the idempotency fingerprint, including conversation scope.
     payload = {"conversation_id": str(conversation.id), "request": request.model_dump(mode="json")}
@@ -54,11 +56,39 @@ def submit_message(
             raise HTTPException(404, "Operação não encontrada")
         if operation.status != "awaiting_data" or request.confirmation is None:
             raise HTTPException(409, "Operação não aguarda esta confirmação")
-        values = request.confirmation.model_dump(exclude_none=True)
+        values = request.confirmation.model_dump(exclude_none=True, mode="json")
         missing = original.context.get("missing_fields", [])
         if set(values) != set(missing):
             raise HTTPException(422, "Confirme somente os campos solicitados")
         context = {**original.context, **values, "missing_fields": []}
+        if "regime" in values:
+            context["company"] = {**context["company"], "regime": values["regime"]}
+        calculation_fields = {
+            "kind",
+            "period",
+            "revenue",
+            "rbt12",
+            "payroll12",
+            "activity",
+            "conditions_confirmed",
+        }
+        if (
+            set(values) & (calculation_fields - {"period"})
+            or original.context.get("calculation_input")
+            or operation.payload.get("request", {}).get("calculation")
+        ):
+            candidate = (
+                {**operation.payload.get("request", {}).get("calculation", {})}
+                if operation.payload.get("request", {}).get("calculation")
+                else {}
+            )
+            candidate.update(original.context.get("calculation_input", {}))
+            candidate.update(
+                {name: value for name, value in values.items() if name in calculation_fields}
+            )
+            if context.get("period"):
+                candidate["period"] = context["period"]
+            context["calculation_input"] = candidate
         original.context = context
         original.status = "queued"
         operation.status = "queued"
@@ -72,6 +102,8 @@ def submit_message(
         operation = receipt
         decision = resolve_context(snapshot(company), request)
         context = {**decision.context, "missing_fields": decision.missing_fields}
+        if request.calculation:
+            context["calculation_input"] = request.calculation.model_dump(mode="json")
         operation.status = "awaiting_data" if decision.missing_fields else "queued"
         if decision.missing_fields:
             operation.result = {"missing_fields": decision.missing_fields}
@@ -87,4 +119,16 @@ def submit_message(
         )
     )
     db.flush()
+    from app.assistant.agents.executor import ensure_run
+
+    if request.confirmation_for:
+        run = ensure_run(db, operation, conversation, context)
+        if run.confirmations >= settings.agent_max_confirmations:
+            raise HTTPException(409, "Limite de confirmações atingido")
+        run.revisions = [*run.revisions, {"revision": run.revision, "context": run.context}]
+        run.revision += 1
+        run.confirmations += 1
+        run.context, run.status, run.deadline = context, "queued", None
+    else:
+        ensure_run(db, operation, conversation, context)
     return operation

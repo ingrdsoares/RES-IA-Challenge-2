@@ -519,3 +519,61 @@ Os testes de ponta a ponta são opt-in: `MVP_TEST_URL`, `MVP_DATABASE_URL` e
 `MVP_S3_URL` devem apontar para uma stack **isolada de teste**. Eles criam somente
 contas e documentos sintéticos. A avaliação fiscal profissional e o deploy público
 não fazem parte dessa validação.
+
+
+## Assistente multiagente
+
+O worker executa um supervisor LLM, agente jurídico, diagnóstico fiscal e planejamento,
+com etapas sequenciais e checkpoints no PostgreSQL. A API mantém o contrato HTTP 202;
+`run_id` e `trace_id` identificam a execução. Consulte `status_url` para acompanhar etapas,
+tentativas, modelo, versão de prompt e uso de tokens. O endpoint não expõe prompts ou leases.
+Mensagens retornam `actions` estruturadas e preservam `next_steps` como textos.
+Criar uma tarefa a partir de uma ação continua exigindo chamada explícita do usuário.
+
+Antes de iniciar a nova versão, aplique as migrações:
+
+```bash
+docker compose --env-file backend/.env -f backend/compose.yaml run --rm api alembic upgrade head
+docker compose --env-file backend/.env -f backend/compose.yaml up -d --build api worker dispatcher
+```
+
+Runs pendentes antigos são convertidos de forma idempotente no primeiro processamento.
+Mensagens concluídas não são reprocessadas. Em caso de queda, o dispatcher recupera leases
+expirados; etapas já concluídas não repetem inferência. Uma chamada LLM pode repetir se o
+processo cair antes do checkpoint. Mensagens e cálculos têm identidades únicas no banco.
+
+O estado `awaiting_data` indica campos retornados em `missing_fields`. Envie uma mensagem
+com `confirmation_for` e `confirmation` contendo exatamente esses campos. Valores monetários
+são strings decimais; confirmações nunca editam o perfil da empresa automaticamente.
+São permitidas até duas confirmações, duas tentativas por etapa e dez minutos por rodada,
+com uma execução ativa por empresa. As variáveis `AGENT_*` estão em `.env.example`.
+
+Conectores oficiais e lembretes permanecem fora desta entrega. Evidências são declaradas;
+regras fiscais precisam de revisão humana. O texto de fatos fiscais e valores é montado
+pelo servidor; a validação de IDs e âncoras não prova toda interpretação jurídica do modelo.
+
+### Índice jurídico híbrido
+
+A busca densa versionada continua disponível. Para preparar e ativar uma geração híbrida,
+execute dentro do container da API, depois de publicar as normas desejadas:
+
+```bash
+python -m app.legal.cli build-hybrid
+python -m app.legal.cli activate-hybrid --generation ID_RETORNADO
+```
+
+A geração usa coleção própria, preservando `legal_versions_v1` e `/rag/query`.
+A ativação valida catálogo e cobertura. Mudanças no catálogo invalidam a seleção híbrida
+até nova reconstrução; a recuperação usa a coleção densa e mantém filtros e âncoras.
+Se configurado, o reranker existente reordena os trechos. Nenhum índice é reconstruído no startup.
+
+### Verificação real opcional
+
+Com os serviços isolados de teste (PostgreSQL 15432, Redis 16379 e Qdrant 16333):
+
+```bash
+MULTIAGENT_TEST_URL=http://localhost:11434 MULTIAGENT_QDRANT_URL=http://localhost:16333 \
+  .venv/bin/python -m pytest backend/api/tests/mvp/test_multiagent_real.py -q -s
+```
+
+O teste usa norma demonstrativa e coleção temporária própria. Não publica regra fiscal real.

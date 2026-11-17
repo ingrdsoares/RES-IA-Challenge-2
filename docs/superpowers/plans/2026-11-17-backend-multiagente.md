@@ -221,3 +221,8 @@ Documentação oficial consultada para o desenho do plano:
 Cobertura: contratos e limites (1), leases/retomada (2), ferramentas e modelos (3), barreira de validação (4), agentes e confirmações (5), compatibilidade e tarefas (6), RAG versionado/híbrido (7), operação e evidência real (8). Os cinco riscos de Review Focus têm testes atribuídos. `AgentRun` e `AgentStep` são compartilhados pelas tarefas 2–6; `ExecutionContext` e referências tipadas são compartilhados por ferramentas, validador e executor. Nenhuma tarefa introduz conectores ou regras fiscais habilitadas automaticamente.
 
 O arquivo de migração 0011 pode receber campos das tarefas seguintes apenas enquanto a branch ainda não tiver sido implantada; se aplicado em ambiente persistente, criar nova migração incremental em vez de editar o histórico. Os comandos e fixtures reais são verificados durante a execução, com desvios registrados no ledger.
+
+
+## Registro da execução
+
+Implementação realizada na branch `feat/backend-multiagente`. As oito entregas estão implementadas; evidências, nomes efetivos dos testes, decisões e limites estão no [relatório de verificação](../reviews/2026-11-17-backend-multiagente-verification.md). Os testes de API/confirmação estão consolidados em `test_multiagent_workflow.py`, e os snapshots das ferramentas em `agent_steps`. O commit de implementação é integrado, preservando runtime, migrações e imports consistentes. Os checkboxes acima conservam o roteiro original; o relatório registra a execução efetiva e seus desvios, sem afirmar que comandos substituídos foram executados literalmente.

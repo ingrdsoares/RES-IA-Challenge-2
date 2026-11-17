@@ -1,7 +1,7 @@
 from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Date, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -15,6 +15,7 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(500))
     period: Mapped[str | None] = mapped_column(String(7))
     due_date: Mapped[date | None] = mapped_column(Date)
+    action_support: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     completed: Mapped[bool] = mapped_column(default=False)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     source_message_id: Mapped[UUID | None] = mapped_column(ForeignKey("messages.id"))

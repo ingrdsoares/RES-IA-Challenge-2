@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     allowed_origins: list[str] = ["http://localhost:8000"]
 
+    agent_timeout: float = Field(default=120, gt=0, le=300)
+    agent_round_seconds: int = Field(default=600, ge=30, le=600)
+    agent_max_calls: int = Field(default=30, ge=5, le=30)
+    agent_token_budget: int = Field(default=245760, ge=8192, le=1000000)
+    agent_max_confirmations: int = Field(default=2, ge=0, le=2)
+    agent_step_attempts: int = Field(default=2, ge=1, le=2)
+
     # Seguranca e Rotacao de Segredos
     app_secret_key: str = Field(
         default="sd_default_secret_dev_key_change_in_prod_1234567890", min_length=16
