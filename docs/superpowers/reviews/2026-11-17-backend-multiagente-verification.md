@@ -62,3 +62,23 @@ Decisões de implementação em relação ao plano:
 Não foram entregues frontend, conectores oficiais, lembretes, RLS, revisão independente, deploy ou regras fiscais homologadas. A validação de estrutura e IDs não prova correção semântica de toda interpretação jurídica ou de todo texto de ação; revisão humana e avaliações de qualidade continuam necessárias. O servidor renderiza resultados fiscais para impedir que o texto livre substitua valores e estados do domínio.
 
 O histórico de versões e checkpoints não tem expurgo automático. Gerações de índice que falhem durante construção ficam sem ativação e podem precisar de limpeza administrativa futura. A suíte em Python 3.14 mantém avisos de depreciação existentes; o runtime Docker continua baseado na configuração Python do projeto.
+
+## Testes práticos adicionais
+
+Cinco cenários com Qwen e embeddings reais, PostgreSQL e Qdrant: jurídico, situação fiscal,
+cálculo sem regra, consulta combinada com planejamento e cálculo com parâmetros artificiais.
+Os quatro primeiros passaram na execução conjunta; o último passou após corrigir a validação
+do texto fiscal que é substituído pela renderização do servidor. O valor conhecido da fixture
+é 800.00; esses parâmetros não são regras tributárias homologadas.
+
+As perguntas, respostas finais, ações, saídas e métricas de cada agente estão em
+`2026-11-17-agent-practical-results.json`. Os testes exigem seleção exata de especialistas,
+conteúdo jurídico pertinente, citação, resposta fiscal sem comprovação indevida e valor do motor.
+Os prompts passaram à versão multiagent-v2 para corrigir delegação excessiva.
+
+Regressão posterior: 373 aprovados e dez pulados. A contagem de pulados cresceu porque o
+único smoke opt-in virou cinco casos parametrizados; os cinco foram executados separadamente.
+Dos seis pulados originais, dois dependiam de QDRANT_TEST_URL, um de OLLAMA_TEST_URL, um
+habilitava o smoke multiagente, um exigia API/stack dedicada via MVP_TEST_URL e outro precisava
+de torch/bert_score ausentes da venv. O benchmark BERT e o fluxo MVP de API implantada não
+foram executados nesta rodada de testes práticos dos agentes.

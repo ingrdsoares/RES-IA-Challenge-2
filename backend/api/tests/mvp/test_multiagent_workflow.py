@@ -265,3 +265,35 @@ def test_restart_after_synthesis_checkpoint_publishes_once(client, monkeypatch):
     executor.execute_run(factory, operation_id, model=Model(), settings=client.app.state.settings)
     assert client.get(response["status_url"]).json()["status"] == "succeeded"
     assert len(client.get(url).json()["items"]) == 2
+
+
+def test_discarded_fiscal_prose_does_not_override_server_rendering(client):
+    from app.assistant.agents.executor import execute_run
+
+    company, chat = conversation(client)
+    url = "/conversas/" + chat["id"] + "/mensagens"
+    receipt = client.post(
+        url,
+        json={"text": "Minha situação fiscal?"},
+        headers={**csrf(client), "Idempotency-Key": "fiscal-render"},
+    ).json()
+
+    class Prose(Model):
+        def generate(self, role, schema, payload, timeout, output_tokens):
+            if role == "synthesis":
+                return schema.model_validate(
+                    {"answer": "Valor inventado R$ 999 [1]", "support_ids": []}
+                ), {}
+            return super().generate(role, schema, payload, timeout, output_tokens)
+
+    execute_run(
+        client.app.state.db_factory,
+        UUID(receipt["operation_id"]),
+        model=Prose(),
+        settings=client.app.state.settings,
+    )
+    assert client.get(receipt["status_url"]).json()["status"] == "succeeded"
+    answer = client.get(url).json()["items"][-1]
+    assert "999" not in answer["text"]
+    assert "[1]" not in answer["text"]
+    assert "não verificada" in answer["text"]

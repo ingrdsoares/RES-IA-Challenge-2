@@ -11,7 +11,10 @@ from test_conversations import conversation
 
 
 @pytest.mark.integration
-def test_multiagent_real_qwen(client, monkeypatch):
+@pytest.mark.parametrize(
+    "scenario", ["juridico", "fiscal", "calculo_sem_regra", "combinado", "calculo_fixture"]
+)
+def test_multiagent_real_qwen(client, monkeypatch, scenario):
     if not os.getenv("MULTIAGENT_TEST_URL"):
         pytest.skip("requires MULTIAGENT_TEST_URL and MULTIAGENT_QDRANT_URL")
     from app.assistant.agents.executor import execute_run
@@ -41,13 +44,13 @@ def test_multiagent_real_qwen(client, monkeypatch):
             db.add(norm)
             db.flush()
             document = normalize(
-                "Art. 1 A biblioteca demonstrativa organiza documentos por assunto e conserva a versão citada na conversa.".encode(),
+                "Art. 18-A O Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês. Este recorte é exclusivo do teste e não comprova pagamento.".encode(),
                 "text/markdown",
             )
             version = NormVersion(
                 document_id=norm.id,
                 version_label="demo",
-                title="Norma demonstrativa da biblioteca",
+                title="Recorte de teste: recolhimento mensal do MEI",
                 authority="Demonstração",
                 jurisdiction="BR",
                 norm_type="demonstracao",
@@ -74,18 +77,49 @@ def test_multiagent_real_qwen(client, monkeypatch):
                 1024,
                 collection=collection,
             )
+        questions = {
+            "juridico": "Segundo o recorte fornecido do art. 18-A, o recolhimento do MEI pode ser fixo mensal independentemente da receita do mês? Explique com a fonte.",
+            "fiscal": "Tenho pagamento fiscal oficialmente verificado na competência 2026-10? Consulte as evidências da minha empresa.",
+            "calculo_sem_regra": "Simule o Simples Nacional da competência 2026-10 usando os dados estruturados informados. Se não existir regra revisada, informe sem inventar valor.",
+            "combinado": "Explique com fonte o recolhimento mensal do MEI segundo o art. 18-A fornecido, consulte se tenho pagamento oficialmente verificado em 2026-10 e proponha um próximo passo sustentado nas conclusões.",
+            "calculo_fixture": "Execute a simulação demonstrativa do Simples em 2026-10 com os dados estruturados fornecidos. Explique o resultado do motor, sem afirmar pagamento.",
+        }
+        request = {"text": questions[scenario]}
+        if scenario in ("calculo_sem_regra", "calculo_fixture"):
+            request["calculation"] = {
+                "kind": "simples",
+                "period": "2026-10",
+                "revenue": "10000.00",
+                "rbt12": "500000.00",
+                "payroll12": "140000.00",
+                "conditions_confirmed": True,
+            }
+        if scenario == "calculo_fixture":
+            from app.fiscal.registry import import_rule, review_rule
+            from app.fiscal.schemas import RuleInput
+            from test_fiscal_calculations import SIMPLES
+
+            with factory.begin() as db:
+                rule = import_rule(
+                    db,
+                    RuleInput(
+                        kind="simples",
+                        version="synthetic-test-only",
+                        valid_from="2026-10",
+                        valid_to="2026-10",
+                        parameters=SIMPLES,
+                        references=["https://example.org/synthetic-fixture"],
+                    ),
+                )
+                review_rule(
+                    db,
+                    rule.id,
+                    "synthetic-test-only",
+                    "Parâmetros artificiais exclusivos de teste, sem validade tributária",
+                )
         response = client.post(
             "/conversas/" + chat["id"] + "/mensagens",
-            json={
-                "text": "Segundo a norma demonstrativa, como a biblioteca organiza documentos? Considere também se tenho pagamento fiscal oficialmente verificado em 2026-10 e proponha um próximo passo. Também simule o Simples usando os dados informados; não há regra revisada nesta base demonstrativa.",
-                "calculation": {
-                    "kind": "simples",
-                    "period": "2026-10",
-                    "revenue": "1000.00",
-                    "rbt12": "12000.00",
-                    "conditions_confirmed": True,
-                },
-            },
+            json=request,
             headers={**csrf(client), "Idempotency-Key": "real-multi"},
         ).json()
         operation_id = UUID(response["operation_id"])
@@ -173,15 +207,50 @@ def test_multiagent_real_qwen(client, monkeypatch):
             diagnostic = [(s.name, s.status, s.error) for s in steps]
         print("REAL_AGENT_RESULTS", [(s.name, s.result) for s in steps])
         assert status["status"] == "succeeded", (status, diagnostic, errors)
-        assert {"plan", "legal", "fiscal", "planning", "synthesis"} <= {s.name for s in steps}, (
-            diagnostic
-        )
+        expected = {"plan", "synthesis"}
+        if scenario in ("juridico", "combinado"):
+            expected.add("legal")
+        if scenario != "juridico":
+            expected.add("fiscal")
+        if scenario == "combinado":
+            expected.add("planning")
+        assert expected == {step.name for step in steps}, diagnostic
         answer = client.get("/conversas/" + chat["id"] + "/mensagens").json()["items"][-1]
-        assert answer["citations"], [(s.name, s.result) for s in steps]
-        assert "não verificada" in answer["text"]
-        assert "Não há regra revisada" in answer["text"]
-        assert len(answer["actions"]) <= 3
+        if scenario in ("juridico", "combinado"):
+            assert "fix" in answer["text"].lower() and "mens" in answer["text"].lower()
+            assert "biblioteca" not in answer["text"].lower()
+            assert answer["citations"], [(step.name, step.result) for step in steps]
+        if scenario != "juridico":
+            assert "não verificada" in answer["text"]
+        if scenario == "calculo_sem_regra":
+            assert "Não há regra revisada" in answer["text"]
+        if scenario == "calculo_fixture":
+            assert "800.00" in answer["text"], answer
+        if scenario == "combinado":
+            assert 1 <= len(answer["actions"]) <= 3
         assert len(client.get("/conversas/" + chat["id"] + "/mensagens").json()["items"]) == 2
+        import json
+
+        artifact = Path(
+            os.getenv("AGENT_PRACTICAL_REPORT_DIR", "/private/tmp/res-ia-agent-practical")
+        )
+        artifact.mkdir(parents=True, exist_ok=True)
+        (artifact / (scenario + ".json")).write_text(
+            json.dumps(
+                {
+                    "scenario": scenario,
+                    "question": request,
+                    "answer": answer,
+                    "agents": [
+                        {"role": step.name, "result": step.result, "usage": step.usage}
+                        for step in steps
+                    ],
+                },
+                ensure_ascii=False,
+                indent=2,
+                default=str,
+            )
+        )
         print("REAL_AGENT_USAGE", [(s.name, s.usage) for s in steps])
     finally:
         if index.collection_exists(collection):

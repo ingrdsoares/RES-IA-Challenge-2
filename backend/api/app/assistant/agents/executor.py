@@ -252,6 +252,18 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             {"question": question, "legal": legal, "fiscal": fiscal, "actions": actions},
         )
         final = result.model_dump(mode="json")
+        if "fiscal" in plan.agents:
+            # Validate the text actually published, rather than discarded fiscal prose.
+            final["legal_claims"] = legal["claims"]
+            final["answer"] = render_answer(final, support, True)
+            final["support_ids"] = sorted(
+                {
+                    ref
+                    for result in (legal, fiscal)
+                    for claim in result.get("claims", [])
+                    for ref in claim["support_ids"]
+                }
+            )
         validate_results(support, legal, fiscal, actions, final)
         final["legal_claims"] = legal["claims"]
         text = render_answer(final, support, "fiscal" in plan.agents, "legal" in plan.agents)
