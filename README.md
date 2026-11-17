@@ -29,6 +29,20 @@ Aproximadamente 95% a 99% das empresas ativas no Brasil são micro e pequenos ne
 
 ---
 
+## Abrir a plataforma web
+
+Com o Docker em execução, rode na raiz do projeto:
+
+```sh
+docker compose -f backend/compose.yaml up -d --build postgres redis
+docker compose -f backend/compose.yaml run --rm --build api alembic upgrade head
+docker compose -f backend/compose.yaml up -d --build frontend worker dispatcher
+```
+
+Abra [a plataforma local](http://localhost:3000), selecione **Criar conta** e cadastre a empresa. O painel usa a API do projeto. Para publicar normas no leitor e habilitar respostas fundamentadas, consulte a [configuração do backend e a ingestão de normas versionadas](backend/README.md#ingestão-administrativa-de-normas-versionadas).
+
+Para desenvolver a interface, mantenha o backend em execução, libere a porta 3000 com `docker compose -f backend/compose.yaml stop frontend` e execute `npm ci` e `npm run dev` em `frontend/`. Use `npm test` para testar o cliente e `npm run api:types` para regenerar os contratos a partir do OpenAPI local. Com a plataforma local em execução, `npx playwright install chromium` e `npm run test:e2e` exercitam o fluxo no navegador, criando uma conta e registros de teste.
+
 ## Backend inicial de RAG
 
 A API fica em [`backend/api/`](backend/api/). O backend usa FastAPI, Qdrant em Docker

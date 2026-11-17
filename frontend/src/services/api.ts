@@ -1,79 +1,85 @@
-const API_BASE = '/api';
+import type { Account, Company, Credentials, Page } from '../types';
 
-class ApiClient {
-  private csrfToken: string | null = null;
-
-  async getCsrfToken(): Promise<string> {
-    if (this.csrfToken) return this.csrfToken;
-    try {
-      const res = await fetch(`${API_BASE}/auth/csrf`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Falha ao obter token CSRF');
-      const data = await res.json();
-      this.csrfToken = data.csrf_token;
-      return data.csrf_token;
-    } catch (err) {
-      console.warn('Não foi possível obter CSRF do backend local:', err);
-      return '';
-    }
-  }
-
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const headers = new Headers(options.headers || {});
-    headers.set('Content-Type', 'application/json');
-
-    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method?.toUpperCase() || '')) {
-      const csrf = await this.getCsrfToken();
-      if (csrf) {
-        headers.set('X-CSRF-Token', csrf);
-      }
-    }
-
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({}));
-      throw new Error(errorBody.detail || errorBody.message || `Erro HTTP ${response.status}`);
-    }
-
-    return response.json();
-  }
-
-  // Métodos de Autenticação
-  async login(email: string, senha: string) {
-    return this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, senha }),
-    });
-  }
-
-  async getMe() {
-    return this.request('/auth/me', { method: 'GET' });
-  }
-
-  async logout() {
-    this.csrfToken = null;
-    return this.request('/auth/logout', { method: 'POST' });
-  }
-
-  // Métodos de Empresas
-  async getEmpresas() {
-    return this.request('/empresas', { method: 'GET' });
-  }
-
-  // Assistente / Chat
-  async perguntarAssistente(empresaId: string, pergunta: string) {
-    return this.request(`/empresas/${empresaId}/assistente/perguntar`, {
-      method: 'POST',
-      body: JSON.stringify({ pergunta }),
-    });
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public fields: Record<string, string> = {},
+  ) {
+    super(message);
   }
 }
-
+async function read<T>(path: string, options: RequestInit): Promise<T> {
+  const response = await fetch('/api' + path, {
+    ...options,
+    credentials: 'same-origin',
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const fields: Record<string, string> = {};
+    if (Array.isArray(body?.detail))
+      for (const issue of body.detail) {
+        fields[issue.loc?.at(-1)] = issue.msg?.includes('CNPJ')
+          ? 'Informe um CNPJ válido.'
+          : 'Confira o valor deste campo.';
+      }
+    if (response.status === 401 && !path.startsWith('/auth/'))
+      window.dispatchEvent(new Event('session-expired'));
+    throw new ApiError(
+      response.status,
+      typeof body?.detail === 'string'
+        ? body.detail
+        : Object.keys(fields).length
+          ? 'Confira os campos indicados.'
+          : 'Serviço indisponível. Tente novamente.',
+      fields,
+    );
+  }
+  return response.status === 204 ? (undefined as T) : response.json();
+}
+class ApiClient {
+  private csrf: Promise<string> | null = null;
+  getCsrfToken() {
+    this.csrf ??= read<{ csrf_token: string }>('/auth/csrf', {})
+      .then((data) => data.csrf_token)
+      .finally(() => {
+        this.csrf = null;
+      });
+    return this.csrf;
+  }
+  async request<T>(path: string, options: RequestInit = {}) {
+    const headers = new Headers(options.headers);
+    if (typeof options.body === 'string' && !headers.has('Content-Type'))
+      headers.set('Content-Type', 'application/json');
+    if (!['GET', 'HEAD'].includes((options.method || 'GET').toUpperCase()))
+      headers.set('X-CSRF-Token', await this.getCsrfToken());
+    return read<T>(path, { ...options, headers });
+  }
+  login(email: string, password: string, register = false) {
+    return this.request<Account>(register ? '/auth/register' : '/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password } satisfies Credentials),
+    });
+  }
+  getMe() {
+    return this.request<Account>('/auth/session');
+  }
+  logout() {
+    return this.request<void>('/auth/logout', { method: 'POST' });
+  }
+  async getEmpresas(signal?: AbortSignal) {
+    const result: Company[] = [];
+    let cursor = '';
+    do {
+      const page: Page<Company> = await this.request(
+        '/empresas?limit=100' +
+          (cursor ? '&cursor=' + encodeURIComponent(cursor) : ''),
+        { signal },
+      );
+      result.push(...page.items);
+      cursor = page.next_cursor || '';
+    } while (cursor);
+    return result;
+  }
+}
 export const api = new ApiClient();

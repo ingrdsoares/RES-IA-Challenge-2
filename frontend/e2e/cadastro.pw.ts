@@ -1,0 +1,34 @@
+import { test, expect } from '@playwright/test';
+
+test('máscaras, seleção dependente e preservação de município legado', async ({page}) => {
+  const company={id:'empresa-teste',cnpj:'11222333000181',cnae:'6201501',size:'ME',regime:'Simples Nacional',municipality:'Nome cadastrado anteriormente',state:'SP',provenance:{},created_at:'2026-01-01'};
+  await page.route('**/api/auth/session', route=>route.fulfill({json:{id:'conta-teste',email:'teste@example.invalid'}}));
+  await page.route('**/api/empresas?*', route=>route.fulfill({json:{items:[company],next_cursor:null}}));
+  await page.goto('/#perfil');
+  await page.getByRole('link', {name:'Sócio Digital, início'}).click();
+  await expect(page.getByRole('heading', {name:'Sua rotina fiscal, em ordem.'})).toBeVisible();
+  await page.goto('/#perfil');
+  await expect(page.getByLabel('Município',{exact:true})).toHaveValue(company.municipality);
+  await expect(page.getByLabel('CNPJ',{exact:true})).toHaveValue('11.222.333/0001-81');
+  await page.getByLabel('UF',{exact:true}).selectOption('DF');
+  await expect(page.getByLabel('Município',{exact:true})).toHaveValue('');
+  await page.getByLabel('Município',{exact:true}).selectOption('Brasília');
+  const cnae=page.getByLabel('CNAE principal',{exact:true});
+  await cnae.fill('');
+  await cnae.pressSequentially('6201501');
+  await expect(cnae).toHaveValue('6201-5/01');
+  await cnae.press('Home');
+  await cnae.press('ArrowRight');
+  await cnae.press('ArrowRight');
+  await cnae.press('ArrowRight');
+  await cnae.press('ArrowRight');
+  await cnae.press('ArrowRight');
+  await cnae.press('Backspace');
+  await expect(cnae).toHaveValue('6205-0/1');
+  await cnae.fill('6201-5/01');
+  await expect(cnae).toHaveValue('6201-5/01');
+  await page.screenshot({path:'test-results/cadastro-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-results/cadastro-mobile.png',fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
