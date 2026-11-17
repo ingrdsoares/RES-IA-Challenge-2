@@ -75,6 +75,7 @@ def test_migration_round_trip_on_new_database(monkeypatch):
                 assert {"agent_runs", "agent_steps", "legal_index_generations"} <= set(
                     inspector.get_table_names()
                 )
+                assert "tool_result" in {c["name"] for c in inspector.get_columns("agent_steps")}
                 assert "actions" in {c["name"] for c in inspector.get_columns("messages")}
             engine.dispose()
             command.downgrade(config, "0010_telemetria_rag")

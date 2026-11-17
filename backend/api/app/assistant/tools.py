@@ -18,6 +18,7 @@ def retrieve_legal(
     collection=COLLECTION,
     hybrid_collection=None,
     reranker=None,
+    ignore_validity_for_test=False,
 ):
     hybrid = bool(hybrid_collection and index.collection_exists(hybrid_collection))
     effective_collection = hybrid_collection if hybrid else collection
@@ -41,6 +42,12 @@ def retrieve_legal(
             )
         ],
     )
+    if ignore_validity_for_test:
+        query_filter = models.Filter(
+            must=[
+                models.FieldCondition(key="jurisdiction", match=models.MatchAny(any=jurisdictions))
+            ]
+        )
     vector = embed(question)
     strategy = "dense"
     try:
@@ -117,9 +124,14 @@ def retrieve_legal(
             version is None
             or version.status != "ready"
             or version.jurisdiction not in jurisdictions
-            or not version.effective_from
-            or version.effective_from > reference
-            or (version.effective_to and version.effective_to < reference)
+            or (
+                not ignore_validity_for_test
+                and (
+                    not version.effective_from
+                    or version.effective_from > reference
+                    or (version.effective_to and version.effective_to < reference)
+                )
+            )
             or str(version.document_id) != payload.get("document_id")
             or payload.get("anchor_id") not in version.anchors
             or not payload.get("text")
@@ -127,6 +139,9 @@ def retrieve_legal(
             continue
         passages.append(
             {
+                "validity_check": "ignored_for_test"
+                if ignore_validity_for_test
+                else "filtered_by_dates",
                 "retrieval_strategy": strategy,
                 "document_id": str(version.document_id),
                 "version_id": str(version.id),
@@ -135,7 +150,7 @@ def retrieve_legal(
                 "title": version.title,
                 "official_url": version.official_url,
                 "reference_date": reference.isoformat(),
-                "effective_from": str(version.effective_from),
+                "effective_from": str(version.effective_from) if version.effective_from else None,
                 "effective_to": str(version.effective_to) if version.effective_to else None,
             }
         )
