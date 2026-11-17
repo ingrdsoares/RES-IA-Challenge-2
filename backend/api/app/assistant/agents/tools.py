@@ -61,12 +61,12 @@ class AgentTools:
             db.flush()
             return record(result)
 
-    def legal(self, question):
+    def legal(self, question, *, ignore_validity_for_test=False, reranker=None):
         index = QdrantClient(
             url=str(self.settings.qdrant_url), timeout=self.settings.qdrant_timeout
         )
         models = LocalModels(self.settings)
-        reranker = Reranker(self.settings)
+        reranker = reranker or Reranker(self.settings)
         try:
             with self.factory() as db:
                 require_company(db, self.owner_id, self.company_id)
@@ -80,6 +80,7 @@ class AgentTools:
                     self.settings.score_threshold,
                     hybrid_collection=active_collection(db),
                     reranker=reranker,
+                    ignore_validity_for_test=ignore_validity_for_test,
                 )
         finally:
             reranker.close()
