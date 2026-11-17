@@ -56,6 +56,7 @@ def main():
         type=Path,
         default=Path("docs/avaliacao/2026-11-17-comparacao-50-agentes-8k-40k.md"),
     )
+    parser.add_argument("--current-label", default="40K")
     args = parser.parse_args()
     baseline = load(args.baseline)
     current = load(args.current)
@@ -69,14 +70,14 @@ def main():
         ):
             raise ValueError("Casos distintos não formam comparação pareada: " + key)
     lines = [
-        "# Bateria de 50 perguntas — comparação 8K × 40K",
+        f"# Bateria de 50 perguntas — comparação 8K × {args.current_label}",
         "",
         f"Nova execução: **{len(new)}/50**. Nova revisão qualitativa: **{len(after)}/50**.",
         "",
         "## Método e limites",
         "",
         "- Mesmo roteiro, modelo Qwen3:8b, prompts, fontes indexadas, limiar 0,3 e até cinco trechos. Contas e empresas são fixtures fictícias novas para cada lote.",
-        "- Lote anterior: janela de 8.192 tokens e corte fixo de 2.200 caracteres. Novo lote: janela de 40.960 tokens e orçamento dinâmico de evidências. As duas mudanças foram aplicadas juntas; este ensaio não isola apenas o tamanho da janela.",
+        f"- Lote anterior: janela de 8.192 tokens, geração até 1.024 tokens, thinking desativado e corte fixo de 2.200 caracteres. Novo lote: janela de {current['metadata']['parameters']['num_ctx']} tokens, geração até {current['metadata']['parameters']['num_predict']} tokens, thinking {current['metadata']['parameters'].get('thinking', False)} e orçamento dinâmico de evidências. O ensaio compara configurações completas e não isola cada mudança.",
         "- Catálogo com 4.026 documentos recebidos, mas somente três versões/348 trechos indexados para a recuperação. Vigência ignorada apenas no experimento. Não houve inclusão de novas fontes entre os lotes.",
         "- Execução automática por TestClient + executor real + Ollama/Qdrant/PostgreSQL. Sem testar transporte da fila RQ. Sem publicar regras fiscais reais.",
         "- Qualidade revisada pelo mesmo assistente com os critérios anteriores: adequada, parcial, incorreta e falha técnica. Não é revisão fiscal independente ou estimativa estatística de acurácia.",
@@ -94,14 +95,14 @@ def main():
         "",
         f"Estados técnicos novos: `{summary(current)}`.",
         "",
-        "| Avaliação | 8K | 40K revisado |",
+        f"| Avaliação | 8K | {args.current_label} revisado |",
         "| --- | ---: | ---: |",
     ]
     old_counts = Counter(r["classification"] for r in before.values())
     new_counts = Counter(r["classification"] for r in after.values())
     for label in ("adequada", "parcial", "incorreta", "falha técnica"):
         lines.append(f"| {label} | {old_counts[label]} | {new_counts[label]} |")
-    for title, data in [("8K", baseline), ("40K", current)]:
+    for title, data in [("8K", baseline), (args.current_label, current)]:
         times = [c["duration_seconds"] for c in data["cases"]]
         if times:
             lines += [
@@ -115,7 +116,7 @@ def main():
         "",
         "## Casos pareados",
         "",
-        "| Caso | 8K | 40K | Fontes/caracteres 8K → 40K |",
+        f"| Caso | 8K | {args.current_label} | Fontes/caracteres 8K → {args.current_label} |",
         "| --- | --- | --- | --- |",
     ]
     for key, c in old.items():
@@ -144,7 +145,7 @@ def main():
             "",
             f"**Avaliação 8K:** {before[key]['classification']}. {before[key]['reason']}",
             "",
-            "**Resposta 40K:**",
+            f"**Resposta {args.current_label}:**",
             "",
         ]
         if not n:
@@ -153,7 +154,7 @@ def main():
         lines += ["> " + line for line in response_text(n).splitlines()]
         lines += [
             "",
-            f"**Avaliação 40K:** {review.get('classification', 'pendente')}. {review.get('reason', 'Revisão qualitativa pendente.')}",
+            f"**Avaliação {args.current_label}:** {review.get('classification', 'pendente')}. {review.get('reason', 'Revisão qualitativa pendente.')}",
             "",
             f"**Execução:** `{n.get('operation', {}).get('status', 'erro')}`; duração {n['duration_seconds']} s; tarefas criadas {n.get('tasks_created', 'não medido')}.",
             "",
@@ -170,7 +171,7 @@ def main():
             )
         lines += [
             "",
-            "<details><summary>Saídas estruturadas dos agentes — 40K</summary>",
+            f"<details><summary>Saídas estruturadas dos agentes — {args.current_label}</summary>",
             "",
             "```json",
             json.dumps(
@@ -195,8 +196,8 @@ def main():
         "## Reprodução",
         "",
         "```bash",
-        ".venv/bin/python scripts/evaluate_agent_flows.py --output docs/avaliacao/2026-11-17-bateria-50-agentes-40k.json",
-        ".venv/bin/python scripts/compare_agent_flows.py",
+        f".venv/bin/python scripts/evaluate_agent_flows.py --num-ctx {current['metadata']['parameters']['num_ctx']} --num-predict {current['metadata']['parameters']['num_predict']} {'--thinking ' if current['metadata']['parameters'].get('thinking') else ''}--output {args.current}",
+        f'.venv/bin/python scripts/compare_agent_flows.py --current {args.current} --reviews {args.reviews} --current-label "{args.current_label}" --output {args.output}',
         "```",
         "",
         "O runner grava cada caso e valida parâmetros/hash do dataset antes de retomar. Arquivo completo é retomado sem repetir os 50; para um novo experimento, escolha outro --output. A classificação qualitativa permanece separada da execução.",

@@ -16,10 +16,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID, uuid4
 
+import ollama
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend/api"))
 
 from app.assistant.agents.executor import execute_run
+from app.assistant.agents.llm import AgentModel
 from app.assistant.agents.models import AgentRun, AgentStep
 from app.assistant.agents.tools import AgentTools
 from app.assistant.tools import retrieve_legal
@@ -35,7 +38,18 @@ from qdrant_client import QdrantClient
 from sqlalchemy import func, select
 
 
-def evaluation_parameters(settings, dataset_bytes):
+class EvaluationClient:
+    """Override thinking only for this experiment; never persist reasoning text."""
+
+    def __init__(self, client, thinking):
+        self.client = client
+        self.thinking = thinking
+
+    def chat(self, **kwargs):
+        return self.client.chat(**{**kwargs, "think": self.thinking})
+
+
+def evaluation_parameters(settings, dataset_bytes, thinking=False):
     from app.assistant.agents.prompts import VERSION
 
     return {
@@ -43,6 +57,7 @@ def evaluation_parameters(settings, dataset_bytes):
         "embedding_model": settings.embedding_model,
         "num_ctx": settings.num_ctx,
         "num_predict": settings.num_predict,
+        "thinking": thinking,
         "max_context_chars": settings.max_context_chars,
         "agent_token_budget": settings.agent_token_budget,
         "agent_timeout": settings.agent_timeout,
@@ -67,10 +82,29 @@ def main():
         "--dataset", type=Path, default=ROOT / "backend/evaluation/data/agent_flow_50.json"
     )
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument("--thinking", action="store_true")
+    parser.add_argument("--num-ctx", type=int, choices=range(8192, 40961), metavar="8192..40960")
+    parser.add_argument("--num-predict", type=int, choices=range(64, 8193), metavar="64..8192")
     args = parser.parse_args()
     settings = Settings(cookie_secure=False, allowed_origins=["http://testserver"])
+    if args.num_ctx is not None:
+        settings = settings.model_copy(
+            update={"num_ctx": args.num_ctx, "max_context_chars": args.num_ctx}
+        )
+    # Experimental output allowance can exceed the production setting's 1K cap.
+    settings = settings.model_copy(
+        update={
+            "num_predict": args.num_predict or (4096 if args.thinking else settings.num_predict),
+            "agent_timeout": 300 if args.thinking else settings.agent_timeout,
+        }
+    )
+    if settings.num_predict >= settings.num_ctx - 2048:
+        parser.error("Reserve at least 2048 context tokens beyond the generation allowance")
     if args.output is None:
-        args.output = ROOT / "docs/avaliacao" / f"bateria-50-agentes-{settings.num_ctx}.json"
+        suffix = "-thinking" if args.thinking else ""
+        args.output = (
+            ROOT / "docs/avaliacao" / f"bateria-50-agentes-{settings.num_ctx}{suffix}.json"
+        )
     cases = json.loads(args.dataset.read_text())
     result = (
         json.loads(args.output.read_text())
@@ -78,11 +112,13 @@ def main():
         else {"metadata": {}, "cases": []}
     )
     completed = {case["id"] for case in result["cases"]}
-    parameters = evaluation_parameters(settings, args.dataset.read_bytes())
+    parameters = evaluation_parameters(settings, args.dataset.read_bytes(), thinking=args.thinking)
     validate_resume(result, parameters)
     factory = session_factory(settings.database_url)
     index = QdrantClient(url=str(settings.qdrant_url), timeout=settings.qdrant_timeout)
     models = LocalModels(settings)
+    generation_client = ollama.Client(host=str(settings.ollama_url), timeout=settings.agent_timeout)
+    agent_model = AgentModel(settings, EvaluationClient(generation_client, args.thinking))
     with factory() as db:
         catalog = dict(
             db.execute(select(NormVersion.status, func.count()).group_by(NormVersion.status)).all()
@@ -207,7 +243,9 @@ def main():
                             )
 
                     tools.legal = legal
-                    execute_run(factory, run.operation_id, settings=settings, tools=tools)
+                    execute_run(
+                        factory, run.operation_id, settings=settings, tools=tools, model=agent_model
+                    )
                     entry["operation"] = client.get(receipt["status_url"]).json()
                     messages = client.get("/conversas/" + chat["id"] + "/mensagens").json()["items"]
                     entry["response"] = next(
@@ -255,6 +293,7 @@ def main():
         save()
         index.close()
         models.close()
+        generation_client.close()
         factory.kw["bind"].dispose()
 
 
