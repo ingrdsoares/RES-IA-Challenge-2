@@ -32,13 +32,14 @@ flowchart TD
 
 ---
 
-## Arquitetura-alvo
+## Arquitetura-alvo multiagente
 
-> Este diagrama mostra a solução planejada, não apenas o que já foi implementado. Frontend, PostgreSQL, autenticação multi-tenant, orquestrador, busca híbrida e integrações fiscais ainda não existem na API.
+Os diagramas apresentam a arquitetura proposta com um supervisor LLM e três agentes especializados: jurídico, diagnóstico fiscal e planejamento. A validação das respostas permanece em código e os cálculos ficam no motor determinístico.
 
-![Arquitetura-alvo do Sócio Digital: fontes e ingestão, produto e processamento, integrações e status fiscal](diagramas/socio_digital_arquitetura.png)
+- [Arquitetura geral multiagente — arquivo Excalidraw](diagramas/socio_digital_arquitetura.excalidraw): componentes, integrações e fluxo de delegação.
+- [Backend multiagente — arquivo Excalidraw](diagramas/socio-digital-design-backend-2.excalidraw): módulos, fluxos, contratos e operação dos agentes.
 
-Arquivo editável: [socio_digital_arquitetura.excalidraw](diagramas/socio_digital_arquitetura.excalidraw), para abrir em [excalidraw.com](https://excalidraw.com).
+Abra os arquivos em [excalidraw.com](https://excalidraw.com). Os desenhos representam a arquitetura-alvo; a execução multiagente, o frontend e as integrações fiscais ainda não estão implementados.
 
 ---
 
