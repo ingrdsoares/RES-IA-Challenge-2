@@ -77,7 +77,7 @@ def test_generation_is_grounded_and_thinking_is_disabled():
         body = json.loads(request.content)
         assert request.url.path == "/api/chat"
         assert body["stream"] is False and body["think"] is False
-        assert body["options"]["num_ctx"] == 8192
+        assert body["options"]["num_ctx"] == 40960
         assert body["options"]["num_predict"] == 1024
         assert body["messages"][0]["role"] == "system"
         assert "instruções" in body["messages"][0]["content"]
@@ -123,7 +123,7 @@ def test_oversized_prompt_is_rejected_before_calling_ollama():
 
     models = make_models(handler)
     with pytest.raises(DependencyUnavailable):
-        models.answer("Pergunta", [source("🎉" * 6000)])
+        models.answer("Pergunta", [source("🎉" * 30000)])
     models.close()
 
 

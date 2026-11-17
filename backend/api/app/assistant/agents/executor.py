@@ -170,15 +170,9 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             # Persist tool output separately from LLM claims so a replay uses exactly the same sources.
             def prepare_legal(step):
                 passages = tools.legal(question)
-                sources = {}
-                remaining = 2200
-                for number, passage in enumerate(passages, 1):
-                    if remaining <= 0:
-                        break
-                    passage = {**passage, "text": passage["text"][:remaining]}
-                    remaining -= len(passage["text"])
-                    sources[f"legal:{number}"] = passage
-                return {"question": question, "sources": sources}
+                from app.assistant.agents.context import legal_payload
+
+                return legal_payload(question, passages, settings)
 
             result, legal_step = stage(
                 "legal",
