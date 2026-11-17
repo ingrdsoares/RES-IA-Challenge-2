@@ -5,8 +5,8 @@ from app.citacoes_normas import avisar_sem_suporte
 from app.compostas import consultas_de_busca, partes_da_pergunta
 from app.config import Settings
 from app.errors import QueryBusy
-from app.guardrails import e_recusa, pede_dados
 from app.esclarecimento import caso_proprio, pedir_esclarecimento, texto_pedido
+from app.guardrails import e_recusa, pede_dados
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
 from app.reranker import Reranker
