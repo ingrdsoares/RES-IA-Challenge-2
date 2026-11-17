@@ -6,6 +6,7 @@ persisted immediately so an interrupted evaluation can be inspected and resumed.
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import subprocess
@@ -34,15 +35,42 @@ from qdrant_client import QdrantClient
 from sqlalchemy import func, select
 
 
+def evaluation_parameters(settings, dataset_bytes):
+    from app.assistant.agents.prompts import VERSION
+
+    return {
+        "model": settings.generation_model,
+        "embedding_model": settings.embedding_model,
+        "num_ctx": settings.num_ctx,
+        "num_predict": settings.num_predict,
+        "max_context_chars": settings.max_context_chars,
+        "agent_token_budget": settings.agent_token_budget,
+        "agent_timeout": settings.agent_timeout,
+        "prompt_version": VERSION,
+        "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
+        "score_threshold": 0.3,
+        "top_k": 5,
+        "ignore_validity_for_test": True,
+    }
+
+
+def validate_resume(result, parameters):
+    if result.get("cases") and result.get("metadata", {}).get("parameters") != parameters:
+        raise ValueError(
+            "Parâmetros ou dataset diferentes: use outro --output para preservar a comparação"
+        )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--dataset", type=Path, default=ROOT / "backend/evaluation/data/agent_flow_50.json"
     )
-    parser.add_argument(
-        "--output", type=Path, default=ROOT / "docs/avaliacao/2026-11-17-bateria-50-agentes.json"
-    )
+    parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
+    settings = Settings(cookie_secure=False, allowed_origins=["http://testserver"])
+    if args.output is None:
+        args.output = ROOT / "docs/avaliacao" / f"bateria-50-agentes-{settings.num_ctx}.json"
     cases = json.loads(args.dataset.read_text())
     result = (
         json.loads(args.output.read_text())
@@ -50,7 +78,8 @@ def main():
         else {"metadata": {}, "cases": []}
     )
     completed = {case["id"] for case in result["cases"]}
-    settings = Settings(cookie_secure=False, allowed_origins=["http://testserver"])
+    parameters = evaluation_parameters(settings, args.dataset.read_bytes())
+    validate_resume(result, parameters)
     factory = session_factory(settings.database_url)
     index = QdrantClient(url=str(settings.qdrant_url), timeout=settings.qdrant_timeout)
     models = LocalModels(settings)
@@ -60,6 +89,7 @@ def main():
         )
     result["metadata"].update(
         {
+            "parameters": parameters,
             "revision": subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
             ).strip(),
