@@ -188,11 +188,11 @@ export function IndicatorInfo({
             ? verification[scope] : indicator.verification}</p></div>
       </div>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-        <dt className="text-slate-500">Fonte</dt>
+        <dt className="text-ink-muted">Fonte</dt>
         <dd>{latest ? originLabel(latest) : 'Sem evidência'}</dd>
-        <dt className="text-slate-500">Coleta</dt>
+        <dt className="text-ink-muted">Coleta</dt>
         <dd>{latest ? dateLabel(latest.created_at) : '—'}</dd>
-        <dt className="text-slate-500">Escopo</dt>
+        <dt className="text-ink-muted">Escopo</dt>
         <dd>{scopeAreas[scope]}</dd>
       </dl>
     </>

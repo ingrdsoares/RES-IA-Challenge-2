@@ -88,6 +88,7 @@
   flex-wrap: wrap;
 }
 .lp-textlink {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -500,5 +501,97 @@
   }
   .lp footer a {
     font-size: 11px;
+  }
+}
+
+
+.lp-preview-play {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -9px -9px -9px 0;
+  border-radius: 50%;
+  color: var(--ink-link);
+}
+
+.lp-preview-play:hover {
+  background: var(--surface-card);
+}
+
+.lp-preview-progress {
+  height: 2px;
+  margin: 11px auto 0;
+  width: min(100%, 13rem);
+  background: var(--border-subtle);
+}
+
+.lp-preview-progress span {
+  display: block;
+  height: 100%;
+  background: var(--palette-blue);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-paper {
+    animation: lp-paper-reveal 680ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  .lp-preview-screen {
+    animation: lp-screen-reveal 300ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  .lp-preview-progress span {
+    animation-name: lp-preview-progress;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+  }
+
+  @keyframes lp-paper-reveal {
+    from { transform: translateY(12px) rotate(.5deg); }
+    to { transform: translateY(0) rotate(2deg); }
+  }
+
+  @keyframes lp-screen-reveal {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes lp-preview-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lp-folder {
+    transition: transform 320ms ease-out, box-shadow 320ms ease-out;
+  }
+
+  .lp-paper {
+    transition: translate 320ms ease-out;
+  }
+
+  .lp-preview:is(:hover, :has(:focus-visible)) .lp-folder {
+    transform: translateY(-3px) rotate(-1deg);
+    box-shadow: 0 16px 30px var(--shadow-paper);
+  }
+
+  .lp-preview:is(:hover, :has(:focus-visible)) .lp-paper {
+    translate: 0 -6px;
+  }
+
+  .lp-switch button svg,
+  .lp-demo-action svg {
+    transition: transform 180ms ease-out;
+  }
+
+  .lp-switch button:is(:hover, :focus-visible) svg {
+    transform: translateY(-2px);
+  }
+
+  .lp-demo-action:is(:hover, :focus-visible) svg {
+    transform: scale(1.12);
   }
 }

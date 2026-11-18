@@ -8,6 +8,7 @@ import {
   ListChecks,
   MessageSquare,
 } from 'lucide-react';
+import { formatCnpj } from '../components/Sidebar';
 import { api } from '../services/api';
 import type { Company } from '../types';
 import {
@@ -98,13 +99,13 @@ function Simulator({ company }: { company: Company }) {
         Simulação tributária
       </summary>
       {!isMei && !isSimples ? (
-        <p className="mt-3 text-sm text-slate-600">
+        <p className="mt-3 text-sm text-ink-muted">
           A simulação está disponível para MEI e Simples Nacional. Regime
           cadastrado · {company.regime}.
         </p>
       ) : (
         <>
-          <p className="my-4 text-sm text-slate-600">
+          <p className="my-4 text-sm text-ink-muted">
             Informe os dados da competência para simular o DAS de{' '}
             {isMei ? 'MEI' : 'Simples Nacional'} com a regra revisada
             disponível.
@@ -174,7 +175,7 @@ function Simulator({ company }: { company: Company }) {
           {error && <Feedback error={error} />}
           {response && (
             <div
-              className="mt-4 rounded-xl bg-slate-50 p-4 text-sm"
+              className="mt-4 rounded-xl bg-surface-muted p-4 text-sm"
               role="status"
             >
               <h3 className="font-semibold">
@@ -254,9 +255,9 @@ export function Dashboard({ company }: PageProps) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Visão geral</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-ink-muted">
             {company.regime} · {company.municipality}/{company.state} · CNPJ{' '}
-            {company.cnpj}
+            {formatCnpj(company.cnpj)}
           </p>
         </div>
         <a href="#assistente" className="primary">
@@ -277,13 +278,13 @@ export function Dashboard({ company }: PageProps) {
               <span className="rounded-lg bg-info p-2 text-link">
                 <Icon size={21} aria-hidden="true" />
               </span>
-              <h2 className="font-semibold text-slate-700">
+              <h2 className="font-semibold text-ink">
                 {scopeNames[scope]}
               </h2>
               {status.data ? (
                 <IndicatorInfo scope={scope} indicator={status.data[scope]} />
               ) : (
-                <p role="status" className="text-sm text-slate-500">
+                <p role="status" className="text-sm text-ink-muted">
                   {status.loading
                     ? 'Carregando indicador…'
                     : 'Consulta indisponível'}
@@ -292,7 +293,7 @@ export function Dashboard({ company }: PageProps) {
               <a
                 href={`#fiscal?scope=${scope}`}
                 aria-label={`Ver detalhes de ${scopeNames[scope]}`}
-                className="mt-auto inline-flex items-center gap-2 pt-2 text-sm font-semibold text-link"
+                className="touch-link mt-auto inline-flex items-center gap-2 text-sm font-semibold text-link"
               >
                 Ver detalhes <ArrowRight size={15} />
               </a>
@@ -306,7 +307,7 @@ export function Dashboard({ company }: PageProps) {
           <h2 className="text-lg font-bold">Próximas tarefas</h2>
           <a
             href="#tarefas"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-link"
+            className="touch-link inline-flex items-center gap-2 text-sm font-semibold text-link"
           >
             Ver todas as tarefas <ArrowRight size={15} />
           </a>
@@ -314,23 +315,23 @@ export function Dashboard({ company }: PageProps) {
         {tasks.loading && <p role="status">Carregando tarefas…</p>}
         {tasks.error && <Feedback error={tasks.error} retry={tasks.refresh} />}
         {upcoming?.length === 0 && (
-          <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+          <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
             Nenhuma tarefa pendente para esta empresa.
           </p>
         )}
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-subtle">
           {upcoming?.map((task) => (
             <li key={task.id}>
               <a
                 href={`#tarefas?task=${task.id}`}
                 className="flex items-center gap-3 py-3 hover:text-link"
               >
-                <CalendarDays size={18} className="shrink-0 text-slate-500" />
+                <CalendarDays size={18} className="shrink-0 text-ink-muted" />
                 <span className="min-w-0">
                   <strong className="block break-words text-sm">
                     {task.title}
                   </strong>
-                  <small className="text-slate-600">
+                  <small className="text-ink-muted">
                     {task.due_date
                       ? 'Prazo ' + dateLabel(task.due_date)
                       : 'Prazo não informado'}

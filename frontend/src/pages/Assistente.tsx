@@ -1,3 +1,4 @@
+import { chatDraftKey } from '../services/chatDrafts';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   ArrowUpRight,
@@ -508,18 +509,25 @@ function Composer({
 }
 
 type ChatProps = {
+  accountId: string;
   companyId: string;
   conversation?: Conversation;
   messageId: string | null;
   onCreated: (conversation: Conversation) => void;
 };
 
-function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
+function Chat({ accountId, companyId, conversation, messageId, onCreated }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reload, setReload] = useState(0);
   const [loading, setLoading] = useState(!!conversation);
   const [sending, setSending] = useState(false);
-  const [draft, setDraft] = useState('');
+  const draftKey = chatDraftKey(accountId, companyId, conversation?.id);
+  const [draft, updateDraft] = useState(() => sessionStorage.getItem(draftKey) || '');
+  function setDraft(text: string) {
+    if (text) sessionStorage.setItem(draftKey, text);
+    else sessionStorage.removeItem(draftKey);
+    updateDraft(text);
+  }
   const [readError, setReadError] = useState('');
   const [sendError, setSendError] = useState('');
   const [reviewKey, setReviewKey] = useState(0);
@@ -791,9 +799,11 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
 }
 
 function CompanyAssistant({
+  accountId,
   company,
   params,
 }: {
+  accountId: string;
   company: Company;
   params: URLSearchParams;
 }) {
@@ -887,6 +897,7 @@ function CompanyAssistant({
         {!id || selected ? (
           <Chat
             key={id ?? 'new'}
+            accountId={accountId}
             companyId={companyId}
             conversation={selected}
             messageId={reading ? null : params.get('mensagem')}
@@ -913,6 +924,7 @@ function CompanyAssistant({
 }
 
 export function Assistente(props: {
+  accountId: string;
   company: Company;
   params: URLSearchParams;
 }) {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowDown,
   ArrowRight,
@@ -15,97 +15,141 @@ import {
   ListChecks,
   MessageSquareText,
   Paperclip,
+  Pause,
+  Play,
 } from 'lucide-react';
 import { Brand } from '../components/Header';
 import './landing.css';
 
 const views = [
-  { name: 'Painel', icon: LayoutDashboard },
-  { name: 'Tarefas', icon: ListChecks },
-  { name: 'Fontes', icon: BookOpen },
+  { name: 'Painel', title: 'Visão geral', icon: LayoutDashboard },
+  { name: 'Tarefas', title: 'Tarefas da empresa', icon: ListChecks },
+  { name: 'Fontes', title: 'Fontes da consulta', icon: BookOpen },
 ] as const;
+
+const previewInterval = 6500;
+const reducedMotion = '(prefers-reduced-motion: reduce)';
 
 function Preview() {
   const [view, setView] = useState(0);
   const [done, setDone] = useState(false);
+  const [playing, setPlaying] = useState(
+    () => !window.matchMedia(reducedMotion).matches && !document.hidden,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia(reducedMotion);
+    const stopForPreference = () => {
+      if (media.matches) setPlaying(false);
+    };
+    const stopIfHidden = () => {
+      if (document.hidden) setPlaying(false);
+    };
+    media.addEventListener('change', stopForPreference);
+    document.addEventListener('visibilitychange', stopIfHidden);
+    return () => {
+      media.removeEventListener('change', stopForPreference);
+      document.removeEventListener('visibilitychange', stopIfHidden);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!playing) return;
+    const timer = window.setTimeout(() => {
+      setView((current) => (current + 1) % views.length);
+    }, previewInterval);
+    return () => window.clearTimeout(timer);
+  }, [playing, view]);
   return (
     <section className="lp-preview" aria-label="Demonstração da plataforma">
       <div className="lp-preview-label">
-        <span className="lp-dot" /> Prévia interativa · Dados ilustrativos
+        <span className="lp-dot" aria-hidden="true" /> Prévia interativa · Dados ilustrativos
+        <button
+          className="lp-preview-play"
+          type="button"
+          aria-label={playing ? 'Pausar prévia' : 'Reproduzir prévia'}
+          onClick={() => setPlaying((current) => !current)}
+        >
+          {playing ? <Pause size={20} aria-hidden="true" /> : <Play size={20} aria-hidden="true" />}
+        </button>
       </div>
       <div className="lp-folder">
         <div className="lp-tab" aria-hidden="true">
           <FolderOpen size={17} /> Pasta fiscal
         </div>
-        <div className="lp-paper">
+        <div
+          className="lp-paper"
+          onFocus={() => setPlaying(false)}
+          onPointerDown={() => setPlaying(false)}
+        >
           <div className="lp-paper-meta">
             <span>Empresa de exemplo</span>
             <Building2 size={16} />
           </div>
-          <h2>
-            {['Visão geral', 'Tarefas da empresa', 'Fontes da consulta'][view]}
-          </h2>
-          <div className="lp-paper-content">
-            {view === 0 && (
-              <>
-                <div className="lp-record">
-                  <span className="lp-record-icon">
-                    <FileCheck2 />
-                  </span>
-                  <div>
-                    <strong>Cadastro da empresa</strong>
-                    <small>Origem dos dados</small>
+          <div key={view} className="lp-preview-screen">
+            <h2>{views[view].title}</h2>
+            <div className="lp-paper-content">
+              {view === 0 && (
+                <>
+                  <div className="lp-record">
+                    <span className="lp-record-icon">
+                      <FileCheck2 />
+                    </span>
+                    <div>
+                      <strong>Cadastro da empresa</strong>
+                      <small>Origem dos dados</small>
+                    </div>
+                    <span className="lp-status">Declarado</span>
                   </div>
-                  <span className="lp-status">Declarado</span>
-                </div>
-                <div className="lp-record">
-                  <span className="lp-record-icon">
-                    <ListChecks />
-                  </span>
-                  <div>
-                    <strong>Conferir guia do mês</strong>
-                    <small>Próxima tarefa</small>
+                  <div className="lp-record">
+                    <span className="lp-record-icon">
+                      <ListChecks />
+                    </span>
+                    <div>
+                      <strong>Conferir guia do mês</strong>
+                      <small>Próxima tarefa</small>
+                    </div>
+                    <span className={'lp-status ' + (!done ? 'pending' : '')}>
+                      {done ? 'Concluída' : 'Pendente'}
+                    </span>
                   </div>
-                  <span className={'lp-status ' + (!done ? 'pending' : '')}>
-                    {done ? 'Concluída' : 'Pendente'}
-                  </span>
-                </div>
-              </>
-            )}
-            {view === 1 && (
-              <>
-                <p>Conferir guia do mês</p>
-                <small>
-                  Compare os dados da guia com a competência registrada.
-                </small>
-                <button
-                  className="lp-demo-action"
-                  onClick={() => setDone(!done)}
-                >
-                  {done ? <Check size={17} /> : <Circle size={17} />}{' '}
-                  {done ? 'Reabrir tarefa' : 'Marcar como concluída'}
-                </button>
-              </>
-            )}
-            {view === 2 && (
-              <>
-                <p>
-                  <BookOpen size={18} /> Lei Complementar nº 123/2006
-                </p>
-                <small>
-                  Uma citação do assistente identifica a norma e a versão
-                  consultada.
-                </small>
-                <a
-                  className="lp-demo-action"
-                  href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Ver publicação oficial <ArrowUpRight size={16} />
-                </a>
-              </>
-            )}
+                </>
+              )}
+              {view === 1 && (
+                <>
+                  <p>Conferir guia do mês</p>
+                  <small>
+                    Compare os dados da guia com a competência registrada.
+                  </small>
+                  <button
+                    className="lp-demo-action"
+                    onClick={() => setDone(!done)}
+                  >
+                    {done ? <Check size={17} /> : <Circle size={17} />}{' '}
+                    {done ? 'Reabrir tarefa' : 'Marcar como concluída'}
+                  </button>
+                </>
+              )}
+              {view === 2 && (
+                <>
+                  <p>
+                    <BookOpen size={18} /> Lei Complementar nº 123/2006
+                  </p>
+                  <small>
+                    Uma citação do assistente identifica a norma e a versão
+                    consultada.
+                  </small>
+                  <a
+                    className="lp-demo-action"
+                    href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Ver publicação oficial <ArrowUpRight size={16} />
+                  </a>
+                </>
+              )}
+            </div>
           </div>
           <div className="lp-binding" aria-hidden="true" />
         </div>
@@ -119,12 +163,19 @@ function Preview() {
           <button
             key={name}
             aria-pressed={view === i}
-            onClick={() => setView(i)}
+            type="button"
+            onClick={() => {
+              setPlaying(false);
+              setView(i);
+            }}
           >
             <Icon size={15} />
             {name}
           </button>
         ))}
+      </div>
+      <div className="lp-preview-progress" aria-hidden="true">
+        {playing && <span key={view} style={{ animationDuration: previewInterval + 'ms' }} />}
       </div>
     </section>
   );

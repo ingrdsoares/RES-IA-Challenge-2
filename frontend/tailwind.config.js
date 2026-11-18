@@ -9,6 +9,9 @@ export default {
       colors: {
         ink: 'var(--ink)',
         link: 'var(--ink-link)',
+        'ink-muted': 'var(--ink-muted)',
+        'surface-muted': 'var(--surface-muted)',
+        subtle: 'var(--border-subtle)',
         info: 'var(--surface-info)',
         highlight: 'var(--citation-mark)',
         notice: 'var(--surface-notice)',

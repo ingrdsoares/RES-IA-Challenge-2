@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { CheckCircle2, Circle, Plus, RotateCcw } from 'lucide-react';
+import { RecordDetail, useRecordNavigation } from './RecordDetail';
 import { api } from '../services/api';
 import {
   dateLabel,
@@ -124,8 +125,7 @@ function TaskDetails({
     }
   }
   return (
-    <aside className="panel space-y-4">
-      <h2 className="text-lg font-bold">Detalhe da tarefa</h2>
+    <>
       <p className="whitespace-pre-wrap break-words font-semibold">
         {task.title}
       </p>
@@ -165,7 +165,7 @@ function TaskDetails({
             : 'Marcar como concluída'}
       </button>
       {error && <Feedback error={error} />}
-      <p className="text-sm text-slate-600">
+      <p className="record-note text-sm">
         A conclusão registra o andamento da tarefa. A situação fiscal depende
         das evidências da empresa.
       </p>
@@ -190,7 +190,7 @@ function TaskDetails({
           </ol>
         )}
       </div>
-    </aside>
+    </>
   );
 }
 
@@ -209,14 +209,16 @@ export function Tarefas({ company, params }: PageProps) {
   const query =
     filter === 'all' ? '' : '?completed=' + String(filter === 'done');
   const tasks = useRead<Task[]>(listUrl + query, readList);
-  const active =
-    tasks.data?.find((task) => task.id === params.get('task')) ||
-    tasks.data?.[0];
+  const selected = params.get('task');
+  const active = selected === null ? tasks.data?.[0] : tasks.data?.find((task) => task.id === selected);
+  const listHref = taskHref(filter);
+  const navigation = useRecordNavigation(company.id, listHref, selected, !tasks.loading);
+  const missing = selected !== null && !!tasks.data && !active;
   const [creating, setCreating] = useState(false);
   const [notice, setNotice] = useState('');
 
   return (
-    <div className="stack">
+    <div className={'stack record-page' + (selected !== null ? ' record-open' : '')}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Tarefas</h1>
         <button
@@ -231,7 +233,7 @@ export function Tarefas({ company, params }: PageProps) {
       </div>
       <nav
         aria-label="Filtrar tarefas por status"
-        className="flex flex-wrap gap-2"
+        className="record-list-context flex flex-wrap gap-2"
       >
         {(Object.keys(filters) as Filter[]).map((item) => (
           <a
@@ -250,7 +252,7 @@ export function Tarefas({ company, params }: PageProps) {
         </p>
       )}
       <div className="grid items-start gap-4 lg:grid-cols-[1.25fr_1fr]">
-        <section className="panel space-y-3" aria-label="Lista de tarefas">
+        <section className="record-list-context panel space-y-3" aria-label="Lista de tarefas">
           {tasks.loading && <p role="status">Carregando tarefas…</p>}
           {tasks.error && (
             <Feedback error={tasks.error} retry={tasks.refresh} />
@@ -266,18 +268,15 @@ export function Tarefas({ company, params }: PageProps) {
               para esta empresa.
             </p>
           )}
-          <ul className="space-y-2">
+          <ul ref={navigation.list} className="space-y-2">
             {tasks.data?.map((task) => (
               <li key={task.id}>
                 <a
                   href={taskHref(filter, task.id)}
+                  data-record-id={task.id}
+                  onClick={navigation.openRecord}
                   aria-current={active?.id === task.id ? 'true' : undefined}
-                  className={
-                    'flex items-start gap-3 rounded-xl border p-4 ' +
-                    (active?.id === task.id
-                      ? 'border-accent bg-info'
-                      : 'border-slate-200 hover:bg-slate-50')
-                  }
+                  className="record-option flex items-start gap-3 rounded-xl border p-4"
                 >
                   {task.completed ? (
                     <CheckCircle2
@@ -310,8 +309,16 @@ export function Tarefas({ company, params }: PageProps) {
             ))}
           </ul>
         </section>
-        {active && (
-          <TaskDetails
+        {(active || selected !== null) && <RecordDetail
+          title={missing ? 'Tarefa não encontrada' : 'Detalhe da tarefa'}
+          listHref={listHref}
+          backLabel="Voltar à lista de tarefas"
+          navigation={navigation}
+        >
+          {missing && <a className="secondary" href={taskHref('all')}>Ver todas as tarefas</a>}
+          {tasks.loading && <p className="lg:hidden" role="status">Carregando tarefa…</p>}
+          {tasks.error && <div className="lg:hidden"><Feedback error={tasks.error} retry={tasks.refresh} /></div>}
+          {active && <TaskDetails
             key={active.id}
             task={active}
             changed={(updated) => {
@@ -324,8 +331,8 @@ export function Tarefas({ company, params }: PageProps) {
               );
               tasks.refresh();
             }}
-          />
-        )}
+          />}
+        </RecordDetail>}
       </div>
       {creating && (
         <NewTask

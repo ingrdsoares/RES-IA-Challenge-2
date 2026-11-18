@@ -161,25 +161,25 @@ export function Leitor({ params }: { params: URLSearchParams }) {
       >
         {conversation && (
           <a
-            className="inline-flex items-center gap-1.5 hover:underline"
+            className="touch-link inline-flex items-center gap-1.5 hover:underline"
             href={`#assistente?${conversationQuery}`}
           >
             <MessageSquare size={16} aria-hidden /> Voltar à resposta
           </a>
         )}
         <a
-          className="inline-flex items-center gap-1.5 hover:underline"
+          className="touch-link inline-flex items-center gap-1.5 hover:underline"
           href={library ? `#normas?${new URLSearchParams(library)}` : '#normas'}
         >
           <ArrowLeft size={16} aria-hidden /> Biblioteca de normas
         </a>
       </nav>
       <header className="space-y-3">
-        <h1 className="break-words text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="break-words text-3xl font-bold tracking-tight text-ink">
           {resolution?.title || 'Leitor da norma'}
         </h1>
         {resolution?.title && (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-ink-muted">
             {[
               resolution.norm_type,
               resolution.authority,
@@ -197,7 +197,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
         </p>
       )}
       {endpoint && !current && (
-        <p className="panel p-5 text-sm text-slate-600" role="status">
+        <p className="panel p-5 text-sm text-ink-muted" role="status">
           Carregando a versão solicitada…
         </p>
       )}
@@ -235,7 +235,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                     className="panel p-4 lg:sticky lg:top-4"
                     aria-label="Sumário da norma"
                   >
-                    <summary className="flex cursor-pointer items-center gap-2 font-semibold text-slate-900">
+                    <summary className="flex cursor-pointer items-center gap-2 font-semibold text-ink">
                       <List size={17} aria-hidden /> Sumário
                     </summary>
                     <ul className="max-h-60 space-y-1 overflow-y-auto lg:max-h-[65vh]">
@@ -243,7 +243,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                         <li key={section.anchor_id}>
                           <button
                             type="button"
-                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-slate-100 ${section.anchor_id === exactAnchor ? 'bg-info font-semibold text-ink' : 'text-slate-700'}`}
+                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-surface-muted ${section.anchor_id === exactAnchor ? 'bg-info font-semibold text-ink' : 'text-ink'}`}
                             onClick={() => {
                               const passage = document.getElementById(
                                 `norm-section-${index}`,
@@ -259,7 +259,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                     </ul>
                   </details>
                   <article
-                    className="panel min-w-0 divide-y divide-slate-100 px-5 sm:px-8"
+                    className="panel min-w-0 divide-y divide-subtle px-5 sm:px-8"
                     aria-label="Texto da norma"
                   >
                     {current.sections.map((section, index) => {
@@ -277,7 +277,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                               Trecho citado
                             </strong>
                           )}
-                          <p className="whitespace-pre-wrap break-words text-base leading-8 text-slate-800">
+                          <p className="whitespace-pre-wrap break-words text-base leading-8 text-ink">
                             {selected ? (
                               <mark className="rounded-sm bg-highlight px-0.5 py-0.5 text-ink">
                                 {section.text}
@@ -286,7 +286,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                               section.text
                             )}
                           </p>
-                          {selected && <p className="mt-3 text-sm text-slate-600">
+                          {selected && <p className="mt-3 text-sm text-ink-muted">
                             Versão · {resolution.version_label || versionId}
                           </p>}
                         </section>
@@ -296,7 +296,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                 </div>
               ) : current?.textFailed || !webLink(resolution.json_url) ? (
                 <div className="panel space-y-3 p-5">
-                  <p role="status" className="text-sm text-slate-700">
+                  <p role="status" className="text-sm text-ink">
                     O texto para leitura na plataforma está indisponível.
                   </p>
                   {current?.textFailed && (
@@ -326,13 +326,13 @@ export function Leitor({ params }: { params: URLSearchParams }) {
           <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
             <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
               {!exactAnchor && <div>
-                <dt className="text-xs font-semibold text-slate-500">Versão</dt>
+                <dt className="text-xs font-semibold text-ink-muted">Versão</dt>
                 <dd className="mt-1 break-all font-medium">
                   {resolution.version_label || versionId}
                 </dd>
               </div>}
               <div>
-                <dt className="text-xs font-semibold text-slate-500">
+                <dt className="text-xs font-semibold text-ink-muted">
                   Vigência
                 </dt>
                 <dd className="mt-1">
@@ -341,7 +341,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
               </div>
               {Boolean(resolution.subjects?.length) && (
                 <div>
-                  <dt className="text-xs font-semibold text-slate-500">
+                  <dt className="text-xs font-semibold text-ink-muted">
                     Assuntos
                   </dt>
                   <dd className="mt-1">{resolution.subjects?.join(', ')}</dd>

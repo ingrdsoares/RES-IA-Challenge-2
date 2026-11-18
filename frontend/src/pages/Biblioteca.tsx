@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import {
   ArrowRight,
   BookOpen,
+  ChevronDown,
   ChevronRight,
   FileText,
   Search,
@@ -67,6 +68,8 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
     error?: boolean;
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filterCount = filters.filter((name) => name !== 'q' && applied.has(name)).length;
   const page = result?.search === search ? result.page : undefined;
   const error = result?.search === search && result.error;
 
@@ -93,6 +96,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
       const value = String(values.get(name) || '').trim();
       if (value) query.set(name, value);
     }
+    setFiltersOpen(false);
     window.location.hash = catalogLink(query);
   }
 
@@ -126,21 +130,21 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
   return (
     <div className="stack space-y-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-3xl font-bold tracking-tight text-ink">
           Biblioteca de normas
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-ink-muted">
           Consulte leis e normas fiscais por assunto, órgão ou período de
           vigência.
         </p>
       </header>
       <form key={search} onSubmit={submit} className="panel space-y-4 p-5">
-        <label className="block text-sm font-semibold text-slate-800">
+        <label className="block text-sm font-semibold text-ink">
           Buscar por título, número, artigo ou palavra-chave
           <span className="relative mt-1.5 block">
             <Search
               size={17}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
               aria-hidden
             />
             <input
@@ -153,7 +157,20 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
             />
           </span>
         </label>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <button
+          type="button"
+          aria-controls="catalog-filters"
+          aria-expanded={filtersOpen}
+          className="flex min-h-11 w-full items-center justify-between text-sm font-semibold text-link sm:hidden"
+          onClick={() => setFiltersOpen((open) => !open)}
+        >
+          Filtros ({filterCount})
+          <ChevronDown size={18} aria-hidden className={filtersOpen ? 'rotate-180' : ''} />
+        </button>
+        <div
+          id="catalog-filters"
+          className={`${filtersOpen ? 'grid' : 'hidden'} gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-4`}
+        >
           {(
             [
               ['subject', 'Assunto', subjects, 'Todos os assuntos'],
@@ -173,7 +190,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
           ).map(([name, label, options, placeholder]) => (
             <label
               key={name}
-              className="block text-sm font-medium text-slate-700"
+              className="block text-sm font-medium text-ink"
             >
               {label}
               <input
@@ -190,7 +207,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
               </datalist>
             </label>
           ))}
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-sm font-medium text-ink">
             Vigente em
             <input
               name="effective_on"
@@ -218,17 +235,17 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
         aria-labelledby="norm-results"
         aria-busy={!page && !error}
       >
-        <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
+        <div className="flex items-center gap-2 border-b border-subtle px-5 py-4">
           <BookOpen size={19} className="text-link" aria-hidden />
           <h2
             id="norm-results"
-            className="text-lg font-semibold text-slate-900"
+            className="text-lg font-semibold text-ink"
           >
             Normas encontradas
           </h2>
         </div>
         {!page && !error && (
-          <p role="status" className="p-5 text-sm text-slate-600">
+          <p role="status" className="p-5 text-sm text-ink-muted">
             Carregando normas…
           </p>
         )}
@@ -247,7 +264,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
           </div>
         )}
         {page && !page.items.length && (
-          <p role="status" className="p-5 text-sm text-slate-600">
+          <p role="status" className="p-5 text-sm text-ink-muted">
             Nenhuma norma encontrada
             {search
               ? '. Limpe ou ajuste os filtros para refazer a busca.'
@@ -255,7 +272,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
           </p>
         )}
         {page && (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-subtle">
             {page.items.map((norm) => (
               <li key={norm.version_id}>
                 <a
@@ -268,15 +285,15 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
                     aria-hidden
                   />
                   <div className="min-w-0 flex-1">
-                    <h3 className="break-words font-semibold text-slate-900 group-hover:text-link">
+                    <h3 className="break-words font-semibold text-ink group-hover:text-link">
                       {norm.title}
                     </h3>
-                    <p className="mt-1 text-sm text-slate-600">
+                    <p className="mt-1 text-sm text-ink-muted">
                       {[norm.norm_type, norm.authority, norm.version_label]
                         .filter(Boolean)
                         .join(' · ')}
                     </p>
-                    <p className="mt-1 text-xs text-slate-600">
+                    <p className="mt-1 text-xs text-ink-muted">
                       Vigência ·{' '}
                       {validity(norm.effective_from, norm.effective_to)}
                     </p>
@@ -285,7 +302,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
                         {norm.subjects.map((subject) => (
                           <span
                             key={subject}
-                            className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
+                            className="rounded-md bg-surface-muted px-2 py-0.5 text-xs text-ink"
                           >
                             {subject}
                           </span>
@@ -295,7 +312,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
                   </div>
                   <ChevronRight
                     size={18}
-                    className="mt-1 shrink-0 text-slate-500"
+                    className="mt-1 shrink-0 text-ink-muted"
                     aria-hidden
                   />
                 </a>
@@ -306,7 +323,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
         {(params.has('cursor') || page?.next_cursor) && (
           <nav
             aria-label="Paginação de normas"
-            className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-3 text-sm font-semibold text-link"
+            className="flex flex-wrap items-center justify-between gap-4 border-t border-subtle px-5 py-3 text-sm font-semibold text-link"
           >
             {params.has('cursor') && <a href={pageLink()}>Primeira página</a>}
             {page?.next_cursor && (

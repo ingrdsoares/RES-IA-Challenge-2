@@ -328,7 +328,7 @@
   color: var(--ink-muted);
   font-size: 0.9rem;
 }
-.access-switch button {
+.access-switch a {
   font-weight: 700;
   color: var(--ink-link);
   margin-left: 4px;
@@ -635,6 +635,12 @@
   border: 1px solid var(--border-control);
   border-radius: 14px;
   background: var(--surface-card);
+}
+@media (max-width: 767px) {
+  .touch-link,
+  .assistant-composer button[type='button'] {
+    min-height: 44px;
+  }
 }
 .assistant-composer:focus-within { outline: 2px solid var(--focus-color); outline-offset: 2px; }
 .composer-input {

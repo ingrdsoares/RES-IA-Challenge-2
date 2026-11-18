@@ -160,3 +160,105 @@ def test_successful_logins_do_not_consume_failure_budget(client):
             ).status_code
             == 200
         )
+
+
+@pytest.fixture
+def reset_mail(client, monkeypatch):
+    from app.access import mail
+
+    settings = client.app.state.settings
+    settings.smtp_host = "mail.invalid"
+    settings.smtp_from = "acesso@example.test"
+    mailbox = []
+    monkeypatch.setattr(
+        mail, "send_reset_link", lambda _, email, token: mailbox.append((email, token))
+    )
+    return mailbox
+
+
+def request_link(client, email):
+    return client.post("/auth/password-reset/request", json={"email": email}, headers=csrf(client))
+
+
+def use_link(client, secret, password="my new longer password"):
+    return client.post(
+        "/auth/password-reset/confirm",
+        json={"token": secret, "password": password},
+        headers=csrf(client),
+    )
+
+
+def test_password_recovery_lifecycle(client, reset_mail):
+    from app.access.models import Account
+    from app.security import digest
+    from sqlalchemy import select
+
+    email = "person@example.com"
+    assert register(client, email).status_code == 201
+    first_session = client.cookies["sd_session"]
+    assert client.post(
+        "/auth/login", json={"email": email, "password": PASSWORD}, headers=csrf(client)
+    ).is_success
+    second_session = client.cookies["sd_session"]
+
+    known = request_link(client, " PERSON@Example.com ")
+    unknown = request_link(client, "missing@example.com")
+    assert known.status_code == unknown.status_code == 204
+    assert known.content == unknown.content == b""
+    assert len(reset_mail) == 1
+    recipient, old_secret = reset_mail[0]
+    assert recipient == email
+    assert request_link(client, email).is_success
+    secret = reset_mail[-1][1]
+    with client.app.state.db_factory() as db:
+        account = db.scalar(select(Account).where(Account.email == email))
+        assert account.reset_token_hash == digest(secret)
+        assert (
+            datetime.now(UTC)
+            < account.reset_expires_at
+            <= datetime.now(UTC) + timedelta(minutes=30)
+        )
+
+    assert use_link(client, old_secret).status_code == 400
+    assert use_link(client, secret, "short").status_code == 422
+    assert use_link(client, secret).status_code == 204
+    assert use_link(client, secret).status_code == 400
+    for session in (first_session, second_session):
+        client.cookies.clear()
+        client.cookies.set("sd_session", session)
+        assert client.get("/auth/session").status_code == 401
+    client.cookies.clear()
+    for password, status in [(PASSWORD, 401), ("my new longer password", 200)]:
+        assert (
+            client.post(
+                "/auth/login", json={"email": email, "password": password}, headers=csrf(client)
+            ).status_code
+            == status
+        )
+
+
+def test_reset_expiry_csrf_and_throttle(client, reset_mail):
+    from app.access.models import Account
+    from sqlalchemy import update
+
+    assert register(client).is_success
+    payload = {"email": "person@example.com"}
+    assert client.post("/auth/password-reset/request", json=payload).status_code == 403
+    assert request_link(client, payload["email"]).is_success
+    secret = reset_mail[0][1]
+    assert (
+        client.post(
+            "/auth/password-reset/confirm", json={"token": secret, "password": PASSWORD}
+        ).status_code
+        == 403
+    )
+    with client.app.state.db_factory() as db:
+        db.execute(
+            update(Account).values(reset_expires_at=datetime.now(UTC) - timedelta(seconds=1))
+        )
+        db.commit()
+    assert use_link(client, secret).status_code == 400
+    for _ in range(4):
+        assert request_link(client, payload["email"]).status_code == 204
+    assert request_link(client, payload["email"]).status_code == 429
+    assert len(reset_mail) == 5

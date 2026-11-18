@@ -11,7 +11,7 @@ test('empresa acompanha uma tarefa, registra evidência e recupera a sessão', a
   const errors: string[] = [];
   page.on('pageerror', (err) => errors.push(err.message));
   await page.goto('/#entrar');
-  await page.getByRole('button', { name: 'Criar conta' }).click();
+  await page.getByRole('link', { name: 'Criar conta', exact: true }).click();
   await page.locator('[name=email]').fill(email);
   await page.locator('[name=password]').fill(password);
   await page.getByRole('button', { name: 'Criar conta' }).click();
@@ -140,7 +140,9 @@ test('empresa acompanha uma tarefa, registra evidência e recupera a sessão', a
   ).toHaveCount(0);
   await page.getByLabel('Município', { exact: true }).selectOption('Goiânia');
   await page.getByRole('button', { name: 'Salvar alterações' }).click();
-  await expect(page.getByText(/Goiânia\/GO/)).toBeVisible();
+  await expect(page.getByRole('status')).toHaveText('Alterações salvas.');
+  await expect(page.getByLabel('Município', { exact: true })).toHaveValue('Goiânia');
+  await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
