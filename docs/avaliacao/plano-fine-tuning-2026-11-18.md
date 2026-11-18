@@ -27,6 +27,18 @@ Configuração de referência: `final_guardrails` (qwen3:8b, `knowledge_base_v2`
 
 **Consequência:** ajustar o gerador (qwen3:8b) não resolve as metas que faltam. A ordem abaixo começa pela busca.
 
+### 1.1 Alinhamento com o backend multiagente (#29)
+
+Com o #29, o chat passa a rodar pelo executor multiagente (`app/assistant/agents/`), com os papéis supervisor, jurídico, fiscal, planejamento e síntese. O RAG medido acima (`app/rag.py`, `knowledge_base_v2`) continua sendo a referência de busca, mas o fluxo de produção muda em três pontos que este plano precisa seguir:
+
+| Ponto | RAG medido (13/11) | Backend multiagente (#29) | Efeito no plano |
+|---|---|---|---|
+| Busca jurídica | `app/rag.py` sobre a `knowledge_base_v2` | `retrieve_legal` (`app/assistant/tools.py`), híbrida com reranker, sobre a geração ativa do índice jurídico (`legal_index_generations`) | A Fase 1 (reranker) vale para os dois fluxos, porque é o mesmo `bge-reranker-v2-m3`. Os pares de treino saem do índice que estiver ativo. |
+| Decisão de pedir dados | `dados_faltantes` (`app/models.py`) | Supervisor (`SupervisorPlan.missing_fields`) + `resolve_context` + campos obrigatórios do motor fiscal | A Fase 2 troca a decisão do supervisor sobre `missing_fields`, não o `dados_faltantes`. Os rótulos são os `MissingField` de `agents/contracts.py`. |
+| Formato da resposta | Texto com `[n]` validado por `citacoes_validas` | JSON por papel; a síntese declara `support_ids`, e `validate_results` exige que eles batam com os `[n]` do texto | Entra a Fase 0b, antes de qualquer treino do gerador. |
+
+A auditoria do #29 (`docs/avaliacao/2026-11-17-auditoria-recuperacao-sete-falhas-thinking.md`) mostra que as 7 operações que falharam pararam primeiro no **contrato de saída**: 6 por "Citações inline inconsistentes" (o texto escreve `[1]` e declara `legal:3`) e 1 por "Síntese sem suporte dos especialistas". Ranking (A04, A07, A09) e truncamento do contexto (A03) vêm depois.
+
 ## 2. Regras para todas as fases
 
 1. **Sem vazamento do teste.** Nenhuma pergunta de `backend/evaluation/data/teste_ampliado_2026-11-12.jsonl` entra no treino. Toda pergunta gerada com similaridade de cosseno acima de 0,9 com alguma pergunta do teste é descartada.
@@ -44,6 +56,16 @@ Configuração de referência: `final_guardrails` (qwen3:8b, `knowledge_base_v2`
 - Medir, para cada pergunta respondível, a posição do artigo esperado entre os 30 candidatos **antes** do reranker e **depois** dele.
 
 **Decisão:** se o artigo está nos 30 candidatos em ≥ 85% dos casos, o gargalo é o reranker e o plano segue para a Fase 1. Se não, a Fase 3 (embedding) sobe de prioridade.
+
+### Fase 0b: contrato de saída da síntese, sem treino (≈ 2 h)
+
+O erro de numeração é determinístico e não precisa de fine-tuning: o servidor já sabe quais `legal:n` cada afirmação usa.
+
+- Gerar os marcadores `[n]` no servidor a partir dos `support_ids` de cada afirmação, como o `render_answer` já faz no caminho fiscal, em vez de exigir que o modelo escreva o número certo.
+- Recusar na síntese qualquer `support_id` que não venha das afirmações do jurídico ou do fiscal. Hoje isso já é validado; o que falta é tratar a recusa com uma resposta de contexto insuficiente, em vez de falhar a operação.
+- Rodar de novo as 50 perguntas da bateria do #29 (`scripts/evaluate_agent_flows.py`) e comparar as operações `failed`.
+
+**Aceite:** zero falhas por "Citações inline inconsistentes" na bateria de 50 perguntas.
 
 ### Fase 1: reranker (`bge-reranker-v2-m3`, 568M), ≈ 4 h
 
@@ -64,7 +86,7 @@ Configuração de referência: `final_guardrails` (qwen3:8b, `knowledge_base_v2`
 
 **Dados:** cerca de 400 perguntas rotuladas "precisa de dado" ou "responde direto". As fontes são as perguntas sintéticas da Fase 1 e perguntas novas de MEI, Simples e ICMS escritas pelo grupo. Nenhuma do teste.
 
-**Modelo:** regressão logística ou MLP pequena sobre o embedding da pergunta (`qwen3-embedding:0.6b`, que a API já calcula). Entra no lugar da chamada ao LLM em `dados_faltantes` (`backend/api/app/models.py`), atrás de uma flag.
+**Modelo:** regressão logística ou MLP pequena sobre o embedding da pergunta (`qwen3-embedding:0.6b`, que a API já calcula). Atrás de uma flag, entra no lugar da chamada ao LLM em `dados_faltantes` (`backend/api/app/models.py`), no RAG medido, e da decisão de `missing_fields` do supervisor (`app/assistant/agents/executor.py`), no fluxo multiagente. Os campos que o motor fiscal exige continuam determinísticos.
 
 **Ganho extra:** a decisão fica determinística e sai uma chamada ao LLM por pergunta.
 
@@ -101,6 +123,7 @@ As respostas de referência precisam de revisão humana. Não usar as respostas 
 | Ordem | Fase | Tempo de máquina | Trabalho humano | Depende de |
 |---|---|---|---|---|
 | 1 | 0. Chunker, reindexação parcial e diagnóstico | 1,5 h | Revisar o teste do chunker | — |
+| 1b | 0b. Contrato de saída da síntese | 2 h + bateria de 50 | — | #29 mesclado |
 | 2 | 1. Reranker | 4 h + 2 h de avaliação | Revisar 100 perguntas sintéticas | Fase 0 |
 | 3 | 2. Classificador de esclarecimento | 0,5 h + 2 h de avaliação | Rotular cerca de 400 perguntas (≈ 2 h) | — (pode rodar em paralelo à Fase 1) |
 | 4 | 3. Embedding (se a Fase 0 indicar) | 5 h + 2 h de avaliação | — | Fases 0 e 1 |
