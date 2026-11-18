@@ -228,7 +228,7 @@ function Simulator({ company }: { company: Company }) {
                   key={ref}
                   target="_blank"
                   rel="noreferrer"
-                  className="block break-all text-emerald-800 underline"
+                  className="block break-all text-link underline"
                 >
                   {ref}
                 </a>
@@ -274,7 +274,7 @@ export function Dashboard({ company }: PageProps) {
               className="panel flex flex-col items-start gap-3"
               key={scope}
             >
-              <span className="rounded-lg bg-emerald-50 p-2 text-emerald-800">
+              <span className="rounded-lg bg-info p-2 text-link">
                 <Icon size={21} aria-hidden="true" />
               </span>
               <h2 className="font-semibold text-slate-700">
@@ -292,7 +292,7 @@ export function Dashboard({ company }: PageProps) {
               <a
                 href={`#fiscal?scope=${scope}`}
                 aria-label={`Ver detalhes de ${scopeNames[scope]}`}
-                className="mt-auto inline-flex items-center gap-2 pt-2 text-sm font-semibold text-emerald-800"
+                className="mt-auto inline-flex items-center gap-2 pt-2 text-sm font-semibold text-link"
               >
                 Ver detalhes <ArrowRight size={15} />
               </a>
@@ -306,7 +306,7 @@ export function Dashboard({ company }: PageProps) {
           <h2 className="text-lg font-bold">Próximas tarefas</h2>
           <a
             href="#tarefas"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-link"
           >
             Ver todas as tarefas <ArrowRight size={15} />
           </a>
@@ -323,7 +323,7 @@ export function Dashboard({ company }: PageProps) {
             <li key={task.id}>
               <a
                 href={`#tarefas?task=${task.id}`}
-                className="flex items-center gap-3 py-3 hover:text-emerald-800"
+                className="flex items-center gap-3 py-3 hover:text-link"
               >
                 <CalendarDays size={18} className="shrink-0 text-slate-500" />
                 <span className="min-w-0">

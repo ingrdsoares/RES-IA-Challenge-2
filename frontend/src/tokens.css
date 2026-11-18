@@ -1,0 +1,39 @@
+:root {
+  /* Paleta Sócio Digital */
+  --palette-apricot: #ffb346;
+  --palette-cream: #fcf8ed;
+  --palette-honey: #ffd166;
+  --palette-orange: #ff9f1c;
+  --palette-blue: #118ab2;
+  --palette-navy: #073b4c;
+
+  --font-ui: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  --surface-page: var(--palette-cream);
+  --surface-card: #fff;
+  --surface-muted: color-mix(in srgb, var(--palette-navy) 5%, white);
+  --surface-info: color-mix(in srgb, var(--palette-blue) 11%, white);
+  --surface-info-hover: color-mix(in srgb, var(--palette-blue) 19%, white);
+  --surface-highlight: color-mix(in srgb, var(--palette-honey) 40%, white);
+  --surface-notice: color-mix(in srgb, var(--palette-honey) 28%, white);
+  --ink: var(--palette-navy);
+  --ink-muted: color-mix(in srgb, var(--ink) 82%, white);
+  --ink-link: color-mix(in srgb, var(--palette-blue) 48%, var(--palette-navy));
+  --ink-inverse: var(--palette-cream);
+  --ink-inverse-muted: color-mix(in srgb, var(--palette-cream) 84%, var(--palette-navy));
+  --border-subtle: color-mix(in srgb, var(--ink) 18%, white);
+  --border-control: color-mix(in srgb, var(--ink) 57%, white);
+  --focus-color: var(--palette-blue);
+  --danger-color: #a43827;
+  --radius-control: .5rem;
+  --radius-panel: .875rem;
+  --space-panel: clamp(1rem, 2vw, 1.65rem);
+  --shadow-paper: color-mix(in srgb, var(--ink) 16%, transparent);
+
+  --button-bg: var(--palette-apricot);
+  --button-hover: var(--palette-orange);
+  --button-ink: var(--ink);
+  --nav-bg: var(--palette-navy);
+  --nav-active: var(--palette-honey);
+  --citation-bg: var(--surface-info);
+  --citation-mark: var(--surface-highlight);
+}

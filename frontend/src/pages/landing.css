@@ -1,6 +1,6 @@
 .lp {
-  background: #f6f9f5;
-  color: #153f35;
+  background: var(--surface-page);
+  color: var(--ink);
   min-height: 100svh;
 }
 .lp-wrap {
@@ -8,7 +8,7 @@
   margin-inline: auto;
 }
 .lp-header {
-  border-bottom: 1px solid #dce6dc;
+  border-bottom: 1px solid var(--border-subtle);
 }
 .lp-nav {
   display: flex;
@@ -27,7 +27,7 @@
 }
 .lp-nav a:not(.lp-btn):hover,
 .lp-textlink:hover {
-  color: #167b5c;
+  color: var(--ink-link);
 }
 .lp-btn {
   display: inline-flex;
@@ -35,8 +35,8 @@
   justify-content: center;
   gap: 16px;
   padding: 15px 22px;
-  background: #164f40;
-  color: #fff;
+  background: var(--button-bg);
+  color: var(--button-ink);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 650;
@@ -44,7 +44,7 @@
   min-height: 48px;
 }
 .lp-btn:hover {
-  background: #0b3a2c;
+  background: var(--button-hover);
 }
 .lp-hero {
   display: grid;
@@ -60,13 +60,13 @@
   gap: 10px;
   font-size: 13px;
   margin-bottom: 26px;
-  color: #446654;
+  color: var(--ink-muted);
 }
 .lp-audience span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #448165;
+  background: var(--palette-blue);
 }
 .lp h1 {
   font-size: clamp(48px, 5.8vw, 78px);
@@ -79,7 +79,7 @@
   line-height: 1.8;
   max-width: 42ch;
   margin: 25px 0 30px;
-  color: #52695d;
+  color: var(--ink-muted);
 }
 .lp-hero-actions {
   display: flex;
@@ -95,7 +95,7 @@
   font-weight: 600;
 }
 .lp-preview {
-  background: #e0ebda;
+  background: var(--surface-info);
   padding: 24px 30px 23px;
   border-radius: 22px;
   position: relative;
@@ -107,28 +107,28 @@
   justify-content: center;
   gap: 7px;
   font-size: 11px;
-  color: #4f6954;
+  color: var(--ink-muted);
 }
 .lp-dot {
   width: 6px;
   height: 6px;
-  background: #4d7657;
+  background: var(--palette-blue);
   border-radius: 50%;
 }
 .lp-folder {
   position: relative;
   margin: 45px 0 28px;
   padding: 21px 16px 20px;
-  background: #92b299;
+  background: var(--palette-honey);
   border-radius: 0 12px 12px 12px;
-  box-shadow: 0 12px 25px #2d512612;
+  box-shadow: 0 12px 25px var(--shadow-paper);
   transform: rotate(-2deg);
 }
 .lp-tab {
   position: absolute;
   top: -27px;
   left: 0;
-  background: #92b299;
+  background: var(--palette-honey);
   border-radius: 10px 10px 0 0;
   padding: 8px 18px;
   display: flex;
@@ -139,18 +139,18 @@
   height: 30px;
 }
 .lp-paper {
-  background: #fffff8;
-  border: 1px solid #d9e2d2;
+  background: var(--surface-page);
+  border: 1px solid var(--border-subtle);
   border-radius: 5px;
   padding: 24px 22px 20px;
-  box-shadow: 0 4px 8px #31502b12;
+  box-shadow: 0 4px 8px var(--shadow-paper);
   transform: rotate(2deg);
 }
 .lp-paper-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #647766;
+  color: var(--ink-muted);
   font-size: 11px;
 }
 .lp-paper h2 {
@@ -167,7 +167,7 @@
   align-items: center;
   gap: 10px;
   padding: 17px 0;
-  border-bottom: 1px solid #e5eadf;
+  border-bottom: 1px solid var(--border-subtle);
 }
 .lp-record > div {
   flex: 1;
@@ -180,13 +180,13 @@
 }
 .lp-record small {
   font-size: 10px;
-  color: #718171;
+  color: var(--ink-muted);
   display: block;
   margin-top: 4px;
 }
 .lp-record-icon {
-  background: #edf2e8;
-  color: #52785a;
+  background: var(--surface-muted);
+  color: var(--ink-link);
   border-radius: 5px;
   padding: 7px;
 }
@@ -196,14 +196,14 @@
 }
 .lp-status {
   font-size: 9px;
-  background: #e2efdf;
-  color: #345f3d;
+  background: var(--surface-info);
+  color: var(--ink);
   padding: 4px 7px;
   border-radius: 4px;
 }
 .lp-status.pending {
-  background: #f1eacb;
-  color: #756324;
+  background: var(--surface-notice);
+  color: var(--ink);
 }
 .lp-paper-content > p {
   display: flex;
@@ -216,7 +216,7 @@
 .lp-paper-content > small {
   display: block;
   font-size: 12px;
-  color: #647564;
+  color: var(--ink-muted);
   line-height: 1.7;
 }
 .lp-demo-action {
@@ -225,7 +225,7 @@
   gap: 7px;
   font-size: 12px;
   font-weight: 650;
-  color: #245f3f;
+  color: var(--ink-link);
   margin-top: 16px;
   padding: 8px 0;
   text-decoration: underline;
@@ -233,7 +233,7 @@
 }
 .lp-binding {
   width: 40px;
-  border-bottom: 3px solid #adc1a3;
+  border-bottom: 3px solid var(--border-subtle);
   margin-top: 8px;
 }
 .lp-switch {
@@ -248,16 +248,16 @@
   padding: 9px 13px;
   font-size: 11px;
   border-radius: 6px;
-  color: #456044;
+  color: var(--ink-muted);
 }
 .lp-switch button[aria-pressed='true'] {
-  background: #fffef7;
-  color: #1b503b;
-  box-shadow: 0 1px 3px #355a2520;
+  background: var(--surface-page);
+  color: var(--ink);
+  box-shadow: 0 1px 3px var(--shadow-paper);
 }
 .lp-resources {
-  background: #123f35;
-  color: #eaf5e9;
+  background: var(--nav-bg);
+  color: var(--ink-inverse);
   padding: 70px 0 78px;
 }
 .lp h2 {
@@ -275,11 +275,11 @@
   margin-top: 44px;
 }
 .lp-features article {
-  border-top: 1px solid #4a6d5c;
+  border-top: 1px solid var(--border-control);
   padding-top: 26px;
 }
 .lp-features svg {
-  color: #b1d7b6;
+  color: var(--ink-inverse-muted);
 }
 .lp-features h3 {
   font-size: 19px;
@@ -288,7 +288,7 @@
   letter-spacing: -0.025em;
 }
 .lp-features p {
-  color: #c0d4c6;
+  color: var(--ink-inverse-muted);
   font-size: 14px;
   line-height: 1.8;
   max-width: 35ch;
@@ -305,7 +305,7 @@
   letter-spacing: -0.04em;
 }
 .lp-faq details {
-  border-bottom: 1px solid #ccd9c8;
+  border-bottom: 1px solid var(--border-subtle);
 }
 .lp-faq summary {
   list-style: none;
@@ -329,12 +329,12 @@
 }
 .lp-faq details p {
   font-size: 14px;
-  color: #526b5c;
+  color: var(--ink-muted);
   line-height: 1.8;
   margin: 0 32px 20px 0;
 }
 .lp footer {
-  border-top: 1px solid #d3dfcf;
+  border-top: 1px solid var(--border-subtle);
   padding: 28px 0;
 }
 .lp footer > .lp-wrap {
@@ -345,7 +345,7 @@
 }
 .lp footer a {
   font-size: 12px;
-  color: #4d6957;
+  color: var(--ink-muted);
 }
 .lp section[id] {
   scroll-margin-top: 24px;
@@ -355,7 +355,7 @@
   align-items: center;
   gap: 7px;
   font-size: 13px;
-  color: #4d6957;
+  color: var(--ink-muted);
   margin-bottom: 24px;
 }
 @media (max-width: 1100px) {

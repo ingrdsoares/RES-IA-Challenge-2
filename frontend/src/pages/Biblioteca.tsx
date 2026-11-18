@@ -219,7 +219,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
         aria-busy={!page && !error}
       >
         <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
-          <BookOpen size={19} className="text-emerald-700" aria-hidden />
+          <BookOpen size={19} className="text-link" aria-hidden />
           <h2
             id="norm-results"
             className="text-lg font-semibold text-slate-900"
@@ -260,15 +260,15 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
               <li key={norm.version_id}>
                 <a
                   href={openDocument(norm)}
-                  className="group flex items-start gap-3 px-5 py-4 transition hover:bg-emerald-50/50 focus-visible:outline-emerald-700"
+                  className="group flex items-start gap-3 px-5 py-4 transition hover:bg-info focus-visible:outline-link"
                 >
                   <FileText
                     size={20}
-                    className="mt-1 shrink-0 text-emerald-700"
+                    className="mt-1 shrink-0 text-link"
                     aria-hidden
                   />
                   <div className="min-w-0 flex-1">
-                    <h3 className="break-words font-semibold text-slate-900 group-hover:text-emerald-800">
+                    <h3 className="break-words font-semibold text-slate-900 group-hover:text-link">
                       {norm.title}
                     </h3>
                     <p className="mt-1 text-sm text-slate-600">
@@ -306,7 +306,7 @@ export function Biblioteca({ params }: { params: URLSearchParams }) {
         {(params.has('cursor') || page?.next_cursor) && (
           <nav
             aria-label="Paginação de normas"
-            className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-3 text-sm font-semibold text-emerald-800"
+            className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-3 text-sm font-semibold text-link"
           >
             {params.has('cursor') && <a href={pageLink()}>Primeira página</a>}
             {page?.next_cursor && (

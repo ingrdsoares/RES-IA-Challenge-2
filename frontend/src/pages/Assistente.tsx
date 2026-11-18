@@ -206,7 +206,7 @@ function Answer({
             .map((url, i) => (
               <a
                 key={url}
-                className="block text-emerald-800 underline"
+                className="block text-link underline"
                 href={url}
                 target="_blank"
                 rel="noreferrer"
@@ -263,13 +263,13 @@ function Answer({
               <li key={index}>
                 <span>{step}</span>
                 {tasks[index] === 'saved' ? (
-                  <a className="text-emerald-800 underline" href="#tarefas">
+                  <a className="text-link underline" href="#tarefas">
                     Ver em Tarefas
                   </a>
                 ) : (
                   <button
                     type="button"
-                    className="text-sm font-semibold text-emerald-800 underline"
+                    className="text-sm font-semibold text-link underline"
                     disabled={tasks[index] === 'saving'}
                     onClick={() => createTask(index)}
                   >
@@ -324,10 +324,10 @@ function Confirmation({
   }
   return (
     <form
-      className="space-y-3 rounded-xl border border-amber-200 bg-amber-50 p-4"
+      className="space-y-3 rounded-xl border border-accent bg-notice p-4"
       onSubmit={submit}
     >
-      <h3 className="font-semibold text-amber-950">Confirmação de contexto</h3>
+      <h3 className="font-semibold text-ink">Confirmação de contexto</h3>
       {fields.includes('period') && (
         <label className="block text-sm">
           Qual competência deseja consultar?
@@ -489,7 +489,7 @@ function Composer({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <button
             type="button"
-            className="text-sm font-medium text-emerald-800 underline"
+            className="text-sm font-medium text-link underline"
             onClick={() => setKind(kind ? '' : 'mei')}
           >
             {kind ? 'Cancelar simulação' : 'Simular cálculo fiscal'}
@@ -704,7 +704,7 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
                 (message.role === 'user'
                   ? 'ml-auto bg-slate-900 text-white'
                   : 'border border-slate-200 bg-white text-slate-800') +
-                (message.id === messageId ? ' ring-2 ring-emerald-500' : '')
+                (message.id === messageId ? ' ring-2 ring-focus' : '')
               }
             >
               <h3 className="font-semibold">
@@ -750,7 +750,7 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
         )}
         {!pollError &&
           ['queued', 'running'].includes(operationStatus ?? '') && (
-            <p className="text-sm text-emerald-800" role="status">
+            <p className="text-sm text-link" role="status">
               Processando sua consulta…
             </p>
           )}
@@ -874,7 +874,7 @@ function CompanyAssistant({
                 className={
                   'block break-words rounded-lg px-3 py-2 text-sm hover:bg-slate-100 ' +
                   (chat.id === id
-                    ? 'bg-emerald-50 font-semibold text-emerald-900'
+                    ? 'bg-info font-semibold text-ink'
                     : 'text-slate-700')
                 }
               >

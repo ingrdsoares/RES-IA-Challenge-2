@@ -275,14 +275,14 @@ export function Tarefas({ company, params }: PageProps) {
                   className={
                     'flex items-start gap-3 rounded-xl border p-4 ' +
                     (active?.id === task.id
-                      ? 'border-emerald-300 bg-emerald-50'
+                      ? 'border-accent bg-info'
                       : 'border-slate-200 hover:bg-slate-50')
                   }
                 >
                   {task.completed ? (
                     <CheckCircle2
                       size={18}
-                      className="mt-1 shrink-0 text-emerald-700"
+                      className="mt-1 shrink-0 text-link"
                     />
                   ) : (
                     <Circle

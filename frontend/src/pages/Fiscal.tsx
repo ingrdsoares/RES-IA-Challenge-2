@@ -175,7 +175,7 @@ function EvidenceDetail({ evidence }: { evidence: Evidence }) {
   return (
     <aside className="panel space-y-4" aria-label="Detalhe da evidência">
       <h2 className="font-bold">Detalhe da evidência</h2>
-      <p className="font-semibold text-emerald-800">
+      <p className="font-semibold text-link">
         {kindNames[evidence.kind]}
       </p>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
@@ -303,13 +303,13 @@ export function Fiscal({ company, params }: PageProps) {
                   className={
                     'flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm ' +
                     (active?.id === item.id
-                      ? 'border-emerald-300 bg-emerald-50'
+                      ? 'border-accent bg-info'
                       : 'border-slate-200 hover:bg-slate-50')
                   }
                 >
                   <FileText
                     size={18}
-                    className="mt-0.5 shrink-0 text-emerald-800"
+                    className="mt-0.5 shrink-0 text-link"
                   />
                   <span>
                     <strong className="block">

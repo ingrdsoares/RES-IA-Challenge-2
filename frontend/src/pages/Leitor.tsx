@@ -157,7 +157,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
     <div className="stack space-y-5">
       <nav
         aria-label="Voltar à origem"
-        className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-emerald-800"
+        className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-link"
       >
         {conversation && (
           <a
@@ -212,7 +212,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
       {resolution && (
         <>
           {resolution.historical && (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <p className="rounded-lg border border-accent bg-notice px-4 py-3 text-sm text-ink">
               Versão histórica. A vigência desta versão já terminou.
             </p>
           )}
@@ -243,7 +243,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                         <li key={section.anchor_id}>
                           <button
                             type="button"
-                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-slate-100 ${section.anchor_id === exactAnchor ? 'bg-emerald-50 font-semibold text-emerald-900' : 'text-slate-700'}`}
+                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-slate-100 ${section.anchor_id === exactAnchor ? 'bg-info font-semibold text-ink' : 'text-slate-700'}`}
                             onClick={() => {
                               const passage = document.getElementById(
                                 `norm-section-${index}`,
@@ -273,13 +273,13 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                           className="scroll-mt-8 py-5 outline-offset-2"
                         >
                           {selected && (
-                            <strong className="mb-2 block text-xs font-bold uppercase tracking-wide text-emerald-800">
+                            <strong className="mb-2 block text-xs font-bold uppercase tracking-wide text-link">
                               Trecho citado
                             </strong>
                           )}
                           <p className="whitespace-pre-wrap break-words text-base leading-8 text-slate-800">
                             {selected ? (
-                              <mark className="rounded-sm bg-emerald-100 px-0.5 py-0.5 text-emerald-950">
+                              <mark className="rounded-sm bg-highlight px-0.5 py-0.5 text-ink">
                                 {section.text}
                               </mark>
                             ) : (
@@ -315,7 +315,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                   href={original}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:underline"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-link hover:underline"
                 >
                   <FileText size={16} aria-hidden /> Abrir arquivo original
                   desta versão <ExternalLink size={14} aria-hidden />
