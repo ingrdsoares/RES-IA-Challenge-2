@@ -37,3 +37,18 @@
   --citation-bg: var(--surface-info);
   --citation-mark: var(--surface-highlight);
 }
+
+/* Variação Azul e Areia */
+:root[data-theme='azul-areia'] {
+  --surface-page: color-mix(in srgb, var(--palette-cream) 73%, white);
+  --surface-muted: color-mix(in srgb, var(--palette-cream) 50%, white);
+  --surface-info: color-mix(in srgb, var(--palette-blue) 8%, white);
+  --surface-info-hover: color-mix(in srgb, var(--palette-blue) 15%, white);
+  --surface-highlight: color-mix(in srgb, var(--palette-honey) 48%, white);
+  --button-bg: color-mix(in srgb, var(--palette-blue) 57%, var(--palette-navy));
+  --button-hover: color-mix(in srgb, var(--palette-blue) 29%, var(--palette-navy));
+  --button-ink: var(--surface-card);
+  --nav-active: var(--surface-highlight);
+  --radius-control: .75rem;
+  --radius-panel: 1.125rem;
+}

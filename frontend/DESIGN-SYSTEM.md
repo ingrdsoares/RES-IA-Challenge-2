@@ -20,3 +20,13 @@ Os [tokens CSS](src/tokens.css) são a fonte da paleta. A [configuração do Tai
 - **Tipografia** usa a pilha definida em `--font-ui`, com Plus Jakarta Sans quando disponível e Segoe UI como opção local.
 
 Prefira tokens de função no código dos componentes. Por exemplo, use `var(--button-bg)` no CSS e `text-link` no JSX. Se uma mesma cor tiver papéis diferentes, cada papel pode evoluir no respectivo token.
+
+## Variação Azul e Areia
+
+O fork usa `data-theme="azul-areia"` no elemento `html` do arquivo
+`index.html`. Os botões principais usam azul com texto branco. O creme
+suaviza as superfícies, e o amarelo indica a seção ativa e os trechos
+citados. Controles e painéis têm cantos mais arredondados.
+
+Remova o atributo `data-theme` para usar o tema base, com botões laranja.
+Os dois temas compartilham os componentes e os seis tokens da paleta.
