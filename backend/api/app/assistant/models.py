@@ -29,6 +29,7 @@ class Message(Base):
     text: Mapped[str] = mapped_column(Text)
     context: Mapped[dict] = mapped_column(JSON)
     citations: Mapped[list] = mapped_column(JSON, default=list)
+    actions: Mapped[list] = mapped_column(JSON, default=list)
     next_steps: Mapped[list] = mapped_column(JSON, default=list)
     status: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[datetime] = mapped_column(

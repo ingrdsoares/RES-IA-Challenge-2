@@ -123,7 +123,7 @@ def test_oversized_prompt_is_rejected_before_calling_ollama():
 
     models = make_models(handler)
     with pytest.raises(DependencyUnavailable):
-        models.answer("Pergunta", [source("🎉" * 6000)])
+        models.answer("Pergunta", [source("🎉" * 30000)])
     models.close()
 
 
