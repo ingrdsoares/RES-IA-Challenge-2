@@ -25,8 +25,8 @@ O acervo jurídico é alimentado por ingestão administrativa. A cobertura depen
 Você precisa de **Git**, **Docker com Compose** e **Ollama** em execução. Clone o repositório e execute o script no PowerShell.
 
 ```powershell
-git clone https://github.com/Lucas-AV/socio-digital.git
-cd socio-digital
+git clone https://github.com/ingrdsoares/RES-IA-Challenge-2.git
+cd RES-IA-Challenge-2
 ./scripts/rodar-localmente.ps1
 ```
 
@@ -56,4 +56,4 @@ Para trabalhar na interface, pare o container `frontend`, mantenha a API local e
 
 ## Origem
 
-O Sócio Digital nasceu no **Grupo 08 do Challenge 2 da Residência em Inteligência Artificial (RES-IA)**. Este fork mantém a atribuição ao [repositório original](https://github.com/ingrdsoares/RES-IA-Challenge-2) e reúne a evolução da experiência web no design system do projeto. Conheça a [equipe e as frentes de trabalho](docs/projeto/equipe.md).
+O Sócio Digital nasceu no **Grupo 08 do Challenge 2 da Residência em Inteligência Artificial (RES-IA)**. Conheça a [equipe e as frentes de trabalho](docs/projeto/equipe.md).
