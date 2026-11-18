@@ -13,11 +13,11 @@ def client(service):
     from redis import Redis
 
     settings = Settings(
-        database_url="postgresql+psycopg://postgres:sd_test_local@localhost:15432/sd_test",
-        redis_url="redis://localhost:16379/15",
+        database_url="postgresql+psycopg://postgres:sd_test_local@127.0.0.1:15432/sd_test",
+        redis_url="redis://127.0.0.1:16379/15",
         cookie_secure=False,
-        s3_endpoint="http://localhost:19000",
-        s3_public_endpoint="http://localhost:19000",
+        s3_endpoint="http://127.0.0.1:19000",
+        s3_public_endpoint="http://127.0.0.1:19000",
         s3_access_key="sd_test_user",
         s3_secret_key="sd_test_password",
         allowed_origins=[ORIGIN],

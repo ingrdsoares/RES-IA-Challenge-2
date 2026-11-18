@@ -69,7 +69,8 @@ def test_mvp_workflow(tmp_path):
         ).json()
         path = tmp_path / "demo.md"
         path.write_text(
-            "Art. 1 A biblioteca demonstrativa organiza documentos por assunto e permite consultar a versão citada na conversa."
+            "Art. 1 A biblioteca demonstrativa organiza documentos por assunto e permite consultar a versão citada na conversa.",
+            encoding="utf-8",
         )
         metadata = IngestMetadata(
             document_key="workflow-" + uuid4().hex,
@@ -124,7 +125,8 @@ def test_mvp_workflow(tmp_path):
             params={key: citation[key] for key in ("document_id", "version_id", "anchor_id")},
         ).json()
         assert reader["state"] == "exact"
-        assert httpx.get(reader["json_url"]).status_code == 200
+        sections = httpx.get(reader["json_url"]).json()["sections"]
+        assert any(s["anchor_id"] == citation["anchor_id"] for s in sections)
         assert (
             client.post(
                 url,
@@ -152,9 +154,17 @@ def test_mvp_workflow(tmp_path):
         assert httpx.get(download).content == body
         task = client.post(
             "/empresas/" + company["id"] + "/tarefas",
-            json={"title": "Conferir guia"},
+            json={"source_message_id": messages[-1]["id"], "source_step_index": 0},
             headers=headers(),
         ).json()
+        assert (
+            client.post(
+                "/empresas/" + company["id"] + "/tarefas",
+                json={"source_message_id": messages[-1]["id"], "source_step_index": 0},
+                headers=headers(),
+            ).json()["id"]
+            == task["id"]
+        )
         assert (
             client.patch(
                 "/tarefas/" + task["id"], json={"completed": True}, headers=headers(uuid4().hex)
@@ -175,6 +185,14 @@ def test_mvp_workflow(tmp_path):
         assert calculation["status"] == "rule_unavailable"
         if os.getenv("MVP_RESULT_FILE"):
             Path(os.environ["MVP_RESULT_FILE"]).write_text(
-                json.dumps({"conversation_id": chat["id"], "operation_id": sent["operation_id"]})
+                json.dumps(
+                    {
+                        "conversation_id": chat["id"],
+                        "operation_id": sent["operation_id"],
+                        "version_id": citation["version_id"],
+                        "anchor_id": citation["anchor_id"],
+                        "stages": result()["result"]["stages"],
+                    }
+                )
             )
     factory.kw["bind"].dispose()

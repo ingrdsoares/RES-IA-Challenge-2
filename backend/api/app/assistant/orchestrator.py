@@ -7,11 +7,11 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from qdrant_client import QdrantClient
 from sqlalchemy import select, tuple_
 
+from app.assistant.agents import diagnose, plan_steps, stage, supervise
 from app.assistant.citations import validate_answer_citations
 from app.assistant.models import Conversation, Message
 from app.assistant.tools import retrieve_legal
 from app.config import Settings
-from app.evidence.service import get_fiscal_status
 from app.fiscal.schemas import CalculationInput
 from app.fiscal.service import calculate
 from app.jobs.errors import JobDeferred
@@ -67,17 +67,28 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
     )
     if existing:
         return {"message_id": str(existing.id), "state": existing.status}
-    facts = get_fiscal_status(db, operation.company_id, user.context.get("period"))
-    user.context = {**user.context, "fiscal_status": facts}
+    checkpoint = (operation.result or {}).get("checkpoint", {}).copy()
+    trace = list((operation.result or {}).get("stages", []))
     calculation_input = operation.payload.get("request", {}).get("calculation")
-    if calculation_input:
-        calculation = calculate(
-            db,
-            operation.company_id,
-            operation.owner_id,
-            CalculationInput.model_validate(calculation_input),
-            context_snapshot=user.context["company"],
-        )
+    with stage(trace, "supervisor", checkpoint):
+        route = supervise(user.text, bool(calculation_input))
+    facts = None
+    if route.diagnosis:
+        with stage(trace, "diagnostico_fiscal", checkpoint):
+            facts = checkpoint.get("fiscal_status")
+            if facts is None:
+                facts = diagnose(db, operation.company_id, user.context.get("period")).model_dump()
+                checkpoint["fiscal_status"] = facts
+            user.context = {**user.context, "fiscal_status": facts}
+    if route.calculation:
+        with stage(trace, "calculo", checkpoint):
+            calculation = calculate(
+                db,
+                operation.company_id,
+                operation.owner_id,
+                CalculationInput.model_validate(calculation_input),
+                context_snapshot=user.context["company"],
+            )
         user.context = {**user.context, "calculation": record(calculation)}
         if calculation.status == "calculated":
             answer = f"Valor simulado pelo motor: R$ {calculation.result['amount']}. Regra: {calculation.result['rule_version']}. Esta simulação não confirma pagamento nem regularidade."
@@ -100,6 +111,7 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
             "message_id": str(reply.id),
             "state": calculation.status,
             "calculation_id": str(calculation.id),
+            "stages": trace,
         }
     settings = settings or Settings()
     own_index, own_models = index is None, embed is None
@@ -110,94 +122,37 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
     )
     model = LocalModels(settings) if own_models else None
     try:
-        passages = retrieve_legal(
-            db,
-            index,
-            user.text,
-            user.context,
-            embed or model.embed_question,
-            settings.top_k,
-            settings.score_threshold,
-        )
+        with stage(trace, "juridico", checkpoint):
+            passages = retrieve_legal(
+                db,
+                index,
+                user.text,
+                user.context,
+                embed or model.embed_question,
+                settings.top_k,
+                settings.score_threshold,
+            )
         citations, steps = [], []
         if not passages:
             answer = "Não encontrei contexto normativo publicado e vigente suficiente para responder. A situação fiscal da empresa permanece não verificada."
-            if any(
+            if facts and any(
                 facts[scope]["latest_evidence"]
                 for scope in ("registration", "federal_certificate", "obligations")
             ):
-                answer = "Há evidências declaradas registradas para este contexto. Elas não comprovam pagamento nem regularidade fiscal. Verificação oficial: não realizada."
+                answer = "Não encontrei norma vigente suficiente. Há evidências declaradas registradas para este contexto. Elas não comprovam pagamento nem regularidade fiscal. Verificação oficial: não realizada."
                 state = "answered"
             else:
                 state = "insufficient_context"
         else:
-            for citation_index, passage in enumerate(passages, start=1):
-                passage["citation_index"] = citation_index
-            history = list(
-                db.scalars(
-                    select(Message)
-                    .where(
-                        Message.conversation_id == conversation.id,
-                        tuple_(Message.created_at, Message.id) < tuple_(user.created_at, user.id),
-                    )
-                    .order_by(Message.created_at.desc(), Message.id.desc())
-                    .limit(6)
+            with stage(trace, "sintese", checkpoint):
+                draft, citations = synthesize(
+                    db, user, conversation, passages, settings, model, generate
                 )
-            )
-            content = {
-                "question": user.text,
-                "context": user.context,
-                "history": [
-                    {"role": item.role, "text": item.text[:2000]} for item in reversed(history)
-                ],
-                "passages": passages,
-            }
-            budget = settings.num_ctx - settings.num_predict - 512
-            while (
-                len(json.dumps(content, ensure_ascii=False).encode()) + len(SYSTEM.encode())
-                > budget
-            ):
-                if content["history"]:
-                    content["history"].pop(0)
-                elif len(passages) > 1:
-                    passages.pop()
-                elif len(passages[0]["text"]) > 256:
-                    passages[0]["text"] = passages[0]["text"][: len(passages[0]["text"]) // 2]
-                else:
-                    raise ValueError("Contexto excede orçamento")
-            if generate:
-                draft = AssistantDraft.model_validate(generate(content))
-            else:
-                client = (
-                    model.client
-                    if model
-                    else ollama.Client(
-                        host=str(settings.ollama_url), timeout=settings.ollama_timeout
-                    )
-                )
-                try:
-                    response = client.chat(
-                        model=settings.generation_model,
-                        messages=[
-                            {"role": "system", "content": SYSTEM},
-                            {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
-                        ],
-                        format=transport_schema(),
-                        stream=False,
-                        think=False,
-                        options={
-                            "temperature": 0,
-                            "seed": 42,
-                            "num_ctx": settings.num_ctx,
-                            "num_predict": settings.num_predict,
-                        },
-                    )
-                    draft = AssistantDraft.model_validate_json(response.message.content)
-                finally:
-                    if model is None:
-                        client.close()
-            citations = validate_answer_citations(draft.answer, draft.cited_indices, passages)
-            answer, steps, state = draft.answer, draft.next_steps, "answered"
+                answer, steps, state = draft.answer, draft.next_steps, "answered"
+        with stage(trace, "planejamento", checkpoint):
+            steps = plan_steps(citations, route.diagnosis, steps)
+        if route.diagnosis and citations:
+            answer += "\n\nVerificação oficial de pagamento: não realizada."
         message = Message(
             conversation_id=conversation.id,
             operation_id=operation.id,
@@ -211,12 +166,75 @@ def answer_message(db, operation, *, settings=None, index=None, embed=None, gene
         db.add(message)
         user.status = state
         db.flush()
-        return {"message_id": str(message.id), "state": state}
+        return {"message_id": str(message.id), "state": state, "stages": trace}
     finally:
         if own_index:
             index.close()
         if own_models:
             model.close()
+
+
+def synthesize(db, user, conversation, passages, settings, model, generate):
+    for citation_index, passage in enumerate(passages, start=1):
+        passage["citation_index"] = citation_index
+    history = list(
+        db.scalars(
+            select(Message)
+            .where(
+                Message.conversation_id == conversation.id,
+                tuple_(Message.created_at, Message.id) < tuple_(user.created_at, user.id),
+            )
+            .order_by(Message.created_at.desc(), Message.id.desc())
+            .limit(6)
+        )
+    )
+    content = {
+        "question": user.text,
+        "context": user.context,
+        "history": [{"role": item.role, "text": item.text[:2000]} for item in reversed(history)],
+        "passages": passages,
+    }
+    budget = settings.num_ctx - settings.num_predict - 512
+    while len(json.dumps(content, ensure_ascii=False).encode()) + len(SYSTEM.encode()) > budget:
+        if content["history"]:
+            content["history"].pop(0)
+        elif len(passages) > 1:
+            passages.pop()
+        elif len(passages[0]["text"]) > 256:
+            passages[0]["text"] = passages[0]["text"][: len(passages[0]["text"]) // 2]
+        else:
+            raise ValueError("Contexto excede orçamento")
+    if generate:
+        draft = AssistantDraft.model_validate(generate(content))
+    else:
+        client = (
+            model.client
+            if model
+            else ollama.Client(host=str(settings.ollama_url), timeout=settings.ollama_timeout)
+        )
+        try:
+            response = client.chat(
+                model=settings.generation_model,
+                messages=[
+                    {"role": "system", "content": SYSTEM},
+                    {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
+                ],
+                format=transport_schema(),
+                stream=False,
+                think=False,
+                options={
+                    "temperature": 0,
+                    "seed": 42,
+                    "num_ctx": settings.num_ctx,
+                    "num_predict": settings.num_predict,
+                },
+            )
+            draft = AssistantDraft.model_validate_json(response.message.content)
+        finally:
+            if model is None:
+                client.close()
+    citations = validate_answer_citations(draft.answer, draft.cited_indices, passages)
+    return draft, citations
 
 
 def transport_schema():

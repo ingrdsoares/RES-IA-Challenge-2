@@ -18,7 +18,7 @@ def test_ingest_publish_and_retry_are_idempotent(client, tmp_path):
         "http://localhost:19000", "http://localhost:19000", "sd_test_user", "sd_test_password"
     )
     path = tmp_path / "law.md"
-    path.write_text("Art. 1º Regra de teste.\n\nArt. 2º Segunda regra.")
+    path.write_text("Art. 1º Regra de teste.\n\nArt. 2º Segunda regra.", encoding="utf-8")
     metadata = IngestMetadata(
         document_key="law",
         title="Lei de teste",

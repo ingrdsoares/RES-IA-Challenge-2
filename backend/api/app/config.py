@@ -13,7 +13,12 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital"
     redis_url: str = "redis://localhost:6379/0"
     cookie_secure: bool = True
-    allowed_origins: list[str] = ["http://localhost:8000"]
+    allowed_origins: list[str] = [
+        "http://localhost:8000",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+    ]
 
     # Seguranca e Rotacao de Segredos
     app_secret_key: str = Field(
