@@ -166,6 +166,8 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             return
         legal, fiscal, actions = {"claims": []}, {"claims": []}, {"actions": []}
         support = {}
+        # Deterministic fiscal data the interface renders next to the answer.
+        published = {}
         if "legal" in plan.agents:
             # Persist tool output separately from LLM claims so a replay uses exactly the same sources.
             def prepare_legal(step):
@@ -209,6 +211,9 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
 
             result, step = stage("fiscal", FiscalResult, fiscal_payload, prepare)
             support.update(step.tool_result["support"])
+            published["fiscal_status"] = step.tool_result["facts"]
+            if step.tool_result.get("calculation"):
+                published["calculation"] = step.tool_result["calculation"]
             fiscal = result.model_dump(mode="json")
             # Required inputs belong to deterministic services, not to model guesses.
             # Evidence lookup can return unverified without any financial inputs.
@@ -276,8 +281,9 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                     rendered_refs.update(
                         ref for claim in legal["claims"] for ref in claim["support_ids"]
                     )
+                # citation_index keeps the source label equal to the inline [n] of the text.
                 citations = [
-                    value
+                    {**value, "citation_index": int(key.split(":", 1)[1])}
                     for key, value in support.items()
                     if key.startswith("legal:") and key in rendered_refs
                 ]
@@ -286,7 +292,7 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                     operation_id=operation_id,
                     role="assistant",
                     text=text,
-                    context=context,
+                    context={**context, **published},
                     citations=citations,
                     next_steps=[action["title"] for action in actions["actions"]],
                     actions=actions["actions"],
