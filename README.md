@@ -22,19 +22,15 @@ O acervo jurídico é alimentado por ingestão administrativa. A cobertura depen
 
 ## Rode localmente
 
-Você precisa de **Git**, **Docker com Compose** e **Ollama** em execução no computador. Baixe os modelos uma vez e suba os serviços a partir da raiz do projeto.
+Você precisa de **Git**, **Docker com Compose** e **Ollama** em execução. Clone o repositório e execute o script no PowerShell.
 
-```bash
+```powershell
 git clone https://github.com/Lucas-AV/socio-digital.git
 cd socio-digital
-
-ollama pull qwen3:8b
-ollama pull qwen3-embedding:0.6b
-
-docker compose -f backend/compose.yaml up -d postgres redis storage qdrant
-docker compose -f backend/compose.yaml run --rm --build api alembic upgrade head
-docker compose -f backend/compose.yaml up -d --build frontend worker dispatcher
+./scripts/rodar-localmente.ps1
 ```
+
+O script baixa os modelos do Ollama, aguarda os serviços de dados, aplica as migrações e inicia a plataforma. As execuções seguintes reaproveitam os volumes do Compose. Para executar as etapas manualmente, consulte o [guia do backend](backend/README.md).
 
 Abra a [plataforma em localhost:3000](http://localhost:3000), crie uma conta e cadastre a empresa. A [API no Swagger](http://localhost:8000/docs) está disponível na porta 8000.
 
