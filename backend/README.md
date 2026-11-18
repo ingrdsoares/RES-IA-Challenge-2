@@ -151,9 +151,9 @@ as variáveis ou use `--env-file`. Nenhuma chave de API é necessária.
 | `SCORE_THRESHOLD` | `0.5` | −1 a 1; valor inicial provisório, avaliar com o corpus real |
 | `QDRANT_TIMEOUT` | `5` | Segundos por chamada, maior que zero até 120 |
 | `OLLAMA_TIMEOUT` | `120` | Segundos por chamada, maior que zero até 600 |
-| `NUM_CTX` | `40960` | 8192–40960 tokens de contexto |
+| `NUM_CTX` | `8192` | 8192–40960 tokens de contexto |
 | `NUM_PREDICT` | `1024` | 64–1024 tokens de saída |
-| `MAX_CONTEXT_CHARS` | `40960` | 1–40960 caracteres de texto recuperado no total |
+| `MAX_CONTEXT_CHARS` | `12000` | 1–40960 caracteres de texto recuperado no total |
 
 Além do limite de caracteres, o backend aplica orçamento conservador em bytes UTF-8
 ao prompt completo, reservando a saída e 256 tokens para o template. Os trechos são
@@ -578,4 +578,4 @@ MULTIAGENT_TEST_URL=http://localhost:11434 MULTIAGENT_QDRANT_URL=http://localhos
 
 O teste usa norma demonstrativa e coleção temporária própria. Não publica regra fiscal real.
 
-Contexto Qwen local: 40.960 tokens, conforme metadados do modelo instalado. O agente jurídico usa orçamento dinâmico para evidências, reservando saída, instruções, schema e metadados; o corte fixo de 2.200 caracteres foi removido. NUM_PREDICT continua 1.024. O limite de contexto não altera vigência nem reindexa documentos.
+Contexto Qwen local: 8.192 tokens por padrão, com até 12.000 caracteres de texto recuperado. Para usar a janela ampliada do modelo local, configure explicitamente NUM_CTX=40960 e MAX_CONTEXT_CHARS=40960. O agente jurídico usa orçamento dinâmico para evidências, reservando saída, instruções, schema e metadados; o corte fixo de 2.200 caracteres foi removido. NUM_PREDICT continua 1.024. O limite de contexto não altera vigência nem reindexa documentos.

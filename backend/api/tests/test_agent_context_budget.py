@@ -11,7 +11,7 @@ def test_large_window_preserves_multiple_complete_passages():
     from app.assistant.agents.context import legal_payload
 
     passages = [{"text": "a" * 3000, "anchor_id": str(i)} for i in range(8)]
-    payload = legal_payload("Pergunta", passages, Settings(num_ctx=40960))
+    payload = legal_payload("Pergunta", passages, Settings(num_ctx=40960, max_context_chars=40960))
     assert len(payload["sources"]) == 8
     assert all(len(p["text"]) == 3000 for p in payload["sources"].values())
 
