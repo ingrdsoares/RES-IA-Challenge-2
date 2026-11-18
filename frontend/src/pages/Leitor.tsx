@@ -159,20 +159,20 @@ export function Leitor({ params }: { params: URLSearchParams }) {
         aria-label="Voltar à origem"
         className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-emerald-800"
       >
+        {conversation && (
+          <a
+            className="inline-flex items-center gap-1.5 hover:underline"
+            href={`#assistente?${conversationQuery}`}
+          >
+            <MessageSquare size={16} aria-hidden /> Voltar à resposta
+          </a>
+        )}
         <a
           className="inline-flex items-center gap-1.5 hover:underline"
           href={library ? `#normas?${new URLSearchParams(library)}` : '#normas'}
         >
           <ArrowLeft size={16} aria-hidden /> Biblioteca de normas
         </a>
-        {conversation && (
-          <a
-            className="inline-flex items-center gap-1.5 hover:underline"
-            href={`#assistente?${conversationQuery}`}
-          >
-            <MessageSquare size={16} aria-hidden /> Voltar à conversa
-          </a>
-        )}
       </nav>
       <header className="space-y-3">
         <h1 className="break-words text-3xl font-bold tracking-tight text-slate-900">
@@ -211,42 +211,6 @@ export function Leitor({ params }: { params: URLSearchParams }) {
       )}
       {resolution && (
         <>
-          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
-            <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
-              <div>
-                <dt className="text-xs font-semibold text-slate-500">Versão</dt>
-                <dd className="mt-1 break-all font-medium">
-                  {resolution.version_label || versionId}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold text-slate-500">
-                  Vigência
-                </dt>
-                <dd className="mt-1">
-                  {validity(resolution.effective_from, resolution.effective_to)}
-                </dd>
-              </div>
-              {Boolean(resolution.subjects?.length) && (
-                <div>
-                  <dt className="text-xs font-semibold text-slate-500">
-                    Assuntos
-                  </dt>
-                  <dd className="mt-1">{resolution.subjects?.join(', ')}</dd>
-                </div>
-              )}
-            </dl>
-            {official && (
-              <a
-                href={official}
-                target="_blank"
-                rel="noreferrer"
-                className="secondary inline-flex items-center gap-2"
-              >
-                Ver publicação oficial <ExternalLink size={15} aria-hidden />
-              </a>
-            )}
-          </div>
           {resolution.historical && (
             <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
               Versão histórica. A vigência desta versão já terminou.
@@ -266,14 +230,14 @@ export function Leitor({ params }: { params: URLSearchParams }) {
           {readable && (
             <>
               {current?.sections ? (
-                <div className="grid items-start gap-5 lg:grid-cols-[minmax(12rem,15rem)_minmax(0,1fr)]">
-                  <nav
+                <div className={current.sections.length > 1 ? "grid items-start gap-5 lg:grid-cols-[minmax(12rem,15rem)_minmax(0,1fr)]" : "grid gap-3"}>
+                  <details key={versionId} open={current.sections.length > 1}
                     className="panel p-4 lg:sticky lg:top-4"
                     aria-label="Sumário da norma"
                   >
-                    <h2 className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+                    <summary className="flex cursor-pointer items-center gap-2 font-semibold text-slate-900">
                       <List size={17} aria-hidden /> Sumário
-                    </h2>
+                    </summary>
                     <ul className="max-h-60 space-y-1 overflow-y-auto lg:max-h-[65vh]">
                       {current.sections.map((section, index) => (
                         <li key={section.anchor_id}>
@@ -293,7 +257,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                         </li>
                       ))}
                     </ul>
-                  </nav>
+                  </details>
                   <article
                     className="panel min-w-0 divide-y divide-slate-100 px-5 sm:px-8"
                     aria-label="Texto da norma"
@@ -322,6 +286,9 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                               section.text
                             )}
                           </p>
+                          {selected && <p className="mt-3 text-sm text-slate-600">
+                            Versão · {resolution.version_label || versionId}
+                          </p>}
                         </section>
                       );
                     })}
@@ -356,6 +323,42 @@ export function Leitor({ params }: { params: URLSearchParams }) {
               )}
             </>
           )}
+          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
+            <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
+              {!exactAnchor && <div>
+                <dt className="text-xs font-semibold text-slate-500">Versão</dt>
+                <dd className="mt-1 break-all font-medium">
+                  {resolution.version_label || versionId}
+                </dd>
+              </div>}
+              <div>
+                <dt className="text-xs font-semibold text-slate-500">
+                  Vigência
+                </dt>
+                <dd className="mt-1">
+                  {validity(resolution.effective_from, resolution.effective_to)}
+                </dd>
+              </div>
+              {Boolean(resolution.subjects?.length) && (
+                <div>
+                  <dt className="text-xs font-semibold text-slate-500">
+                    Assuntos
+                  </dt>
+                  <dd className="mt-1">{resolution.subjects?.join(', ')}</dd>
+                </div>
+              )}
+            </dl>
+            {official && (
+              <a
+                href={official}
+                target="_blank"
+                rel="noreferrer"
+                className="secondary inline-flex items-center gap-2"
+              >
+                Ver publicação oficial <ExternalLink size={15} aria-hidden />
+              </a>
+            )}
+          </div>
         </>
       )}
     </div>

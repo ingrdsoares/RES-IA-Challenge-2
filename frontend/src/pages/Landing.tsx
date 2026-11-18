@@ -154,7 +154,7 @@ const questions = [
   ],
   [
     'O que preciso para começar?',
-    'Crie uma conta com e-mail e senha. Depois, informe CNPJ, CNAE, porte, regime tributário e município para abrir o painel da empresa.',
+    'Crie uma conta com e-mail e senha. Depois, informe CNPJ, CNAE, porte, regime tributário e município para abrir o assistente fiscal.',
   ],
   [
     'A plataforma confirma que uma guia foi paga?',
@@ -167,7 +167,7 @@ const questions = [
 ];
 
 export function Landing({ signedIn }: { signedIn: boolean }) {
-  const action = signedIn ? '#dashboard' : '#criar-conta';
+  const action = signedIn ? '#assistente' : '#criar-conta';
   return (
     <div className="lp" id="inicio">
       <header className="lp-header">
@@ -180,7 +180,7 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
           <div className="lp-nav-actions">
             {!signedIn && <a href="#entrar">Entrar</a>}
             <a className="lp-btn" href={action}>
-              {signedIn ? 'Abrir painel' : 'Criar conta'}
+              {signedIn ? 'Abrir assistente' : 'Criar conta'}
               <ArrowUpRight size={16} />
             </a>
           </div>
@@ -203,7 +203,7 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
             </p>
             <div className="lp-hero-actions">
               <a href={action} className="lp-btn">
-                {signedIn ? 'Acessar meu painel' : 'Criar minha conta'}{' '}
+                {signedIn ? 'Acessar meu assistente' : 'Criar minha conta'}{' '}
                 <ArrowRight size={18} />
               </a>
               <a className="lp-textlink" href="#recursos">

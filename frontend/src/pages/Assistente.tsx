@@ -2,12 +2,17 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
-  MessageSquare,
+  MessagesSquare,
+  History,
+  FileCheck2,
+  ListChecks,
   Plus,
   Send,
 } from 'lucide-react';
 import { api } from '../services/api';
-import type { Page } from '../types';
+import { formatCnpj } from '../components/Sidebar';
+import { Leitor } from './Leitor';
+import type { Company, Page } from '../types';
 
 type Conversation = { id: string; title: string; company_id: string };
 type Citation = {
@@ -152,37 +157,23 @@ function Answer({
               anchor_id: source.anchor_id,
               conversa: message.conversation_id,
               mensagem: message.id,
-              official_url: source.official_url,
             });
             const article =
               /^\s*(?:#+\s*)?(Art(?:igo)?\.?\s+\d+[º°o]?(?:[-–][\p{L}\d]+)?)/iu.exec(
                 source.text,
               )?.[1];
             return (
-              <div
+              <a
                 key={source.version_id + source.anchor_id}
-                className="rounded-lg bg-slate-50 p-3 text-sm"
+                className="assistant-citation"
+                href={'#assistente?' + query}
               >
-                <a
-                  className="font-semibold text-emerald-800 underline"
-                  href={'#leitor?' + query}
-                >
-                  [{source.citation_index ?? index + 1}] {source.title} ·{' '}
-                  {article ?? 'Abrir trecho'}{' '}
-                  <ArrowUpRight size={14} className="inline" />
-                </a>
-                <p className="text-xs text-slate-600">
-                  Versão {source.version_id.slice(0, 8)}
-                  {source.effective_from &&
-                    ' · Vigência a partir de ' +
-                      localDate(source.effective_from)}
-                </p>
-                {source.text && (
-                  <blockquote className="mt-2 line-clamp-3">
-                    {source.text}
-                  </blockquote>
-                )}
-              </div>
+                <BookOpen size={15} aria-hidden />
+                <span>[{source.citation_index ?? index + 1}] {source.title}
+                  {article && !source.title.toLowerCase().includes(article.toLowerCase()) && ' · ' + article}
+                </span>
+                <ArrowUpRight size={14} aria-hidden />
+              </a>
             );
           })}
         </section>
@@ -267,10 +258,10 @@ function Answer({
       {message.next_steps.length > 0 && (
         <section className="space-y-2">
           <h4 className="font-semibold">Próximos passos</h4>
-          <ol className="list-decimal space-y-2 pl-5">
+          <ol className="assistant-steps">
             {message.next_steps.slice(0, 3).map((step, index) => (
               <li key={index}>
-                {step}{' '}
+                <span>{step}</span>
                 {tasks[index] === 'saved' ? (
                   <a className="text-emerald-800 underline" href="#tarefas">
                     Ver em Tarefas
@@ -374,6 +365,22 @@ function Composer({
   setDraft: (text: string) => void;
 }) {
   const [kind, setKind] = useState('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport || kind) return;
+    function keepSendVisible() {
+      if (!viewport || viewport.width > 800 || viewport.height > 600 ||
+          document.activeElement !== inputRef.current) return;
+      const bottom = submitRef.current?.getBoundingClientRect().bottom;
+      if (bottom === undefined) return;
+      const overflow = bottom + 12 - (viewport.offsetTop + viewport.height);
+      if (overflow > 0) window.scrollBy(0, overflow);
+    }
+    viewport.addEventListener('resize', keepSendVisible);
+    return () => viewport.removeEventListener('resize', keepSendVisible);
+  }, [kind]);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -405,16 +412,18 @@ function Composer({
   }
   return (
     <form
-      className="space-y-3 border-t border-slate-200 pt-4"
+      className="assistant-composer"
       onSubmit={submit}
     >
       <fieldset disabled={busy} className="space-y-3">
-        <label className="block text-sm font-semibold" htmlFor="chat-question">
+        <label className="sr-only" htmlFor="chat-question">
           Mensagem
         </label>
         <textarea
+          ref={inputRef}
           id="chat-question"
-          className="field min-h-20"
+          className="composer-input"
+          rows={3}
           placeholder="Digite sua pergunta"
           maxLength={2000}
           required={!kind}
@@ -487,6 +496,7 @@ function Composer({
           </button>
           <button
             className="primary"
+            ref={submitRef}
             disabled={busy || (!draft.trim() && !kind)}
           >
             <Send size={15} /> Enviar
@@ -649,20 +659,23 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
     }
   }
 
-  const company = messages[messages.length - 1]?.context.company;
+  const welcome = !loading && !readError && !messages.length;
+  const period = messages.at(-1)?.context.period;
   const busy = sending || loading || !!operationId || !!readError;
   return (
-    <section className="panel min-w-0 space-y-4 p-4 sm:p-5">
-      <header className="border-b border-slate-200 pb-3">
+    <section className={'assistant-thread' + (welcome ? ' is-welcome' : '')}>
+      {welcome && (
+        <header className="assistant-welcome">
+          <span className="assistant-symbol"><MessagesSquare size={26} aria-hidden /></span>
+          <h2>O que você precisa resolver hoje?</h2>
+        </header>
+      )}
+      {conversation && <header className="border-b border-slate-200 pb-3">
         <h2 className="break-words text-lg font-semibold">
-          {conversation?.title ?? 'Nova conversa'}
+          {conversation.title}
         </h2>
-        {company && (
-          <p className="mt-1 text-sm text-slate-600">
-            {company.municipality} / {company.state} · {company.regime}
-          </p>
-        )}
-      </header>
+        {period && <p className="text-sm text-slate-600">Competência · {period}</p>}
+      </header>}
       {readError && (
         <p className="notice" role="alert">
           {readError}{' '}
@@ -675,7 +688,8 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
         </p>
       )}
       <div
-        className="max-h-[62vh] space-y-4 overflow-y-auto px-1 py-2"
+        hidden={welcome && !messageId}
+        className="assistant-messages space-y-4"
         aria-label="Mensagens da conversa"
       >
         {messages.map((message) => (
@@ -696,7 +710,7 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
               <h3 className="font-semibold">
                 {message.role === 'user' ? 'Você' : 'Assistente fiscal'}
               </h3>
-              <p className="whitespace-pre-wrap">{message.text}</p>
+              <p className="message-copy whitespace-pre-wrap">{message.text}</p>
               {message.role === 'assistant' && (
                 <Answer message={message} companyId={companyId} />
               )}
@@ -723,12 +737,6 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
               )}
           </div>
         ))}
-        {!loading && !readError && !messages.length && (
-          <div className="flex items-start gap-3 py-6 text-slate-600">
-            <MessageSquare size={22} className="shrink-0 text-emerald-700" />
-            <p>Qual é a sua dúvida fiscal?</p>
-          </div>
-        )}
         {!loading &&
           !readError &&
           messageId &&
@@ -771,18 +779,27 @@ function Chat({ companyId, conversation, messageId, onCreated }: ChatProps) {
         draft={draft}
         setDraft={setDraft}
       />
+      {welcome && (
+            <div className="assistant-choices">
+              <button type="button" onClick={() => send({ text: 'Paguei a guia da minha empresa?' })} disabled={busy}><FileCheck2 /> Conferir uma guia</button>
+              <button type="button" onClick={() => { setDraft('Quero entender a regra sobre '); document.getElementById('chat-question')?.focus(); }}><BookOpen /> Entender uma regra</button>
+              <a href="#tarefas"><ListChecks /> Consultar minhas tarefas</a>
+            </div>
+      )}
     </section>
   );
 }
 
 function CompanyAssistant({
-  companyId,
+  company,
   params,
 }: {
-  companyId: string;
+  company: Company;
   params: URLSearchParams;
 }) {
+  const companyId = company.id;
   const id = params.get('conversa');
+  const reading = !!(id && params.get('version_id') && params.get('document_id'));
   const [history, setHistory] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -813,15 +830,23 @@ function CompanyAssistant({
     return () => controller.abort();
   }, [companyId, revision]);
   const selected = history.find((conversation) => conversation.id === id);
+  const resumeKey = 'ultima-conversa:' + companyId;
+  useEffect(() => {
+    if (selected) sessionStorage.setItem(resumeKey, selected.id);
+  }, [resumeKey, selected]);
+  const lastVisited = sessionStorage.getItem(resumeKey);
+  const recent = history.find((chat) => chat.id === lastVisited) ?? history[0];
   return (
-    <div className="stack">
-      <h1 className="text-2xl font-bold text-slate-950">Assistente fiscal</h1>
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(190px,240px)_minmax(0,1fr)]">
-        <aside className="panel min-w-0 space-y-4 p-4 sm:p-5">
-          <a className="secondary" href="#assistente">
-            <Plus size={16} /> Nova conversa
-          </a>
-          <h2 className="font-semibold">Histórico</h2>
+    <div className={'assistant-layout' + (reading && selected ? ' with-reader' : '')}>
+      <div className="assistant-main">
+        <header className="assistant-heading">
+          <div><h1>Assistente fiscal</h1><p><span className="assistant-company-id">{formatCnpj(company.cnpj)} · </span>{company.regime} · {company.municipality}/{company.state}</p></div>
+          {id && <a className="secondary" href="#assistente"><Plus size={16} /> Nova pergunta</a>}
+        </header>
+        <div className="assistant-tools">
+          {!id && recent && <a className="assistant-resume" href={chatLink(recent.id)}>Continuar de onde parei <ArrowUpRight size={16} /></a>}
+          <details className="assistant-history" key={id || 'inicio'}>
+            <summary><History size={16} /> Histórico de conversas</summary>
           {loading && <p role="status">Carregando conversas…</p>}
           {error && (
             <p className="notice" role="alert">
@@ -853,17 +878,18 @@ function CompanyAssistant({
                     : 'text-slate-700')
                 }
               >
-                {chat.title}
+                <span className="line-clamp-2">{chat.title}</span>
               </a>
             ))}
           </nav>
-        </aside>
+          </details>
+        </div>
         {!id || selected ? (
           <Chat
             key={id ?? 'new'}
             companyId={companyId}
             conversation={selected}
-            messageId={params.get('mensagem')}
+            messageId={reading ? null : params.get('mensagem')}
             onCreated={(chat) =>
               setHistory((current) => [
                 chat,
@@ -881,13 +907,14 @@ function CompanyAssistant({
           </p>
         )}
       </div>
+      {reading && selected && <aside className="assistant-reader" aria-label="Norma citada"><Leitor params={params} /></aside>}
     </div>
   );
 }
 
 export function Assistente(props: {
-  companyId: string;
+  company: Company;
   params: URLSearchParams;
 }) {
-  return <CompanyAssistant key={props.companyId} {...props} />;
+  return <CompanyAssistant key={props.company.id} {...props} />;
 }

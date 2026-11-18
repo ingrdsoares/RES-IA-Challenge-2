@@ -15,8 +15,8 @@ import { Brand } from './Header';
 import type { Company } from '../types';
 
 const links = [
-  ['dashboard', 'Visão geral', LayoutDashboard],
   ['assistente', 'Assistente fiscal', MessagesSquare],
+  ['dashboard', 'Visão geral', LayoutDashboard],
   ['fiscal', 'Situação fiscal', Landmark],
   ['tarefas', 'Tarefas', ListChecks],
   ['normas', 'Biblioteca de normas', BookOpen],

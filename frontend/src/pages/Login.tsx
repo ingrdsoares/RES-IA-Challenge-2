@@ -88,8 +88,8 @@ export function Login({
           <h1>{register ? 'Crie sua conta' : 'Entre na sua conta'}</h1>
           <p>
             {register
-              ? 'Cadastre seu acesso ao painel da empresa.'
-              : 'Acesse o painel da sua empresa.'}
+              ? 'Crie seu acesso ao assistente fiscal.'
+              : 'Continue no assistente fiscal da sua empresa.'}
           </p>
           <form onSubmit={submit} className="stack">
             <label className="field">

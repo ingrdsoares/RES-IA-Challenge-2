@@ -136,7 +136,7 @@ export function Empresas({
         <p>
           {company
             ? 'Revise os dados usados nas consultas e no assistente fiscal.'
-            : 'Preencha os dados cadastrais para abrir o painel da empresa.'}
+            : 'Preencha os dados cadastrais para abrir o assistente fiscal.'}
         </p>
       </div>
       <form className="panel company-form stack" onSubmit={save}>
@@ -268,7 +268,7 @@ export function Empresas({
               ? 'Salvando…'
               : company
                 ? 'Salvar alterações'
-                : 'Salvar e abrir painel'}
+                : 'Salvar e abrir assistente'}
           </button>
         </div>
       </form>

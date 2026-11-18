@@ -44,7 +44,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
     company && Object.prototype.hasOwnProperty.call(titles, route)
       ? route
       : company
-        ? 'dashboard'
+        ? 'assistente'
         : 'cadastro';
   const params = new URLSearchParams(search);
   useEffect(() => {
@@ -53,7 +53,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
   function select(value: string) {
     sessionStorage.setItem('company:' + user.id, value);
     setId(value);
-    location.hash = 'dashboard';
+    location.hash = 'assistente';
   }
   function saved(updated: Company) {
     setCompanies((old) =>
@@ -120,7 +120,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
               onCancel={
                 company
                   ? () => {
-                      location.hash = 'dashboard';
+                      location.hash = 'assistente';
                     }
                   : undefined
               }
@@ -132,7 +132,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
               company={company}
               onSave={saved}
               onCancel={() => {
-                location.hash = 'dashboard';
+                location.hash = 'assistente';
               }}
             />
           )}
@@ -140,7 +140,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
           {page === 'fiscal' && props && <Fiscal {...props} />}
           {page === 'tarefas' && props && <Tarefas {...props} />}
           {page === 'assistente' && company && (
-            <Assistente companyId={company.id} params={params} />
+            <Assistente company={company} params={params} />
           )}
           {page === 'normas' && <Biblioteca params={params} />}
           {page === 'leitor' && <Leitor params={params} />}
@@ -223,7 +223,7 @@ export function App() {
       notice={notice}
       onLoginSuccess={(a) => {
         setNotice('');
-        location.hash = 'dashboard';
+        location.hash = 'assistente';
         setAccount(a);
       }}
     />
