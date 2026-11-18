@@ -67,7 +67,22 @@ type Payload = {
   text: string;
   calculation?: Record<string, unknown>;
   confirmation_for?: string;
-  confirmation?: Record<string, string>;
+  confirmation?: Record<string, string | boolean>;
+};
+// Every field the backend may request (MissingField in agents/contracts.py).
+const MONEY_FIELDS: Record<string, string> = {
+  revenue: 'Receita da competência (R$)',
+  rbt12: 'Receita dos últimos 12 meses (R$)',
+  payroll12: 'Folha dos últimos 12 meses (R$)',
+};
+const FIELD_NAMES: Record<string, string> = {
+  period: 'competência',
+  regime: 'regime',
+  kind: 'tipo de simulação',
+  revenue: 'receita da competência',
+  rbt12: 'receita dos últimos 12 meses',
+  payroll12: 'folha dos últimos 12 meses',
+  activity: 'atividade',
 };
 type Operation = { operation_id: string; status: string };
 
@@ -307,18 +322,23 @@ function Confirmation({
     event.preventDefault();
     if (!message.operation_id) return;
     const data = new FormData(event.currentTarget);
-    const confirmation = Object.fromEntries(
-      fields.map((field) => [field, String(data.get(field) ?? '').trim()]),
-    );
-    if (Object.values(confirmation).some((value) => !value)) return;
-    const description = [
-      confirmation.period && 'competência ' + confirmation.period,
-      confirmation.regime && 'regime ' + confirmation.regime,
-    ]
-      .filter(Boolean)
-      .join(' e ');
+    const confirmation: Record<string, string | boolean> = {};
+    for (const field of fields) {
+      if (field === 'conditions_confirmed') {
+        confirmation[field] = data.has(field);
+        continue;
+      }
+      const value = String(data.get(field) ?? '').trim();
+      if (!value) return;
+      // Money goes as a decimal string; the backend rejects floats.
+      confirmation[field] = field in MONEY_FIELDS ? value.replace(',', '.') : value;
+    }
+    const description = fields
+      .filter((field) => field !== 'conditions_confirmed')
+      .map((field) => (FIELD_NAMES[field] ?? field) + ' ' + confirmation[field])
+      .join(', ');
     send({
-      text: 'Confirmo ' + description + '.',
+      text: description ? 'Confirmo ' + description + '.' : 'Confirmo as condições informadas.',
       confirmation_for: message.operation_id,
       confirmation,
     });
@@ -345,6 +365,54 @@ function Confirmation({
             defaultValue={message.context.company?.regime}
             className="field"
           />
+        </label>
+      )}
+      {fields.includes('kind') && (
+        <label className="block text-sm">
+          Qual simulação deseja fazer?
+          <select name="kind" required className="field">
+            <option value="mei">MEI</option>
+            <option value="simples">Simples Nacional</option>
+          </select>
+        </label>
+      )}
+      {fields.includes('activity') && (
+        <label className="block text-sm">
+          Qual é a atividade da empresa?
+          <select name="activity" required className="field">
+            <option value="trade">Comércio</option>
+            <option value="services">Serviços</option>
+            <option value="mixed">Comércio e serviços</option>
+          </select>
+        </label>
+      )}
+      {Object.entries(MONEY_FIELDS)
+        .filter(([name]) => fields.includes(name))
+        .map(([name, label]) => (
+          <label key={name} className="block text-sm">
+            {label}
+            <input
+              name={name}
+              required
+              className="field"
+              inputMode="decimal"
+              pattern="[0-9]+([.,][0-9]{1,2})?"
+              placeholder="0,00"
+            />
+          </label>
+        ))}
+      {fields
+        .filter((field) => !(field in FIELD_NAMES) && field !== 'conditions_confirmed')
+        .map((field) => (
+          <label key={field} className="block text-sm">
+            {field}
+            <input name={field} required maxLength={200} className="field" />
+          </label>
+        ))}
+      {fields.includes('conditions_confirmed') && (
+        <label className="block text-sm">
+          <input type="checkbox" name="conditions_confirmed" required /> Confirmo os
+          dados e condições informados para esta simulação.
         </label>
       )}
       <button className="primary" disabled={busy}>

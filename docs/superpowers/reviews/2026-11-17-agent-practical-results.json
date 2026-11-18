@@ -1,0 +1,456 @@
+[
+  {
+    "scenario": "calculo_fixture",
+    "question": {
+      "text": "Execute a simulação demonstrativa do Simples em 2026-10 com os dados estruturados fornecidos. Explique o resultado do motor, sem afirmar pagamento.",
+      "calculation": {
+        "kind": "simples",
+        "period": "2026-10",
+        "revenue": "10000.00",
+        "rbt12": "500000.00",
+        "payroll12": "140000.00",
+        "conditions_confirmed": true
+      }
+    },
+    "answer": "Valor simulado pelo motor: R$ 800.00. Regra: synthetic-test-only.\nSituação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade.",
+    "actions": [],
+    "agents": [
+      {
+        "role": "plan",
+        "result": {
+          "intent": "fiscal",
+          "agents": [
+            "fiscal"
+          ],
+          "missing_fields": [],
+          "reason": "A simulação do Simples em 2026-10 será executada com os dados estruturados fornecidos, incluindo receita, RBT12 e folha de pagamento. O resultado do motor será explicado, sem afirmar pagamento."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1072,
+          "output_tokens": 89,
+          "latency_ms": 8047,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "fiscal",
+        "result": {
+          "status": "answered",
+          "claims": [
+            {
+              "text": "A simulação demonstrativa do Simples para o período 2026-10 foi executada com base nos dados fornecidos.",
+              "support_ids": [
+                "calculation:56c542a2-9532-46bd-af57-6ffe59ac054e"
+              ]
+            },
+            {
+              "text": "O resultado do motor indica que o valor da contribuição é de R$ 800,00, com taxa efetiva de 8,00%.",
+              "support_ids": [
+                "calculation:56c542a2-9532-46bd-af57-6ffe59ac054e"
+              ]
+            },
+            {
+              "text": "A contribuição é composta por duas partes: R$ 480,00 e R$ 320,00, conforme os componentes calculados.",
+              "support_ids": [
+                "calculation:56c542a2-9532-46bd-af57-6ffe59ac054e"
+              ]
+            },
+            {
+              "text": "A simulação foi realizada com base em uma regra de teste sintético, que exclui casos especiais.",
+              "support_ids": [
+                "calculation:56c542a2-9532-46bd-af57-6ffe59ac054e"
+              ]
+            }
+          ],
+          "missing_fields": [
+            "regime",
+            "conditions_confirmed",
+            "activity"
+          ],
+          "limitations": [
+            "Verificação oficial não realizada",
+            "A simulação não substitui a análise fiscal completa e não comprova pagamento"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 2197,
+          "output_tokens": 409,
+          "latency_ms": 37581,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "synthesis",
+        "result": {
+          "answer": "A simulação demonstrativa do Simples para o período 2026-10 foi executada com base nos dados fornecidos [1]. O resultado do motor indica que o valor da contribuição é de R$ 800,00, com taxa efetiva de 8,00% [1]. A contribuição é composta por duas partes: R$ 480,00 e R$ 320,00, conforme os componentes calculados [1]. A simulação foi realizada com base em uma regra de teste sintético, que exclui casos especiais [1].",
+          "support_ids": [
+            "calculation:56c542a2-9532-46bd-af57-6ffe59ac054e"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 806,
+          "output_tokens": 179,
+          "latency_ms": 13756,
+          "monetary_cost": null
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "calculo_sem_regra",
+    "question": {
+      "text": "Simule o Simples Nacional da competência 2026-10 usando os dados estruturados informados. Se não existir regra revisada, informe sem inventar valor.",
+      "calculation": {
+        "kind": "simples",
+        "period": "2026-10",
+        "revenue": "10000.00",
+        "rbt12": "500000.00",
+        "payroll12": "140000.00",
+        "conditions_confirmed": true
+      }
+    },
+    "answer": "Não há regra revisada para esta competência\nSituação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade.",
+    "actions": [],
+    "agents": [
+      {
+        "role": "plan",
+        "result": {
+          "intent": "fiscal",
+          "agents": [
+            "fiscal"
+          ],
+          "missing_fields": [],
+          "reason": "A simulação do Simples Nacional para a competência 2026-10 será realizada com base nos dados estruturados fornecidos, incluindo os valores de RBT12, Receita e Folha de Pagamento. A regra revisada será verificada para garantir a precisão da simulação."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1077,
+          "output_tokens": 104,
+          "latency_ms": 13390,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "fiscal",
+        "result": {
+          "status": "answered",
+          "claims": [],
+          "missing_fields": [
+            "revenue",
+            "rbt12",
+            "payroll12",
+            "activity"
+          ],
+          "limitations": [
+            "Verificação oficial não realizada",
+            "Não há regra revisada para esta competência"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1919,
+          "output_tokens": 63,
+          "latency_ms": 21122,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "synthesis",
+        "result": {
+          "answer": "Não há regra revisada para esta competência.",
+          "support_ids": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 497,
+          "output_tokens": 19,
+          "latency_ms": 2755,
+          "monetary_cost": null
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "combinado",
+    "question": {
+      "text": "Explique com fonte o recolhimento mensal do MEI segundo o art. 18-A fornecido, consulte se tenho pagamento oficialmente verificado em 2026-10 e proponha um próximo passo sustentado nas conclusões."
+    },
+    "answer": "Situação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade.\nO Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês. [1]",
+    "actions": [
+      {
+        "title": "Consultar norma sobre recolhimento do MEI",
+        "priority": "normal",
+        "preconditions": [
+          "Acesso a norma legal"
+        ],
+        "support_ids": [
+          "legal:1"
+        ],
+        "responsible": null,
+        "due_date": null,
+        "deadline_kind": "suggested"
+      }
+    ],
+    "agents": [
+      {
+        "role": "plan",
+        "result": {
+          "intent": "Explique com fonte o recolhimento mensal do MEI segundo o art. 18-A, consulte se tenho pagamento oficialmente verificado em 2026-10 e proponha um próximo passo sustentado nas conclusões.",
+          "agents": [
+            "legal",
+            "fiscal",
+            "planning"
+          ],
+          "missing_fields": [],
+          "reason": "A pergunta envolve explicação de uma regra legal (art. 18-A), consulta sobre situação fiscal (pagamento verificado em 2026-10) e proposta de próximo passo, exigindo a atuação de legal, fiscal e planning."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1010,
+          "output_tokens": 151,
+          "latency_ms": 18213,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "legal",
+        "result": {
+          "status": "answered",
+          "claims": [
+            {
+              "text": "O Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês.",
+              "support_ids": [
+                "legal:1"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 632,
+          "output_tokens": 64,
+          "latency_ms": 8288,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "fiscal",
+        "result": {
+          "status": "answered",
+          "claims": [],
+          "missing_fields": [
+            "regime",
+            "activity",
+            "kind",
+            "conditions_confirmed"
+          ],
+          "limitations": [
+            "Verificação oficial não realizada"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 470,
+          "output_tokens": 47,
+          "latency_ms": 6963,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "planning",
+        "result": {
+          "actions": [
+            {
+              "title": "Consultar norma sobre recolhimento do MEI",
+              "priority": "normal",
+              "preconditions": [
+                "Acesso a norma legal"
+              ],
+              "support_ids": [
+                "legal:1"
+              ],
+              "responsible": null,
+              "due_date": null,
+              "deadline_kind": "suggested"
+            }
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 601,
+          "output_tokens": 56,
+          "latency_ms": 5964,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "synthesis",
+        "result": {
+          "answer": "O MEI pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês [1]. Não há verificação oficial realizada para confirmar o pagamento em 2026-10. Próximo passo: Consultar norma sobre recolhimento do MEI.",
+          "support_ids": [
+            "legal:1"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 629,
+          "output_tokens": 94,
+          "latency_ms": 11506,
+          "monetary_cost": null
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "fiscal",
+    "question": {
+      "text": "Tenho pagamento fiscal oficialmente verificado na competência 2026-10? Consulte as evidências da minha empresa."
+    },
+    "answer": "Situação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade.",
+    "actions": [],
+    "agents": [
+      {
+        "role": "plan",
+        "result": {
+          "intent": "fiscal",
+          "agents": [
+            "fiscal"
+          ],
+          "missing_fields": [],
+          "reason": "A pergunta busca confirmar se o pagamento fiscal está oficialmente verificado na competência 2026-10, o que exige consulta à situação da empresa."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 980,
+          "output_tokens": 62,
+          "latency_ms": 9011,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "fiscal",
+        "result": {
+          "status": "answered",
+          "claims": [],
+          "missing_fields": [
+            "regime",
+            "activity",
+            "kind",
+            "conditions_confirmed"
+          ],
+          "limitations": [
+            "Verificação oficial não realizada"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 438,
+          "output_tokens": 47,
+          "latency_ms": 6680,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "synthesis",
+        "result": {
+          "answer": "Não há verificação oficial realizada para a competência 2026-10.",
+          "support_ids": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 468,
+          "output_tokens": 28,
+          "latency_ms": 3033,
+          "monetary_cost": null
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "juridico",
+    "question": {
+      "text": "Segundo o recorte fornecido do art. 18-A, o recolhimento do MEI pode ser fixo mensal independentemente da receita do mês? Explique com a fonte."
+    },
+    "answer": "Sim, o Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês [1].",
+    "actions": [],
+    "agents": [
+      {
+        "role": "plan",
+        "result": {
+          "intent": "Explique uma regra do MEI com fonte",
+          "agents": [
+            "legal"
+          ],
+          "missing_fields": [],
+          "reason": "A pergunta busca uma explicação sobre uma regra específica do MEI, referenciando o art. 18-A, o que exige a consulta a normas legais."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 983,
+          "output_tokens": 72,
+          "latency_ms": 16155,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "legal",
+        "result": {
+          "status": "answered",
+          "claims": [
+            {
+              "text": "O Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês.",
+              "support_ids": [
+                "legal:1"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 620,
+          "output_tokens": 64,
+          "latency_ms": 6812,
+          "monetary_cost": null
+        }
+      },
+      {
+        "role": "synthesis",
+        "result": {
+          "answer": "Sim, o Microempreendedor Individual pode optar pelo recolhimento em valores fixos mensais dos tributos abrangidos pelo Simples Nacional, independentemente da receita bruta do mês [1].",
+          "support_ids": [
+            "legal:1"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 528,
+          "output_tokens": 58,
+          "latency_ms": 7160,
+          "monetary_cost": null
+        }
+      }
+    ]
+  }
+]

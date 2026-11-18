@@ -4,8 +4,9 @@ from datetime import UTC, datetime, timedelta
 from redis import Redis
 from redis.exceptions import RedisError
 from rq import Queue
-from sqlalchemy import or_, select
+from sqlalchemy import and_, exists, or_, select
 
+from app.assistant.agents.models import AgentRun, AgentStep
 from app.config import Settings
 from app.db import session_factory
 from app.jobs.models import Operation
@@ -21,6 +22,28 @@ def dispatch(factory, redis: Redis) -> int:
                 or_(
                     Operation.dispatched_at.is_(None),
                     Operation.dispatched_at < datetime.now(UTC) - timedelta(minutes=15),
+                    and_(
+                        Operation.kind == "assistant.answer",
+                        Operation.dispatched_at < datetime.now(UTC) - timedelta(seconds=30),
+                        ~exists(
+                            select(AgentStep.id)
+                            .join(AgentRun, AgentStep.run_id == AgentRun.id)
+                            .where(
+                                AgentRun.operation_id == Operation.id,
+                                AgentStep.status == "running",
+                                AgentStep.lease_until > datetime.now(UTC),
+                            )
+                        ),
+                    ),
+                    exists(
+                        select(AgentStep.id)
+                        .join(AgentRun, AgentStep.run_id == AgentRun.id)
+                        .where(
+                            AgentRun.operation_id == Operation.id,
+                            AgentStep.status == "running",
+                            AgentStep.lease_until <= datetime.now(UTC),
+                        )
+                    ),
                 ),
             )
             .with_for_update(skip_locked=True)
@@ -31,7 +54,7 @@ def dispatch(factory, redis: Redis) -> int:
                 Queue("sd", connection=redis).enqueue(
                     "app.jobs.worker.run_operation",
                     str(operation.id),
-                    job_timeout=600,
+                    job_timeout=660,
                     result_ttl=0,
                     failure_ttl=3600,
                 )

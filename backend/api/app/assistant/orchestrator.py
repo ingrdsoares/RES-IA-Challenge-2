@@ -7,9 +7,9 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from qdrant_client import QdrantClient
 from sqlalchemy import select, tuple_
 
-from app.assistant.agents import diagnose, plan_steps, stage, supervise
 from app.assistant.citations import validate_answer_citations
 from app.assistant.models import Conversation, Message
+from app.assistant.stages import diagnose, plan_steps, stage, supervise
 from app.assistant.tools import retrieve_legal
 from app.config import Settings
 from app.fiscal.schemas import CalculationInput

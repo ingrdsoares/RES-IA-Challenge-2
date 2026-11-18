@@ -1,0 +1,104 @@
+{
+  "condition": "Original legal prompt, exact original evidence and question; think=True; num_predict=4096 instead of 1024. Two settings change together; this is not a pure thinking ablation.",
+  "cases": [
+    {
+      "id": "A06",
+      "question": "O MEI pode contratar empregados sem limite de quantidade?",
+      "baseline_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O MEI pode contratar empregados sem limite de quantidade.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O MEI pode contratar apenas um empregado, com exceções específicas para afastamento legal do único empregado.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "usage": {
+        "input_tokens": 1735,
+        "output_tokens": 50
+      },
+      "seconds": 36.771
+    },
+    {
+      "id": "A07",
+      "question": "Qualquer atividade profissional pode ser enquadrada como MEI?",
+      "baseline_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "Qualquer atividade profissional pode ser enquadrada como MEI.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O MEI é modalidade de microempresa e não há restrições à prática de qualquer profissão ou participação em licitações, desde que atenda aos critérios de microempresa.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "usage": {
+        "input_tokens": 1726,
+        "output_tokens": 63
+      },
+      "seconds": 30.379
+    },
+    {
+      "id": "A23",
+      "question": "Como a parcela a deduzir participa da fórmula da alíquota efetiva? Não faça simulação da minha empresa.",
+      "baseline_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "A alíquota efetiva é calculada multiplicando-se a receita bruta acumulada nos doze meses anteriores ao período de apuração (RBT12) pela alíquota nominal e pela parcela a deduzir, conforme previsto nos Anexos I a V da Lei Complementar.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "A alíquota efetiva é calculada multiplicando-se a receita bruta acumulada nos doze meses anteriores (RBT12) pela alíquota nominal (Aliq) e pela parcela a deduzir (PD), conforme definido nos Anexos I a V da Lei Complementar nº 123/2006.",
+            "support_ids": [
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "usage": {
+        "input_tokens": 1900,
+        "output_tokens": 102
+      },
+      "seconds": 48.929
+    }
+  ]
+}
