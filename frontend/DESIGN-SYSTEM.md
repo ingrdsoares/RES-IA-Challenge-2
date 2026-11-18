@@ -23,10 +23,10 @@ Prefira tokens de função no código dos componentes. Por exemplo, use `var(--b
 
 ## Variação Azul e Areia
 
-O fork usa `data-theme="azul-areia"` no elemento `html` do arquivo
-`index.html`. Os botões principais usam azul com texto branco. O creme
+Para ativar essa variação, defina `data-theme="azul-areia"` no elemento
+`html` do arquivo `index.html`. Os botões principais usam azul com texto branco. O creme
 suaviza as superfícies, e o amarelo indica a seção ativa e os trechos
 citados. Controles e painéis têm cantos mais arredondados.
 
-Remova o atributo `data-theme` para usar o tema base, com botões laranja.
+O fork usa `data-theme="original"` por padrão, com botões laranja.
 Os dois temas compartilham os componentes e os seis tokens da paleta.
