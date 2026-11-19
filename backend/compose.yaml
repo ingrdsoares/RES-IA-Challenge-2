@@ -62,6 +62,9 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
       TOP_K: ${TOP_K:-8}
@@ -141,6 +144,9 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-qwen3-embedding:0.6b}
       GENERATION_MODEL: ${GENERATION_MODEL:-qwen3:8b}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       COLLECTION_NAME: ${COLLECTION_NAME:-knowledge_base_v2}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
       TOP_K: ${TOP_K:-8}
