@@ -86,6 +86,8 @@ class Settings(BaseSettings):
     deepseek_api_key: SecretStr = SecretStr("")
     google_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     deepseek_base_url: str = "https://api.deepseek.com"
+    # Enviado ao Gemini quando o raciocínio não foi pedido; vazio não envia (2.5 Pro, Gemini 3).
+    google_reasoning_effort: str = "none"
     collection_name: str = Field(default="knowledge_base", min_length=1, max_length=255)
     embedding_dimensions: int = Field(default=1024, ge=32, le=4096)
     top_k: int = Field(default=8, ge=1, le=10)

@@ -56,7 +56,7 @@ def test_ollama_envia_opcoes_atuais():
     client.close()
 
 
-def test_google_usa_json_schema_e_bearer():
+def test_google_usa_json_object_e_bearer():
     pedidos = []
 
     def respond(request):
@@ -72,11 +72,9 @@ def test_google_usa_json_schema_e_bearer():
     assert corpo["model"] == "modelo-x"
     assert corpo["max_tokens"] == 128
     assert corpo["temperature"] == 0
-    assert corpo["response_format"] == {
-        "type": "json_schema",
-        "json_schema": {"name": "resposta", "schema": SCHEMA},
-    }
-    assert corpo["messages"] == MENSAGENS
+    # Gemini recusa partes do JSON Schema do Pydantic; mesmo caminho do DeepSeek.
+    assert corpo["response_format"] == {"type": "json_object"}
+    assert json.dumps(SCHEMA) in corpo["messages"][0]["content"]
     assert (resposta.texto, resposta.tokens_in, resposta.tokens_out) == ('{"ok": true}', 7, 3)
 
 
@@ -107,6 +105,7 @@ def test_nuvem_http_erro_vira_dependencia(status):
     with pytest.raises(DependencyUnavailable) as erro:
         chat(settings, MENSAGENS, max_tokens=64, http_client=http)
     assert "chave-k" not in str(erro.value)
+    assert "Google Gemini" in str(erro.value) and str(status) in str(erro.value)
 
 
 def test_nuvem_timeout_vira_dependency_timeout():
@@ -130,3 +129,44 @@ def test_nuvem_resposta_vazia(corpo):
     settings, http = _nuvem("google", lambda request: httpx.Response(200, json=corpo))
     with pytest.raises(DependencyUnavailable):
         chat(settings, MENSAGENS, max_tokens=64, http_client=http)
+
+
+def test_google_desliga_raciocinio_salvo_quando_pedido_ou_configurado():
+    corpos = []
+
+    def respond(request):
+        corpos.append(json.loads(request.content))
+        return httpx.Response(200, json=_resposta_openai())
+
+    settings, http = _nuvem("google", respond)
+    chat(settings, MENSAGENS, max_tokens=64, http_client=http)
+    chat(settings, MENSAGENS, max_tokens=64, think=True, http_client=http)
+    chat(
+        settings.model_copy(update={"google_reasoning_effort": ""}),
+        MENSAGENS,
+        max_tokens=64,
+        http_client=http,
+    )
+    padrao, pensando, sem_campo = corpos
+    assert padrao["reasoning_effort"] == "none"
+    assert "reasoning_effort" not in pensando
+    assert "reasoning_effort" not in sem_campo
+
+
+def test_deepseek_nao_recebe_reasoning_effort():
+    corpos = []
+
+    def respond(request):
+        corpos.append(json.loads(request.content))
+        return httpx.Response(200, json=_resposta_openai())
+
+    settings, http = _nuvem("deepseek", respond)
+    chat(settings, MENSAGENS, max_tokens=64, http_client=http)
+    assert "reasoning_effort" not in corpos[0]
+
+
+def test_json_cortado_por_limite_vira_dependencia():
+    corpo = {"choices": [{"message": {"content": '{"ok": tr'}, "finish_reason": "length"}]}
+    settings, http = _nuvem("google", lambda request: httpx.Response(200, json=corpo))
+    with pytest.raises(DependencyUnavailable):
+        chat(settings, MENSAGENS, max_tokens=64, schema=SCHEMA, http_client=http)

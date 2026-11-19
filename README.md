@@ -48,6 +48,8 @@ GENERATION_MODEL=gemini-2.5-flash   # ou deepseek-chat
 
 A pergunta e os trechos recuperados do acervo passam a ser enviados ao provedor escolhido. Os embeddings e o reranker continuam locais, então o Ollama segue necessário, só com o modelo de embedding. Os limites de contexto (`NUM_CTX`, `MAX_CONTEXT_CHARS`) não mudam com o provedor.
 
+No Gemini, `GOOGLE_REASONING_EFFORT=none` (padrão) desliga o raciocínio do 2.5 Flash, que senão consome o limite de tokens da resposta. Para 2.5 Pro ou Gemini 3, que não aceitam `none`, deixe a variável vazia.
+
 ## Como funciona
 
 1. O **frontend React + TypeScript** envia a pergunta à API e acompanha o processamento sem perder o contexto da conversa.

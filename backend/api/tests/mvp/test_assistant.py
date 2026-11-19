@@ -322,7 +322,7 @@ def test_assistente_via_nuvem():
 
     def respond(request):
         corpo = _json.loads(request.content)
-        assert corpo["response_format"]["type"] == "json_schema"
+        assert corpo["response_format"]["type"] == "json_object"
         return httpx.Response(
             200, json={"choices": [{"message": {"content": _json.dumps(rascunho)}}]}
         )

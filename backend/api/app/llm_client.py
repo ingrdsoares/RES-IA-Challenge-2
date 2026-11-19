@@ -31,14 +31,18 @@ def chat(
     ollama_client: ollama.Client | None = None,
     http_client: httpx.Client | None = None,
 ) -> Resposta:
-    """Uma rodada de chat, determinística (temperature 0). Falhas viram erro de dependência."""
+    """Uma rodada de chat com temperature 0. Falhas viram erro de dependência.
+
+    `think` liga o raciocínio no Ollama; no Google, `think=False` envia
+    `reasoning_effort` (GOOGLE_REASONING_EFFORT); no DeepSeek o modelo decide.
+    """
     timeout = timeout or settings.ollama_timeout
     with dependency_errors(_NOMES[settings.llm_provider]):
         if settings.llm_provider == "ollama":
             return _ollama(
                 settings, messages, max_tokens, schema, think, num_ctx, timeout, ollama_client
             )
-        return _nuvem(settings, messages, max_tokens, schema, timeout, http_client)
+        return _nuvem(settings, messages, max_tokens, schema, think, timeout, http_client)
 
 
 def _ollama(settings, messages, max_tokens, schema, think, num_ctx, timeout, client):
@@ -64,7 +68,7 @@ def _ollama(settings, messages, max_tokens, schema, think, num_ctx, timeout, cli
     return Resposta(response.message.content or "", response.prompt_eval_count, response.eval_count)
 
 
-def _nuvem(settings, messages, max_tokens, schema, timeout, client):
+def _nuvem(settings, messages, max_tokens, schema, think, timeout, client):
     provedor = settings.llm_provider
     corpo = {
         "model": settings.generation_model,
@@ -72,13 +76,12 @@ def _nuvem(settings, messages, max_tokens, schema, timeout, client):
         "max_tokens": max_tokens,
         "temperature": 0,
     }
-    if schema is not None and provedor == "google":
-        corpo["response_format"] = {
-            "type": "json_schema",
-            "json_schema": {"name": "resposta", "schema": schema},
-        }
-    elif schema is not None:
-        # DeepSeek só garante JSON válido; o schema vai no prompt e o Pydantic valida depois.
+    if provedor == "google" and not think and settings.google_reasoning_effort:
+        # Gemini 2.5 Flash raciocina por padrão e gasta max_tokens nisso.
+        corpo["reasoning_effort"] = settings.google_reasoning_effort
+    if schema is not None:
+        # Os schemas do Pydantic ($defs, anyOf, pattern) não passam em todo provedor:
+        # pede só JSON válido, o schema vai no prompt e o Pydantic valida depois.
         corpo["response_format"] = {"type": "json_object"}
         corpo["messages"] = _schema_no_sistema(messages, schema)
     owned = client is None
@@ -92,16 +95,22 @@ def _nuvem(settings, messages, max_tokens, schema, timeout, client):
             },
             json=corpo,
         )
-        response.raise_for_status()
+        if response.is_error:
+            # Status sem corpo: o corpo do provedor pode ecoar o pedido.
+            raise DependencyUnavailable(
+                f"{_NOMES[provedor]} respondeu HTTP {response.status_code}."
+            )
         dados = response.json()
     finally:
         if owned:
             client.close()
     try:
-        texto = dados["choices"][0]["message"]["content"]
+        escolha = dados["choices"][0]
+        texto = escolha["message"]["content"]
     except (KeyError, IndexError, TypeError):
-        texto = None
-    if not isinstance(texto, str) or not texto.strip():
+        escolha, texto = {}, None
+    cortado = schema is not None and escolha.get("finish_reason") == "length"
+    if not isinstance(texto, str) or not texto.strip() or cortado:
         raise DependencyUnavailable("O modelo não retornou uma resposta utilizável.")
     usage = dados.get("usage") or {}
     return Resposta(texto, usage.get("prompt_tokens"), usage.get("completion_tokens"))
