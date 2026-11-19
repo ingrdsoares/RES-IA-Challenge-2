@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { FileText, ShieldQuestion } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { api } from '../services/api';
 import type { Company } from '../types';
@@ -165,34 +166,33 @@ export function IndicatorInfo({
   indicator: Indicator;
 }) {
   const latest = indicator.latest_evidence;
-  const states = {
-    absent: 'Sem evidência',
-    expired: 'Evidência vencida',
-    declared: 'Evidência declarada',
+  const verification = {
+    registration: 'Cadastro não verificado',
+    federal_certificate: 'Certidão não verificada',
+    obligations: 'Pagamento não verificado',
   };
   return (
     <>
-      <p className="text-xl font-semibold text-slate-900">
-        {indicator.verification === 'unverified'
-          ? 'Não verificado'
-          : indicator.verification}
-      </p>
-      <span
-        className={
-          'inline-block rounded-full px-2.5 py-1 text-xs font-semibold ' +
-          (indicator.evidence_state === 'expired'
-            ? 'bg-amber-100 text-amber-900'
-            : 'bg-slate-100 text-slate-700')
-        }
-      >
-        {states[indicator.evidence_state]}
-      </span>
+      <div className="indicator-evidence">
+        <FileText size={19} aria-hidden />
+        <div>
+          <p className="font-semibold">{latest ? kindNames[latest.kind] : 'Sem evidência registrada'}</p>
+          {latest && <p className="text-sm">{indicator.evidence_state === 'expired' ? 'Evidência vencida' : 'Evidência registrada'}
+            {latest.period && ' · ' + periodLabel(latest.period)}</p>}
+        </div>
+      </div>
+      <div className="indicator-verification">
+        <ShieldQuestion size={17} aria-hidden />
+        <div><p className="text-xs">Verificação oficial</p>
+          <p className="font-semibold">{indicator.verification === 'unverified'
+            ? verification[scope] : indicator.verification}</p></div>
+      </div>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-        <dt className="text-slate-500">Fonte</dt>
+        <dt className="text-ink-muted">Fonte</dt>
         <dd>{latest ? originLabel(latest) : 'Sem evidência'}</dd>
-        <dt className="text-slate-500">Coleta</dt>
+        <dt className="text-ink-muted">Coleta</dt>
         <dd>{latest ? dateLabel(latest.created_at) : '—'}</dd>
-        <dt className="text-slate-500">Escopo</dt>
+        <dt className="text-ink-muted">Escopo</dt>
         <dd>{scopeAreas[scope]}</dd>
       </dl>
     </>

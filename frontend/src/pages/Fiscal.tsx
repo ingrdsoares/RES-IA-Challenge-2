@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { FileText, Plus, RefreshCw } from 'lucide-react';
+import { RecordDetail, useRecordNavigation } from './RecordDetail';
 import { api } from '../services/api';
 import {
   dateLabel,
@@ -173,9 +174,8 @@ function EvidenceDetail({ evidence }: { evidence: Evidence }) {
     }
   }
   return (
-    <aside className="panel space-y-4" aria-label="Detalhe da evidência">
-      <h2 className="font-bold">Detalhe da evidência</h2>
-      <p className="font-semibold text-emerald-800">
+    <>
+      <p className="font-semibold text-link">
         {kindNames[evidence.kind]}
       </p>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
@@ -191,7 +191,7 @@ function EvidenceDetail({ evidence }: { evidence: Evidence }) {
         <dd>{dateLabel(evidence.valid_until)}</dd>
       </dl>
       {evidence.kind === 'guide' && (
-        <p className="text-sm text-slate-600">
+        <p className="record-note text-sm">
           Esta guia documenta a emissão. O pagamento continua sem verificação.
         </p>
       )}
@@ -205,8 +205,14 @@ function EvidenceDetail({ evidence }: { evidence: Evidence }) {
         </button>
       )}
       {error && <Feedback error={error} />}
-    </aside>
+    </>
   );
+}
+
+function evidenceHref(scope: Scope, id?: string) {
+  const params = new URLSearchParams({ scope });
+  if (id) params.set('evidence', id);
+  return '#fiscal?' + params;
 }
 
 export function Fiscal({ company, params }: PageProps) {
@@ -217,16 +223,19 @@ export function Fiscal({ company, params }: PageProps) {
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
   const evidence = useRead<Evidence[]>(base + '/evidencias', readList);
   const [showForm, setShowForm] = useState(false);
-  const [selected, setSelected] = useState('');
+  const selected = params.get('evidence');
+  const listHref = evidenceHref(scope);
+  const navigation = useRecordNavigation(company.id, listHref, selected, !evidence.loading);
   const [notice, setNotice] = useState('');
   const items = evidence.data?.filter((item) => item.scope === scope).reverse();
-  const active = items?.find((item) => item.id === selected) || items?.[0];
+  const active = selected === null ? items?.[0] : items?.find((item) => item.id === selected);
+  const missing = selected !== null && !!items && !active;
   function refresh() {
     status.refresh();
     evidence.refresh();
   }
   return (
-    <div className="stack">
+    <div className={'stack record-page' + (selected !== null ? ' record-open' : '')}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Situação fiscal</h1>
         <button
@@ -240,11 +249,11 @@ export function Fiscal({ company, params }: PageProps) {
           <RefreshCw size={16} /> Atualizar consultas
         </button>
       </div>
-      <nav aria-label="Escopo fiscal" className="flex flex-wrap gap-2">
+      <nav aria-label="Escopo fiscal" className="record-list-context flex flex-wrap gap-2">
         {scopes.map((item) => (
           <a
             key={item}
-            href={`#fiscal?scope=${item}`}
+            href={evidenceHref(item)}
             aria-current={scope === item ? 'page' : undefined}
             className={scope === item ? 'primary' : 'secondary'}
           >
@@ -252,7 +261,7 @@ export function Fiscal({ company, params }: PageProps) {
           </a>
         ))}
       </nav>
-      <section className="panel space-y-3">
+      <section className="record-list-context panel space-y-3">
         <h2 className="text-lg font-bold">{scopeNames[scope]}</h2>
         {status.loading && <p role="status">Carregando indicador…</p>}
         {status.error && (
@@ -272,7 +281,7 @@ export function Fiscal({ company, params }: PageProps) {
         </p>
       )}
       <div className="grid items-start gap-4 lg:grid-cols-[1.25fr_1fr]">
-        <section className="panel space-y-4">
+        <section className="record-list-context panel space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-bold">Evidências registradas</h2>
             <button
@@ -294,22 +303,19 @@ export function Fiscal({ company, params }: PageProps) {
               Nenhuma evidência registrada neste escopo.
             </p>
           )}
-          <ul className="space-y-2">
+          <ul ref={navigation.list} className="space-y-2">
             {items?.map((item) => (
               <li key={item.id}>
-                <button
-                  onClick={() => setSelected(item.id)}
-                  aria-pressed={active?.id === item.id}
-                  className={
-                    'flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm ' +
-                    (active?.id === item.id
-                      ? 'border-emerald-300 bg-emerald-50'
-                      : 'border-slate-200 hover:bg-slate-50')
-                  }
+                <a
+                  href={evidenceHref(scope, item.id)}
+                  data-record-id={item.id}
+                  onClick={navigation.openRecord}
+                  aria-current={active?.id === item.id ? 'true' : undefined}
+                  className="record-option flex w-full items-start gap-3 rounded-lg border p-3 text-sm"
                 >
                   <FileText
                     size={18}
-                    className="mt-0.5 shrink-0 text-emerald-800"
+                    className="mt-0.5 shrink-0 text-link"
                   />
                   <span>
                     <strong className="block">
@@ -320,12 +326,22 @@ export function Fiscal({ company, params }: PageProps) {
                       {originLabel(item)} · {dateLabel(item.created_at)}
                     </span>
                   </span>
-                </button>
+                </a>
               </li>
             ))}
           </ul>
         </section>
-        {active && <EvidenceDetail key={active.id} evidence={active} />}
+        {(active || selected !== null) && <RecordDetail
+          title={missing ? 'Evidência não encontrada' : 'Detalhe da evidência'}
+          listHref={listHref}
+          backLabel="Voltar à lista de evidências"
+          navigation={navigation}
+        >
+          {missing && <a href={listHref} className="secondary">Ver evidências deste escopo</a>}
+          {evidence.loading && <p className="lg:hidden" role="status">Carregando evidência…</p>}
+          {evidence.error && <div className="lg:hidden"><Feedback error={evidence.error} retry={evidence.refresh} /></div>}
+          {active && <EvidenceDetail key={active.id} evidence={active} />}
+        </RecordDetail>}
       </div>
       {showForm && (
         <NewEvidence
@@ -335,7 +351,7 @@ export function Fiscal({ company, params }: PageProps) {
           close={() => setShowForm(false)}
           recorded={refresh}
           saved={(id) => {
-            setSelected(id);
+            window.location.hash = evidenceHref(scope, id);
             setShowForm(false);
             setNotice('Evidência registrada.');
             refresh();

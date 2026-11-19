@@ -57,3 +57,36 @@ test('landing pública, prévia interativa e caminhos de acesso', async ({
     fullPage: true,
   });
 });
+
+test('a prévia avança, pausa e mantém a aba escolhida manualmente', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.clock.install();
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Visão geral' })).toBeVisible();
+  await page.clock.fastForward(6500);
+  await expect(page.getByRole('heading', { name: 'Tarefas da empresa' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Pausar prévia' }).click();
+  await page.clock.fastForward(13000);
+  await expect(page.getByRole('heading', { name: 'Tarefas da empresa' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Reproduzir prévia' }).click();
+  await page.clock.fastForward(6500);
+  await expect(page.getByRole('heading', { name: 'Fontes da consulta' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Painel', exact: true }).click();
+  await page.clock.fastForward(13000);
+  await expect(page.getByRole('heading', { name: 'Visão geral' })).toBeVisible();
+});
+
+test('a prévia respeita a preferência por movimento reduzido', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install();
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Reproduzir prévia' })).toBeVisible();
+  await page.clock.fastForward(13000);
+  await expect(page.getByRole('heading', { name: 'Visão geral' })).toBeVisible();
+  await page.getByRole('button', { name: 'Tarefas', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Tarefas da empresa' })).toBeVisible();
+  await expect(page.locator('.lp-preview-screen')).toHaveCSS('animation-name', 'none');
+});

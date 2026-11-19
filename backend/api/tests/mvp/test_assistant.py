@@ -25,7 +25,7 @@ def test_draft_rejects_more_than_three_steps():
 
 
 @pytest.mark.parametrize(
-    "mode", ["valid", "invented", "timeout", "too_many_steps", "other_jurisdiction"]
+    "mode", ["valid", "invented", "timeout", "too_many_steps", "other_jurisdiction", "mixed_retry"]
 )
 def test_assistant_persists_sources_once(client, mode):
     from app.assistant.orchestrator import answer_message
@@ -37,7 +37,11 @@ def test_assistant_persists_sources_once(client, mode):
     company, chat = conversation(client)
     response = client.post(
         "/conversas/" + chat["id"] + "/mensagens",
-        json={"text": "O que é MEI?"},
+        json={
+            "text": "Paguei a guia em 2026-10? Qual é a regra?"
+            if mode == "mixed_retry"
+            else "O que é MEI?"
+        },
         headers={**csrf(client), "Idempotency-Key": "answer"},
     )
     from uuid import UUID
@@ -73,7 +77,12 @@ def test_assistant_persists_sources_once(client, mode):
         index_version(index, version, document, lambda text: [1.0, 0.0], 2)
         db.commit()
 
+    attempts = []
+
     def generate(prompt):
+        attempts.append(prompt)
+        if mode == "mixed_retry" and len(attempts) == 1:
+            raise TimeoutError("transient")
         if mode == "timeout":
             raise TimeoutError("private internal details")
         return {
@@ -101,6 +110,23 @@ def test_assistant_persists_sources_once(client, mode):
         assert messages[-1]["status"] == "insufficient_context"
         assert messages[-1]["citations"] == []
         assert operation["status"] == "succeeded"
+    elif mode == "mixed_retry":
+        assert len(messages) == 2
+        assert len(attempts) == 2
+        assert messages[-1]["citations"][0]["version_id"] == str(version.id)
+        assert (
+            messages[-1]["context"]["fiscal_status"]["obligations"]["verification"] == "unverified"
+        )
+        assert messages[-1]["next_steps"][0].startswith("Conferir o comprovante")
+        stages = operation["result"]["stages"]
+        assert any(s["role"] == "sintese" and s["status"] == "failed" for s in stages)
+        assert [s["role"] for s in stages[-5:]] == [
+            "supervisor",
+            "diagnostico_fiscal",
+            "juridico",
+            "sintese",
+            "planejamento",
+        ]
     elif mode == "valid":
         assert len(messages) == 2
         assert messages[1]["role"] == "assistant"

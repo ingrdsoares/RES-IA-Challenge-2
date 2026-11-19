@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from redis.exceptions import RedisError
 from sqlalchemy.orm import Session
 
-from app.access import service
+from app.access import mail, service
 from app.access.models import Account, AuthSession
-from app.access.schemas import AccountView, Credentials
+from app.access.schemas import AccountView, Credentials, EmailInput, NewPassword
 from app.db import get_db
 from app.dependencies import require_account
 from app.security import digest, require_csrf, token
@@ -43,11 +43,11 @@ def csrf(request: Request, response: Response, db: Session = Depends(get_db)):
     return {"csrf_token": value}
 
 
-def throttle(request: Request, email: str):
+def throttle(request: Request, identity: str, namespace: str = "login"):
     redis = request.app.state.redis
     keys = [
-        "login:ip:" + digest(request.client.host if request.client else "unknown"),
-        "login:email:" + digest(email),
+        f"{namespace}:ip:" + digest(request.client.host if request.client else "unknown"),
+        f"{namespace}:email:" + digest(identity),
     ]
     script = """
     for _,key in ipairs(KEYS) do
@@ -104,6 +104,27 @@ def login(data: Credentials, request: Request, response: Response, db: Session =
     grant = service.login(data.email, data.password, db)
     release_success(request, keys)
     return grant_response(grant, request, response)
+
+
+@router.post("/password-reset/request", status_code=204, dependencies=[Depends(require_csrf)])
+def request_password_reset(
+    data: EmailInput, request: Request, background: BackgroundTasks, db: Session = Depends(get_db)
+):
+    settings = request.app.state.settings
+    if not settings.smtp_host or not settings.smtp_from:
+        raise HTTPException(503, "Recuperação de senha temporariamente indisponível.")
+    throttle(request, data.email, "reset-request")
+    secret = service.request_reset(data.email, db)
+    if secret:
+        background.add_task(mail.send_reset_link, settings, data.email, secret)
+    return Response(status_code=204, headers={"Cache-Control": "no-store"})
+
+
+@router.post("/password-reset/confirm", status_code=204, dependencies=[Depends(require_csrf)])
+def confirm_password_reset(data: NewPassword, request: Request, db: Session = Depends(get_db)):
+    throttle(request, data.token, "reset-confirm")
+    service.reset_password(data.token, data.password, db)
+    return Response(status_code=204, headers={"Cache-Control": "no-store"})
 
 
 @router.get("/session", response_model=AccountView)

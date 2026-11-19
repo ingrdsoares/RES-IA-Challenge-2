@@ -57,6 +57,19 @@ const fields = [
   { key: 'state', label: 'UF', icon: Map },
   { key: 'municipality', label: 'Município', icon: MapPin },
 ] as const;
+const suggestions = {
+  size: ['MEI', 'ME', 'EPP', 'Demais'],
+  regime: ['SIMEI', 'Simples Nacional', 'Lucro Presumido', 'Lucro Real'],
+};
+
+function editableValues(company: Company): CompanyInput {
+  return {
+    ...company,
+    cnpj: company.cnpj.replace(/\D/g, ''),
+    cnae: company.cnae.replace(/\D/g, ''),
+  };
+}
+
 export function Empresas({
   company,
   onSave,
@@ -67,14 +80,9 @@ export function Empresas({
   onCancel?: () => void;
 }) {
   const [values, setValues] = useState<CompanyInput>(
-    company
-      ? {
-          ...company,
-          cnpj: company.cnpj.replace(/\D/g, ''),
-          cnae: company.cnae.replace(/\D/g, ''),
-        }
-      : blank,
+    () => company ? editableValues(company) : blank,
   );
+  const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -85,7 +93,12 @@ export function Empresas({
     values.state === company.state &&
     values.municipality === company.municipality &&
     !cities.includes(company.municipality);
+  const original = company && editableValues(company);
+  const entries = fields
+    .filter(({ key }) => !original || (key !== 'cnpj' && values[key].trim() !== original[key]))
+    .map(({ key }) => [key, values[key].trim()]);
   function change(key: keyof CompanyInput, value: string) {
+    setSaved(false);
     setValues((current) => ({
       ...current,
       [key]: value,
@@ -99,21 +112,11 @@ export function Empresas({
   }
   async function save(e: FormEvent) {
     e.preventDefault();
-    if (busy) return;
+    if (busy || !entries.length) return;
     setBusy(true);
     setError('');
     setErrors({});
-    const entries = fields
-      .filter(
-        ({ key }) =>
-          !company || (key !== 'cnpj' && values[key].trim() !== company[key]),
-      )
-      .map(({ key }) => [key, values[key].trim()]);
     try {
-      if (company && !entries.length) {
-        onSave(company);
-        return;
-      }
       const updated = await api.request<Company>(
         company ? '/empresas/' + company.id : '/empresas',
         {
@@ -121,6 +124,10 @@ export function Empresas({
           body: JSON.stringify(Object.fromEntries(entries)),
         },
       );
+      if (company) {
+        setValues(editableValues(updated));
+        setSaved(true);
+      }
       onSave(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Não foi possível salvar.');
@@ -136,7 +143,7 @@ export function Empresas({
         <p>
           {company
             ? 'Revise os dados usados nas consultas e no assistente fiscal.'
-            : 'Preencha os dados cadastrais para abrir o painel da empresa.'}
+            : 'Preencha os dados cadastrais para abrir o assistente fiscal.'}
         </p>
       </div>
       <form className="panel company-form stack" onSubmit={save}>
@@ -160,6 +167,7 @@ export function Empresas({
             const shared = {
               id: 'company-' + key,
               required: true,
+              disabled: busy,
               'aria-invalid': !!errors[key],
               'aria-describedby': helpId,
             };
@@ -204,7 +212,7 @@ export function Empresas({
                       {...shared}
                       autoComplete="address-level2"
                       value={values.municipality}
-                      disabled={!values.state}
+                      disabled={busy || !values.state}
                       onChange={(e) => change(key, e.target.value)}
                     >
                       <option value="">
@@ -226,6 +234,7 @@ export function Empresas({
                   ) : (
                     <input
                       {...shared}
+                      list={'company-' + key + '-suggestions'}
                       maxLength={'max' in field ? field.max : undefined}
                       placeholder={
                         'placeholder' in field ? field.placeholder : undefined
@@ -235,6 +244,11 @@ export function Empresas({
                     />
                   )}
                 </div>
+                {(key === 'size' || key === 'regime') && (
+                  <datalist id={'company-' + key + '-suggestions'}>
+                    {suggestions[key].map((option) => <option key={option} value={option} />)}
+                  </datalist>
+                )}
                 <small id={helpId} role={errors[key] ? 'alert' : undefined}>
                   {errors[key] ||
                     (changed || !origin
@@ -251,6 +265,7 @@ export function Empresas({
             );
           })}
         </div>
+        {saved && <p className="notice" role="status">Alterações salvas.</p>}
         {error && (
           <p role="alert" className="notice">
             {error}
@@ -262,13 +277,13 @@ export function Empresas({
               Cancelar
             </button>
           )}
-          <button disabled={busy} className="primary">
+          <button disabled={busy || !entries.length} className="primary">
             <Save size={16} />
             {busy
               ? 'Salvando…'
               : company
                 ? 'Salvar alterações'
-                : 'Salvar e abrir painel'}
+                : 'Salvar e abrir assistente'}
           </button>
         </div>
       </form>

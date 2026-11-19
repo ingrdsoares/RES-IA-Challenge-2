@@ -17,7 +17,15 @@ async function read<T>(path: string, options: RequestInit): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const fields: Record<string, string> = {};
-    if (Array.isArray(body?.detail))
+    if (Array.isArray(body?.error?.fields)) {
+      for (const issue of body.error.fields) {
+        if (typeof issue?.field !== 'string') continue;
+        const field = issue.field.replace(/^body\./, '');
+        fields[field] = field === 'cnpj'
+          ? 'Informe um CNPJ válido.'
+          : 'Confira o valor deste campo.';
+      }
+    } else if (Array.isArray(body?.detail))
       for (const issue of body.detail) {
         fields[issue.loc?.at(-1)] = issue.msg?.includes('CNPJ')
           ? 'Informe um CNPJ válido.'
@@ -27,7 +35,9 @@ async function read<T>(path: string, options: RequestInit): Promise<T> {
       window.dispatchEvent(new Event('session-expired'));
     throw new ApiError(
       response.status,
-      typeof body?.detail === 'string'
+      typeof body?.error?.message === 'string'
+        ? body.error.message
+        : typeof body?.detail === 'string'
         ? body.detail
         : Object.keys(fields).length
           ? 'Confira os campos indicados.'

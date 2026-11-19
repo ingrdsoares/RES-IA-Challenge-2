@@ -1,4 +1,6 @@
-from pydantic import Field, HttpUrl, field_validator, model_validator
+from ipaddress import ip_address
+
+from pydantic import Field, HttpUrl, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +15,12 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:sd_local@localhost:5432/socio_digital"
     redis_url: str = "redis://localhost:6379/0"
     cookie_secure: bool = True
-    allowed_origins: list[str] = ["http://localhost:8000"]
+    allowed_origins: list[str] = [
+        "http://localhost:8000",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+    ]
 
     agent_timeout: float = Field(default=120, gt=0, le=300)
     agent_round_seconds: int = Field(default=600, ge=30, le=600)
@@ -21,6 +28,39 @@ class Settings(BaseSettings):
     agent_token_budget: int = Field(default=1228800, ge=8192, le=2000000)
     agent_max_confirmations: int = Field(default=2, ge=0, le=2)
     agent_step_attempts: int = Field(default=2, ge=1, le=2)
+
+    # Entrega de links de recuperação. Configurar a URL pública no servidor.
+    frontend_url: HttpUrl | None = None
+    smtp_host: str = ""
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_starttls: bool = True
+    smtp_from: str = ""
+    smtp_username: str = ""
+    smtp_password: SecretStr = SecretStr("")
+
+    @model_validator(mode="after")
+    def validate_reset_delivery(self):
+        local_mailpit = self.smtp_host in {"mailpit", "localhost", "127.0.0.1", "::1"}
+        if not self.smtp_starttls and (
+            not local_mailpit or self.smtp_username or self.smtp_password.get_secret_value()
+        ):
+            raise ValueError("Use STARTTLS para SMTP externo ou autenticado.")
+        url = self.frontend_url
+        if local_mailpit and not self.smtp_starttls and url is None:
+            self.frontend_url = url = HttpUrl("http://localhost:3000")
+        if url and (url.fragment or url.query or url.username or url.password):
+            raise ValueError("FRONTEND_URL deve apontar para a página pública do aplicativo.")
+        if url and url.scheme != "https" and url.host not in {"localhost", "127.0.0.1", "[::1]"}:
+            raise ValueError("FRONTEND_URL deve usar HTTPS fora de localhost.")
+        if self.smtp_host and self.smtp_starttls:
+            host = (url.host or "").strip("[]").rstrip(".").lower() if url else ""
+            try:
+                public = ip_address(host).is_global
+            except ValueError:
+                public = "." in host and not host.endswith((".localhost", ".local"))
+            if not url or url.scheme != "https" or not public:
+                raise ValueError("Defina FRONTEND_URL explicitamente com a URL HTTPS pública.")
+        return self
 
     # Seguranca e Rotacao de Segredos
     app_secret_key: str = Field(
@@ -74,9 +114,9 @@ class Settings(BaseSettings):
     reranker_url: HttpUrl | None = None
     reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
 
-    @field_validator("reranker_url", mode="before")
+    @field_validator("reranker_url", "frontend_url", mode="before")
     @classmethod
-    def optional_reranker(cls, value):
+    def optional_url(cls, value):
         return value or None
 
     @model_validator(mode="after")

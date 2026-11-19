@@ -324,8 +324,24 @@ novamente o token CSRF, pois a sessão o rotaciona. `GET /auth/session` retorna
 identidade; `POST /auth/logout` revoga a sessão. Cookies expiram em 24 horas.
 
 HTTPS e `COOKIE_SECURE=true` são necessários fora do ambiente local.
-`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. Não existem
-confirmação de e-mail ou recuperação de senha nesta etapa.
+`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. O cadastro dispensa confirmação de e-mail.
+
+### Recuperação de senha
+
+Aplique a migração com `docker compose exec api alembic upgrade head` na pasta
+`backend`. O Compose local captura os e-mails no Mailpit. Abra a tela de entrada,
+solicite um link em **Esqueci minha senha** e consulte a [caixa local](http://localhost:8025).
+O último link solicitado vale por 30 minutos. Redefinir a senha encerra as sessões da conta.
+
+A API executada fora do Compose pode usar a mesma caixa com `SMTP_HOST=127.0.0.1`,
+`SMTP_PORT=1025`, `SMTP_STARTTLS=false` e `SMTP_FROM=acesso@sociodigital.test`.
+Configure `FRONTEND_URL` com a URL do frontend usado para abrir o link (padrão
+`http://localhost:3000`).
+
+No Compose de produção, defina `FRONTEND_URL` com a URL HTTPS pública,
+`SMTP_HOST`, `SMTP_PORT` e `SMTP_FROM` para um servidor com STARTTLS.
+Com SMTP desativado, a API continua funcionando e o pedido de recuperação retorna HTTP 503.
+Para autenticação, forneça `SMTP_USERNAME` e `SMTP_PASSWORD` pelo ambiente de deploy.
 
 Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
 na porta 16379, em containers separados. Essa base é recriada por teste;

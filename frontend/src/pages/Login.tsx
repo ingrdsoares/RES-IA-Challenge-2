@@ -1,29 +1,33 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import {
   ArrowRight,
   Eye,
   EyeOff,
-  FileText,
-  Layers3,
   LockKeyhole,
 } from 'lucide-react';
-import { Brand } from '../components/Header';
+import { AccessCover } from '../components/AccessCover';
 import { api } from '../services/api';
 import type { Account } from '../types';
 
 export function Login({
   onLoginSuccess,
   notice,
-  initialRegister = false,
+  register,
+  destination,
 }: {
   onLoginSuccess: (user: Account) => void;
   notice?: string;
-  initialRegister?: boolean;
+  register: boolean;
+  destination: string;
 }) {
-  const [register, setRegister] = useState(initialRegister),
-    [visible, setVisible] = useState(false),
+  const [visible, setVisible] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
+  const switchRoute = (register ? '#entrar' : '#criar-conta') +
+    (destination ? '?' + new URLSearchParams({ destino: destination }) : '');
+  useEffect(() => {
+    document.title = (register ? 'Criar conta' : 'Entrar') + ' | Sócio Digital';
+  }, [register]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -47,35 +51,7 @@ export function Login({
   }
   return (
     <main className="access">
-      <section className="access-cover">
-        <Brand />
-        <div className="cover-copy">
-          <div className="cover-rule" />
-          <h2>
-            Gestão fiscal para
-            <br />
-            pequenos negócios.
-          </h2>
-          <p>
-            Consulte normas, acompanhe suas obrigações e tire dúvidas com o
-            assistente fiscal.
-          </p>
-        </div>
-        <div className="folder-art" aria-hidden="true">
-          <div className="sheet back-sheet" />
-          <div className="sheet mid-sheet" />
-          <div className="sheet front-sheet">
-            <FileText size={28} />
-            <div className="ink-bar" />
-            <div className="ink-bar short" />
-            <div className="ledger" />
-            <div className="seal">
-              <Layers3 size={28} />
-            </div>
-          </div>
-          <div className="folder-face" />
-        </div>
-      </section>
+      <AccessCover />
       <section className="access-form">
         <div>
           <a className="access-home" href="#inicio">
@@ -88,8 +64,8 @@ export function Login({
           <h1>{register ? 'Crie sua conta' : 'Entre na sua conta'}</h1>
           <p>
             {register
-              ? 'Cadastre seu acesso ao painel da empresa.'
-              : 'Acesse o painel da sua empresa.'}
+              ? 'Crie seu acesso ao assistente fiscal.'
+              : 'Continue no assistente fiscal da sua empresa.'}
           </p>
           <form onSubmit={submit} className="stack">
             <label className="field">
@@ -111,6 +87,7 @@ export function Login({
                   autoComplete={register ? 'new-password' : 'current-password'}
                   type={visible ? 'text' : 'password'}
                   minLength={12}
+                  aria-describedby={register ? 'password-help' : undefined}
                   maxLength={128}
                   required
                   placeholder={
@@ -126,6 +103,11 @@ export function Login({
                 </button>
               </span>
             </label>
+            {register ? (
+              <small id="password-help" className="text-sm text-link">Use pelo menos 12 caracteres na senha.</small>
+            ) : (
+              <a href="#recuperar-senha" className="inline-flex min-h-11 items-center text-sm text-link underline">Esqueci minha senha</a>
+            )}
             {(error || notice) && (
               <p role="alert" className="notice">
                 {error || notice}
@@ -138,15 +120,9 @@ export function Login({
           </form>
           <p className="access-switch">
             {register ? 'Já tem uma conta?' : 'Primeiro acesso?'}{' '}
-            <button
-              disabled={busy}
-              onClick={() => {
-                setRegister(!register);
-                setError('');
-              }}
-            >
+            <a className="inline-flex min-h-11 items-center font-semibold text-link underline" href={switchRoute}>
               {register ? 'Entrar' : 'Criar conta'}
-            </button>
+            </a>
           </p>
         </div>
       </section>

@@ -34,6 +34,8 @@ def test_full_run_persists_checkpoints_and_replay_has_one_answer(client):
     messages = client.get(url).json()["items"]
     assert len(messages) == 2
     assert "não verificada" in messages[-1]["text"]
+    # The interface renders the deterministic fiscal facts next to the answer.
+    assert set(messages[-1]["context"]["fiscal_status"]) >= {"registration", "obligations"}
     with factory() as db:
         run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation_id))
         assert run.status == "succeeded"
@@ -297,3 +299,42 @@ def test_discarded_fiscal_prose_does_not_override_server_rendering(client):
     assert "999" not in answer["text"]
     assert "[1]" not in answer["text"]
     assert "não verificada" in answer["text"]
+
+
+def test_legal_citations_keep_inline_numbering(client):
+    from app.assistant.agents.executor import execute_run
+
+    company, chat = conversation(client)
+    url = "/conversas/" + chat["id"] + "/mensagens"
+    receipt = client.post(
+        url,
+        json={"text": "O que diz a LC 123 sobre o DAS?"},
+        headers={**csrf(client), "Idempotency-Key": "legal-numbering"},
+    ).json()
+
+    class Tools:
+        def legal(self, question):
+            return [{"title": f"Fonte {n}", "text": f"Trecho {n}"} for n in (1, 2, 3)]
+
+    class Legal(Model):
+        def generate(self, role, schema, payload, timeout, output_tokens):
+            replies = {
+                "plan": {"intent": "norma", "agents": ["legal"]},
+                "legal": {
+                    "status": "answered",
+                    "claims": [{"text": "Regra do DAS.", "support_ids": ["legal:3"]}],
+                },
+                "synthesis": {"answer": "Regra do DAS [3].", "support_ids": ["legal:3"]},
+            }
+            return schema.model_validate(replies[role]), {}
+
+    execute_run(
+        client.app.state.db_factory,
+        UUID(receipt["operation_id"]),
+        model=Legal(),
+        tools=Tools(),
+        settings=client.app.state.settings,
+    )
+    answer = client.get(url).json()["items"][-1]
+    assert "[3]" in answer["text"]
+    assert [(c["title"], c["citation_index"]) for c in answer["citations"]] == [("Fonte 3", 3)]

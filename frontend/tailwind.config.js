@@ -7,13 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-        }
+        ink: 'var(--ink)',
+        link: 'var(--ink-link)',
+        'ink-muted': 'var(--ink-muted)',
+        'surface-muted': 'var(--surface-muted)',
+        subtle: 'var(--border-subtle)',
+        info: 'var(--surface-info)',
+        highlight: 'var(--citation-mark)',
+        notice: 'var(--surface-notice)',
+        accent: 'var(--palette-honey)',
+        focus: 'var(--focus-color)',
       }
     },
   },

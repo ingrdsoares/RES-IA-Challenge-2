@@ -39,3 +39,27 @@ describe('Sessão do Sócio Digital', () => {
     });
   });
 });
+
+describe('Contrato de erros da API do produto', () => {
+  it.each([
+    [422, 'validation_error', 'Dados inválidos', [{ field: 'body.cnpj', code: 'value_error' }], { cnpj: 'Informe um CNPJ válido.' }],
+    [409, 'conflict', 'CNPJ já cadastrado nesta conta', [], {}],
+  ] as const)('mostra a mensagem e os campos para HTTP %i', async (status, code, message, fields, expectedFields) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      Response.json({ error: { code, message, fields } }, { status }),
+    ));
+    await expect(api.request('/empresas')).rejects.toMatchObject({
+      status, message, fields: expectedFields,
+    });
+  });
+
+  it('sinaliza sessão expirada em uma rota protegida', async () => {
+    const dispatchEvent = vi.fn();
+    vi.stubGlobal('window', { dispatchEvent });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      Response.json({ error: { code: 'unauthorized', message: 'Sessão expirada', fields: [] } }, { status: 401 }),
+    ));
+    await expect(api.request('/empresas')).rejects.toMatchObject({ status: 401 });
+    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'session-expired' }));
+  });
+});

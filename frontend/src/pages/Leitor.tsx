@@ -157,29 +157,29 @@ export function Leitor({ params }: { params: URLSearchParams }) {
     <div className="stack space-y-5">
       <nav
         aria-label="Voltar à origem"
-        className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-emerald-800"
+        className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-link"
       >
+        {conversation && (
+          <a
+            className="touch-link inline-flex items-center gap-1.5 hover:underline"
+            href={`#assistente?${conversationQuery}`}
+          >
+            <MessageSquare size={16} aria-hidden /> Voltar à resposta
+          </a>
+        )}
         <a
-          className="inline-flex items-center gap-1.5 hover:underline"
+          className="touch-link inline-flex items-center gap-1.5 hover:underline"
           href={library ? `#normas?${new URLSearchParams(library)}` : '#normas'}
         >
           <ArrowLeft size={16} aria-hidden /> Biblioteca de normas
         </a>
-        {conversation && (
-          <a
-            className="inline-flex items-center gap-1.5 hover:underline"
-            href={`#assistente?${conversationQuery}`}
-          >
-            <MessageSquare size={16} aria-hidden /> Voltar à conversa
-          </a>
-        )}
       </nav>
       <header className="space-y-3">
-        <h1 className="break-words text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="break-words text-3xl font-bold tracking-tight text-ink">
           {resolution?.title || 'Leitor da norma'}
         </h1>
         {resolution?.title && (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-ink-muted">
             {[
               resolution.norm_type,
               resolution.authority,
@@ -197,7 +197,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
         </p>
       )}
       {endpoint && !current && (
-        <p className="panel p-5 text-sm text-slate-600" role="status">
+        <p className="panel p-5 text-sm text-ink-muted" role="status">
           Carregando a versão solicitada…
         </p>
       )}
@@ -211,44 +211,8 @@ export function Leitor({ params }: { params: URLSearchParams }) {
       )}
       {resolution && (
         <>
-          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
-            <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
-              <div>
-                <dt className="text-xs font-semibold text-slate-500">Versão</dt>
-                <dd className="mt-1 break-all font-medium">
-                  {resolution.version_label || versionId}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold text-slate-500">
-                  Vigência
-                </dt>
-                <dd className="mt-1">
-                  {validity(resolution.effective_from, resolution.effective_to)}
-                </dd>
-              </div>
-              {Boolean(resolution.subjects?.length) && (
-                <div>
-                  <dt className="text-xs font-semibold text-slate-500">
-                    Assuntos
-                  </dt>
-                  <dd className="mt-1">{resolution.subjects?.join(', ')}</dd>
-                </div>
-              )}
-            </dl>
-            {official && (
-              <a
-                href={official}
-                target="_blank"
-                rel="noreferrer"
-                className="secondary inline-flex items-center gap-2"
-              >
-                Ver publicação oficial <ExternalLink size={15} aria-hidden />
-              </a>
-            )}
-          </div>
           {resolution.historical && (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <p className="rounded-lg border border-accent bg-notice px-4 py-3 text-sm text-ink">
               Versão histórica. A vigência desta versão já terminou.
             </p>
           )}
@@ -266,20 +230,20 @@ export function Leitor({ params }: { params: URLSearchParams }) {
           {readable && (
             <>
               {current?.sections ? (
-                <div className="grid items-start gap-5 lg:grid-cols-[minmax(12rem,15rem)_minmax(0,1fr)]">
-                  <nav
+                <div className={current.sections.length > 1 ? "grid items-start gap-5 lg:grid-cols-[minmax(12rem,15rem)_minmax(0,1fr)]" : "grid gap-3"}>
+                  <details key={versionId} open={current.sections.length > 1}
                     className="panel p-4 lg:sticky lg:top-4"
                     aria-label="Sumário da norma"
                   >
-                    <h2 className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+                    <summary className="flex cursor-pointer items-center gap-2 font-semibold text-ink">
                       <List size={17} aria-hidden /> Sumário
-                    </h2>
+                    </summary>
                     <ul className="max-h-60 space-y-1 overflow-y-auto lg:max-h-[65vh]">
                       {current.sections.map((section, index) => (
                         <li key={section.anchor_id}>
                           <button
                             type="button"
-                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-slate-100 ${section.anchor_id === exactAnchor ? 'bg-emerald-50 font-semibold text-emerald-900' : 'text-slate-700'}`}
+                            className={`block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-surface-muted ${section.anchor_id === exactAnchor ? 'bg-info font-semibold text-ink' : 'text-ink'}`}
                             onClick={() => {
                               const passage = document.getElementById(
                                 `norm-section-${index}`,
@@ -293,9 +257,9 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                         </li>
                       ))}
                     </ul>
-                  </nav>
+                  </details>
                   <article
-                    className="panel min-w-0 divide-y divide-slate-100 px-5 sm:px-8"
+                    className="panel min-w-0 divide-y divide-subtle px-5 sm:px-8"
                     aria-label="Texto da norma"
                   >
                     {current.sections.map((section, index) => {
@@ -309,19 +273,22 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                           className="scroll-mt-8 py-5 outline-offset-2"
                         >
                           {selected && (
-                            <strong className="mb-2 block text-xs font-bold uppercase tracking-wide text-emerald-800">
+                            <strong className="mb-2 block text-xs font-bold uppercase tracking-wide text-link">
                               Trecho citado
                             </strong>
                           )}
-                          <p className="whitespace-pre-wrap break-words text-base leading-8 text-slate-800">
+                          <p className="whitespace-pre-wrap break-words text-base leading-8 text-ink">
                             {selected ? (
-                              <mark className="rounded-sm bg-emerald-100 px-0.5 py-0.5 text-emerald-950">
+                              <mark className="rounded-sm bg-highlight px-0.5 py-0.5 text-ink">
                                 {section.text}
                               </mark>
                             ) : (
                               section.text
                             )}
                           </p>
+                          {selected && <p className="mt-3 text-sm text-ink-muted">
+                            Versão · {resolution.version_label || versionId}
+                          </p>}
                         </section>
                       );
                     })}
@@ -329,7 +296,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                 </div>
               ) : current?.textFailed || !webLink(resolution.json_url) ? (
                 <div className="panel space-y-3 p-5">
-                  <p role="status" className="text-sm text-slate-700">
+                  <p role="status" className="text-sm text-ink">
                     O texto para leitura na plataforma está indisponível.
                   </p>
                   {current?.textFailed && (
@@ -348,7 +315,7 @@ export function Leitor({ params }: { params: URLSearchParams }) {
                   href={original}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:underline"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-link hover:underline"
                 >
                   <FileText size={16} aria-hidden /> Abrir arquivo original
                   desta versão <ExternalLink size={14} aria-hidden />
@@ -356,6 +323,42 @@ export function Leitor({ params }: { params: URLSearchParams }) {
               )}
             </>
           )}
+          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
+            <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
+              {!exactAnchor && <div>
+                <dt className="text-xs font-semibold text-ink-muted">Versão</dt>
+                <dd className="mt-1 break-all font-medium">
+                  {resolution.version_label || versionId}
+                </dd>
+              </div>}
+              <div>
+                <dt className="text-xs font-semibold text-ink-muted">
+                  Vigência
+                </dt>
+                <dd className="mt-1">
+                  {validity(resolution.effective_from, resolution.effective_to)}
+                </dd>
+              </div>
+              {Boolean(resolution.subjects?.length) && (
+                <div>
+                  <dt className="text-xs font-semibold text-ink-muted">
+                    Assuntos
+                  </dt>
+                  <dd className="mt-1">{resolution.subjects?.join(', ')}</dd>
+                </div>
+              )}
+            </dl>
+            {official && (
+              <a
+                href={official}
+                target="_blank"
+                rel="noreferrer"
+                className="secondary inline-flex items-center gap-2"
+              >
+                Ver publicação oficial <ExternalLink size={15} aria-hidden />
+              </a>
+            )}
+          </div>
         </>
       )}
     </div>

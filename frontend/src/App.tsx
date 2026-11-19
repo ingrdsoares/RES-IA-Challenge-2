@@ -9,6 +9,8 @@ import { Tarefas } from './pages/Tarefas';
 import { Biblioteca } from './pages/Biblioteca';
 import { Leitor } from './pages/Leitor';
 import { Empresas } from './pages/Empresas';
+import { clearChatDrafts } from './services/chatDrafts';
+import { RecuperarSenha } from './pages/RecuperarSenha';
 import { Login } from './pages/Login';
 import { api, ApiError } from './services/api';
 import type { Account, Company } from './types';
@@ -44,7 +46,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
     company && Object.prototype.hasOwnProperty.call(titles, route)
       ? route
       : company
-        ? 'dashboard'
+        ? 'assistente'
         : 'cadastro';
   const params = new URLSearchParams(search);
   useEffect(() => {
@@ -53,7 +55,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
   function select(value: string) {
     sessionStorage.setItem('company:' + user.id, value);
     setId(value);
-    location.hash = 'dashboard';
+    location.hash = 'assistente';
   }
   function saved(updated: Company) {
     setCompanies((old) =>
@@ -61,7 +63,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
         ? old.map((c) => (c.id === updated.id ? updated : c))
         : [...(old || []), updated],
     );
-    select(updated.id);
+    if (page === 'cadastro') select(updated.id);
   }
   async function logout() {
     try {
@@ -120,7 +122,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
               onCancel={
                 company
                   ? () => {
-                      location.hash = 'dashboard';
+                      location.hash = 'assistente';
                     }
                   : undefined
               }
@@ -132,7 +134,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
               company={company}
               onSave={saved}
               onCancel={() => {
-                location.hash = 'dashboard';
+                location.hash = 'assistente';
               }}
             />
           )}
@@ -140,7 +142,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
           {page === 'fiscal' && props && <Fiscal {...props} />}
           {page === 'tarefas' && props && <Tarefas {...props} />}
           {page === 'assistente' && company && (
-            <Assistente companyId={company.id} params={params} />
+            <Assistente accountId={user.id} company={company} params={params} />
           )}
           {page === 'normas' && <Biblioteca params={params} />}
           {page === 'leitor' && <Leitor params={params} />}
@@ -149,6 +151,11 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
     </div>
   );
 }
+function protectedRoute(hash: string | null) {
+  if (!hash?.startsWith('#')) return '';
+  return Object.prototype.hasOwnProperty.call(titles, hash.slice(1).split('?')[0]) ? hash : '';
+}
+
 export function App() {
   const [publicRoute, setPublicRoute] = useState(location.hash);
   useEffect(() => {
@@ -180,6 +187,7 @@ export function App() {
       })
       .catch((e) => {
         if (live) {
+          if (e instanceof ApiError && e.status === 401) clearChatDrafts();
           setAccount(null);
           if (!(e instanceof ApiError && e.status === 401))
             setNotice(
@@ -188,9 +196,12 @@ export function App() {
         }
       });
     const end = () => {
+      const destination = protectedRoute(location.hash);
+      clearChatDrafts();
       setAccount(null);
+      if (!destination) return;
       setNotice('Sua sessão expirou. Entre novamente.');
-      location.hash = 'entrar';
+      location.replace('#entrar?' + new URLSearchParams({ destino: destination }));
     };
     window.addEventListener('session-expired', end);
     return () => {
@@ -198,6 +209,12 @@ export function App() {
       window.removeEventListener('session-expired', end);
     };
   }, []);
+  const [action, query = ''] = publicRoute.slice(1).split('?');
+  const params = new URLSearchParams(query);
+  const destination = protectedRoute(publicRoute) || protectedRoute(params.get('destino'));
+  if (action === 'recuperar-senha' || action === 'redefinir-senha') {
+    return <RecuperarSenha key={publicRoute} token={action === 'redefinir-senha' ? params.get('token') || '' : undefined} />;
+  }
   if (isLanding) return <Landing signedIn={!!account} />;
   if (account === undefined)
     return (
@@ -211,6 +228,7 @@ export function App() {
       key={account.id}
       user={account}
       onEnd={() => {
+        clearChatDrafts();
         setAccount(null);
         setNotice('');
         location.hash = '';
@@ -219,11 +237,12 @@ export function App() {
   ) : (
     <Login
       key={publicRoute}
-      initialRegister={publicRoute === '#criar-conta'}
+      register={action === 'criar-conta'}
+      destination={destination}
       notice={notice}
       onLoginSuccess={(a) => {
         setNotice('');
-        location.hash = 'dashboard';
+        location.replace(destination || '#assistente');
         setAccount(a);
       }}
     />

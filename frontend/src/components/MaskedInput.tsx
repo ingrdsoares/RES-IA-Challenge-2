@@ -46,7 +46,7 @@ export function MaskedInput({ value, mask, onChange, ...props }: Props) {
         onChange(digits);
         const next = formatDigits(digits, mask);
         // Restore the caret after React adds punctuation, including edits in the middle.
-        requestAnimationFrame(() => {
+        queueMicrotask(() => {
           if (document.activeElement === input) {
             const caret = caretAfterDigits(next, count);
             input.setSelectionRange(caret, caret);
@@ -66,7 +66,7 @@ export function MaskedInput({ value, mask, onChange, ...props }: Props) {
         const index = back ? before - 1 : before;
         const next = value.slice(0, index) + value.slice(index + 1);
         onChange(next);
-        requestAnimationFrame(() => {
+        queueMicrotask(() => {
           const caret = caretAfterDigits(
             formatDigits(next, mask),
             Math.max(0, index),
