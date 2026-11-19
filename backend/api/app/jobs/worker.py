@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from app.config import Settings
 from app.db import session_factory
-from app.jobs.errors import JobDeferred
+from app.jobs.errors import AssistantStageFailed, JobDeferred
 from app.jobs.models import Operation
 
 # Only trusted application code registers handlers, never request payloads.
@@ -33,7 +33,9 @@ def execute(factory, operation_id: UUID, handlers: dict):
             operation.attempts -= 1
             operation.status = "queued"
             operation.dispatched_at = None
-        except Exception:
+        except Exception as exc:
+            if isinstance(exc, AssistantStageFailed):
+                operation.result = {"stages": exc.stages, "checkpoint": exc.checkpoint}
             # No exception contents: they may contain private data.
             operation.error = "operation_failed"
             operation.status = "failed" if operation.attempts >= 3 else "queued"
@@ -67,7 +69,15 @@ def run_operation(operation_id: str) -> None:
     settings = Settings()
     factory = session_factory(settings.database_url)
     try:
-        execute(factory, UUID(operation_id), HANDLERS)
+        with factory() as db:
+            operation = db.get(Operation, UUID(operation_id))
+            is_assistant = operation is not None and operation.kind == "assistant.answer"
+        if is_assistant:
+            from app.assistant.agents.executor import execute_run
+
+            execute_run(factory, UUID(operation_id), settings=settings)
+        else:
+            execute(factory, UUID(operation_id), HANDLERS)
     finally:
         factory.kw["bind"].dispose()
 

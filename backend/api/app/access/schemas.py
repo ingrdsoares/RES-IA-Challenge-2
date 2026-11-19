@@ -4,11 +4,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
 
+Password = Annotated[str, StringConstraints(min_length=12, max_length=128)]
 
-class Credentials(BaseModel):
+
+class EmailInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: str
-    password: Annotated[str, StringConstraints(min_length=12, max_length=128)]
 
     @field_validator("email")
     @classmethod
@@ -17,6 +18,16 @@ class Credentials(BaseModel):
         if len(value) > 254 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
             raise ValueError("E-mail inválido")
         return value
+
+
+class Credentials(EmailInput):
+    password: Password
+
+
+class NewPassword(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+    password: Password
 
 
 class AccountView(BaseModel):

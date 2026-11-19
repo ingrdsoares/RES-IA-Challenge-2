@@ -1,0 +1,84 @@
+{
+  "nome": "naive_rag",
+  "env": {
+    "COLLECTION_NAME": "knowledge_base_v2",
+    "QDRANT_URL": "http://127.0.0.1:6334",
+    "TOPOLOGIA": "naive_rag",
+    "OLLAMA_TIMEOUT": "600",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "repeticoes": 3,
+  "relatorio": "data\\benchmark\\topologias-2026-11-13\\naive_rag\\avaliacao\\reports\\a2f305d6453290f314848ff40bda249e7d4d16198ebd21ecaa55586f69e45c4d\\6e802a4a5bfd405471d2b56b2d982d03f1f0df6bc41a7857fd9c5b58bcff70e9\\results.json",
+  "avaliacao": {
+    "todos": {
+      "perguntas": 81,
+      "tentativas": 243,
+      "falhas": 0,
+      "rouge_l": 0.24606797147481302,
+      "bert_score": 0.5884387399924634,
+      "artigo_esperado": 0.5425531914893617,
+      "citacao_suportada": 0.952982202982203,
+      "clarify": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 1.6016890999890165,
+      "lat_p95": 3.453962900006445,
+      "conc_resposta": 0.8888888888888887,
+      "conc_fontes": 1.0
+    },
+    "sem_recorte_completo": {
+      "perguntas": 74,
+      "tentativas": 222,
+      "falhas": 0,
+      "rouge_l": 0.2437229763467018,
+      "bert_score": 0.5857294580420932,
+      "artigo_esperado": 0.5348837209302325,
+      "citacao_suportada": 0.9709443099273608,
+      "clarify": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 1.6099063500005286,
+      "lat_p95": 3.453962900006445,
+      "conc_resposta": 0.8918918918918917,
+      "conc_fontes": 1.0
+    }
+  }
+}

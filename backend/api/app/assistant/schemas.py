@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StringConstraints, field_validator
 
-from app.fiscal.schemas import CalculationInput
+from app.fiscal.schemas import CalculationInput, Money
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
 Period = Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-(0[1-9]|1[0-2])$")]
@@ -19,6 +19,20 @@ class ConversationInput(BaseModel):
 
 class ContextConfirmation(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    kind: Literal["mei", "simples"] | None = None
+    revenue: Money | None = None
+    rbt12: Money | None = None
+    payroll12: Money | None = None
+    activity: Literal["trade", "services", "mixed"] | None = None
+    conditions_confirmed: StrictBool | None = None
+
+    @field_validator("revenue", "rbt12", "payroll12", mode="before")
+    @classmethod
+    def decimal_inputs(cls, value):
+        if isinstance(value, (float, bool)):
+            raise ValueError("Use strings decimais")
+        return value
+
     period: Period | None = None
     regime: (
         Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=40)] | None
@@ -49,6 +63,7 @@ class MessageView(BaseModel):
     text: str
     context: dict
     citations: list
+    actions: list = Field(default_factory=list)
     next_steps: list
     status: str
     created_at: datetime

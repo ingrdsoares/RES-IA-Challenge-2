@@ -1,91 +1,109 @@
-import React from 'react';
-import { LayoutDashboard, MessageSquareText, Building2, CheckSquare, ShieldCheck, LogOut } from 'lucide-react';
-import { Empresa } from '../types';
+import { useState } from 'react';
+import {
+  LayoutDashboard,
+  MessagesSquare,
+  Landmark,
+  ListChecks,
+  BookOpen,
+  Building2,
+  LogOut,
+  Menu,
+  X,
+  Plus,
+} from 'lucide-react';
+import { Brand } from './Header';
+import type { Company } from '../types';
 
-interface SidebarProps {
-  currentTab: string;
-  onSelectTab: (tab: string) => void;
-  empresaAtiva: Empresa | null;
-  onLogout: () => void;
+const links = [
+  ['assistente', 'Assistente fiscal', MessagesSquare],
+  ['dashboard', 'Visão geral', LayoutDashboard],
+  ['fiscal', 'Situação fiscal', Landmark],
+  ['tarefas', 'Tarefas', ListChecks],
+  ['normas', 'Biblioteca de normas', BookOpen],
+  ['perfil', 'Perfil da empresa', Building2],
+] as const;
+export const titles: Record<string, string> = {
+  ...Object.fromEntries(links.map(([id, label]) => [id, label])),
+  cadastro: 'Cadastro da empresa',
+  leitor: 'Leitor da norma',
+};
+export function formatCnpj(id: string) {
+  return id.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
 }
-
-export const Sidebar: React.FC<SidebarProps> = ({
-  currentTab,
-  onSelectTab,
-  empresaAtiva,
+export function Sidebar({
+  page,
+  companies,
+  company,
+  onSelect,
   onLogout,
-}) => {
-  const navItems = [
-    { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard },
-    { id: 'assistente', label: 'Copiloto Fiscal', icon: MessageSquareText },
-    { id: 'tarefas', label: 'Obrigações & Tarefas', icon: CheckSquare },
-    { id: 'empresas', label: 'Empresas', icon: Building2 },
-    { id: 'normas', label: 'Biblioteca de Normas', icon: ShieldCheck },
-  ];
-
+}: {
+  page: string;
+  companies: Company[];
+  company?: Company;
+  onSelect: (id: string) => void;
+  onLogout: () => void;
+}) {
+  const [open, setOpen] = useState(false);
   return (
-    <aside className="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 h-screen sticky top-0">
-      <div>
-        {/* Marca & Identidade */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800/80 gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-base shadow-sm">
-            S
-          </div>
-          <div>
-            <span className="text-sm font-bold text-white tracking-tight">Sócio Digital</span>
-            <span className="block text-[10px] font-medium text-slate-400">Copiloto Fiscal & MEI</span>
-          </div>
-        </div>
-
-        {/* Seletor de Empresa Ativa */}
-        <div className="p-4 mx-3 my-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
-            <span>Empresa Ativa</span>
-            <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-medium border border-emerald-500/30">
-              {empresaAtiva?.porte || 'ME'}
-            </span>
-          </div>
-          <div className="text-xs font-bold text-white truncate">
-            {empresaAtiva?.razao_social || 'TecnoSoft Tecnologia Ltda'}
-          </div>
-          <div className="text-[11px] font-mono text-slate-400">
-            {empresaAtiva?.cnpj || '45.123.890/0001-44'}
-          </div>
-        </div>
-
-        {/* Menu de Navegação */}
-        <nav className="px-3 space-y-1 text-xs font-medium">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                  active
-                    ? 'bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20 shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${active ? 'text-emerald-400' : 'text-slate-400'}`} />
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Rodapé do Menu */}
-      <div className="p-4 border-t border-slate-800/80">
+    <aside className={'sidebar ' + (open ? 'is-open' : '')}>
+      <div className="side-head">
+        <Brand />
         <button
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800/50 transition-all text-xs"
+          aria-label="Menu de navegação"
+          aria-expanded={open}
+          className="mobile-menu"
+          onClick={() => setOpen(!open)}
         >
-          <LogOut className="w-4 h-4" />
-          Encerrar Sessão
+          {open ? <X /> : <Menu />}
+        </button>
+      </div>
+      <div className="side-content">
+        <div className="company-picker">
+          <label htmlFor="company">Empresa ativa</label>
+          {company ? (
+            <select
+              id="company"
+              value={company.id}
+              onChange={(e) => {
+                onSelect(e.target.value);
+                setOpen(false);
+              }}
+            >
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {formatCnpj(c.cnpj)}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <strong>Primeiro cadastro</strong>
+          )}
+          <a href="#cadastro" onClick={() => setOpen(false)}>
+            <Plus size={14} /> Cadastrar empresa
+          </a>
+        </div>
+        <nav aria-label="Navegação principal">
+          {company &&
+            links.map(([key, label, Icon]) => (
+              <a
+                key={key}
+                href={'#' + key}
+                aria-current={
+                  key === page || (key === 'normas' && page === 'leitor')
+                    ? 'page'
+                    : undefined
+                }
+                onClick={() => setOpen(false)}
+              >
+                <Icon size={18} />
+                {label}
+              </a>
+            ))}
+        </nav>
+        <button className="logout" onClick={onLogout}>
+          <LogOut size={17} /> Sair da conta
         </button>
       </div>
     </aside>
   );
-};
+}

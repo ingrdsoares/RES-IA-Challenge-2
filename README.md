@@ -1,103 +1,59 @@
-# Sócio Digital: Copiloto de Gestão Fiscal para Pequenos Negócios
+# Sócio Digital
 
-> **Desmistificando a contabilidade e a regularização de MEIs e MEs com IA**  
-> Repositório do **Grupo 08** para o **Challenge 2** da **Residência em Inteligência Artificial (RES-IA)**.
+**Assistente fiscal para MEIs e pequenos negócios brasileiros.**
 
-**Documentação Oficial (GitHub Pages):** [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)  
-**Download do Entregável da Semana (PDF):** [docs/entrega/entregaveis-challenge-2-grupo-08-final.pdf](docs/entrega/entregaveis-challenge-2-grupo-08-final.pdf)
+O Sócio Digital reúne perguntas, documentos e tarefas fiscais no contexto de cada empresa. Você pode consultar uma regra, abrir o trecho da norma citado na resposta e transformar uma orientação em tarefa. A conversa mantém o histórico e pode pedir o mês de referência (competência) quando ele é necessário para responder.
 
----
+![Tela do Assistente fiscal com os atalhos para conferir uma guia, entender uma regra e consultar tarefas](docs/media/assistente-fiscal.png)
 
-## Divisão do Grupo (Grupo 08)
+*Assistente fiscal no tema original, com uma empresa de demonstração.*
 
-| Papel / Frente | Integrante | Foco de Atuação |
-| :--- | :--- | :--- |
-| **Engenheiro de Dados, Dev** | **Lucas** | Ingestão de dados fiscais (CNAEs, tabelas do Simples Nacional), desenvolvimento da API e painel de monitoramento. |
-| **Cientista de Dados** | **Jhessica** | Modelagem do RAG factual com legislação tributária, extração de entidades fiscais e avaliação de fidelidade. |
-| **Arquitetura de Soluções** | **Clara e Nasser** | Topologia da arquitetura, contratos de serviço, modelo de dados do painel e requisitos não funcionais. |
-| **Ops (DevOps & MLOps)** | **Ingrid** | CI/CD, governança de modelos/dados (MLflow/DVC), infraestrutura e automação do GitHub Pages. |
+## O que você pode fazer
 
----
+| Recurso | Como usar |
+| --- | --- |
+| **Assistente fiscal** | Cadastre a empresa, faça uma pergunta e retome a conversa quando precisar. O assistente considera o contexto cadastral e pode solicitar esclarecimentos. |
+| **Biblioteca de normas** | Pesquise o acervo por assunto, tipo, órgão ou vigência. Abra uma citação para ler a versão consultada e o trecho que fundamenta a resposta. |
+| **Situação fiscal** | Registre guias, comprovantes e certidões. A interface distingue as evidências que você adicionou da situação verificada oficialmente. |
+| **Tarefas** | Crie uma tarefa a partir de uma orientação do assistente e acompanhe o que está pendente ou concluído. |
+| **Simulação tributária** | Informe os dados do período para simular cenários de MEI ou Simples Nacional cobertos por uma regra revisada. |
 
-## Sobre a Solução
+O acervo jurídico é alimentado por ingestão administrativa. A cobertura depende dos documentos publicados e das regras habilitadas. As respostas são informativas e ajudam a preparar a revisão com um profissional contábil.
 
-Aproximadamente 95% a 99% das empresas ativas no Brasil são micro e pequenos negócios. A falta de formação contábil gera dependência cega do contador e terror fiscal nos empreendedores. O **Sócio Digital** é uma aplicação inteligente que:
+## Rode localmente
 
-1. **Recebe informações da empresa:** Nicho, atividade (CNAE), faturamento estimado, regime atual ou intenção de abertura de CNPJ.
-2. **Responde com soluções práticas:** Simula enquadramentos (MEI vs Simples Nacional, Anexo III vs Anexo V com Fator R) e gera roteiros de regularização em 3 passos.
-3. **Painel de Monitoramento:** Centraliza o status da empresa com semáforo de conformidade fiscal e alertas de vencimento para evitar multas.
+Você precisa de **Git**, **Docker com Compose** e **Ollama** em execução. Clone o repositório e execute o script no PowerShell.
 
----
-
-## Backend inicial de RAG
-
-A API fica em [`backend/api/`](backend/api/). O backend usa FastAPI, Qdrant em Docker
-com persistência e Ollama no macOS para executar `qwen3:8b` e `qwen3-embedding:0.6b`.
-A base começa vazia e será alimentada posteriormente.
-
-Consulte [`backend/README.md`](backend/README.md) para configuração, execução e contrato
-dos documentos. Para iniciar os serviços com Docker Desktop e Ollama disponíveis:
-
-```bash
-docker compose -f backend/compose.yaml up -d --build
+```powershell
+git clone https://github.com/ingrdsoares/RES-IA-Challenge-2.git
+cd RES-IA-Challenge-2
+./scripts/rodar-localmente.ps1
 ```
 
-API: http://localhost:8000/docs. Qdrant: http://localhost:6333/dashboard.
+O script baixa os modelos do Ollama, aguarda os serviços de dados, aplica as migrações e inicia a plataforma. As execuções seguintes reaproveitam os volumes do Compose. Para executar as etapas manualmente, consulte o [guia do backend](backend/README.md).
 
-## Estrutura da Documentação
+Abra a [plataforma em localhost:3000](http://localhost:3000), crie uma conta e cadastre a empresa. A [API no Swagger](http://localhost:8000/docs) está disponível na porta 8000.
 
-A documentação interativa é servida via **Docsify** e está localizada no diretório [`docs/`](docs/):
+Para testar o percurso com citação, ingira o excerto de referência da LC 123/2006 e pergunte ao assistente sobre a periodicidade do recolhimento pelo documento único de arrecadação. A referência e o comando de ingestão estão no [roteiro de reprodução local](docs/superpowers/plans/2026-11-17-integracao-multiagente.md#reprodução-local-da-primeira-entrega). Consulte o [guia do backend](backend/README.md) para configurar o Ollama, publicar outras normas e rodar os testes de integração.
 
-- [`docs/README.md`](docs/README.md): Visão geral do projeto e apresentação do time.
-- [`docs/projeto/definicao-projeto.md`](docs/projeto/definicao-projeto.md): Pacote completo de definição do projeto (cenário, problema, personas, requisitos, riscos e métricas).
-- [`docs/projeto/guiding-questions.md`](docs/projeto/guiding-questions.md): Guiding questions, fundamentação de qualidade de vida e fluxo consultivo sem exercício ilegal da contabilidade.
-- [`docs/arquitetura/arquitetura.md`](docs/arquitetura/arquitetura.md): Diretrizes arquiteturais e frentes de dados/engenharia.
-- [`docs/arquitetura/devops-mlops.md`](docs/arquitetura/devops-mlops.md): Infraestrutura, esteiras e práticas de MLOps.
-- [`docs/projeto/equipe.md`](docs/projeto/equipe.md): Matriz detalhada de responsabilidades e atribuições.
-- [`docs/projeto/metodologia.md`](docs/projeto/metodologia.md): Scrum adaptado, git flow e critérios de aceitação.
+## Como funciona
 
----
+1. O **frontend React + TypeScript** envia a pergunta à API e acompanha o processamento sem perder o contexto da conversa.
+2. A **API FastAPI** persiste os dados no PostgreSQL e enfileira o trabalho no Redis.
+3. O **worker** coordena recuperação jurídica, diagnóstico fiscal e planejamento. O Qdrant recupera trechos do acervo e o Ollama executa os modelos Qwen.
+4. A resposta volta com as fontes e os próximos passos disponíveis. O armazenamento compatível com S3 atende os documentos e anexos.
 
-## Como Visualizar Localmente a Documentação
+| Onde | O que você encontra |
+| --- | --- |
+| [`frontend/`](frontend/) | Aplicação web, testes de navegador e [design system](frontend/DESIGN-SYSTEM.md). |
+| [`backend/api/`](backend/api/) | API, worker, migrações e testes do produto. |
+| [`backend/crawler/`](backend/crawler/) | Coleta de fontes fiscais. |
+| [`backend/refino/`](backend/refino/) | Preparação do acervo para recuperação de trechos. |
+| [`backend/evaluation/`](backend/evaluation/) | Avaliação da qualidade do RAG. |
+| [`docs/`](docs/) | Documentação, diagramas e entregáveis do projeto. |
 
-Você pode executar o Docsify localmente com qualquer um dos métodos abaixo:
+Para trabalhar na interface, pare o container `frontend`, mantenha a API local em execução e use `npm ci` e `npm run dev` dentro de `frontend/`. No mesmo diretório, `npm test` roda os testes unitários e `npm run build` gera a versão de produção.
 
-### Método 1: Python HTTP Server (Nativo)
-```bash
-python3 -m http.server 3000 --directory docs
-```
-Acesse em: [http://localhost:3000](http://localhost:3000)
+## Origem
 
-### Método 2: Docsify CLI (via npx / Node.js)
-```bash
-npx docsify-cli serve docs
-```
-Acesse em: [http://localhost:3000](http://localhost:3000)
-
----
-
-## Como Ativar o GitHub Pages no Repositório
-
-Para habilitar a publicação automática em `https://ingrdsoares.github.io/RES-IA-Challenge-2/`:
-
-1. No repositório no GitHub, clique na aba **Settings** (Configurações).
-2. Na barra lateral esquerda, clique em **Pages**.
-3. Em **Build and deployment** > **Source**, selecione:
-   - **Deploy from a branch:** Selecione a branch `main` e a pasta `/docs`, depois clique em **Save**.
-4. O site estará disponível em instantes em: [https://ingrdsoares.github.io/RES-IA-Challenge-2/](https://ingrdsoares.github.io/RES-IA-Challenge-2/)
-
-## Backend e coleta de dados
-
-A API está em [backend/api](backend/api), e a preparação da coleta em [backend/crawler](backend/crawler). Consulte [backend/README.md](backend/README.md) para executar a API e [o plano da coleta inicial](backend/crawler/README.md).
-
-A expansão inclui ICMS/consultas DF, reforma tributária, histórico CGSN, CNPJ DF por todos os lotes, documentação fiscal, jurisprudência e candidatos a exemplos oficiais. Os resultados e limites estão no [README do crawler](backend/crawler/README.md). Execute `python -m backend.crawler.estatisticas` para atualizar a [contagem consolidada local](backend/crawler/data/estatisticas/indice.md), com documentos, versões, páginas, empresas e volume separados.
-
-Consulte a [sumarização integral do acervo tributário](docs/sumarizacao-acervo-tributario.md), com descrição de todas as frentes, cobertura e referências de cada versão coletada. O [inventário integral de referências](docs/referencias-acervo/inventario-integral.json) permite processamento automatizado.
-
-O refino tem [arquitetura própria](docs/arquitetura/arquitetura-refino.md), [pipeline reproduzível](backend/refino/README.md) e [instruções de continuidade para outros agentes](handoff/refino/CONTINUAR.md). Gere um pacote portátil com python -m backend.refino.exportar.
-
-## Avaliação do RAG
-
-O pipeline de avaliação em [`backend/api/evaluation/`](backend/api/evaluation/) permite
-coleta retomável, ROUGE-L/BERTScore, bootstrap, comparação pareada e exportação Excel.
-Instalação, formato do dataset e comandos: [`backend/evaluation/README.md`](backend/evaluation/README.md).
+O Sócio Digital nasceu no **Grupo 08 do Challenge 2 da Residência em Inteligência Artificial (RES-IA)**. Conheça a [equipe e as frentes de trabalho](docs/projeto/equipe.md).

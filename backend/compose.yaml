@@ -1,6 +1,12 @@
 name: socio-digital
 
 services:
+  mailpit:
+    image: axllent/mailpit:v1.21.8
+    ports:
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1025:1025"
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -62,6 +68,12 @@ services:
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
       QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
       OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      AGENT_TIMEOUT: ${AGENT_TIMEOUT:-120}
+      AGENT_ROUND_SECONDS: ${AGENT_ROUND_SECONDS:-600}
+      AGENT_MAX_CALLS: ${AGENT_MAX_CALLS:-30}
+      AGENT_TOKEN_BUDGET: ${AGENT_TOKEN_BUDGET:-1228800}
+      AGENT_MAX_CONFIRMATIONS: ${AGENT_MAX_CONFIRMATIONS:-2}
+      AGENT_STEP_ATTEMPTS: ${AGENT_STEP_ATTEMPTS:-2}
       NUM_CTX: ${NUM_CTX:-8192}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
       MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
@@ -118,6 +130,11 @@ services:
       S3_PUBLIC_ENDPOINT: http://localhost:9000
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-sd_local_user}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-sd_local_password}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_STARTTLS: "false"
+      SMTP_FROM: acesso@sociodigital.test
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       ALLOWED_ORIGINS: '${ALLOWED_ORIGINS:-["http://localhost:8000","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173"]}'
       QDRANT_URL: http://qdrant:6333
@@ -130,6 +147,12 @@ services:
       SCORE_THRESHOLD: ${SCORE_THRESHOLD:-0.5}
       QDRANT_TIMEOUT: ${QDRANT_TIMEOUT:-5}
       OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-120}
+      AGENT_TIMEOUT: ${AGENT_TIMEOUT:-120}
+      AGENT_ROUND_SECONDS: ${AGENT_ROUND_SECONDS:-600}
+      AGENT_MAX_CALLS: ${AGENT_MAX_CALLS:-30}
+      AGENT_TOKEN_BUDGET: ${AGENT_TOKEN_BUDGET:-1228800}
+      AGENT_MAX_CONFIRMATIONS: ${AGENT_MAX_CONFIRMATIONS:-2}
+      AGENT_STEP_ATTEMPTS: ${AGENT_STEP_ATTEMPTS:-2}
       NUM_CTX: ${NUM_CTX:-8192}
       NUM_PREDICT: ${NUM_PREDICT:-1024}
       MAX_CONTEXT_CHARS: ${MAX_CONTEXT_CHARS:-12000}
@@ -145,6 +168,8 @@ services:
       PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     depends_on:
+      mailpit:
+        condition: service_started
       qdrant:
         condition: service_started
       postgres:

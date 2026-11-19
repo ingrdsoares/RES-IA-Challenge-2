@@ -1,0 +1,615 @@
+{
+  "method": "Read-only retrieval replay with same embedding and dense cosine index; no generation, no product changes, no validity analysis. Relevant anchors selected by manual inspection of indexed text. This is not an embedding-model comparison.",
+  "indexed_points": 348,
+  "cases": [
+    {
+      "id": "A03",
+      "question": "Quais componentes formam o recolhimento mensal do MEI segundo a legislação disponível?",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O recolhimento mensal do MEI compreende a contribuição fixa de R$ 45,65 e o imposto referido no inciso VII do art. 13, caso seja contribuinte do ICMS.",
+            "support_ids": [
+              "legal:3"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "O recolhimento mensal do MEI compreende a contribuição fixa de R$ 45,65 e o imposto referido no inciso VII do art. 13 [1].",
+        "support_ids": [
+          "legal:3"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s85-368950b21d7a",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-C. Observado o disposto no *caput*\ne nos §§ 1º a 25 do art. 18-A desta Lei Complementar, poderá\nenquadrar-se como MEI o empresário individual ou o empreendedor que\nexerça as atividades de industrialização, comercialização e\nprestação de serviços no âmbito rural que possua um único\nempregado que receba exclusivamente um salário mínimo ou o piso\nsalarial da categoria profissional. [*(“Caput”\ndo artigo com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n1º Na hipótese referida no *caput*,\no MEI:\n\nI\n- deverá reter e recolher a contribuição previdenciária relativa\nao segurado a seu serviço na forma da lei, observados prazo e\ncondições estabelecidos pelo CGSN;\n\nII\n- é obrigado a prestar informações relativas ao segurado a seu\nserviço, na forma estabelecida pelo CGSN; e\n\nIII\n- está sujeito ao recolhimento da contribuição de que trata o\ninciso VI do *caput*\ndo art. 13, calculada à alíquota de 3% (três por cento) sobre o\nsalário de contribuição previsto no *caput*,\nna forma e prazos estabelecidos pelo CGSN.\n\n§\n2º Para os casos de afastamento legal do único empregado do MEI,\nserá permitida a contratação de outro empregado, inclusive por\nprazo determinado, até que cessem as condições do afastamento, na\nforma estabelecida pelo Ministério do Trabalho e Emprego. [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n3º O CGSN poderá determinar, com relação ao MEI, a forma, a\nperiodicidade e o prazo:\n\nI\n- de entrega à Secretaria da Receita Federal do Brasil de uma única\ndeclaração com dados relacionados a fatos geradores, base de\ncálculo e valores dos tributos previstos nos arts. 18-A e 18-C, da\ncontribuição para a Seguridade Social descontada do empregado e do\nFundo de Garantia do Tempo de Serviço (FGTS), e outras informações\nde interesse do Ministério do Trabalho e Emprego, do Instituto\nNacional do Seguro Social (INSS) e do Conselho Curador do FGTS,\nobservado o disposto no § 7º do art. 26; [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\nII\n- do recolhimento dos tributos previstos nos arts. 18-A e 18-C, bem\ncomo do FGTS e da contribuição para a Seguridade Social descontada\ndo empregado.\n\n§\n4º A entrega da declaração única de que trata o inciso I do § 3º\nsubstituirá, na forma regulamentada pelo CGSN, a obrigatoriedade de\nentrega de todas as informações, formulários e declarações a que\nestão sujeitas as demais empresas ou equiparados que contratam\nempr"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s90-0251136b9523",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-E. O instituto do MEI é uma política pública que tem por\nobjetivo a formalização de pequenos empreendimentos e a inclusão\nsocial e previdenciária. [*(“Caput”\ndo artigo acrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n1º A formalização de MEI não tem caráter eminentemente econômico\nou fiscal. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n2º Todo benefício previsto nesta Lei Complementar aplicável à\nmicroempresa estende-se ao MEI sempre que lhe for mais favorável.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n3º O MEI é modalidade de microempresa. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º É vedado impor restrições ao MEI relativamente ao exercício\nde profissão ou participação em licitações, em função da sua\nnatureza jurídica, inclusive por ocasião da contratação dos\nserviços previstos no § 1º do art. 18-B desta Lei Complementar.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014,*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)[*com\nredação dada pela Lei Complementar nº 155, de 27/10/2016,\nproduzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n5º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural que\nefetuar seu registro como MEI não perderá a condição de segurado\nespecial da Previdência Social. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n6º O disposto no § 5º e o licenciamento simplificado de atividades\npara o empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural serão\nregulamentados pelo CGSIM em até cento e oitenta dias. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n7º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural manterá\ntodas as suas obrigações relativas à condição de produtor ru"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s76-550615e03730",
+          "sent_chars": 2141,
+          "indexed_chars": 3000,
+          "sent_text": "queno porte concedidas pelo Estado, Município ou\nDistrito Federal a partir de 1º de julho de 2007 que abranjam\nintegralmente a faixa de receita bruta anual até o limite previsto\nno § 1º;\n\nIV\n- a opção pelo enquadramento como Microempreendedor Individual\nimporta opção pelo recolhimento da contribuição referida no\ninciso X do § 1º do art. 13 desta Lei Complementar na forma\nprevista no § 2º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991; [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\na)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nb)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nV\n- o MEI, com receita bruta anual igual ou inferior a R$ 81.000,00\n(oitenta e um mil reais), recolherá, na forma regulamentada pelo\nComitê Gestor, valor fixo mensal correspondente à soma das\nseguintes parcelas: [*(“Caput”\ndo inciso com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](https://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\na)\nR$ 45,65 (quarenta e cinco reais e sessenta e cinco centavos), a\ntítulo da contribuição prevista no inciso IV deste parágrafo;\n\nb)\nR$ 1,00 (um real), a título do imposto referido no inciso VII do\n*caput*\ndo art. 13 desta Lei Complementar, caso seja contribuinte do ICMS; e\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.cama"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s85-368950b21d7a",
+          "score": 0.6311724
+        },
+        {
+          "rank": 2,
+          "anchor": "s90-0251136b9523",
+          "score": 0.6282103
+        },
+        {
+          "rank": 3,
+          "anchor": "s76-550615e03730",
+          "score": 0.61731994
+        },
+        {
+          "rank": 4,
+          "anchor": "s75-2557864f6bd9",
+          "score": 0.6084156
+        },
+        {
+          "rank": 5,
+          "anchor": "s77-a2fd117a767c",
+          "score": 0.6081239
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 3,
+          "anchor": "s76-550615e03730",
+          "score": 0.61731994,
+          "text": "queno porte concedidas pelo Estado, Município ou\nDistrito Federal a partir de 1º de julho de 2007 que abranjam\nintegralmente a faixa de receita bruta anual até o limite previsto\nno § 1º;\n\nIV\n- a opção pelo enquadramento como Microempreendedor Individual\nimporta opção pelo recolhimento da contribuição referida no\ninciso X do § 1º do art. 13 desta Lei Complementar na forma\nprevista no § 2º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991; [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\na)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nb)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nV\n- o MEI, com receita bruta anual igual ou inferior a R$ 81.000,00\n(oitenta e um mil reais), recolherá, na forma regulamentada pelo\nComitê Gestor, valor fixo mensal correspondente à soma das\nseguintes parcelas: [*(“Caput”\ndo inciso com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](https://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\na)\nR$ 45,65 (quarenta e cinco reais e sessenta e cinco centavos), a\ntítulo da contribuição prevista no inciso IV deste parágrafo;\n\nb)\nR$ 1,00 (um real), a título do imposto referido no inciso VII do\n*caput*\ndo art. 13 desta Lei Complementar, caso seja contribuinte do ICMS; e\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nc)\nR$ 5,00 (cinco reais), a título do imposto referido no inciso VIII\ndo *caput*\ndo art. 13 desta Lei Complementar, caso seja contribuinte do ISS;\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nd)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\ne)\n[*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nVI\n- sem prejuízo do disposto nos §§ 1º a 3º do art. 13, o MEI t"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    },
+    {
+      "id": "A04",
+      "question": "O MEI pode participar de outra empresa como sócio? Responda com fonte.",
+      "legal_result": {
+        "status": "insufficient_context",
+        "claims": [],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "O MEI não pode participar de outra empresa como sócio, conforme previsto em [1] e [2].",
+        "support_ids": [
+          "legal:1",
+          "legal:2"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s85-368950b21d7a",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-C. Observado o disposto no *caput*\ne nos §§ 1º a 25 do art. 18-A desta Lei Complementar, poderá\nenquadrar-se como MEI o empresário individual ou o empreendedor que\nexerça as atividades de industrialização, comercialização e\nprestação de serviços no âmbito rural que possua um único\nempregado que receba exclusivamente um salário mínimo ou o piso\nsalarial da categoria profissional. [*(“Caput”\ndo artigo com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n1º Na hipótese referida no *caput*,\no MEI:\n\nI\n- deverá reter e recolher a contribuição previdenciária relativa\nao segurado a seu serviço na forma da lei, observados prazo e\ncondições estabelecidos pelo CGSN;\n\nII\n- é obrigado a prestar informações relativas ao segurado a seu\nserviço, na forma estabelecida pelo CGSN; e\n\nIII\n- está sujeito ao recolhimento da contribuição de que trata o\ninciso VI do *caput*\ndo art. 13, calculada à alíquota de 3% (três por cento) sobre o\nsalário de contribuição previsto no *caput*,\nna forma e prazos estabelecidos pelo CGSN.\n\n§\n2º Para os casos de afastamento legal do único empregado do MEI,\nserá permitida a contratação de outro empregado, inclusive por\nprazo determinado, até que cessem as condições do afastamento, na\nforma estabelecida pelo Ministério do Trabalho e Emprego. [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n3º O CGSN poderá determinar, com relação ao MEI, a forma, a\nperiodicidade e o prazo:\n\nI\n- de entrega à Secretaria da Receita Federal do Brasil de uma única\ndeclaração com dados relacionados a fatos geradores, base de\ncálculo e valores dos tributos previstos nos arts. 18-A e 18-C, da\ncontribuição para a Seguridade Social descontada do empregado e do\nFundo de Garantia do Tempo de Serviço (FGTS), e outras informações\nde interesse do Ministério do Trabalho e Emprego, do Instituto\nNacional do Seguro Social (INSS) e do Conselho Curador do FGTS,\nobservado o disposto no § 7º do art. 26; [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\nII\n- do recolhimento dos tributos previstos nos arts. 18-A e 18-C, bem\ncomo do FGTS e da contribuição para a Seguridade Social descontada\ndo empregado.\n\n§\n4º A entrega da declaração única de que trata o inciso I do § 3º\nsubstituirá, na forma regulamentada pelo CGSN, a obrigatoriedade de\nentrega de todas as informações, formulários e declarações a que\nestão sujeitas as demais empresas ou equiparados que contratam\nempr"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s90-0251136b9523",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-E. O instituto do MEI é uma política pública que tem por\nobjetivo a formalização de pequenos empreendimentos e a inclusão\nsocial e previdenciária. [*(“Caput”\ndo artigo acrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n1º A formalização de MEI não tem caráter eminentemente econômico\nou fiscal. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n2º Todo benefício previsto nesta Lei Complementar aplicável à\nmicroempresa estende-se ao MEI sempre que lhe for mais favorável.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n3º O MEI é modalidade de microempresa. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º É vedado impor restrições ao MEI relativamente ao exercício\nde profissão ou participação em licitações, em função da sua\nnatureza jurídica, inclusive por ocasião da contratação dos\nserviços previstos no § 1º do art. 18-B desta Lei Complementar.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014,*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)[*com\nredação dada pela Lei Complementar nº 155, de 27/10/2016,\nproduzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n5º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural que\nefetuar seu registro como MEI não perderá a condição de segurado\nespecial da Previdência Social. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n6º O disposto no § 5º e o licenciamento simplificado de atividades\npara o empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural serão\nregulamentados pelo CGSIM em até cento e oitenta dias. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n7º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural manterá\ntodas as suas obrigações relativas à condição de produtor ru"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s80-d9759c6c8b84",
+          "sent_chars": 2157,
+          "indexed_chars": 3000,
+          "sent_text": "eicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n19. Fica vedada aos conselhos representativos de categorias\neconômicas a exigência de obrigações diversas das estipuladas\nnesta Lei Complementar para inscrição do MEI em seus quadros, sob\npena de responsabilidade. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n19-A. O MEI inscrito no conselho profissional de sua categoria na\nqualidade de pessoa física é dispensado de realizar nova inscrição\nno mesmo conselho na qualidade de empresário individual. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n19-B. São vedadas aos conselhos profissionais, sob pena de\nresponsabilidade, a exigência de inscrição e a execução de\nqualquer tipo de ação fiscalizadora quando a ocupação do MEI não\nexigir registro profissional da pessoa física. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n20. Os documentos fiscais das microempresas e empresas de pequeno\nporte poderão ser emitidos diretamente por sistema nacional\ninformatizado e pela internet, sem custos para o empreendedor, na\nforma regulamentada pelo Comitê Gestor do Simples Nacional.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n21. Assegurar-se-á o registro nos cadastros oficiais ao guia de\nturismo inscrito como MEI. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n22. Fica vedado às conces"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s85-368950b21d7a",
+          "score": 0.5942358
+        },
+        {
+          "rank": 2,
+          "anchor": "s90-0251136b9523",
+          "score": 0.57336056
+        },
+        {
+          "rank": 3,
+          "anchor": "s80-d9759c6c8b84",
+          "score": 0.5702976
+        },
+        {
+          "rank": 4,
+          "anchor": "s12-16455761d62b",
+          "score": 0.5571769
+        },
+        {
+          "rank": 5,
+          "anchor": "s277-9af54b63bfbd",
+          "score": 0.52644193
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 12,
+          "anchor": "s77-a2fd117a767c",
+          "score": 0.45970535,
+          "text": "erá\nisenção dos tributos referidos nos incisos I a VI do *caput*\ndaquele artigo, ressalvado o disposto no art. 18-C.\n\n§\n4º Não poderá optar pela sistemática de recolhimento prevista no\n*caput*\ndeste artigo o MEI:\n\nI\n- cuja atividade seja tributada na forma dos Anexos V ou VI desta Lei\nComplementar, salvo autorização relativa a exercício de atividade\nisolada na forma regulamentada pelo CGSN; [*(Inciso\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014,\npublicada no DOU de 8/8/2014, com produção de efeitos a partir de\n1º de janeiro do primeiro ano subsequente ao da publicação)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\nII\n- que possua mais de um estabelecimento;\n\nIII\n- que participe de outra empresa como titular, sócio ou\nadministrador; ou\n\nIV\n- [*(Revogado\npela Lei Complementar nº 155, de 27/10/2016, produzindo efeitos a\npartir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\nV\n- constituído na forma de *startup*.\n[*(Inciso\nacrescido pela Lei Complementar nº 167, de 24/4/2019)*](https://www2.camara.leg.br/legin/fed/leicom/2019/leicomplementar-167-24-abril-2019-788009-publicacaooriginal-157795-pl.html)\n\n§\n4º-A. Observadas as demais condições deste artigo, poderá optar\npela sistemática de recolhimento prevista no *caput*\no empresário individual que exerça atividade de comercialização e\nprocessamento de produtos de natureza extrativista.\n\n§\n4º-B. O CGSN determinará as atividades autorizadas a optar pela\nsistemática de recolhimento de que trata este artigo, de forma a\nevitar a fragilização das relações de trabalho, bem como sobre a\nincidência do ICMS e do ISS. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n5º A opção de que trata o *caput*\ndeste artigo dar-se-á na forma a ser estabelecida em ato do Comitê\nGestor, observando-se que:\n\nI\n- será irretratável para todo o ano-calendário;\n\nII\n- deverá ser realizada no início do ano-calendário, na forma\ndisciplinada pelo Comitê Gestor, produzindo efeitos a partir do\nprimeiro dia do ano-calendário da opção, ressalvado o disposto no\ninciso III;\n\nIII\n- produzirá efeitos a partir da data do início de atividade desde\nque exercida nos termos, prazo e condições a serem estabelecidos em\nato do Comitê Gestor a que se refere o *caput*\ndeste parágrafo.\n\n§\n6º O desenquadramento da sistemática de que trata o *caput*\ndeste artigo será realizado de ofício ou mediante comunicação do\nMEI.\n\n§\n7º O desenquadramento mediante comunicação do MEI à Secretaria da\nReceita Federal do Brasil - RFB dar-se-á:\n\nI\n- por opção, que deverá ser efetuada no início do ano-calendário,\nna forma disciplinada pelo Comitê Gestor, produzindo efeitos a\npartir de 1o de janeiro do ano-calendário da comunicação; [*(Vide\nLei Complementar nº 227"
+        }
+      ],
+      "replayed_validation_error": "Síntese sem suporte dos especialistas"
+    },
+    {
+      "id": "A05",
+      "question": "O MEI pode ter filial? Cite o dispositivo recuperado.",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O MEI não pode ter filial, pois o dispositivo prevê que o MEI que possua mais de um estabelecimento não pode optar pela sistemática de recolhimento prevista no caput do artigo.",
+            "support_ids": [
+              "legal:2"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "O MEI não pode ter filial, conforme previsto no art. 11, caput, da Lei 13.109/2015 [1].",
+        "support_ids": [
+          "legal:2"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s90-0251136b9523",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-E. O instituto do MEI é uma política pública que tem por\nobjetivo a formalização de pequenos empreendimentos e a inclusão\nsocial e previdenciária. [*(“Caput”\ndo artigo acrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n1º A formalização de MEI não tem caráter eminentemente econômico\nou fiscal. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n2º Todo benefício previsto nesta Lei Complementar aplicável à\nmicroempresa estende-se ao MEI sempre que lhe for mais favorável.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n3º O MEI é modalidade de microempresa. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º É vedado impor restrições ao MEI relativamente ao exercício\nde profissão ou participação em licitações, em função da sua\nnatureza jurídica, inclusive por ocasião da contratação dos\nserviços previstos no § 1º do art. 18-B desta Lei Complementar.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014,*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)[*com\nredação dada pela Lei Complementar nº 155, de 27/10/2016,\nproduzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n5º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural que\nefetuar seu registro como MEI não perderá a condição de segurado\nespecial da Previdência Social. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n6º O disposto no § 5º e o licenciamento simplificado de atividades\npara o empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural serão\nregulamentados pelo CGSIM em até cento e oitenta dias. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n7º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural manterá\ntodas as suas obrigações relativas à condição de produtor ru"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s77-a2fd117a767c",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "erá\nisenção dos tributos referidos nos incisos I a VI do *caput*\ndaquele artigo, ressalvado o disposto no art. 18-C.\n\n§\n4º Não poderá optar pela sistemática de recolhimento prevista no\n*caput*\ndeste artigo o MEI:\n\nI\n- cuja atividade seja tributada na forma dos Anexos V ou VI desta Lei\nComplementar, salvo autorização relativa a exercício de atividade\nisolada na forma regulamentada pelo CGSN; [*(Inciso\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014,\npublicada no DOU de 8/8/2014, com produção de efeitos a partir de\n1º de janeiro do primeiro ano subsequente ao da publicação)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\nII\n- que possua mais de um estabelecimento;\n\nIII\n- que participe de outra empresa como titular, sócio ou\nadministrador; ou\n\nIV\n- [*(Revogado\npela Lei Complementar nº 155, de 27/10/2016, produzindo efeitos a\npartir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\nV\n- constituído na forma de *startup*.\n[*(Inciso\nacrescido pela Lei Complementar nº 167, de 24/4/2019)*](https://www2.camara.leg.br/legin/fed/leicom/2019/leicomplementar-167-24-abril-2019-788009-publicacaooriginal-157795-pl.html)\n\n§\n4º-A. Observadas as demais condições deste artigo, poderá optar\npela sistemática de recolhimento prevista no *caput*\no empresário individual que exerça atividade de comercialização e\nprocessamento de produtos de natureza extrativista.\n\n§\n4º-B. O CGSN determinará as atividades autorizadas a optar pela\nsistemática de recolhimento de que trata este artigo, de forma a\nevitar a fragilização das relações de trabalho, bem como sobre a\nincidência do ICMS e do ISS. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n5º A opção de que trata o *caput*\ndeste artigo dar-se-á na forma a ser estabelecida em ato do Comitê\nGestor, observando-se que:\n\nI\n- será irretratável para todo o ano-calendário;\n\nII\n- deverá ser realizada no início do ano-calendário, na forma\ndisciplinada pelo Comitê Gestor, produzindo efeitos a partir do\nprimeiro dia do ano-calendário da opção, ressalvado o disposto no\ninciso III;\n\nIII\n- produzirá efeitos a partir da data do início de atividade desde\nque exercida nos termos, prazo e condições a serem estabelecidos em\nato do Comitê Gestor a que se refere o *caput*\ndeste parágrafo.\n\n§\n6º O desenquadramento da sistemática de que trata o *caput*\ndeste artigo será realizado de ofício ou mediante comunicação do\nMEI.\n\n§\n7º O desenquadramento mediante comunicação do MEI à Secretaria da\nReceita Federal do Brasil - RFB dar-se-á:\n\nI\n- por opção, que deverá ser efetuada no início do ano-calendário,\nna forma disciplinada pelo Comitê Gestor, produzindo efeitos a\npartir de 1o de janeiro do ano-calendário da comunicação; [*(Vide\nLei Complementar nº 227"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s85-368950b21d7a",
+          "sent_chars": 2128,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-C. Observado o disposto no *caput*\ne nos §§ 1º a 25 do art. 18-A desta Lei Complementar, poderá\nenquadrar-se como MEI o empresário individual ou o empreendedor que\nexerça as atividades de industrialização, comercialização e\nprestação de serviços no âmbito rural que possua um único\nempregado que receba exclusivamente um salário mínimo ou o piso\nsalarial da categoria profissional. [*(“Caput”\ndo artigo com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n1º Na hipótese referida no *caput*,\no MEI:\n\nI\n- deverá reter e recolher a contribuição previdenciária relativa\nao segurado a seu serviço na forma da lei, observados prazo e\ncondições estabelecidos pelo CGSN;\n\nII\n- é obrigado a prestar informações relativas ao segurado a seu\nserviço, na forma estabelecida pelo CGSN; e\n\nIII\n- está sujeito ao recolhimento da contribuição de que trata o\ninciso VI do *caput*\ndo art. 13, calculada à alíquota de 3% (três por cento) sobre o\nsalário de contribuição previsto no *caput*,\nna forma e prazos estabelecidos pelo CGSN.\n\n§\n2º Para os casos de afastamento legal do único empregado do MEI,\nserá permitida a contratação de outro empregado, inclusive por\nprazo determinado, até que cessem as condições do afastamento, na\nforma estabelecida pelo Ministério do Trabalho e Emprego. [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n3º O CGSN poderá determinar, com relação ao MEI, a forma, a\nperiodicidade e o prazo:\n\nI\n- de entrega à Secretaria da Receita Federal do Brasil de uma única\ndeclaração com dados relacionados a fatos geradores, base de\ncálculo e valores dos tributos previstos nos arts. 18-A e 18-C, da\ncontribuição para a Segurida"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s90-0251136b9523",
+          "score": 0.51812315
+        },
+        {
+          "rank": 2,
+          "anchor": "s77-a2fd117a767c",
+          "score": 0.50387305
+        },
+        {
+          "rank": 3,
+          "anchor": "s85-368950b21d7a",
+          "score": 0.49620688
+        },
+        {
+          "rank": 4,
+          "anchor": "s78-a1b65f361226",
+          "score": 0.4801033
+        },
+        {
+          "rank": 5,
+          "anchor": "s80-d9759c6c8b84",
+          "score": 0.4749324
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 2,
+          "anchor": "s77-a2fd117a767c",
+          "score": 0.50387305,
+          "text": "erá\nisenção dos tributos referidos nos incisos I a VI do *caput*\ndaquele artigo, ressalvado o disposto no art. 18-C.\n\n§\n4º Não poderá optar pela sistemática de recolhimento prevista no\n*caput*\ndeste artigo o MEI:\n\nI\n- cuja atividade seja tributada na forma dos Anexos V ou VI desta Lei\nComplementar, salvo autorização relativa a exercício de atividade\nisolada na forma regulamentada pelo CGSN; [*(Inciso\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014,\npublicada no DOU de 8/8/2014, com produção de efeitos a partir de\n1º de janeiro do primeiro ano subsequente ao da publicação)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\nII\n- que possua mais de um estabelecimento;\n\nIII\n- que participe de outra empresa como titular, sócio ou\nadministrador; ou\n\nIV\n- [*(Revogado\npela Lei Complementar nº 155, de 27/10/2016, produzindo efeitos a\npartir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\nV\n- constituído na forma de *startup*.\n[*(Inciso\nacrescido pela Lei Complementar nº 167, de 24/4/2019)*](https://www2.camara.leg.br/legin/fed/leicom/2019/leicomplementar-167-24-abril-2019-788009-publicacaooriginal-157795-pl.html)\n\n§\n4º-A. Observadas as demais condições deste artigo, poderá optar\npela sistemática de recolhimento prevista no *caput*\no empresário individual que exerça atividade de comercialização e\nprocessamento de produtos de natureza extrativista.\n\n§\n4º-B. O CGSN determinará as atividades autorizadas a optar pela\nsistemática de recolhimento de que trata este artigo, de forma a\nevitar a fragilização das relações de trabalho, bem como sobre a\nincidência do ICMS e do ISS. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n5º A opção de que trata o *caput*\ndeste artigo dar-se-á na forma a ser estabelecida em ato do Comitê\nGestor, observando-se que:\n\nI\n- será irretratável para todo o ano-calendário;\n\nII\n- deverá ser realizada no início do ano-calendário, na forma\ndisciplinada pelo Comitê Gestor, produzindo efeitos a partir do\nprimeiro dia do ano-calendário da opção, ressalvado o disposto no\ninciso III;\n\nIII\n- produzirá efeitos a partir da data do início de atividade desde\nque exercida nos termos, prazo e condições a serem estabelecidos em\nato do Comitê Gestor a que se refere o *caput*\ndeste parágrafo.\n\n§\n6º O desenquadramento da sistemática de que trata o *caput*\ndeste artigo será realizado de ofício ou mediante comunicação do\nMEI.\n\n§\n7º O desenquadramento mediante comunicação do MEI à Secretaria da\nReceita Federal do Brasil - RFB dar-se-á:\n\nI\n- por opção, que deverá ser efetuada no início do ano-calendário,\nna forma disciplinada pelo Comitê Gestor, produzindo efeitos a\npartir de 1o de janeiro do ano-calendário da comunicação; [*(Vide\nLei Complementar nº 227"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    },
+    {
+      "id": "A07",
+      "question": "Qualquer atividade profissional pode ser enquadrada como MEI?",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O MEI é modalidade de microempresa e pode incluir qualquer atividade profissional que atenda aos critérios legais estabelecidos.",
+            "support_ids": [
+              "legal:1",
+              "legal:3"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "O MEI é modalidade de microempresa e pode incluir qualquer atividade profissional que atenda aos critérios legais estabelecidos [1], [2].",
+        "support_ids": [
+          "legal:1",
+          "legal:3"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s90-0251136b9523",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-E. O instituto do MEI é uma política pública que tem por\nobjetivo a formalização de pequenos empreendimentos e a inclusão\nsocial e previdenciária. [*(“Caput”\ndo artigo acrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n1º A formalização de MEI não tem caráter eminentemente econômico\nou fiscal. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n2º Todo benefício previsto nesta Lei Complementar aplicável à\nmicroempresa estende-se ao MEI sempre que lhe for mais favorável.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n3º O MEI é modalidade de microempresa. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º É vedado impor restrições ao MEI relativamente ao exercício\nde profissão ou participação em licitações, em função da sua\nnatureza jurídica, inclusive por ocasião da contratação dos\nserviços previstos no § 1º do art. 18-B desta Lei Complementar.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014,*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)[*com\nredação dada pela Lei Complementar nº 155, de 27/10/2016,\nproduzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n5º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural que\nefetuar seu registro como MEI não perderá a condição de segurado\nespecial da Previdência Social. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n6º O disposto no § 5º e o licenciamento simplificado de atividades\npara o empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural serão\nregulamentados pelo CGSIM em até cento e oitenta dias. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n7º O empreendedor que exerça as atividades de industrialização,\ncomercialização e prestação de serviços no âmbito rural manterá\ntodas as suas obrigações relativas à condição de produtor ru"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s80-d9759c6c8b84",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "eicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n19. Fica vedada aos conselhos representativos de categorias\neconômicas a exigência de obrigações diversas das estipuladas\nnesta Lei Complementar para inscrição do MEI em seus quadros, sob\npena de responsabilidade. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n19-A. O MEI inscrito no conselho profissional de sua categoria na\nqualidade de pessoa física é dispensado de realizar nova inscrição\nno mesmo conselho na qualidade de empresário individual. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n19-B. São vedadas aos conselhos profissionais, sob pena de\nresponsabilidade, a exigência de inscrição e a execução de\nqualquer tipo de ação fiscalizadora quando a ocupação do MEI não\nexigir registro profissional da pessoa física. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n20. Os documentos fiscais das microempresas e empresas de pequeno\nporte poderão ser emitidos diretamente por sistema nacional\ninformatizado e pela internet, sem custos para o empreendedor, na\nforma regulamentada pelo Comitê Gestor do Simples Nacional.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n21. Assegurar-se-á o registro nos cadastros oficiais ao guia de\nturismo inscrito como MEI. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n22. Fica vedado às concessionárias de serviço público o aumento\ndas tarifas pagas pelo MEI por conta da modificação da sua condição\nde pessoa física para pessoa jurídica. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n23. [*(VETADO\nna Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-veto-144701-pl.html)\n\n§\n24. Aplica-se ao MEI o disposto no inciso XI do § 4º do art. 3º.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n25. O MEI poderá utilizar sua residência como sede do\nestabelecimento, q"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s85-368950b21d7a",
+          "sent_chars": 2168,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n18-C. Observado o disposto no *caput*\ne nos §§ 1º a 25 do art. 18-A desta Lei Complementar, poderá\nenquadrar-se como MEI o empresário individual ou o empreendedor que\nexerça as atividades de industrialização, comercialização e\nprestação de serviços no âmbito rural que possua um único\nempregado que receba exclusivamente um salário mínimo ou o piso\nsalarial da categoria profissional. [*(“Caput”\ndo artigo com redação dada pela Lei Complementar nº 155, de\n27/10/2016, produzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n1º Na hipótese referida no *caput*,\no MEI:\n\nI\n- deverá reter e recolher a contribuição previdenciária relativa\nao segurado a seu serviço na forma da lei, observados prazo e\ncondições estabelecidos pelo CGSN;\n\nII\n- é obrigado a prestar informações relativas ao segurado a seu\nserviço, na forma estabelecida pelo CGSN; e\n\nIII\n- está sujeito ao recolhimento da contribuição de que trata o\ninciso VI do *caput*\ndo art. 13, calculada à alíquota de 3% (três por cento) sobre o\nsalário de contribuição previsto no *caput*,\nna forma e prazos estabelecidos pelo CGSN.\n\n§\n2º Para os casos de afastamento legal do único empregado do MEI,\nserá permitida a contratação de outro empregado, inclusive por\nprazo determinado, até que cessem as condições do afastamento, na\nforma estabelecida pelo Ministério do Trabalho e Emprego. [*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\n§\n3º O CGSN poderá determinar, com relação ao MEI, a forma, a\nperiodicidade e o prazo:\n\nI\n- de entrega à Secretaria da Receita Federal do Brasil de uma única\ndeclaração com dados relacionados a fatos geradores, base de\ncálculo e valores dos tributos previstos nos arts. 18-A e 18-C, da\ncontribuição para a Seguridade Social descontada do empregado e do\nF"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s90-0251136b9523",
+          "score": 0.7041813
+        },
+        {
+          "rank": 2,
+          "anchor": "s80-d9759c6c8b84",
+          "score": 0.6860635
+        },
+        {
+          "rank": 3,
+          "anchor": "s85-368950b21d7a",
+          "score": 0.6526383
+        },
+        {
+          "rank": 4,
+          "anchor": "s83-89de5f257afe",
+          "score": 0.5891739
+        },
+        {
+          "rank": 5,
+          "anchor": "s21-d3c6625a01ee",
+          "score": 0.5375743
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 8,
+          "anchor": "s77-a2fd117a767c",
+          "score": 0.48885238,
+          "text": "erá\nisenção dos tributos referidos nos incisos I a VI do *caput*\ndaquele artigo, ressalvado o disposto no art. 18-C.\n\n§\n4º Não poderá optar pela sistemática de recolhimento prevista no\n*caput*\ndeste artigo o MEI:\n\nI\n- cuja atividade seja tributada na forma dos Anexos V ou VI desta Lei\nComplementar, salvo autorização relativa a exercício de atividade\nisolada na forma regulamentada pelo CGSN; [*(Inciso\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014,\npublicada no DOU de 8/8/2014, com produção de efeitos a partir de\n1º de janeiro do primeiro ano subsequente ao da publicação)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\nII\n- que possua mais de um estabelecimento;\n\nIII\n- que participe de outra empresa como titular, sócio ou\nadministrador; ou\n\nIV\n- [*(Revogado\npela Lei Complementar nº 155, de 27/10/2016, produzindo efeitos a\npartir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\nV\n- constituído na forma de *startup*.\n[*(Inciso\nacrescido pela Lei Complementar nº 167, de 24/4/2019)*](https://www2.camara.leg.br/legin/fed/leicom/2019/leicomplementar-167-24-abril-2019-788009-publicacaooriginal-157795-pl.html)\n\n§\n4º-A. Observadas as demais condições deste artigo, poderá optar\npela sistemática de recolhimento prevista no *caput*\no empresário individual que exerça atividade de comercialização e\nprocessamento de produtos de natureza extrativista.\n\n§\n4º-B. O CGSN determinará as atividades autorizadas a optar pela\nsistemática de recolhimento de que trata este artigo, de forma a\nevitar a fragilização das relações de trabalho, bem como sobre a\nincidência do ICMS e do ISS. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n5º A opção de que trata o *caput*\ndeste artigo dar-se-á na forma a ser estabelecida em ato do Comitê\nGestor, observando-se que:\n\nI\n- será irretratável para todo o ano-calendário;\n\nII\n- deverá ser realizada no início do ano-calendário, na forma\ndisciplinada pelo Comitê Gestor, produzindo efeitos a partir do\nprimeiro dia do ano-calendário da opção, ressalvado o disposto no\ninciso III;\n\nIII\n- produzirá efeitos a partir da data do início de atividade desde\nque exercida nos termos, prazo e condições a serem estabelecidos em\nato do Comitê Gestor a que se refere o *caput*\ndeste parágrafo.\n\n§\n6º O desenquadramento da sistemática de que trata o *caput*\ndeste artigo será realizado de ofício ou mediante comunicação do\nMEI.\n\n§\n7º O desenquadramento mediante comunicação do MEI à Secretaria da\nReceita Federal do Brasil - RFB dar-se-á:\n\nI\n- por opção, que deverá ser efetuada no início do ano-calendário,\nna forma disciplinada pelo Comitê Gestor, produzindo efeitos a\npartir de 1o de janeiro do ano-calendário da comunicação; [*(Vide\nLei Complementar nº 227"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    },
+    {
+      "id": "A09",
+      "question": "Pedir desenquadramento do MEI é a mesma coisa que dar baixa no CNPJ?",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "O desenquadramento do MEI é um procedimento específico para remoção da sistemática de recolhimento do Simples Nacional, enquanto a baixa do CNPJ refere-se à cancelamento da inscrição no Registro Nacional da Empresa, sendo processos distintos.",
+            "support_ids": [
+              "legal:2",
+              "legal:1"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "Pedir desenquadramento do MEI é processo para remoção da sistemática do Simples Nacional, enquanto baixa do CNPJ é cancelamento da inscrição no Registro Nacional da Empresa, sendo etapas distintas [1].",
+        "support_ids": [
+          "legal:1",
+          "legal:2"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s21-d3c6625a01ee",
+          "sent_chars": 1514,
+          "indexed_chars": 1514,
+          "sent_text": "ciativa ou oferta de serviços privados relativos aos\natos de que trata o § 3º deste artigo somente poderá ser efetuada\na partir de demanda prévia do próprio MEI, firmado por meio de\ncontrato com assinatura autógrafa, observando-se que:\n\nI\n- para a emissão de boletos de cobrança, os bancos públicos e\nprivados deverão exigir das instituições sindicais e associativas\nautorização prévia específica a ser emitida pelo CGSIM;\n\nII\n- o desrespeito ao disposto neste parágrafo configurará vantagem\nilícita pelo induzimento ao erro em prejuízo do MEI, aplicando-se\nas sanções previstas em lei. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n5º [*(VETADO\nna Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-veto-144701-pl.html)\n\n§\n6º Na ocorrência de fraude no registro do Microempreendedor\nIndividual - MEI feito por terceiros, o pedido de baixa deve ser\nfeito por meio exclusivamente eletrônico, com efeitos retroativos à\ndata de registro, na forma a ser regulamentada pelo CGSIM, não sendo\naplicáveis os efeitos do § 1º do art. 29 desta Lei Complementar.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s79-9bb1cb6cd988",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "ressalvado o disposto no art. 18-C desta\nLei Complementar, de:\n\nI\n- atender o disposto no inciso IV do *caput*\ndo art. 32 da Lei nº 8.212, de 24 de julho de 1991;\n\nII\n- apresentar a Relação Anual de Informações Sociais (Rais); e\n\nIII\n- declarar ausência de fato gerador para a Caixa Econômica Federal\npara emissão da Certidão de Regularidade Fiscal perante o FGTS.\n\n§\n14. O Comitê Gestor disciplinará o disposto neste artigo.\n\n§\n15. A inadimplência do recolhimento do valor previsto na alínea \"a\"\ndo inciso V do § 3º tem como consequência a não contagem da\ncompetência em atraso para fins de carência para obtenção dos\nbenefícios previdenciários respectivos.\n\n§\n15-A. Ficam autorizados os Estados, o Distrito Federal e os\nMunicípios a promover a remissão dos débitos decorrentes dos\nvalores previstos nas alíneas *b*\ne *c*\ndo inciso V do § 3º, inadimplidos isolada ou simultaneamente.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n15-B. O MEI poderá ter sua inscrição automaticamente cancelada\napós período de 12 (doze) meses consecutivos sem recolhimento ou\ndeclarações, independentemente de qualquer notificação, devendo a\ninformação ser publicada no Portal do Empreendedor, na forma\nregulamentada pelo CGSIM. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n16. O CGSN estabelecerá, para o MEI, critérios, procedimentos,\nprazos e efeitos diferenciados para desenquadramento da sistemática\nde que trata este artigo, cobrança, inscrição em dívida ativa e\nexclusão do Simples Nacional.\n\n§\n16-A. A baixa do MEI via portal eletrônico dispensa a comunicação\naos órgãos da administração pública. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n17. A alteração de dados no CNPJ informada pelo empresário à\nSecretaria da Receita Federal do Brasil equivalerá à comunicação\nobrigatória de desenquadramento da sistemática de recolhimento de\nque trata este artigo, nas seguintes hipóteses:\n\nI\n- alteração para natureza jurídica distinta de empresário\nindividual a que se refere o art. 966 da Lei nº 10.406, de 10 de\njaneiro de 2002 (Código Civil);\n\nII\n- inclusão de atividade econômica não autorizada pelo CGSN;\n\nIII\n- abertura de filial.\n\n§\n18. Os Municípios somente poderão realizar o cancelamento da\ninscrição do MEI caso tenham regulamentação própria de\nclassificação de risco e o respectivo processo simplificado de\ninscrição e legalização, em conformidade com esta Lei\nComplementar e com as resoluções do CGSIM. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/l"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s78-a1b65f361226",
+          "sent_chars": 2999,
+          "indexed_chars": 2999,
+          "sent_text": ", de 13/1/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-227-13-janeiro-2026-798657-publicacaooriginal-177770-pl.html)\n\nII\n- obrigatoriamente, quando o MEI incorrer em alguma das situações\nprevistas no § 4º deste artigo, devendo a comunicação ser\nefetuada até o último dia útil do mês subsequente àquele em que\nocorrida a situação de vedação, produzindo efeitos a partir do\nmês subsequente ao da ocorrência da situação impeditiva;\n\nIII\n- obrigatoriamente, quando o MEI exceder, no ano-calendário, o\nlimite de receita bruta previsto no § 1º deste artigo, devendo a\ncomunicação ser efetuada até o último dia útil do mês\nsubsequente àquele em que ocorrido o excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente a 1º de janeiro do ano-calendário da ocorrência do\nexcesso, na hipótese de ter ultrapassado o referido limite em mais\nde 20% (vinte por cento);\n\nIV\n- obrigatoriamente, quando o MEI exceder o limite de receita bruta\nprevisto no § 2º deste artigo, devendo a comunicação ser efetuada\naté o último dia útil do mês subsequente àquele em que ocorrido\no excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente ao início de atividade, na hipótese de ter\nultrapassado o referido limite em mais de 20% (vinte por cento).\n\n§\n8º O desenquadramento de ofício dar-se-á quando verificada a falta\nde comunicação de que trata o § 7º deste artigo.\n\n§\n9º O Empresário Individual desenquadrado da sistemática de\nrecolhimento prevista no *caput*\ndeste artigo passará a recolher os tributos devidos pela regra geral\ndo Simples Nacional a partir da data de início dos efeitos do\ndesenquadramento, ressalvado o disposto no § 10 deste artigo.\n\n§\n10. Nas hipóteses previstas nas alíneas a dos incisos III e IV do §\n7º deste artigo, o MEI deverá recolher a diferença, sem\nacréscimos, em parcela única, juntamente com a da apuração do mês\nde janeiro do ano-calendário subsequente ao do excesso, na forma a\nser estabelecida em ato do Comitê Gestor.\n\n§\n11. O valor referido na alínea a do inciso V do § 3º deste artigo\nserá reajustado, na forma prevista em lei ordinária, na mesma data\nde reajustamento dos benefícios de que trata a Lei nº 8.213, de 24\nde julho de 1991, de forma a manter equivalência com a contribuição\nde que trata o § 2º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991.\n\n§\n12. Aplica-se ao MEI que tenha optado pela contribuição na forma do\n§ 1º deste artigo o disposto no § 4º do art. 55 e no § 2º do\nart. 94, ambos da Lei nº 8.213, de 24 de julho de 1991, exceto se\noptar pela complementação da contribuição previdenciária a que\nse refere o § 3º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991.\n\n§\n13. O MEI está dispensado,"
+        },
+        {
+          "id": "legal:4",
+          "anchor": "s80-d9759c6c8b84",
+          "sent_chars": 88,
+          "indexed_chars": 3000,
+          "sent_text": "eicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s21-d3c6625a01ee",
+          "score": 0.58779895
+        },
+        {
+          "rank": 2,
+          "anchor": "s79-9bb1cb6cd988",
+          "score": 0.58060765
+        },
+        {
+          "rank": 3,
+          "anchor": "s78-a1b65f361226",
+          "score": 0.5753773
+        },
+        {
+          "rank": 4,
+          "anchor": "s80-d9759c6c8b84",
+          "score": 0.55498934
+        },
+        {
+          "rank": 5,
+          "anchor": "s90-0251136b9523",
+          "score": 0.5417414
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 2,
+          "anchor": "s79-9bb1cb6cd988",
+          "score": 0.58060765,
+          "text": "ressalvado o disposto no art. 18-C desta\nLei Complementar, de:\n\nI\n- atender o disposto no inciso IV do *caput*\ndo art. 32 da Lei nº 8.212, de 24 de julho de 1991;\n\nII\n- apresentar a Relação Anual de Informações Sociais (Rais); e\n\nIII\n- declarar ausência de fato gerador para a Caixa Econômica Federal\npara emissão da Certidão de Regularidade Fiscal perante o FGTS.\n\n§\n14. O Comitê Gestor disciplinará o disposto neste artigo.\n\n§\n15. A inadimplência do recolhimento do valor previsto na alínea \"a\"\ndo inciso V do § 3º tem como consequência a não contagem da\ncompetência em atraso para fins de carência para obtenção dos\nbenefícios previdenciários respectivos.\n\n§\n15-A. Ficam autorizados os Estados, o Distrito Federal e os\nMunicípios a promover a remissão dos débitos decorrentes dos\nvalores previstos nas alíneas *b*\ne *c*\ndo inciso V do § 3º, inadimplidos isolada ou simultaneamente.\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n15-B. O MEI poderá ter sua inscrição automaticamente cancelada\napós período de 12 (doze) meses consecutivos sem recolhimento ou\ndeclarações, independentemente de qualquer notificação, devendo a\ninformação ser publicada no Portal do Empreendedor, na forma\nregulamentada pelo CGSIM. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n16. O CGSN estabelecerá, para o MEI, critérios, procedimentos,\nprazos e efeitos diferenciados para desenquadramento da sistemática\nde que trata este artigo, cobrança, inscrição em dívida ativa e\nexclusão do Simples Nacional.\n\n§\n16-A. A baixa do MEI via portal eletrônico dispensa a comunicação\naos órgãos da administração pública. [*(Parágrafo\nacrescido pela Lei Complementar nº 155, de 27/10/2016, produzindo\nefeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)\n\n§\n17. A alteração de dados no CNPJ informada pelo empresário à\nSecretaria da Receita Federal do Brasil equivalerá à comunicação\nobrigatória de desenquadramento da sistemática de recolhimento de\nque trata este artigo, nas seguintes hipóteses:\n\nI\n- alteração para natureza jurídica distinta de empresário\nindividual a que se refere o art. 966 da Lei nº 10.406, de 10 de\njaneiro de 2002 (Código Civil);\n\nII\n- inclusão de atividade econômica não autorizada pelo CGSN;\n\nIII\n- abertura de filial.\n\n§\n18. Os Municípios somente poderão realizar o cancelamento da\ninscrição do MEI caso tenham regulamentação própria de\nclassificação de risco e o respectivo processo simplificado de\ninscrição e legalização, em conformidade com esta Lei\nComplementar e com as resoluções do CGSIM. [*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/l"
+        },
+        {
+          "rank": 3,
+          "anchor": "s78-a1b65f361226",
+          "score": 0.5753773,
+          "text": ", de 13/1/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-227-13-janeiro-2026-798657-publicacaooriginal-177770-pl.html)\n\nII\n- obrigatoriamente, quando o MEI incorrer em alguma das situações\nprevistas no § 4º deste artigo, devendo a comunicação ser\nefetuada até o último dia útil do mês subsequente àquele em que\nocorrida a situação de vedação, produzindo efeitos a partir do\nmês subsequente ao da ocorrência da situação impeditiva;\n\nIII\n- obrigatoriamente, quando o MEI exceder, no ano-calendário, o\nlimite de receita bruta previsto no § 1º deste artigo, devendo a\ncomunicação ser efetuada até o último dia útil do mês\nsubsequente àquele em que ocorrido o excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente a 1º de janeiro do ano-calendário da ocorrência do\nexcesso, na hipótese de ter ultrapassado o referido limite em mais\nde 20% (vinte por cento);\n\nIV\n- obrigatoriamente, quando o MEI exceder o limite de receita bruta\nprevisto no § 2º deste artigo, devendo a comunicação ser efetuada\naté o último dia útil do mês subsequente àquele em que ocorrido\no excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente ao início de atividade, na hipótese de ter\nultrapassado o referido limite em mais de 20% (vinte por cento).\n\n§\n8º O desenquadramento de ofício dar-se-á quando verificada a falta\nde comunicação de que trata o § 7º deste artigo.\n\n§\n9º O Empresário Individual desenquadrado da sistemática de\nrecolhimento prevista no *caput*\ndeste artigo passará a recolher os tributos devidos pela regra geral\ndo Simples Nacional a partir da data de início dos efeitos do\ndesenquadramento, ressalvado o disposto no § 10 deste artigo.\n\n§\n10. Nas hipóteses previstas nas alíneas a dos incisos III e IV do §\n7º deste artigo, o MEI deverá recolher a diferença, sem\nacréscimos, em parcela única, juntamente com a da apuração do mês\nde janeiro do ano-calendário subsequente ao do excesso, na forma a\nser estabelecida em ato do Comitê Gestor.\n\n§\n11. O valor referido na alínea a do inciso V do § 3º deste artigo\nserá reajustado, na forma prevista em lei ordinária, na mesma data\nde reajustamento dos benefícios de que trata a Lei nº 8.213, de 24\nde julho de 1991, de forma a manter equivalência com a contribuição\nde que trata o § 2º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991.\n\n§\n12. Aplica-se ao MEI que tenha optado pela contribuição na forma do\n§ 1º deste artigo o disposto no § 4º do art. 55 e no § 2º do\nart. 94, ambos da Lei nº 8.213, de 24 de julho de 1991, exceto se\noptar pela complementação da contribuição previdenciária a que\nse refere o § 3º do art. 21 da Lei nº 8.212, de 24 de julho de\n1991.\n\n§\n13. O MEI está dispensado,"
+        },
+        {
+          "rank": 13,
+          "anchor": "s32-0257f59e4306",
+          "score": 0.48348364,
+          "text": "Art.\n9º O registro dos atos constitutivos, de suas alterações e\nextinções (baixas), referentes a empresários e pessoas jurídicas\nem qualquer órgão dos 3 (três) âmbitos de governo ocorrerá\nindependentemente da regularidade de obrigações tributárias,\nprevidenciárias ou trabalhistas, principais ou acessórias, do\nempresário, da sociedade, dos sócios, dos administradores ou de\nempresas de que participem, sem prejuízo das responsabilidades do\nempresário, dos titulares, dos sócios ou dos administradores por\ntais obrigações, apuradas antes ou após o ato de extinção.\n[*(“Caput”\ndo artigo com redação dada pela Lei Complementar nº 147, de\n7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n1º O arquivamento, nos órgãos de registro, dos atos constitutivos\nde empresários, de sociedades empresárias e de demais equiparados\nque se enquadrarem como microempresa ou empresa de pequeno porte bem\ncomo o arquivamento de suas alterações são dispensados das\nseguintes exigências:\n\nI\n- certidão de inexistência de condenação criminal, que será\nsubstituída por declaração do titular ou administrador, firmada\nsob as penas da lei, de não estar impedido de exercer atividade\nmercantil ou a administração de sociedade, em virtude de condenação\ncriminal;\n\nII\n- prova de quitação, regularidade ou inexistência de débito\nreferente a tributo ou contribuição de qualquer natureza.\n\n§\n2º Não se aplica às microempresas e às empresas de pequeno porte\no disposto no § 2º do art. 1º da Lei nº 8.906, de 4 de julho de\n1994.\n\n§\n3º [*(Revogado\npela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º A baixa do empresário ou da pessoa jurídica não impede que,\nposteriormente, sejam lançados ou cobrados tributos, contribuições\ne respectivas penalidades, decorrentes da falta do cumprimento de\nobrigações ou da prática comprovada e apurada em processo\nadministrativo ou judicial de outras irregularidades praticadas pelos\nempresários, pelas pessoas jurídicas ou por seus titulares, sócios\nou administradores. [*(Parágrafo\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n5º A solicitação de baixa do empresário ou da pessoa jurídica\nimporta responsabilidade solidária dos empresários, dos titulares,\ndos sócios e dos administradores no período da ocorrência dos\nrespectivos fatos geradores. [*(Parágrafo\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n6º Os órgãos referidos no *caput*\ndeste artigo terão o prazo de 60 (sessenta) dias para efetivar a\nbaixa nos respectivos cadastros.\n\n§\n7º Ultrapassado o prazo previsto no § 6º deste artigo"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    },
+    {
+      "id": "A12",
+      "question": "Abrir um CNPJ torna minha empresa automaticamente optante pelo Simples Nacional?",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "Abrir um CNPJ não torna automaticamente a empresa optante pelo Simples Nacional.",
+            "support_ids": [
+              "legal:3",
+              "legal:5"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "Abrir um CNPJ não torna automaticamente a empresa optante pelo Simples Nacional [1].",
+        "support_ids": [
+          "legal:3",
+          "legal:5"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s315-8264ef1cd1f2",
+          "sent_chars": 699,
+          "indexed_chars": 699,
+          "sent_text": "Art.\n79-E. A empresa de pequeno porte optante pelo Simples Nacional em 31\nde dezembro de 2017 que durante o ano-calendário de 2017 auferir\nreceita bruta total anual entre R$ 3.600.000,01 (três milhões,\nseiscentos mil reais e um centavo) e R$ 4.800.000,00 (quatro milhões\ne oitocentos mil reais) continuará automaticamente incluída no\nSimples Nacional com efeitos a partir de 1o de janeiro de 2018,\nressalvado o direito de exclusão por comunicação da optante.\n[*(Artigo\ncom redação dada pela Lei Complementar nº 155, de 27/10/2016,\nproduzindo efeitos a partir de 1/1/2018)*](http://www2.camara.leg.br/legin/fed/leicom/2016/leicomplementar-155-27-outubro-2016-783850-publicacaooriginal-151329-pl.html)"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s134-75e782175696",
+          "sent_chars": 2464,
+          "indexed_chars": 2464,
+          "sent_text": "Art.\n30. A exclusão do Simples Nacional, mediante comunicação das\nmicroempresas ou das empresas de pequeno porte, dar-se-á:\n\nI\n- por opção;\n\nII\n- obrigatoriamente, quando elas incorrerem em qualquer das situações\nde vedação previstas nesta Lei Complementar; ou\n\nIII\n- obrigatoriamente, quando ultrapassado, no ano-calendário de início\nde atividade, o limite proporcional de receita bruta de que trata o §\n2º do art. 3º;\n\nIV\n- obrigatoriamente, quando ultrapassado, no ano-calendário, o limite\nde receita bruta previsto no inciso II do *caput*\ndo art. 3º, quando não estiver no ano-calendário de início de\natividade.\n\n§\n1º A exclusão deverá ser comunicada à Secretaria da Receita\nFederal:\n\nI\n- na hipótese do inciso I do *caput*\ndeste artigo, até o último dia útil do mês de janeiro;\n\nII\n- na hipótese do inciso II do *caput*\ndeste artigo, até o último dia útil do mês subsequente àquele em\nque ocorrida a situação de vedação;\n\nIII\n- na hipótese do inciso III do *caput*:\n\na)\naté o último dia útil do mês seguinte àquele em que tiver\nultrapassado em mais de 20% (vinte por cento) o limite proporcional\nde que trata o § 10 do art. 3º; ou\n\nb)\naté o último dia útil do mês de janeiro do ano-calendário\nsubsequente ao de início de atividades, caso o excesso seja inferior\na 20% (vinte por cento) do respectivo limite;\n\nIV\n- na hipótese do inciso IV do *caput*:\n\na)\naté o último dia útil do mês subsequente à ultrapassagem em mais\nde 20% (vinte por cento) do limite de receita bruta previsto no\ninciso II do *caput*\ndo art. 3º; ou\n\nb)\naté o último dia útil do mês de janeiro do ano-calendário\nsubsequente, na hipótese de não ter ultrapassado em mais de 20%\n(vinte por cento) o limite de receita bruta previsto no inciso II do\n*caput*\ndo art. 3º.\n\n§\n2º A comunicação de que trata o *caput*\ndeste artigo dar-se-á na forma a ser estabelecida pelo Comitê\nGestor.\n\n§\n3º A alteração de dados no CNPJ, informada pela ME ou EPP à\nSecretaria da Receita Federal do Brasil, equivalerá à comunicação\nobrigatória de exclusão do Simples Nacional nas seguintes\nhipóteses:\n\nI\n- alteração de natureza jurídica para Sociedade Anônima,\nSociedade Empresária em Comandita por Ações, Sociedade em Conta de\nParticipação ou Estabelecimento, no Brasil, de Sociedade\nEstrangeira;\n\nII\n- inclusão de atividade econômica vedada à opção pelo Simples\nNacional;\n\nIII\n- inclusão de sócio pessoa jurídica;\n\nIV\n- inclusão de sócio domiciliado no exterior;\n\nV\n- cisão parcial; ou\n\nVI\n- extinção da empresa."
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s53-561759725db8",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n16. A opção pelo Simples Nacional da pessoa jurídica enquadrada na\ncondição de microempresa e empresa de pequeno porte dar-se-á na\nforma a ser estabelecida em ato do Comitê Gestor, sendo irretratável\npara todo o ano-calendário.\n\n§\n1º Para efeito de enquadramento no Simples Nacional, considerar-se-á\nmicroempresa ou empresa de pequeno porte aquela cuja receita bruta no\nano-calendário anterior ao da opção esteja compreendida dentro dos\nlimites previstos no art. 3º desta Lei Complementar.\n\n§\n1º-A. A opção pelo Simples Nacional implica aceitação de sistema\nde comunicação eletrônica, destinado, dentre outras finalidades,\na:\n\nI\n- cientificar o sujeito passivo de quaisquer tipos de atos\nadministrativos, incluídos os relativos ao indeferimento de opção,\nà exclusão do regime e a ações fiscais;\n\nII\n- encaminhar notificações e intimações; e\n\nIII\n- expedir avisos em geral.\n\n§\n1º-B. O sistema de comunicação eletrônica de que trata o § 1º-A\nserá regulamentado pelo CGSN, observando-se o seguinte:\n\nI\n- as comunicações serão feitas, por meio eletrônico, em portal\npróprio, dispensando-se a sua publicação no Diário Oficial e o\nenvio por via postal;\n\nII\n- a comunicação feita na forma prevista no *caput*\nserá considerada pessoal para todos os efeitos legais;\n\nIII\n- a ciência por meio do sistema de que trata o § 1º-A com\nutilização de certificação digital ou de código de acesso\npossuirá os requisitos de validade;\n\nIV\n- considerar-se-á realizada a comunicação no dia em que o sujeito\npassivo efetivar a consulta eletrônica ao teor da comunicação; e\n\nV\n- na hipótese do inciso IV, nos casos em que a consulta se dê em\ndia não útil, a comunicação será considerada como realizada no\nprimeiro dia útil seguinte.\n\n§\n1º-C. A consulta referida nos incisos IV e V do § 1º-B deverá ser\nfeita em até 45 (quarenta e cinco) dias contados da data da\ndisponibilização da comunicação no portal a que se refere o\ninciso I do § 1º-B, ou em prazo superior estipulado pelo CGSN, sob\npena de ser considerada automaticamente realizada na data do término\ndesse prazo.\n\n§\n1º-D. Enquanto não editada a regulamentação de que trata o §\n1º-B, os entes federativos poderão utilizar sistemas de comunicação\neletrônica, com regras próprias, para as finalidades previstas no §\n1º-A, podendo a referida regulamentação prever a adoção desses\nsistemas como meios complementares de comunicação.\n\n§\n2º A opção de que trata o *caput*\ndeste artigo deverá ser realizada no mês de janeiro, até o seu\núltimo dia útil, produzindo efeitos a partir do primeiro dia do\nano-calendário da opção, ressalvado o disposto no § 3º deste\nartigo. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n3º A opção produzirá efeitos a partir da data do início de\natividade, desde que exercida nos termos, prazo e condições a serem\nestabelecidos no ato do Comitê Gestor a que se refere o *caput*\ndeste artigo.\n\n§\n4º Serão consid"
+        },
+        {
+          "id": "legal:4",
+          "anchor": "s127-24c5212e4eca",
+          "sent_chars": 293,
+          "indexed_chars": 293,
+          "sent_text": "Art.\n27. As microempresas e empresas de pequeno porte optantes pelo\nSimples Nacional poderão, opcionalmente, adotar contabilidade\nsimplificada para os registros e controles das operações\nrealizadas, conforme regulamentação do Comitê Gestor.\n\n**Seção\nVIII**\n\n**Da\nExclusão do Simples Nacional**"
+        },
+        {
+          "id": "legal:5",
+          "anchor": "s54-38b4110af31c",
+          "sent_chars": 551,
+          "indexed_chars": 604,
+          "sent_text": "eradas inscritas no Simples Nacional, em 1º de\njulho de 2007, as microempresas e empresas de pequeno porte\nregularmente optantes pelo regime tributário de que trata a Lei nº\n9.317, de 5 de dezembro de 1996, salvo as que estiverem impedidas de\noptar por alguma vedação imposta por esta Lei Complementar.\n\n§\n5º O Comitê Gestor regulamentará a opção automática prevista no\n§ 4º deste artigo.\n\n§\n6º O indeferimento da opção pelo Simples Nacional será\nformalizado mediante ato da Administração Tributária segundo\nregulamentação do Comitê Gestor.\n\n**Seção\nI"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s315-8264ef1cd1f2",
+          "score": 0.6996773
+        },
+        {
+          "rank": 2,
+          "anchor": "s134-75e782175696",
+          "score": 0.6599923
+        },
+        {
+          "rank": 3,
+          "anchor": "s53-561759725db8",
+          "score": 0.652454
+        },
+        {
+          "rank": 4,
+          "anchor": "s127-24c5212e4eca",
+          "score": 0.6434171
+        },
+        {
+          "rank": 5,
+          "anchor": "s54-38b4110af31c",
+          "score": 0.63692445
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 3,
+          "anchor": "s53-561759725db8",
+          "score": 0.652454,
+          "text": "Art.\n16. A opção pelo Simples Nacional da pessoa jurídica enquadrada na\ncondição de microempresa e empresa de pequeno porte dar-se-á na\nforma a ser estabelecida em ato do Comitê Gestor, sendo irretratável\npara todo o ano-calendário.\n\n§\n1º Para efeito de enquadramento no Simples Nacional, considerar-se-á\nmicroempresa ou empresa de pequeno porte aquela cuja receita bruta no\nano-calendário anterior ao da opção esteja compreendida dentro dos\nlimites previstos no art. 3º desta Lei Complementar.\n\n§\n1º-A. A opção pelo Simples Nacional implica aceitação de sistema\nde comunicação eletrônica, destinado, dentre outras finalidades,\na:\n\nI\n- cientificar o sujeito passivo de quaisquer tipos de atos\nadministrativos, incluídos os relativos ao indeferimento de opção,\nà exclusão do regime e a ações fiscais;\n\nII\n- encaminhar notificações e intimações; e\n\nIII\n- expedir avisos em geral.\n\n§\n1º-B. O sistema de comunicação eletrônica de que trata o § 1º-A\nserá regulamentado pelo CGSN, observando-se o seguinte:\n\nI\n- as comunicações serão feitas, por meio eletrônico, em portal\npróprio, dispensando-se a sua publicação no Diário Oficial e o\nenvio por via postal;\n\nII\n- a comunicação feita na forma prevista no *caput*\nserá considerada pessoal para todos os efeitos legais;\n\nIII\n- a ciência por meio do sistema de que trata o § 1º-A com\nutilização de certificação digital ou de código de acesso\npossuirá os requisitos de validade;\n\nIV\n- considerar-se-á realizada a comunicação no dia em que o sujeito\npassivo efetivar a consulta eletrônica ao teor da comunicação; e\n\nV\n- na hipótese do inciso IV, nos casos em que a consulta se dê em\ndia não útil, a comunicação será considerada como realizada no\nprimeiro dia útil seguinte.\n\n§\n1º-C. A consulta referida nos incisos IV e V do § 1º-B deverá ser\nfeita em até 45 (quarenta e cinco) dias contados da data da\ndisponibilização da comunicação no portal a que se refere o\ninciso I do § 1º-B, ou em prazo superior estipulado pelo CGSN, sob\npena de ser considerada automaticamente realizada na data do término\ndesse prazo.\n\n§\n1º-D. Enquanto não editada a regulamentação de que trata o §\n1º-B, os entes federativos poderão utilizar sistemas de comunicação\neletrônica, com regras próprias, para as finalidades previstas no §\n1º-A, podendo a referida regulamentação prever a adoção desses\nsistemas como meios complementares de comunicação.\n\n§\n2º A opção de que trata o *caput*\ndeste artigo deverá ser realizada no mês de janeiro, até o seu\núltimo dia útil, produzindo efeitos a partir do primeiro dia do\nano-calendário da opção, ressalvado o disposto no § 3º deste\nartigo. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n3º A opção produzirá efeitos a partir da data do início de\natividade, desde que exercida nos termos, prazo e condições a serem\nestabelecidos no ato do Comitê Gestor a que se refere o *caput*\ndeste artigo.\n\n§\n4º Serão consid"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    },
+    {
+      "id": "A13",
+      "question": "Ser microempresa significa obrigatoriamente estar no Simples Nacional?",
+      "legal_result": {
+        "status": "answered",
+        "claims": [
+          {
+            "text": "Ser microempresa não implica obrigatoriamente estar no Simples Nacional, pois a opção pelo regime é facultativa.",
+            "support_ids": [
+              "legal:1",
+              "legal:4"
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "synthesis_result": {
+        "answer": "Ser microempresa não implica obrigatoriamente estar no Simples Nacional, pois a opção pelo regime é facultativa [1].",
+        "support_ids": [
+          "legal:1",
+          "legal:4"
+        ]
+      },
+      "sent_sources": [
+        {
+          "id": "legal:1",
+          "anchor": "s127-24c5212e4eca",
+          "sent_chars": 293,
+          "indexed_chars": 293,
+          "sent_text": "Art.\n27. As microempresas e empresas de pequeno porte optantes pelo\nSimples Nacional poderão, opcionalmente, adotar contabilidade\nsimplificada para os registros e controles das operações\nrealizadas, conforme regulamentação do Comitê Gestor.\n\n**Seção\nVIII**\n\n**Da\nExclusão do Simples Nacional**"
+        },
+        {
+          "id": "legal:2",
+          "anchor": "s122-1e7ce672e822",
+          "sent_chars": 2999,
+          "indexed_chars": 2999,
+          "sent_text": "Art.\n26. As microempresas e empresas de pequeno porte optantes pelo\nSimples Nacional ficam obrigadas a:\n\nI\n- emitir documento fiscal de venda ou prestação de serviço, de\nacordo com instruções expedidas pelo Comitê Gestor;\n\nII\n- manter em boa ordem e guarda os documentos que fundamentaram a\napuração dos impostos e contribuições devidos e o cumprimento das\nobrigações acessórias a que se referem os arts. 25 e 25-B desta\nLei Complementar enquanto não decorrido o prazo decadencial e não\nprescritas eventuais ações que lhes sejam pertinentes. [*(Inciso\ncom redação dada pela Lei Complementar nº 214, de 16/1/2025,\nproduzindo efeitos a partir de 1º/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n1º O MEI fará a comprovação da receita bruta mediante\napresentação do registro de vendas ou de prestação de serviços\nna forma estabelecida pelo CGSN, ficando dispensado da emissão do\ndocumento fiscal previsto no inciso I do *caput*,\nressalvadas as hipóteses de emissão obrigatória previstas pelo\nreferido Comitê. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\nI\n- (REVOGADO)\n\nII\n- (REVOGADO)\n\nIII\n- (REVOGADO)\n\n§\n2º As demais microempresas e as empresas de pequeno porte, além do\ndisposto nos incisos I e II do *caput*\ndeste artigo, deverão, ainda, manter o livro-caixa em que será\nescriturada sua movimentação financeira e bancária.\n\n§\n3º A exigência das declarações a que se referem os arts. 25 e\n25-B não desobriga a prestação de informações relativas a\nterceiros. [*(Parágrafo\ncom redação dada pela Lei Complementar nº 214, de 16/1/2025,\nproduzindo efeitos a partir de 1º/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n4º É vedada a exigência de obrigações tributárias acessórias\nrelativas aos tributos apurados na forma do Simples Nacional além\ndaquelas estipuladas pelo CGSN e atendidas por meio do Portal do\nSimples Nacional, bem como, o estabelecimento de exigências\nadicionais e unilaterais pelos entes federativos, exceto os programas\nde cidadania fiscal. [*(Parágrafo\ncom redação dada pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\n§\n4º-A. A escrituração fiscal digital ou obrigação equivalente não\npoderá ser exigida da microempresa ou empresa de pequeno porte\noptante pelo Simples Nacional, salvo se, cumulativamente, houver:\n[*(Parágrafo\nacrescido pela Lei Complementar nº 147, de 7/8/2014)*](http://www2.camara.leg.br/legin/fed/leicom/2014/leicomplementar-147-7-agosto-2014-779146-publicacaooriginal-144700-pl.html)\n\nI\n- autorização específica do CGSN, que estabelecerá as condições\npara a obrigatoriedade; [*(Inciso\nacrescido pela Lei Complementar nº"
+        },
+        {
+          "id": "legal:3",
+          "anchor": "s136-88ec1065ecd2",
+          "sent_chars": 3000,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n31. A exclusão das microempresas ou das empresas de pequeno porte do\nSimples Nacional produzirá efeitos:\n\nI\n- na hipótese do inciso I do *caput*\ndo art. 30 desta Lei Complementar, a partir de 1º de janeiro do\nano-calendário subsequente, ressalvado o disposto no § 4º deste\nartigo;\n\nII\n- na hipótese do inciso II do *caput*\ndo art. 30 desta Lei Complementar, a partir do mês seguinte da\nocorrência da situação impeditiva;\n\nIII\n- na hipótese do inciso III do *caput*\ndo art. 30 desta Lei Complementar:\n\na)\ndesde o início das atividades;\n\nb)\na partir de 1º de janeiro do ano-calendário subsequente, na\nhipótese de não ter ultrapassado em mais de 20% (vinte por cento) o\nlimite proporcional de que trata o § 10 do art. 3º;\n\nIV\n- na hipótese do inciso V do *caput*\ndo art. 17 desta Lei Complementar, a partir do ano-calendário\nsubsequente ao da ciência da comunicação da exclusão;\n\nV\n- na hipótese do inciso IV do *caput*\ndo art. 30:\n\na)\na partir do mês subsequente à ultrapassagem em mais de 20% (vinte\npor cento) do limite de receita bruta previsto no inciso II do art.\n3º;\n\nb)\na partir de 1º de janeiro do ano-calendário subsequente, na\nhipótese de não ter ultrapassado em mais de 20% (vinte por cento) o\nlimite de receita bruta previsto no inciso II do art. 3º.\n\n§\n1º Na hipótese prevista no inciso III do *caput*\ndo art. 30 desta Lei Complementar, a microempresa ou empresa de\npequeno porte não poderá optar, no ano-calendário subsequente ao\ndo início de atividades, pelo Simples Nacional.\n\n§\n2º Na hipótese dos incisos V e XVI do *caput*\ndo art. 17 desta Lei Complementar, será permitida a permanência da\npessoa jurídica como optante pelo Simples Nacional mediante a\ncomprovação da regularização do débito ou do cadastro fiscal no\nprazo de até 90 (noventa) dias contados a partir da ciência da\ncomunicação da exclusão. [*(Parágrafo\ncom redação dada pela Lei Complementar nº 216, de 28/7/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-216-28-julho-2025-797784-publicacaooriginal-176007-pl.html)\n\n§\n3º O CGSN regulamentará os procedimentos relativos ao impedimento\nde recolher o ICMS e o ISS na forma do Simples Nacional, em face da\nultrapassagem dos limites estabelecidos na forma dos incisos I ou II\ndo art. 19 e do art. 20. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n4º No caso de a microempresa ou a empresa de pequeno porte ser\nexcluída do Simples Nacional no mês de janeiro, na hipótese do\ninciso I do *caput*\ndo art. 30 desta Lei Complementar, os efeitos da exclusão dar-se-ão\nnesse mesmo ano. [*(Vide\nLei Complementar nº 227, de 13/1/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-227-13-janeiro-2026-798657-publicacaooriginal-177770-pl.html)\n\n§\n5º Na hipótese do inciso II do *caput*\ndeste artigo, uma vez que o motivo da exclusão deixe de existir,\nhavendo a exclusão retroativa de ofício no caso do"
+        },
+        {
+          "id": "legal:4",
+          "anchor": "s53-561759725db8",
+          "sent_chars": 1315,
+          "indexed_chars": 3000,
+          "sent_text": "Art.\n16. A opção pelo Simples Nacional da pessoa jurídica enquadrada na\ncondição de microempresa e empresa de pequeno porte dar-se-á na\nforma a ser estabelecida em ato do Comitê Gestor, sendo irretratável\npara todo o ano-calendário.\n\n§\n1º Para efeito de enquadramento no Simples Nacional, considerar-se-á\nmicroempresa ou empresa de pequeno porte aquela cuja receita bruta no\nano-calendário anterior ao da opção esteja compreendida dentro dos\nlimites previstos no art. 3º desta Lei Complementar.\n\n§\n1º-A. A opção pelo Simples Nacional implica aceitação de sistema\nde comunicação eletrônica, destinado, dentre outras finalidades,\na:\n\nI\n- cientificar o sujeito passivo de quaisquer tipos de atos\nadministrativos, incluídos os relativos ao indeferimento de opção,\nà exclusão do regime e a ações fiscais;\n\nII\n- encaminhar notificações e intimações; e\n\nIII\n- expedir avisos em geral.\n\n§\n1º-B. O sistema de comunicação eletrônica de que trata o § 1º-A\nserá regulamentado pelo CGSN, observando-se o seguinte:\n\nI\n- as comunicações serão feitas, por meio eletrônico, em portal\npróprio, dispensando-se a sua publicação no Diário Oficial e o\nenvio por via postal;\n\nII\n- a comunicação feita na forma prevista no *caput*\nserá considerada pessoal para todos os efeitos legais;\n\nIII\n- a ciência por meio do sistema de que trata o §"
+        }
+      ],
+      "replayed_top_5": [
+        {
+          "rank": 1,
+          "anchor": "s127-24c5212e4eca",
+          "score": 0.75851804
+        },
+        {
+          "rank": 2,
+          "anchor": "s122-1e7ce672e822",
+          "score": 0.73674387
+        },
+        {
+          "rank": 3,
+          "anchor": "s136-88ec1065ecd2",
+          "score": 0.72952914
+        },
+        {
+          "rank": 4,
+          "anchor": "s53-561759725db8",
+          "score": 0.72031534
+        },
+        {
+          "rank": 5,
+          "anchor": "s54-38b4110af31c",
+          "score": 0.71985424
+        }
+      ],
+      "relevant_anchors": [
+        {
+          "rank": 4,
+          "anchor": "s53-561759725db8",
+          "score": 0.72031534,
+          "text": "Art.\n16. A opção pelo Simples Nacional da pessoa jurídica enquadrada na\ncondição de microempresa e empresa de pequeno porte dar-se-á na\nforma a ser estabelecida em ato do Comitê Gestor, sendo irretratável\npara todo o ano-calendário.\n\n§\n1º Para efeito de enquadramento no Simples Nacional, considerar-se-á\nmicroempresa ou empresa de pequeno porte aquela cuja receita bruta no\nano-calendário anterior ao da opção esteja compreendida dentro dos\nlimites previstos no art. 3º desta Lei Complementar.\n\n§\n1º-A. A opção pelo Simples Nacional implica aceitação de sistema\nde comunicação eletrônica, destinado, dentre outras finalidades,\na:\n\nI\n- cientificar o sujeito passivo de quaisquer tipos de atos\nadministrativos, incluídos os relativos ao indeferimento de opção,\nà exclusão do regime e a ações fiscais;\n\nII\n- encaminhar notificações e intimações; e\n\nIII\n- expedir avisos em geral.\n\n§\n1º-B. O sistema de comunicação eletrônica de que trata o § 1º-A\nserá regulamentado pelo CGSN, observando-se o seguinte:\n\nI\n- as comunicações serão feitas, por meio eletrônico, em portal\npróprio, dispensando-se a sua publicação no Diário Oficial e o\nenvio por via postal;\n\nII\n- a comunicação feita na forma prevista no *caput*\nserá considerada pessoal para todos os efeitos legais;\n\nIII\n- a ciência por meio do sistema de que trata o § 1º-A com\nutilização de certificação digital ou de código de acesso\npossuirá os requisitos de validade;\n\nIV\n- considerar-se-á realizada a comunicação no dia em que o sujeito\npassivo efetivar a consulta eletrônica ao teor da comunicação; e\n\nV\n- na hipótese do inciso IV, nos casos em que a consulta se dê em\ndia não útil, a comunicação será considerada como realizada no\nprimeiro dia útil seguinte.\n\n§\n1º-C. A consulta referida nos incisos IV e V do § 1º-B deverá ser\nfeita em até 45 (quarenta e cinco) dias contados da data da\ndisponibilização da comunicação no portal a que se refere o\ninciso I do § 1º-B, ou em prazo superior estipulado pelo CGSN, sob\npena de ser considerada automaticamente realizada na data do término\ndesse prazo.\n\n§\n1º-D. Enquanto não editada a regulamentação de que trata o §\n1º-B, os entes federativos poderão utilizar sistemas de comunicação\neletrônica, com regras próprias, para as finalidades previstas no §\n1º-A, podendo a referida regulamentação prever a adoção desses\nsistemas como meios complementares de comunicação.\n\n§\n2º A opção de que trata o *caput*\ndeste artigo deverá ser realizada no mês de janeiro, até o seu\núltimo dia útil, produzindo efeitos a partir do primeiro dia do\nano-calendário da opção, ressalvado o disposto no § 3º deste\nartigo. [*(Vide\nLei Complementar nº 214, de 16/1/2025)*](https://www2.camara.leg.br/legin/fed/leicom/2025/leicomplementar-214-16-janeiro-2025-796905-publicacaooriginal-174141-pl.html)\n\n§\n3º A opção produzirá efeitos a partir da data do início de\natividade, desde que exercida nos termos, prazo e condições a serem\nestabelecidos no ato do Comitê Gestor a que se refere o *caput*\ndeste artigo.\n\n§\n4º Serão consid"
+        }
+      ],
+      "replayed_validation_error": "Citações inline inconsistentes"
+    }
+  ]
+}

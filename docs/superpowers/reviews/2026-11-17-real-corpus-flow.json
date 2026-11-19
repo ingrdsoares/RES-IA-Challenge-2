@@ -1,0 +1,630 @@
+[
+  {
+    "question": "Segundo a LC 123/2006, como funciona o recolhimento em valores fixos mensais do MEI? Cite a fonte recuperada.",
+    "operation": {
+      "run": {
+        "run_id": "841ef628-c770-45bc-95ef-c016d9b532e7",
+        "trace_id": "6b81d7ad-9ec1-42ae-959d-67e28bd743df",
+        "status": "succeeded",
+        "revision": 0,
+        "calls": 3,
+        "stages": [
+          {
+            "name": "plan",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 975,
+              "output_tokens": 103,
+              "latency_ms": 14654,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "legal",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 1497,
+              "output_tokens": 84,
+              "latency_ms": 13068,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "synthesis",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 541,
+              "output_tokens": 58,
+              "latency_ms": 5919,
+              "monetary_cost": null
+            },
+            "error": null
+          }
+        ]
+      },
+      "operation_id": "9b90ceda-ab42-4d8d-9136-e27a4f72f1d0",
+      "status": "succeeded",
+      "result": {
+        "message_id": "5fca7f77-3dac-437f-a899-a33192ce5961",
+        "state": "answered",
+        "run_id": "841ef628-c770-45bc-95ef-c016d9b532e7"
+      },
+      "error": null
+    },
+    "messages": {
+      "items": [
+        {
+          "id": "13cf9b3f-8afb-4d45-92b2-088ecbfcce6f",
+          "conversation_id": "4d7d6bb0-c620-424c-9706-d0094f3c2274",
+          "operation_id": "9b90ceda-ab42-4d8d-9136-e27a4f72f1d0",
+          "role": "user",
+          "text": "Segundo a LC 123/2006, como funciona o recolhimento em valores fixos mensais do MEI? Cite a fonte recuperada.",
+          "context": {
+            "company": {
+              "cnpj": "11222333000181",
+              "cnae": "6201501",
+              "size": "ME",
+              "regime": "simples",
+              "municipality": "Brasília",
+              "state": "DF",
+              "id": "9418b8b4-09b4-4ddf-afbd-1c0b66d02db4",
+              "provenance": {
+                "cnpj": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448237+00:00"
+                },
+                "cnae": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448244+00:00"
+                },
+                "size": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448245+00:00"
+                },
+                "regime": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448246+00:00"
+                },
+                "municipality": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448247+00:00"
+                },
+                "state": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448248+00:00"
+                }
+              },
+              "created_at": "2026-11-17T13:51:32.448617Z"
+            },
+            "missing_fields": []
+          },
+          "citations": [],
+          "actions": [],
+          "next_steps": [],
+          "status": "answered",
+          "created_at": "2026-11-17T13:51:32.465688Z"
+        },
+        {
+          "id": "5fca7f77-3dac-437f-a899-a33192ce5961",
+          "conversation_id": "4d7d6bb0-c620-424c-9706-d0094f3c2274",
+          "operation_id": "9b90ceda-ab42-4d8d-9136-e27a4f72f1d0",
+          "role": "assistant",
+          "text": "O MEI poderá optar pelo recolhimento dos impostos e contribuições em valores fixos mensais, independentemente da receita bruta, na forma prevista no artigo mencionado [1].",
+          "context": {
+            "company": {
+              "cnpj": "11222333000181",
+              "cnae": "6201501",
+              "size": "ME",
+              "regime": "simples",
+              "municipality": "Brasília",
+              "state": "DF",
+              "id": "9418b8b4-09b4-4ddf-afbd-1c0b66d02db4",
+              "provenance": {
+                "cnpj": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448237+00:00"
+                },
+                "cnae": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448244+00:00"
+                },
+                "size": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448245+00:00"
+                },
+                "regime": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448246+00:00"
+                },
+                "municipality": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448247+00:00"
+                },
+                "state": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448248+00:00"
+                }
+              },
+              "created_at": "2026-11-17T13:51:32.448617Z"
+            },
+            "missing_fields": []
+          },
+          "citations": [
+            {
+              "validity_check": "ignored_for_test",
+              "retrieval_strategy": "dense",
+              "document_id": "1d4656b7-6b94-41bb-bbb7-124f95cd3d66",
+              "version_id": "16bdfe39-1559-429f-bc4c-ec8770642bfb",
+              "anchor_id": "s75-2557864f6bd9",
+              "text": "Art.\n18-A. O Microempreendedor Individual - MEI poderá optar pelo\nrecolhimento dos impostos e contribuições abrangidos pelo Simples\nNacional em valores fixos mensais, independentemente da receita bruta\npor ele auferida no mês, na forma prevista neste artigo.\n\n§\n1º Para os efeitos desta Lei Complementar, considera-se MEI quem\ntenha auferido receita bruta, no ano-calendário anterior, de até R$\n81.000,00 (oitenta e um mil reais), que seja optante pelo Simples\nNacional e que não esteja impedido de optar pela sistemática\nprevista neste artigo, e seja empresário individual que se enquadre\nna definição do art. 966 da Lei nº 10.406, de 10 de janeiro de\n2002 (Código Civil), ou o empreendedor que exerça: [*(Parágrafo\ncom redação dada pela Lei Complementar nº 188, de 31/12/2021)*](https://www2.camara.leg.br/legin/fed/leicom/2021/leicomplementar-188-31-dezembro-2021-792195-publicacaooriginal-164275-pl.html)\n[*(Vide\nLei Complementar nº 238, de 21/10/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-238-21-outubro-2026-800071-publicacaooriginal-181678-pl.html)\n\nI\n- as atividades de que trata o § 4º-A deste artigo; [*(Inciso\nacrescido pela Lei Complementar nº 188, de 31/12/2021)*](https://www2.camara.leg.br/legin/fed/leicom/2021/leicomplementar-188-31-dezembro-2021-792195-publicacaooriginal-164275-pl.html)\n\nII\n- as atividades de que trata o § 4º-B deste artigo estabelecidas\npelo CGSN; e [*(Inciso\nacrescido pela Lei Complementar nº 188, de 31/12/2021)*](https://www2.camara.leg.br/legin/fed/leicom/2021/leicomplementar-188-31-dezembro-2021-792195-publicacaooriginal-164275-pl.html)\n\nIII\n- as atividades de industrialização, comercialização e prestação\nde serviços no âmbito rural. [*(Inciso\nacrescido pela Lei Complementar nº 188, de 31/12/2021)*](https://www2.camara.leg.br/legin/fed/leicom/2021/leicomplementar-188-31-dezembro-2021-792195-publicacaooriginal-164275-pl.html)\n\n§\n2º No caso de início de atividades, o limite de que trata o § 1º\nserá de R$ 6.750,00 (seis mil, setecentos e cinquenta reais)\nmultiplicados pelo número de meses compreendido entre o início da\natividade e o final do respectivo ano-calendário, consideradas as\nfrações de meses como um mês int",
+              "title": "Lei Complementar nº 123, de 14 de dezembro de 2006",
+              "official_url": "https://www2.camara.leg.br/legin/fed/leicom/2006/leicomplementar-123-14-dezembro-2006-548099-normaatualizada-pl.html",
+              "reference_date": "2026-11-17",
+              "effective_from": null,
+              "effective_to": null
+            }
+          ],
+          "actions": [],
+          "next_steps": [],
+          "status": "answered",
+          "created_at": "2026-11-17T13:52:07.720938Z"
+        }
+      ],
+      "next_cursor": null
+    },
+    "agents": [
+      {
+        "name": "plan",
+        "result": {
+          "intent": "legal",
+          "agents": [
+            "legal"
+          ],
+          "missing_fields": [],
+          "reason": "A pergunta busca entender uma regra geral do MEI, especificamente sobre o recolhimento em valores fixos mensais, conforme a LC 123/2006. Não há necessidade de consultar a situação da empresa ou realizar cálculos, portanto, o agente legal é adequado para responder com base em normas e fontes legais."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 975,
+          "output_tokens": 103,
+          "latency_ms": 14654,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "legal",
+        "result": {
+          "status": "answered",
+          "claims": [
+            {
+              "text": "O Microempreendedor Individual - MEI poderá optar pelo recolhimento dos impostos e contribuições abrangidos pelo Simples Nacional em valores fixos mensais, independentemente da receita bruta por ele auferida no mês, na forma prevista neste artigo.",
+              "support_ids": [
+                "legal:1"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1497,
+          "output_tokens": 84,
+          "latency_ms": 13068,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "synthesis",
+        "result": {
+          "answer": "O MEI poderá optar pelo recolhimento dos impostos e contribuições em valores fixos mensais, independentemente da receita bruta, na forma prevista no artigo mencionado [1].",
+          "support_ids": [
+            "legal:1"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 541,
+          "output_tokens": 58,
+          "latency_ms": 5919,
+          "monetary_cost": null
+        }
+      }
+    ],
+    "evaluation": {
+      "technical_flow": "passed",
+      "validity": "ignored explicitly for this experiment; original dates unchanged",
+      "semantic_review": "passed: explanation of fixed monthly MEI collection grounded in retrieved text"
+    }
+  },
+  {
+    "question": "Explique o recolhimento mensal do MEI conforme a LC 123/2006, consulte se meu pagamento de 2026-10 foi oficialmente verificado e proponha um próximo passo baseado nas fontes.",
+    "operation": {
+      "run": {
+        "run_id": "c375dbb7-54ea-4922-adf7-8067c22be792",
+        "trace_id": "162abc42-aa99-4963-91fc-6633baa2b88c",
+        "status": "succeeded",
+        "revision": 0,
+        "calls": 5,
+        "stages": [
+          {
+            "name": "plan",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 1006,
+              "output_tokens": 158,
+              "latency_ms": 13046,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "legal",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 1397,
+              "output_tokens": 134,
+              "latency_ms": 18302,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "fiscal",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 467,
+              "output_tokens": 65,
+              "latency_ms": 6715,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "planning",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 687,
+              "output_tokens": 58,
+              "latency_ms": 8013,
+              "monetary_cost": null
+            },
+            "error": null
+          },
+          {
+            "name": "synthesis",
+            "revision": 0,
+            "status": "succeeded",
+            "attempts": 1,
+            "model": "qwen3:8b",
+            "prompt_version": "multiagent-v2",
+            "usage": {
+              "model": "qwen3:8b",
+              "prompt_version": "multiagent-v2",
+              "input_tokens": 717,
+              "output_tokens": 143,
+              "latency_ms": 12734,
+              "monetary_cost": null
+            },
+            "error": null
+          }
+        ]
+      },
+      "operation_id": "a1bb06aa-8016-42f4-b515-8c7f2f9fe3b0",
+      "status": "succeeded",
+      "result": {
+        "message_id": "e2b92bd2-44c2-4298-a5c6-71c5b8e66573",
+        "state": "answered",
+        "run_id": "c375dbb7-54ea-4922-adf7-8067c22be792"
+      },
+      "error": null
+    },
+    "messages": {
+      "items": [
+        {
+          "id": "15b219c5-bb88-471b-8ab2-e5d4ea3269ae",
+          "conversation_id": "26a46f63-bee3-40d9-a9f3-97986902924c",
+          "operation_id": "a1bb06aa-8016-42f4-b515-8c7f2f9fe3b0",
+          "role": "user",
+          "text": "Explique o recolhimento mensal do MEI conforme a LC 123/2006, consulte se meu pagamento de 2026-10 foi oficialmente verificado e proponha um próximo passo baseado nas fontes.",
+          "context": {
+            "company": {
+              "cnpj": "11222333000181",
+              "cnae": "6201501",
+              "size": "ME",
+              "regime": "simples",
+              "municipality": "Brasília",
+              "state": "DF",
+              "id": "9418b8b4-09b4-4ddf-afbd-1c0b66d02db4",
+              "provenance": {
+                "cnpj": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448237+00:00"
+                },
+                "cnae": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448244+00:00"
+                },
+                "size": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448245+00:00"
+                },
+                "regime": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448246+00:00"
+                },
+                "municipality": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448247+00:00"
+                },
+                "state": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448248+00:00"
+                }
+              },
+              "created_at": "2026-11-17T13:51:32.448617Z"
+            },
+            "period": "2026-10",
+            "missing_fields": []
+          },
+          "citations": [],
+          "actions": [],
+          "next_steps": [],
+          "status": "answered",
+          "created_at": "2026-11-17T13:52:07.842324Z"
+        },
+        {
+          "id": "e2b92bd2-44c2-4298-a5c6-71c5b8e66573",
+          "conversation_id": "26a46f63-bee3-40d9-a9f3-97986902924c",
+          "operation_id": "a1bb06aa-8016-42f4-b515-8c7f2f9fe3b0",
+          "role": "assistant",
+          "text": "Situação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade.\nO recolhimento mensal do MEI conforme a LC 123/2006 é obrigatório quando o MEI exceder o limite de receita bruta previsto no § 1º ou § 2º deste artigo, devendo a comunicação ser efetuada até o último dia útil do mês subsequente àquele em que ocorrido o excesso, produzindo efeitos retroativamente ou a partir do ano-calendário subsequente, conforme a hipótese. [1]",
+          "context": {
+            "company": {
+              "cnpj": "11222333000181",
+              "cnae": "6201501",
+              "size": "ME",
+              "regime": "simples",
+              "municipality": "Brasília",
+              "state": "DF",
+              "id": "9418b8b4-09b4-4ddf-afbd-1c0b66d02db4",
+              "provenance": {
+                "cnpj": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448237+00:00"
+                },
+                "cnae": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448244+00:00"
+                },
+                "size": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448245+00:00"
+                },
+                "regime": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448246+00:00"
+                },
+                "municipality": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448247+00:00"
+                },
+                "state": {
+                  "origin": "declared",
+                  "updated_at": "2026-11-17T13:51:32.448248+00:00"
+                }
+              },
+              "created_at": "2026-11-17T13:51:32.448617Z"
+            },
+            "period": "2026-10",
+            "missing_fields": []
+          },
+          "citations": [
+            {
+              "validity_check": "ignored_for_test",
+              "retrieval_strategy": "dense",
+              "document_id": "1d4656b7-6b94-41bb-bbb7-124f95cd3d66",
+              "version_id": "16bdfe39-1559-429f-bc4c-ec8770642bfb",
+              "anchor_id": "s78-a1b65f361226",
+              "text": ", de 13/1/2026)*](https://www2.camara.leg.br/legin/fed/leicom/2026/leicomplementar-227-13-janeiro-2026-798657-publicacaooriginal-177770-pl.html)\n\nII\n- obrigatoriamente, quando o MEI incorrer em alguma das situações\nprevistas no § 4º deste artigo, devendo a comunicação ser\nefetuada até o último dia útil do mês subsequente àquele em que\nocorrida a situação de vedação, produzindo efeitos a partir do\nmês subsequente ao da ocorrência da situação impeditiva;\n\nIII\n- obrigatoriamente, quando o MEI exceder, no ano-calendário, o\nlimite de receita bruta previsto no § 1º deste artigo, devendo a\ncomunicação ser efetuada até o último dia útil do mês\nsubsequente àquele em que ocorrido o excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente a 1º de janeiro do ano-calendário da ocorrência do\nexcesso, na hipótese de ter ultrapassado o referido limite em mais\nde 20% (vinte por cento);\n\nIV\n- obrigatoriamente, quando o MEI exceder o limite de receita bruta\nprevisto no § 2º deste artigo, devendo a comunicação ser efetuada\naté o último dia útil do mês subsequente àquele em que ocorrido\no excesso, produzindo efeitos:\n\na)\na partir de 1º de janeiro do ano-calendário subsequente ao da\nocorrência do excesso, na hipótese de não ter ultrapassado o\nreferido limite em mais de 20% (vinte por cento);\n\nb)\nretroativamente ao início de atividade, na hipótese de ter\nultrapassado o referido limite em mais de 20% (vinte por cento).\n\n§\n8º O desenquadramento de ofício dar-se-á quando verificada a falta\nde comunicação de que trata o § 7º deste artigo.\n\n§\n9º O Empresário Individual desenquadrado da sistemática de\nrecolhimento prevista no *caput*\ndeste artigo passará a recolher os tributos devidos pela regra geral\ndo Simples Nacional a partir da data de início dos efeitos do\ndesenquadramento, ressalvado o disposto no § 10 deste artigo.\n\n§\n10. Nas hipóteses previstas nas alíneas a dos incisos III e IV do §\n7º deste artigo, o MEI deverá recolher a diferença, sem\nacréscimos, em parcela única, juntamente com a da apuração do mês\nde janeiro d",
+              "title": "Lei Complementar nº 123, de 14 de dezembro de 2006",
+              "official_url": "https://www2.camara.leg.br/legin/fed/leicom/2006/leicomplementar-123-14-dezembro-2006-548099-normaatualizada-pl.html",
+              "reference_date": "2026-10-01",
+              "effective_from": null,
+              "effective_to": null
+            }
+          ],
+          "actions": [
+            {
+              "title": "Consultar norma sobre recolhimento do MEI",
+              "priority": "normal",
+              "preconditions": [
+                "Acesso a norma legal para análise"
+              ],
+              "support_ids": [
+                "legal:1"
+              ],
+              "responsible": null,
+              "due_date": null,
+              "deadline_kind": "suggested"
+            }
+          ],
+          "next_steps": [
+            "Consultar norma sobre recolhimento do MEI"
+          ],
+          "status": "answered",
+          "created_at": "2026-11-17T13:53:07.278309Z"
+        }
+      ],
+      "next_cursor": null
+    },
+    "agents": [
+      {
+        "name": "plan",
+        "result": {
+          "intent": "Explique o recolhimento mensal do MEI conforme a LC 123/2006, consulte se meu pagamento de 2026-10 foi oficialmente verificado e proponha um próximo passo baseado nas fontes.",
+          "agents": [
+            "legal",
+            "fiscal",
+            "planning"
+          ],
+          "missing_fields": [],
+          "reason": "A pergunta envolve explicação de uma regra geral (LC 123/2006), consulta sobre situação concreta da empresa (verificação do pagamento de 2026-10) e proposta de próximo passo, exigindo ações de legal, fiscal e planning."
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1006,
+          "output_tokens": 158,
+          "latency_ms": 13046,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "legal",
+        "result": {
+          "status": "answered",
+          "claims": [
+            {
+              "text": "O recolhimento mensal do MEI conforme a LC 123/2006 é obrigatório quando o MEI exceder o limite de receita bruta previsto no § 1º ou § 2º deste artigo, devendo a comunicação ser efetuada até o último dia útil do mês subsequente àquele em que ocorrido o excesso, produzindo efeitos retroativamente ou a partir do ano-calendário subsequente, conforme a hipótese.",
+              "support_ids": [
+                "legal:1"
+              ]
+            }
+          ],
+          "limitations": []
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 1397,
+          "output_tokens": 134,
+          "latency_ms": 18302,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "fiscal",
+        "result": {
+          "status": "answered",
+          "claims": [],
+          "missing_fields": [
+            "period",
+            "regime",
+            "conditions_confirmed"
+          ],
+          "limitations": [
+            "Verificação oficial não realizada",
+            "Falta de dados para análise",
+            "Não há evidências de pagamento ou verificação"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 467,
+          "output_tokens": 65,
+          "latency_ms": 6715,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "synthesis",
+        "result": {
+          "answer": "O recolhimento mensal do MEI conforme a LC 123/2006 é obrigatório quando o MEI exceder o limite de receita bruta previsto no § 1º ou § 2º deste artigo, devendo a comunicação ser efetuada até o último dia útil do mês subsequente àquele em que ocorrido o excesso, produzindo efeitos retroativamente ou a partir do ano-calendário subsequente, conforme a hipótese [1]. Não há evidências de pagamento ou verificação oficial [2].",
+          "support_ids": [
+            "legal:1",
+            "legal:2"
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 717,
+          "output_tokens": 143,
+          "latency_ms": 12734,
+          "monetary_cost": null
+        }
+      },
+      {
+        "name": "planning",
+        "result": {
+          "actions": [
+            {
+              "title": "Consultar norma sobre recolhimento do MEI",
+              "priority": "normal",
+              "preconditions": [
+                "Acesso a norma legal para análise"
+              ],
+              "support_ids": [
+                "legal:1"
+              ],
+              "responsible": null,
+              "due_date": null,
+              "deadline_kind": "suggested"
+            }
+          ]
+        },
+        "usage": {
+          "model": "qwen3:8b",
+          "prompt_version": "multiagent-v2",
+          "input_tokens": 687,
+          "output_tokens": 58,
+          "latency_ms": 8013,
+          "monetary_cost": null
+        }
+      }
+    ],
+    "evaluation": {
+      "technical_flow": "passed",
+      "validity": "ignored explicitly for this experiment; original dates unchanged",
+      "semantic_review": "failed: conflates monthly MEI collection with exclusion/change of regime after revenue excess; citation identity validation did not detect the mismatch"
+    }
+  }
+]

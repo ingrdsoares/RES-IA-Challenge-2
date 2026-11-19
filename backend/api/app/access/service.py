@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -48,7 +48,7 @@ def issue_session(account: Account, db: Session, hours: int = 24) -> SessionGran
 
 
 def login(email: str, password: str, db: Session) -> SessionGrant:
-    account = db.scalar(select(Account).where(Account.email == email))
+    account = db.scalar(select(Account).where(Account.email == email).with_for_update())
     try:
         hasher.verify(account.password_hash if account else _dummy_hash, password)
     except VerificationError:
@@ -58,3 +58,30 @@ def login(email: str, password: str, db: Session) -> SessionGrant:
     if hasher.check_needs_rehash(account.password_hash):
         account.password_hash = hasher.hash(password)
     return issue_session(account, db)
+
+
+RESET_MINUTES = 30
+
+
+def request_reset(email: str, db: Session) -> str | None:
+    account = db.scalar(select(Account).where(Account.email == email).with_for_update())
+    if account is None:
+        return None
+    secret = token()
+    account.reset_token_hash = digest(secret)
+    account.reset_expires_at = datetime.now(UTC) + timedelta(minutes=RESET_MINUTES)
+    db.commit()
+    return secret
+
+
+def reset_password(secret: str, password: str, db: Session):
+    account = db.scalar(
+        select(Account).where(Account.reset_token_hash == digest(secret)).with_for_update()
+    )
+    if not account or not account.reset_expires_at or account.reset_expires_at <= datetime.now(UTC):
+        raise HTTPException(400, "O link expirou ou já foi usado. Solicite um novo link.")
+    account.password_hash = hasher.hash(password)
+    account.reset_token_hash = None
+    account.reset_expires_at = None
+    db.execute(delete(AuthSession).where(AuthSession.account_id == account.id))
+    db.commit()

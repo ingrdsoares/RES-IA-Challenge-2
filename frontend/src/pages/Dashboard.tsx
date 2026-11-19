@@ -1,127 +1,353 @@
-import React from 'react';
-import { TrendingUp, AlertTriangle, FileText, CheckCircle2 } from 'lucide-react';
-import { Empresa } from '../types';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import {
+  ArrowRight,
+  Building2,
+  CalendarDays,
+  FileBadge2,
+  ListChecks,
+  MessageSquare,
+} from 'lucide-react';
+import { formatCnpj } from '../components/Sidebar';
+import { api } from '../services/api';
+import type { Company } from '../types';
+import {
+  dateLabel,
+  Feedback,
+  IndicatorInfo,
+  periodLabel,
+  problem,
+  readJson,
+  readList,
+  scopeNames,
+  scopes,
+  useRead,
+} from './fiscal-data';
+import type { FiscalStatus, PageProps, Task } from './fiscal-data';
 
-interface DashboardProps {
-  empresa: Empresa | null;
-  onNavigateToAssistente: () => void;
+const scopeIcons = {
+  registration: Building2,
+  federal_certificate: FileBadge2,
+  obligations: ListChecks,
+};
+const money = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+const percent = new Intl.NumberFormat('pt-BR', {
+  style: 'percent',
+  maximumFractionDigits: 4,
+});
+interface Calculation {
+  status: string;
+  reason: string | null;
+  request: { period: string };
+  references: string[];
+  result: {
+    amount: string;
+    effective_rate?: string;
+    factor_r?: string | null;
+    annex?: string;
+    rule_version: string;
+    assumptions: string[];
+  } | null;
+}
+function Simulator({ company }: { company: Company }) {
+  const [response, setResponse] = useState<Calculation>();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const regime = company.regime.toLowerCase();
+  const isMei =
+    /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
+  const isSimples = regime.includes('simples');
+  async function calculate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    const fields = new FormData(event.currentTarget);
+    const values = isMei
+      ? { activity: fields.get('activity') }
+      : {
+          rbt12: fields.get('rbt12'),
+          revenue: fields.get('revenue'),
+          payroll12: fields.get('payroll12') || null,
+        };
+    setBusy(true);
+    setError('');
+    setResponse(undefined);
+    try {
+      setResponse(
+        await api.request<Calculation>(`/empresas/${company.id}/calculos`, {
+          method: 'POST',
+          body: JSON.stringify({
+            kind: isMei ? 'mei' : 'simples',
+            period: fields.get('period'),
+            conditions_confirmed: fields.has('confirmed'),
+            ...values,
+          }),
+        }),
+      );
+    } catch (err) {
+      setError(problem(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const result = response?.result;
+  return (
+    <details className="panel">
+      <summary className="cursor-pointer font-semibold">
+        Simulação tributária
+      </summary>
+      {!isMei && !isSimples ? (
+        <p className="mt-3 text-sm text-ink-muted">
+          A simulação está disponível para MEI e Simples Nacional. Regime
+          cadastrado · {company.regime}.
+        </p>
+      ) : (
+        <>
+          <p className="my-4 text-sm text-ink-muted">
+            Informe os dados da competência para simular o DAS de{' '}
+            {isMei ? 'MEI' : 'Simples Nacional'} com a regra revisada
+            disponível.
+          </p>
+          <form
+            onSubmit={calculate}
+            onChange={() => {
+              setResponse(undefined);
+              setError('');
+            }}
+            className="space-y-4"
+          >
+            <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
+              <label className="field">
+                Competência
+                <input type="month" name="period" required />
+              </label>
+              {isMei ? (
+                <label className="field">
+                  Atividade
+                  <select name="activity" required defaultValue="">
+                    <option value="" disabled>
+                      Selecione
+                    </option>
+                    <option value="trade">Comércio</option>
+                    <option value="services">Serviços</option>
+                    <option value="mixed">Comércio e serviços</option>
+                  </select>
+                </label>
+              ) : (
+                <>
+                  <label className="field">
+                    Receita acumulada em 12 meses (R$)
+                    <input
+                      name="rbt12"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </label>
+                  <label className="field">
+                    Receita do mês (R$)
+                    <input
+                      name="revenue"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </label>
+                  <label className="field">
+                    Folha em 12 meses (R$), se houver Fator R
+                    <input name="payroll12" type="number" min="0" step="0.01" />
+                  </label>
+                </>
+              )}
+              <label className="col-span-full flex items-center gap-2 text-sm">
+                <input type="checkbox" name="confirmed" required />
+                Confirmo o enquadramento e os dados desta competência.
+              </label>
+            </fieldset>
+            <button className="primary" disabled={busy}>
+              {busy ? 'Calculando…' : 'Simular DAS'}
+            </button>
+          </form>
+          {error && <Feedback error={error} />}
+          {response && (
+            <div
+              className="mt-4 rounded-xl bg-surface-muted p-4 text-sm"
+              role="status"
+            >
+              <h3 className="font-semibold">
+                Resultado da competência {periodLabel(response.request.period)}
+              </h3>
+              {result ? (
+                <>
+                  <dl className="my-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                    <dt>DAS simulado</dt>
+                    <dd className="font-bold">
+                      {money.format(Number(result.amount))}
+                    </dd>
+                    {result.annex && (
+                      <>
+                        <dt>Anexo</dt>
+                        <dd>{result.annex}</dd>
+                      </>
+                    )}
+                    {result.effective_rate != null && (
+                      <>
+                        <dt>Alíquota efetiva</dt>
+                        <dd>{percent.format(Number(result.effective_rate))}</dd>
+                      </>
+                    )}
+                    {!isMei && (
+                      <>
+                        <dt>Fator R</dt>
+                        <dd>
+                          {result.factor_r == null
+                            ? 'Não aplicável'
+                            : percent.format(Number(result.factor_r))}
+                        </dd>
+                      </>
+                    )}
+                    <dt>Versão da regra</dt>
+                    <dd>{result.rule_version}</dd>
+                  </dl>
+                  {result.assumptions.map((item) => (
+                    <p key={item}>{item}</p>
+                  ))}
+                </>
+              ) : (
+                <p>
+                  {response.reason?.replace('payroll12', 'folha em 12 meses') ||
+                    'Simulação indisponível.'}
+                </p>
+              )}
+              {response.references.map((ref) => (
+                <a
+                  href={ref}
+                  key={ref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block break-all text-link underline"
+                >
+                  {ref}
+                </a>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </details>
+  );
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ empresa, onNavigateToAssistente }) => {
+export function Dashboard({ company }: PageProps) {
+  const base = `/empresas/${company.id}`;
+  const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
+  const tasks = useRead<Task[]>(base + '/tarefas?completed=false', readList);
+  const upcoming = tasks.data
+    ?.slice()
+    .sort((a, b) => (a.due_date || '9999').localeCompare(b.due_date || '9999'))
+    .slice(0, 4);
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Alerta de Status Fiscal / Semáforo */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start justify-between">
-        <div className="flex gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-          <div>
-            <h3 className="text-sm font-semibold text-emerald-900">
-              Situação Fiscal Regular — Simples Nacional
-            </h3>
-            <p className="text-xs text-emerald-700 mt-0.5">
-              Nenhuma pendência impeditiva no e-CAC ou Dívida Ativa da União para o CNPJ{' '}
-              <span className="font-mono">{empresa?.cnpj || '45.123.890/0001-44'}</span>.
-            </p>
-          </div>
+    <div className="stack">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Visão geral</h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            {company.regime} · {company.municipality}/{company.state} · CNPJ{' '}
+            {formatCnpj(company.cnpj)}
+          </p>
         </div>
-        <button
-          onClick={onNavigateToAssistente}
-          className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg transition-colors shrink-0"
-        >
-          Consultar Copiloto
-        </button>
+        <a href="#assistente" className="primary">
+          <MessageSquare size={16} /> Abrir assistente
+        </a>
       </div>
-
-      {/* Cards de Métricas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <div className="text-xs font-medium text-slate-500">Regime Vigente</div>
-          <div className="text-lg font-bold text-slate-900 mt-1">Anexo III (Simples)</div>
-          <div className="text-[11px] text-emerald-600 mt-1 flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5" /> Fator R = 30.0% (Beneficiado)
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <div className="text-xs font-medium text-slate-500">Alíquota Efetiva Atual</div>
-          <div className="text-lg font-bold text-slate-900 mt-1">8,08%</div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Economia de R$ 2.105/mês vs. Anexo V
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <div className="text-xs font-medium text-slate-500">Próxima Guia DAS</div>
-          <div className="text-lg font-bold text-slate-900 mt-1">R$ 2.020,00</div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Vencimento: 20 do próximo mês
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <div className="text-xs font-medium text-slate-500">Faturamento Acumulado 12m</div>
-          <div className="text-lg font-bold text-slate-900 mt-1">R$ 300.000,00</div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Folha de Pagamento 12m: R$ 90.000,00
-          </div>
-        </div>
-      </div>
-
-      {/* Próximas Obrigações & Prazos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-            <h4 className="text-sm font-bold text-slate-900">Agenda Fiscal & Obrigações</h4>
-            <span className="text-xs text-slate-400">Competência Corrente</span>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200/60">
-              <div className="flex items-center gap-3">
-                <FileText className="w-4 h-4 text-slate-500" />
-                <div>
-                  <div className="text-xs font-semibold text-slate-800">Guia DAS Simples Nacional</div>
-                  <div className="text-[11px] text-slate-500">Apuração mensal PGDAS-D</div>
-                </div>
-              </div>
-              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-                Em dia
+      <section
+        aria-label="Indicadores fiscais"
+        className="grid gap-4 md:grid-cols-3"
+      >
+        {scopes.map((scope) => {
+          const Icon = scopeIcons[scope];
+          return (
+            <article
+              className="panel flex flex-col items-start gap-3"
+              key={scope}
+            >
+              <span className="rounded-lg bg-info p-2 text-link">
+                <Icon size={21} aria-hidden="true" />
               </span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200/60">
-              <div className="flex items-center gap-3">
-                <FileText className="w-4 h-4 text-slate-500" />
-                <div>
-                  <div className="text-xs font-semibold text-slate-800">Declaração DEFIS Anual</div>
-                  <div className="text-[11px] text-slate-500">Prestação de informações socioeconômicas</div>
-                </div>
-              </div>
-              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">
-                Prazo: 31/Mar
-              </span>
-            </div>
-          </div>
+              <h2 className="font-semibold text-ink">
+                {scopeNames[scope]}
+              </h2>
+              {status.data ? (
+                <IndicatorInfo scope={scope} indicator={status.data[scope]} />
+              ) : (
+                <p role="status" className="text-sm text-ink-muted">
+                  {status.loading
+                    ? 'Carregando indicador…'
+                    : 'Consulta indisponível'}
+                </p>
+              )}
+              <a
+                href={`#fiscal?scope=${scope}`}
+                aria-label={`Ver detalhes de ${scopeNames[scope]}`}
+                className="touch-link mt-auto inline-flex items-center gap-2 text-sm font-semibold text-link"
+              >
+                Ver detalhes <ArrowRight size={15} />
+              </a>
+            </article>
+          );
+        })}
+      </section>
+      {status.error && <Feedback error={status.error} retry={status.refresh} />}
+      <section className="panel space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-bold">Próximas tarefas</h2>
+          <a
+            href="#tarefas"
+            className="touch-link inline-flex items-center gap-2 text-sm font-semibold text-link"
+          >
+            Ver todas as tarefas <ArrowRight size={15} />
+          </a>
         </div>
-
-        {/* Alerta de Fronteira Ética & CRC */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-amber-600 mb-2">
-              <AlertTriangle className="w-4 h-4" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Aviso Regulatório & Fronteira Ética (CRC)
-              </h4>
-            </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              O <strong>Sócio Digital</strong> atua exclusivamente no letramento, simulação determinística e organização das obrigações do seu negócio. As simulações não substituem a escrituração contábil formal nem a apuração oficial privativa de profissionais registrados no CRC (Decreto-Lei nº 9.295/1946).
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-200/80 text-[11px] text-slate-500 flex justify-between items-center">
-            <span>Base normativa: LC 123/2006 & CGSN 140</span>
-            <span className="font-semibold text-slate-700">Auditado por RAG Factual</span>
-          </div>
-        </div>
-      </div>
+        {tasks.loading && <p role="status">Carregando tarefas…</p>}
+        {tasks.error && <Feedback error={tasks.error} retry={tasks.refresh} />}
+        {upcoming?.length === 0 && (
+          <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
+            Nenhuma tarefa pendente para esta empresa.
+          </p>
+        )}
+        <ul className="divide-y divide-subtle">
+          {upcoming?.map((task) => (
+            <li key={task.id}>
+              <a
+                href={`#tarefas?task=${task.id}`}
+                className="flex items-center gap-3 py-3 hover:text-link"
+              >
+                <CalendarDays size={18} className="shrink-0 text-ink-muted" />
+                <span className="min-w-0">
+                  <strong className="block break-words text-sm">
+                    {task.title}
+                  </strong>
+                  <small className="text-ink-muted">
+                    {task.due_date
+                      ? 'Prazo ' + dateLabel(task.due_date)
+                      : 'Prazo não informado'}
+                    {task.period &&
+                      ' · Competência ' + periodLabel(task.period)}
+                  </small>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <Simulator
+        key={[company.id, company.cnae, company.regime, company.size].join('/')}
+        company={company}
+      />
     </div>
   );
-};
+}

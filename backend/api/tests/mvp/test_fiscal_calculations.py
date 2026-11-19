@@ -92,9 +92,11 @@ def test_reviewed_calculation_reaches_chat_without_llm_arithmetic(client):
     from uuid import UUID
 
     from app.assistant.orchestrator import answer_message
+    from app.fiscal.models import Calculation
     from app.fiscal.registry import import_rule, review_rule
     from app.fiscal.schemas import RuleInput
     from app.jobs.worker import execute
+    from sqlalchemy import func, select
     from test_access import csrf
     from test_conversations import conversation
 
@@ -132,16 +134,27 @@ def test_reviewed_calculation_reaches_chat_without_llm_arithmetic(client):
     def forbidden(prompt):
         pytest.fail("LLM must not calculate this amount")
 
-    execute(
-        client.app.state.db_factory,
-        UUID(response.json()["operation_id"]),
-        {
-            "assistant.answer": lambda db, operation: answer_message(
-                db, operation, generate=forbidden
-            )
-        },
-    )
+    for _ in range(2):
+        execute(
+            client.app.state.db_factory,
+            UUID(response.json()["operation_id"]),
+            {
+                "assistant.answer": lambda db, operation: answer_message(
+                    db, operation, generate=forbidden
+                )
+            },
+        )
     messages = client.get("/conversas/" + chat["id"] + "/mensagens").json()["items"]
     assert messages[-1]["context"]["calculation"]["result"]["amount"] == "55.00"
     assert messages[-1]["context"]["calculation"]["result"]["rule_version"] == "synthetic"
     assert "55.00" in messages[-1]["text"]
+    assert len(messages) == 2
+    with client.app.state.db_factory() as db:
+        assert (
+            db.scalar(
+                select(func.count())
+                .select_from(Calculation)
+                .where(Calculation.company_id == UUID(company["id"]))
+            )
+            == 1
+        )

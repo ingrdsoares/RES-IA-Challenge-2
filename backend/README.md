@@ -151,9 +151,9 @@ as variáveis ou use `--env-file`. Nenhuma chave de API é necessária.
 | `SCORE_THRESHOLD` | `0.5` | −1 a 1; valor inicial provisório, avaliar com o corpus real |
 | `QDRANT_TIMEOUT` | `5` | Segundos por chamada, maior que zero até 120 |
 | `OLLAMA_TIMEOUT` | `120` | Segundos por chamada, maior que zero até 600 |
-| `NUM_CTX` | `8192` | 8192–32768 tokens de contexto |
+| `NUM_CTX` | `8192` | 8192–40960 tokens de contexto |
 | `NUM_PREDICT` | `1024` | 64–1024 tokens de saída |
-| `MAX_CONTEXT_CHARS` | `6000` | 1–6000 caracteres de texto recuperado no total |
+| `MAX_CONTEXT_CHARS` | `12000` | 1–40960 caracteres de texto recuperado no total |
 
 Além do limite de caracteres, o backend aplica orçamento conservador em bytes UTF-8
 ao prompt completo, reservando a saída e 256 tokens para o template. Os trechos são
@@ -324,8 +324,24 @@ novamente o token CSRF, pois a sessão o rotaciona. `GET /auth/session` retorna
 identidade; `POST /auth/logout` revoga a sessão. Cookies expiram em 24 horas.
 
 HTTPS e `COOKIE_SECURE=true` são necessários fora do ambiente local.
-`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. Não existem
-confirmação de e-mail ou recuperação de senha nesta etapa.
+`ALLOWED_ORIGINS` deve conter somente as origens confiáveis. O cadastro dispensa confirmação de e-mail.
+
+### Recuperação de senha
+
+Aplique a migração com `docker compose exec api alembic upgrade head` na pasta
+`backend`. O Compose local captura os e-mails no Mailpit. Abra a tela de entrada,
+solicite um link em **Esqueci minha senha** e consulte a [caixa local](http://localhost:8025).
+O último link solicitado vale por 30 minutos. Redefinir a senha encerra as sessões da conta.
+
+A API executada fora do Compose pode usar a mesma caixa com `SMTP_HOST=127.0.0.1`,
+`SMTP_PORT=1025`, `SMTP_STARTTLS=false` e `SMTP_FROM=acesso@sociodigital.test`.
+Configure `FRONTEND_URL` com a URL do frontend usado para abrir o link (padrão
+`http://localhost:3000`).
+
+No Compose de produção, defina `FRONTEND_URL` com a URL HTTPS pública,
+`SMTP_HOST`, `SMTP_PORT` e `SMTP_FROM` para um servidor com STARTTLS.
+Com SMTP desativado, a API continua funcionando e o pedido de recuperação retorna HTTP 503.
+Para autenticação, forneça `SMTP_USERNAME` e `SMTP_PASSWORD` pelo ambiente de deploy.
 
 Os testes de acesso usam exclusivamente `sd_test` na porta 15432 e Redis DB 15
 na porta 16379, em containers separados. Essa base é recriada por teste;
@@ -519,3 +535,63 @@ Os testes de ponta a ponta são opt-in: `MVP_TEST_URL`, `MVP_DATABASE_URL` e
 `MVP_S3_URL` devem apontar para uma stack **isolada de teste**. Eles criam somente
 contas e documentos sintéticos. A avaliação fiscal profissional e o deploy público
 não fazem parte dessa validação.
+
+
+## Assistente multiagente
+
+O worker executa um supervisor LLM, agente jurídico, diagnóstico fiscal e planejamento,
+com etapas sequenciais e checkpoints no PostgreSQL. A API mantém o contrato HTTP 202;
+`run_id` e `trace_id` identificam a execução. Consulte `status_url` para acompanhar etapas,
+tentativas, modelo, versão de prompt e uso de tokens. O endpoint não expõe prompts ou leases.
+Mensagens retornam `actions` estruturadas e preservam `next_steps` como textos.
+Criar uma tarefa a partir de uma ação continua exigindo chamada explícita do usuário.
+
+Antes de iniciar a nova versão, aplique as migrações:
+
+```bash
+docker compose --env-file backend/.env -f backend/compose.yaml run --rm api alembic upgrade head
+docker compose --env-file backend/.env -f backend/compose.yaml up -d --build api worker dispatcher
+```
+
+Runs pendentes antigos são convertidos de forma idempotente no primeiro processamento.
+Mensagens concluídas não são reprocessadas. Em caso de queda, o dispatcher recupera leases
+expirados; etapas já concluídas não repetem inferência. Uma chamada LLM pode repetir se o
+processo cair antes do checkpoint. Mensagens e cálculos têm identidades únicas no banco.
+
+O estado `awaiting_data` indica campos retornados em `missing_fields`. Envie uma mensagem
+com `confirmation_for` e `confirmation` contendo exatamente esses campos. Valores monetários
+são strings decimais; confirmações nunca editam o perfil da empresa automaticamente.
+São permitidas até duas confirmações, duas tentativas por etapa e dez minutos por rodada,
+com uma execução ativa por empresa. As variáveis `AGENT_*` estão em `.env.example`.
+
+Conectores oficiais e lembretes permanecem fora desta entrega. Evidências são declaradas;
+regras fiscais precisam de revisão humana. O texto de fatos fiscais e valores é montado
+pelo servidor; a validação de IDs e âncoras não prova toda interpretação jurídica do modelo.
+
+### Índice jurídico híbrido
+
+A busca densa versionada continua disponível. Para preparar e ativar uma geração híbrida,
+execute dentro do container da API, depois de publicar as normas desejadas:
+
+```bash
+python -m app.legal.cli build-hybrid
+python -m app.legal.cli activate-hybrid --generation ID_RETORNADO
+```
+
+A geração usa coleção própria, preservando `legal_versions_v1` e `/rag/query`.
+A ativação valida catálogo e cobertura. Mudanças no catálogo invalidam a seleção híbrida
+até nova reconstrução; a recuperação usa a coleção densa e mantém filtros e âncoras.
+Se configurado, o reranker existente reordena os trechos. Nenhum índice é reconstruído no startup.
+
+### Verificação real opcional
+
+Com os serviços isolados de teste (PostgreSQL 15432, Redis 16379 e Qdrant 16333):
+
+```bash
+MULTIAGENT_TEST_URL=http://localhost:11434 MULTIAGENT_QDRANT_URL=http://localhost:16333 \
+  .venv/bin/python -m pytest backend/api/tests/mvp/test_multiagent_real.py -q -s
+```
+
+O teste usa norma demonstrativa e coleção temporária própria. Não publica regra fiscal real.
+
+Contexto Qwen local: 8.192 tokens por padrão, com até 12.000 caracteres de texto recuperado. Para usar a janela ampliada do modelo local, configure explicitamente NUM_CTX=40960 e MAX_CONTEXT_CHARS=40960. O agente jurídico usa orçamento dinâmico para evidências, reservando saída, instruções, schema e metadados; o corte fixo de 2.200 caracteres foi removido. NUM_PREDICT continua 1.024. O limite de contexto não altera vigência nem reindexa documentos.

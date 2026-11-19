@@ -44,12 +44,15 @@ def test_no_relevant_results_skips_generation(service, monkeypatch):
 
 
 def test_complete_rag_returns_only_bounded_context(service):
-    add_document(service, "🎉" * 6000)
+    add_document(service, "🎉" * 30000)
     response = service.query("Pergunta")
     assert response.status == "answered"
     assert response.answer == "Orientação [1]"
     assert response.sources[0].id == 1
-    assert 0 < len(response.sources[0].text) < 4000
+    assert 0 < len(response.sources[0].text) < 30000
+    assert len(response.sources[0].text.encode()) <= 2 * (
+        service.settings.num_ctx - service.settings.num_predict - 256
+    )
 
 
 def test_conferir_citacoes_avisa_so_quando_ligado(service, monkeypatch):

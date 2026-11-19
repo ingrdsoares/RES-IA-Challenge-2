@@ -1,0 +1,108 @@
+{
+  "nome": "v4e_corte_artigo",
+  "descricao": "Corte por artigo (legislação), 0,6B, qwen3:8b",
+  "env": {
+    "CANDIDATE_K": "30",
+    "LEGISLATION_BOOST": "0.2",
+    "RERANK_LEGISLATION_BOOST": "0",
+    "CONTEXT_WINDOW_CHARS": "0",
+    "MAX_TRECHOS_POR_DOCUMENTO": "0",
+    "ESCLARECIMENTO_MODELO": "false",
+    "CONFERIR_CITACOES": "false",
+    "PESO_EXPANSAO": "0.5",
+    "RERANKER_URL": "http://127.0.0.1:8080",
+    "QDRANT_URL": "http://127.0.0.1:6333",
+    "OLLAMA_TIMEOUT": "600",
+    "RERANKER_TIMEOUT": "120",
+    "QDRANT_TIMEOUT": "60",
+    "COLLECTION_NAME": "knowledge_base_v4e"
+  },
+  "repeticoes": 3,
+  "relatorio": "data\\benchmark\\experimentos-2026-11-13-v4e\\v4e_corte_artigo\\avaliacao\\reports\\a2f305d6453290f314848ff40bda249e7d4d16198ebd21ecaa55586f69e45c4d\\3f2e8da198174c3f81d5f052175322ab7dfcc11dc0402ff6558e6c2d6f5dd48c\\results.json",
+  "avaliacao": {
+    "todos": {
+      "perguntas": 81,
+      "tentativas": 243,
+      "falhas": 0,
+      "rouge_l": 0.2569776505138676,
+      "bert_score": 0.6037805225700139,
+      "artigo_esperado": 0.7092198581560284,
+      "citacao_suportada": 0.9833229588131548,
+      "clarify": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 183,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.1783796999952756,
+      "lat_p95": 4.740353500004858,
+      "conc_resposta": 0.9012345679012344,
+      "conc_fontes": 1.0
+    },
+    "sem_recorte_completo": {
+      "perguntas": 74,
+      "tentativas": 222,
+      "falhas": 0,
+      "rouge_l": 0.25605524071460095,
+      "bert_score": 0.604029616536615,
+      "artigo_esperado": 0.7403100775193799,
+      "citacao_suportada": 0.9818852828487716,
+      "clarify": {
+        "n": 3,
+        "total": 30,
+        "taxa": 0.1
+      },
+      "falso_positivo": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "recusa_fora_acervo": {
+        "n": 0,
+        "total": 30,
+        "taxa": 0.0
+      },
+      "recusa_indevida": {
+        "n": 0,
+        "total": 162,
+        "taxa": 0.0
+      },
+      "respostas_boas": null,
+      "respostas_erradas": null,
+      "lat_mediana": 2.237210999999661,
+      "lat_p95": 4.740353500004858,
+      "conc_resposta": 0.9054054054054053,
+      "conc_fontes": 1.0
+    }
+  },
+  "recuperacao": {
+    "todos": {
+      "recall8": 0.4754,
+      "mrr8": 0.3689,
+      "recall8_leniente": 0.5246,
+      "mrr8_leniente": 0.394
+    },
+    "sem_recorte_completo": {
+      "recall8": 0.537,
+      "mrr8": 0.4167,
+      "recall8_leniente": 0.5926,
+      "mrr8_leniente": 0.4451
+    }
+  }
+}

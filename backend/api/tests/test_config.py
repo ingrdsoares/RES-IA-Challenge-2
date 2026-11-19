@@ -69,3 +69,22 @@ def test_peso_expansao_padrao_e_limites():
     assert Settings().peso_expansao == 0.5
     with pytest.raises(ValidationError):
         Settings(peso_expansao=1.5)
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["", "http://example.com", "https://localhost", "https://127.0.0.1", "https://example.com/#x"],
+)
+def test_external_smtp_requires_explicit_public_frontend(url):
+    with pytest.raises(ValueError, match="FRONTEND_URL"):
+        Settings(smtp_host="smtp.example.com", frontend_url=url)
+
+
+def test_reset_delivery_settings():
+    assert Settings(smtp_host="", frontend_url="").frontend_url is None
+    local = Settings(smtp_host="mailpit", smtp_starttls=False, frontend_url="")
+    assert str(local.frontend_url) == "http://localhost:3000/"
+    external = Settings(smtp_host="smtp.example.com", frontend_url="https://fiscal.example.com")
+    assert str(external.frontend_url) == "https://fiscal.example.com/"
+    with pytest.raises(ValueError, match="STARTTLS"):
+        Settings(smtp_host="smtp.example.com", smtp_starttls=False)

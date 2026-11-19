@@ -1,0 +1,31 @@
+.record-return {
+  display: none;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-link);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.record-detail h2 { scroll-margin-top: 1rem; }
+.record-option {
+  border-color: var(--border-subtle);
+  color: var(--ink);
+}
+.record-option:hover { background: var(--surface-muted); }
+.record-option[aria-current] {
+  border-color: var(--focus-color);
+  background: var(--surface-info);
+}
+.record-detail dt, .record-detail .record-note { color: var(--ink-muted); }
+.record-detail dl { color: var(--ink); }
+@media (max-width: 1023px) {
+  .record-page:not(.record-open) .record-detail,
+  .record-open .record-list-context { display: none; }
+  .record-return { display: inline-flex; }
+  .record-page:not(.record-open) .record-option[aria-current] {
+    border-color: var(--border-subtle);
+    background: var(--surface-card);
+  }
+}
