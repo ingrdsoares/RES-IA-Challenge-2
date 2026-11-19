@@ -59,6 +59,9 @@ data/processed/*
 !data/processed/*.dvc
 !data/processed/.gitignore
 
+# Raw evaluation checkpoints (summaries resultado.json / comparacao.* are versioned)
+data/benchmark/**/avaliacao/
+
 # Local scratch, handoff packages and exports (not versioned)
 tmp/
 handoff/

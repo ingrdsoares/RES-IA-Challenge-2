@@ -5,7 +5,8 @@ from app.config import Settings
 def test_runner_records_effective_window_and_rejects_mixed_resume():
     from scripts.evaluate_agent_flows import evaluation_parameters, validate_resume
 
-    maximum = evaluation_parameters(Settings(num_ctx=40960), b"[]")
+    # Same profile the CLI builds for --num-ctx 40960 (window and retrieved chars together).
+    maximum = evaluation_parameters(Settings(num_ctx=40960, max_context_chars=40960), b"[]")
     assert maximum["num_ctx"] == 40960
     assert maximum["max_context_chars"] == 40960
     previous = {**maximum, "num_ctx": 8192}
