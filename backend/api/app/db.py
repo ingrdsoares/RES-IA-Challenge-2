@@ -24,6 +24,7 @@ def session_factory(url: str):
         "telemetria",
     ):
         import_module(f"app.{module}.models")
+    import_module("app.assistant.agents.models")
     # Sem timeout de conexão, banco inalcançável trava a requisição (inclusive a telemetria).
     args = {"connect_timeout": 5} if url.startswith("postgresql") else {}
     return sessionmaker(

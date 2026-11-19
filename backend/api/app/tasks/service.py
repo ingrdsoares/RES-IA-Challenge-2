@@ -23,6 +23,7 @@ def require_task(db, account_id, task_id, lock=False):
 def create_task(db, company_id, account_id, data):
     require_company(db, account_id, company_id)
     title = data.title
+    action_support = None
     if data.source_message_id:
         message = db.scalar(
             select(Message).where(Message.id == data.source_message_id).with_for_update()
@@ -47,11 +48,17 @@ def create_task(db, company_id, account_id, data):
         if existing:
             return existing
         title = message.next_steps[data.source_step_index]
+        if message.actions and data.source_step_index < len(message.actions):
+            action_support = message.actions[data.source_step_index]
     elif data.source_step_index is not None:
         raise HTTPException(422, "Passo exige mensagem de origem")
     if not title:
         raise HTTPException(422, "Informe título ou passo de origem")
-    task = Task(company_id=company_id, **{**data.model_dump(), "title": title})
+    task = Task(
+        company_id=company_id,
+        action_support=action_support,
+        **{**data.model_dump(), "title": title},
+    )
     db.add(task)
     db.commit()
     return task

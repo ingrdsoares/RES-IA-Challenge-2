@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     allowed_origins: list[str] = ["http://localhost:8000"]
 
+    agent_timeout: float = Field(default=120, gt=0, le=300)
+    agent_round_seconds: int = Field(default=600, ge=30, le=600)
+    agent_max_calls: int = Field(default=30, ge=5, le=30)
+    agent_token_budget: int = Field(default=1228800, ge=8192, le=2000000)
+    agent_max_confirmations: int = Field(default=2, ge=0, le=2)
+    agent_step_attempts: int = Field(default=2, ge=1, le=2)
+
     # Seguranca e Rotacao de Segredos
     app_secret_key: str = Field(
         default="sd_default_secret_dev_key_change_in_prod_1234567890", min_length=16
@@ -61,9 +68,9 @@ class Settings(BaseSettings):
     score_threshold: float = Field(default=0.5, ge=-1, le=1, allow_inf_nan=False)
     qdrant_timeout: float = Field(default=5, gt=0, le=120, allow_inf_nan=False)
     ollama_timeout: float = Field(default=120, gt=0, le=600, allow_inf_nan=False)
-    num_ctx: int = Field(default=8192, ge=8192, le=32768)
+    num_ctx: int = Field(default=8192, ge=8192, le=40960)
     num_predict: int = Field(default=1024, ge=64, le=1024)
-    max_context_chars: int = Field(default=12000, ge=1, le=24000)
+    max_context_chars: int = Field(default=12000, ge=1, le=40960)
     reranker_url: HttpUrl | None = None
     reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
 

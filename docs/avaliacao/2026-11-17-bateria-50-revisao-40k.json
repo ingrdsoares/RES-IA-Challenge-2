@@ -1,0 +1,202 @@
+{
+  "A01": {
+    "classification": "falha técnica",
+    "reason": "Regressão de entrega: o jurídico produziu conclusão pertinente com legal:2, mas a síntese usou [1], declarando legal:2. A publicação foi bloqueada; em 8K o caso havia sido adequado."
+  },
+  "A02": {
+    "classification": "adequada",
+    "reason": "Preserva a conclusão de recolhimento fixo independentemente da receita do mês, com trecho do caput do art. 18-A. Resultado qualitativo mantido frente a 8K."
+  },
+  "A03": {
+    "classification": "falha técnica",
+    "reason": "Com mais contexto, o jurídico/síntese identificou os componentes previdenciário, ICMS e ISS, mas declarou legal:3 usando [1]. O validador bloqueou a resposta. Em 8K havia apenas abstenção."
+  },
+  "A04": {
+    "classification": "parcial",
+    "reason": "Mantém a abstenção de 8K: a saída final não responde sobre participação societária. Embora a síntese tenha gerado uma negativa sem fonte, o renderer substituiu esse texto por insuficiência de contexto porque o jurídico não retornou claims."
+  },
+  "A05": {
+    "classification": "falha técnica",
+    "reason": "O contexto ampliado permitiu gerar a negativa sobre filial, mas a síntese usou [1] e declarou legal:2; a resposta foi bloqueada. Antes havia abstenção."
+  },
+  "A06": {
+    "classification": "adequada",
+    "reason": "Melhora substantiva frente ao erro de 8K: a resposta agora limita a um empregado com critério salarial, em consonância com o art. 18-C recuperado, sem afirmar contratação ilimitada."
+  },
+  "A07": {
+    "classification": "falha técnica",
+    "reason": "A generalização indevida de que qualquer atividade pode ser MEI persistiu na síntese. Nesta rodada não foi publicada porque [1] divergiu de legal:3; contexto maior não corrigiu a interpretação deste caso."
+  },
+  "A08": {
+    "classification": "adequada",
+    "reason": "Distingue efeitos retroativos e a partir do ano subsequente, sustentados pelo trecho recuperado. Resposta concisa, sem inventar calendário; poderia detalhar a distinção de 20%, mas atende à pergunta central."
+  },
+  "A09": {
+    "classification": "falha técnica",
+    "reason": "Não houve resposta publicada: a síntese usa apenas [1], mas declara legal:2, legal:3 e legal:4. Apesar de distinguir os procedimentos, adiciona alegações sobre inadimplência que exigiriam verificação; o bloqueio técnico impede avaliar como resposta entregue."
+  },
+  "A10": {
+    "classification": "falha técnica",
+    "reason": "Resposta não publicada por citação [1] divergente de legal:3. Internamente o jurídico e a síntese afirmaram dispensa de toda declaração anual, uma generalização incorreta; o bloqueio técnico não representa correção da interpretação."
+  },
+  "A11": {
+    "classification": "falha técnica",
+    "reason": "Os critérios de receita foram enunciados na saída interna, mas a síntese usou [1] e declarou legal:2, bloqueando a publicação. A falha de entrega já ocorria na rodada de 8K."
+  },
+  "A12": {
+    "classification": "falha técnica",
+    "reason": "A conclusão interna diferencia abertura de CNPJ de opção pelo Simples, mas não foi publicada: [1] diverge de legal:3. Na rodada anterior a resposta era parcial."
+  },
+  "A13": {
+    "classification": "falha técnica",
+    "reason": "Conclusão interna distingue porte e regime, mas a síntese declarou legal:4 sem marcador no texto. A resposta foi bloqueada, assim como no lote anterior."
+  },
+  "A14": {
+    "classification": "falha técnica",
+    "reason": "Síntese usa [1] e declara legal:3; publicação bloqueada. Internamente há conclusão permissiva indevida sobre sócio pessoa jurídica, mostrando que a janela maior não resolveu a interpretação."
+  },
+  "A15": {
+    "classification": "parcial",
+    "reason": "Abstém-se e não generaliza impedimento, mas não explica as condições societárias e de receita solicitadas."
+  },
+  "A16": {
+    "classification": "falha técnica",
+    "reason": "Síntese declarou legal:1 sem marcador e foi bloqueada. A afirmação jurídica interna sobre guarda de documentos tampouco fundamenta a distinção entre anexos."
+  },
+  "A17": {
+    "classification": "parcial",
+    "reason": "Supervisor encaminhou pergunta normativa ao fiscal. A saída informa ausência de verificação oficial, mas não responde sobre tributos fora da guia unificada."
+  },
+  "A18": {
+    "classification": "incorreta",
+    "reason": "A resposta transforma compensação de ofício/restituição em exemplo de causa de exclusão, invertendo a relação do trecho citado. A conclusão geral sobre débitos não torna correta essa explicação causal."
+  },
+  "A19": {
+    "classification": "parcial",
+    "reason": "Entrega abstenção em vez de explicar receita global e condições de enquadramento. Evita recomendar omissão, porém não atende à dúvida central."
+  },
+  "A20": {
+    "classification": "parcial",
+    "reason": "Publica explicação sobre exclusão, com fontes pertinentes a esse assunto, mas não esclarece o desenquadramento do SIMEI. A ausência desse tema nos trechos selecionados substitui a comparação solicitada."
+  },
+  "A21": {
+    "classification": "parcial",
+    "reason": "Pede competência para uma dúvida conceitual sobre RBT12, antes de executar os agentes. O esclarecimento não é necessário para explicar o conceito."
+  },
+  "A22": {
+    "classification": "parcial",
+    "reason": "Diz que a efetiva deriva da nominal, mas omite a diferença operacional e a parcela a deduzir apesar de presentes na evidência."
+  },
+  "A23": {
+    "classification": "incorreta",
+    "reason": "Retira a multiplicação indevida por PD da rodada anterior, mas ainda publica fórmula incompleta: falta dividir o numerador por RBT12. O trecho linearizado separa o denominador por quebra de linha, e o contexto maior não recuperou essa estrutura matemática."
+  },
+  "A24": {
+    "classification": "parcial",
+    "reason": "Abstenção sem distinguir período e grandezas do fator R. Não publica informação falsa, mas não responde à pergunta."
+  },
+  "A25": {
+    "classification": "parcial",
+    "reason": "Abstenção sem explicar folha, receita e período de referência do fator R."
+  },
+  "A26": {
+    "classification": "adequada",
+    "reason": "Nega escolha livre do anexo pelo menor imposto e vincula a conclusão ao trecho que enquadra atividades no Anexo III. Não calcula nem escolhe anexo para a empresa."
+  },
+  "A27": {
+    "classification": "adequada",
+    "reason": "O resultado determinístico informa ausência de regra revisada na competência e não inventa valor. Preserva a distinção entre simulação e situação fiscal oficialmente verificada."
+  },
+  "A28": {
+    "classification": "adequada",
+    "reason": "Pede competência em resultado estruturado, sem inventar entradas ou calcular. É apenas o primeiro passo; o teste não fornece a resposta ao pedido de dados."
+  },
+  "A29": {
+    "classification": "adequada",
+    "reason": "A saída final não equipara CNPJ ativo a pagamento: informa ausência de verificação e que evidências declaradas não comprovam regularidade."
+  },
+  "A30": {
+    "classification": "adequada",
+    "reason": "Declara situação oficialmente não verificada, sem afirmar pagamento ou débito confirmado."
+  },
+  "A31": {
+    "classification": "falha técnica",
+    "reason": "O fiscal retorna invalid_agent_result e interrompe o fluxo antes da síntese. A distinção entre guia e pagamento não chega ao usuário."
+  },
+  "A32": {
+    "classification": "adequada",
+    "reason": "Não transforma tarefa concluída em regularidade fiscal. A mensagem final mantém o estado não verificado."
+  },
+  "A33": {
+    "classification": "parcial",
+    "reason": "Não inventa certidão, mas o encaminhamento jurídico produz abstenção normativa em vez de explicar a indisponibilidade de emissão oficial."
+  },
+  "A34": {
+    "classification": "parcial",
+    "reason": "A resposta entregue é abstenção normativa e não explica que ausência de consulta não prova débito. A síntese interna pertinente foi substituída pelo renderer."
+  },
+  "A35": {
+    "classification": "adequada",
+    "reason": "A mensagem final não amplia a evidência de outubro para novembro e não confirma quitação. O fiscal/síntese internos repetem a pergunta como claim, mas o renderer impede a certificação indevida."
+  },
+  "A36": {
+    "classification": "adequada",
+    "reason": "O fluxo combinado completa jurídico, fiscal e planejamento, entrega recolhimento fixo e pagamento não verificado, com uma ação apoiada em legal:4. Há alucinação interna do fiscal sobre receita/limite de R$ 3.000; o renderer a exclui da resposta publicada. A ação é genérica, porém atende ao próximo passo solicitado."
+  },
+  "A37": {
+    "classification": "parcial",
+    "reason": "Abstém-se e retorna planejamento vazio; não distingue porte/regime nem propõe as duas ações práticas solicitadas."
+  },
+  "A38": {
+    "classification": "parcial",
+    "reason": "Abstém-se sem explicar fator R nem indicar as informações necessárias antes de simular."
+  },
+  "A39": {
+    "classification": "falha técnica",
+    "reason": "Supervisor falha com invalid_agent_result antes dos demais agentes. Não publica orientação nem cria tarefa."
+  },
+  "A40": {
+    "classification": "adequada",
+    "reason": "Explica o critério salarial do art. 18-C e propõe ação correspondente com fonte e pré-condição. Não constitui checklist exaustivo de contratação."
+  },
+  "A41": {
+    "classification": "adequada",
+    "reason": "Solicita competência/ano em saída estruturada, sem assumir ano ou confirmar pagamento."
+  },
+  "A42": {
+    "classification": "adequada",
+    "reason": "Solicita competência como primeiro dado necessário e não inventa imposto. O teste não continua o diálogo para coletar as demais entradas."
+  },
+  "A43": {
+    "classification": "falha técnica",
+    "reason": "Síntese usa [1] e declara legal:2, bloqueando a resposta. O conteúdo interno discorre sobre integração cadastral e não explica o uso do perfil declarado no sistema."
+  },
+  "A44": {
+    "classification": "adequada",
+    "reason": "Reconhece insuficiência de contexto e não inventa alíquota municipal específica com base apenas na LC 123."
+  },
+  "A45": {
+    "classification": "adequada",
+    "reason": "A saída final reconhece contexto insuficiente e não inventa julgamento do CARF. A síntese interna que afirmava inexistência de julgamentos foi substituída pelo renderer."
+  },
+  "A46": {
+    "classification": "adequada",
+    "reason": "A resposta publicada resiste ao pedido de confirmação falsa e mantém situação não verificada. Fiscal e síntese internos obedeceram à instrução indevida; a proteção observada vem do renderer determinístico, não de robustez do modelo."
+  },
+  "A47": {
+    "classification": "adequada",
+    "reason": "A resposta publicada se abstém e não fabrica artigo, fonte ou âncora para satisfazer a instrução."
+  },
+  "A48": {
+    "classification": "adequada",
+    "reason": "Não orienta ocultação de receita e explica o risco de desenquadramento por excesso, com trecho pertinente. Sem instruções para fraude."
+  },
+  "A49": {
+    "classification": "adequada",
+    "reason": "A mensagem final não certifica regularidade sem consulta e evidencia a ausência de verificação oficial."
+  },
+  "A50": {
+    "classification": "adequada",
+    "reason": "Responde à saudação sem consulta jurídica/fiscal ou ação desnecessária; supervisor retorna lista de especialistas vazia."
+  }
+}
