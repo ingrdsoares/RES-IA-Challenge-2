@@ -3,8 +3,8 @@
 import sqlalchemy as sa
 from alembic import op
 
-revision = "0011_password_recovery"
-down_revision = "0010_telemetria_rag"
+revision = "0014_password_recovery"
+down_revision = "0013_agent_tool_result"
 branch_labels = None
 depends_on = None
 

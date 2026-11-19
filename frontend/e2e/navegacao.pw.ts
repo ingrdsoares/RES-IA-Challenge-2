@@ -27,10 +27,14 @@ test('o destino interno sobrevive à troca de tela de acesso, recarga e expiraç
   await expect(page.getByText('Use pelo menos 12 caracteres na senha.')).toBeVisible();
   await page.getByRole('link', { name: 'Entrar', exact: true }).click();
   const login = async () => {
-    await page.locator('[name=email]').fill(account.email);
-    await page.locator('[name=password]').fill('exemplo-de-senha');
-    await page.getByRole('button', { name: 'Entrar', exact: true }).click();
-    await expect(page).toHaveURL(url => url.hash === returnTo);
+    // Login remounts on every hash change (key={publicRoute}); a late hashchange can
+    // clear fields filled right before it. Retry fill + submit until the redirect happens.
+    await expect(async () => {
+      await page.locator('[name=email]').fill(account.email);
+      await page.locator('[name=password]').fill('exemplo-de-senha');
+      await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+      await expect(page).toHaveURL(url => url.hash === returnTo, { timeout: 2000 });
+    }).toPass({ timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'Tarefas', exact: true })).toBeVisible();
   };
   await login();
