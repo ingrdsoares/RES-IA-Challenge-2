@@ -31,8 +31,13 @@ def main() -> int:
         pasta.mkdir(parents=True, exist_ok=True)
         if (pasta / "resultado.json").exists():
             continue
-        env = {"COLLECTION_NAME": "knowledge_base_v2", "QDRANT_URL": a.qdrant, "TOPOLOGIA": nome,
-               "OLLAMA_TIMEOUT": "600", "PYTHONIOENCODING": "utf-8"}
+        env = {
+            "COLLECTION_NAME": "knowledge_base_v2",
+            "QDRANT_URL": a.qdrant,
+            "TOPOLOGIA": nome,
+            "OLLAMA_TIMEOUT": "600",
+            "PYTHONIOENCODING": "utf-8",
+        }
         exp = {"nome": nome, "env_final": env}
         run_dir = pasta / "avaliacao"
         retomar = (run_dir / "checkpoints.sqlite3").exists()
@@ -43,10 +48,19 @@ def main() -> int:
             print(f"{nome}: avaliação falhou ({r.returncode})")
             return 1
         linhas = json.loads(rel.read_text(encoding="utf-8"))
-        res = {"nome": nome, "env": env, "repeticoes": 3, "relatorio": str(rel),
-               "avaliacao": {"todos": ex.metricas_avaliacao(linhas, False),
-                             "sem_recorte_completo": ex.metricas_avaliacao(linhas, True)}}
-        (pasta / "resultado.json").write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
+        res = {
+            "nome": nome,
+            "env": env,
+            "repeticoes": 3,
+            "relatorio": str(rel),
+            "avaliacao": {
+                "todos": ex.metricas_avaliacao(linhas, False),
+                "sem_recorte_completo": ex.metricas_avaliacao(linhas, True),
+            },
+        }
+        (pasta / "resultado.json").write_text(
+            json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         print(nome, "ok")
     return 0
 

@@ -43,6 +43,7 @@
   * [Métricas de Avaliação RAG](avaliacao/metricas-avaliacao-rag.md)
   * [Benchmark RAG e Governança MLOps](avaliacao/benchmark-rag-mlops.md)
   * [Avaliação do RAG (07/11/2026)](avaliacao/avaliacao-rag-2026-11-07.md)
+  * [Plano de Fine-tuning (18/11/2026)](avaliacao/plano-fine-tuning-2026-11-18.md)
 
 * **Entregáveis**
   * [Semana 3: Relatório Comparativo LLM x RAG (PDF)](entrega/entrega2_semana3_llm_rag.pdf)

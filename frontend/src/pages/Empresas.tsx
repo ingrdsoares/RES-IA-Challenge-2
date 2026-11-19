@@ -1,107 +1,277 @@
-import React, { useState } from 'react';
-import { Plus, Check } from 'lucide-react';
-import { Empresa } from '../types';
+import { useState, type FormEvent } from 'react';
+import {
+  Building2,
+  Save,
+  Fingerprint,
+  BriefcaseBusiness,
+  Landmark,
+  MapPin,
+  Map,
+  ChartNoAxesColumnIncreasing,
+} from 'lucide-react';
+import type { Company, CompanyInput } from '../types';
+import { api, ApiError } from '../services/api';
+import locations from '../data/localidades.json';
+import { MaskedInput } from '../components/MaskedInput';
+import './empresa-form.css';
 
-interface EmpresasProps {
-  empresaAtiva: Empresa | null;
-  onSelecionarEmpresa: (empresa: Empresa) => void;
-}
-
-export const Empresas: React.FC<EmpresasProps> = ({ empresaAtiva, onSelecionarEmpresa }) => {
-  const [empresas] = useState<Empresa[]>([
-    {
-      id: 'emp-1',
-      cnpj: '45.123.890/0001-44',
-      razao_social: 'TecnoSoft Tecnologia Ltda',
-      porte: 'ME',
-      cnae_principal: '6201-5/01 - Desenvolvimento de programas de computador',
-      municipio: 'Brasília',
-      uf: 'DF',
-      regime: 'SIMPLES_NACIONAL',
-      faturamento_anual: 300000,
-      folha_anual: 90000,
-      created_at: '2026-01-15',
-    },
-    {
-      id: 'emp-2',
-      cnpj: '12.345.678/0001-99',
-      razao_social: 'Studio Beleza & Estética MEI',
-      porte: 'MEI',
-      cnae_principal: '9602-5/01 - Cabeleireiros, manicure e pedicure',
-      municipio: 'Brasília',
-      uf: 'DF',
-      regime: 'SIMEI',
-      faturamento_anual: 60000,
-      created_at: '2026-02-10',
-    },
-  ]);
-
-  return (
-    <div className="p-6 space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-bold text-slate-900">Minhas Empresas</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Gerencie os negócios vinculados à sua conta com total isolamento multi-tenant.
-          </p>
-        </div>
-        <button className="flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-lg text-xs transition-colors shadow-sm">
-          <Plus className="w-4 h-4" />
-          Adicionar Empresa
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {empresas.map((emp) => {
-          const selecionada = empresaAtiva?.id === emp.id;
-          return (
-            <div
-              key={emp.id}
-              className={`p-5 rounded-xl border bg-white shadow-sm transition-all flex flex-col justify-between ${
-                selecionada ? 'border-emerald-500 ring-1 ring-emerald-500/20' : 'border-slate-200'
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-mono text-slate-400">{emp.cnpj}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    {emp.porte}
-                  </span>
-                </div>
-                <h3 className="text-sm font-bold text-slate-900">{emp.razao_social}</h3>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-1">{emp.cnae_principal}</p>
-                <div className="mt-3 text-xs text-slate-600 flex items-center gap-4">
-                  <span>Regime: <strong>{emp.regime}</strong></span>
-                  <span>Local: <strong>{emp.municipio}/{emp.uf}</strong></span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">
-                  {selecionada ? 'Empresa atualmente ativa' : 'Clique para alternar'}
-                </span>
-                <button
-                  onClick={() => onSelecionarEmpresa(emp)}
-                  disabled={selecionada}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                    selecionada
-                      ? 'bg-emerald-50 text-emerald-700 cursor-default'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                  }`}
-                >
-                  {selecionada ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" /> Ativa
-                    </>
-                  ) : (
-                    'Selecionar'
-                  )}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+const blank: CompanyInput = {
+  cnpj: '',
+  cnae: '',
+  size: '',
+  regime: '',
+  municipality: '',
+  state: '',
 };
+const fields = [
+  {
+    key: 'cnpj',
+    label: 'CNPJ',
+    placeholder: '00.000.000/0000-00',
+    icon: Fingerprint,
+    max: 14,
+    mask: '##.###.###/####-##',
+  },
+  {
+    key: 'cnae',
+    label: 'CNAE principal',
+    placeholder: '0000-0/00',
+    icon: BriefcaseBusiness,
+    max: 7,
+    mask: '####-#/##',
+  },
+  {
+    key: 'size',
+    label: 'Porte',
+    placeholder: 'Ex. ME',
+    icon: ChartNoAxesColumnIncreasing,
+    max: 30,
+  },
+  {
+    key: 'regime',
+    label: 'Regime tributário',
+    placeholder: 'Ex. Simples Nacional',
+    icon: Landmark,
+    max: 40,
+  },
+  { key: 'state', label: 'UF', icon: Map },
+  { key: 'municipality', label: 'Município', icon: MapPin },
+] as const;
+export function Empresas({
+  company,
+  onSave,
+  onCancel,
+}: {
+  company?: Company;
+  onSave: (company: Company) => void;
+  onCancel?: () => void;
+}) {
+  const [values, setValues] = useState<CompanyInput>(
+    company
+      ? {
+          ...company,
+          cnpj: company.cnpj.replace(/\D/g, ''),
+          cnae: company.cnae.replace(/\D/g, ''),
+        }
+      : blank,
+  );
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const cities =
+    locations.find((item) => item.code === values.state)?.municipalities || [];
+  const legacyCity =
+    company &&
+    values.state === company.state &&
+    values.municipality === company.municipality &&
+    !cities.includes(company.municipality);
+  function change(key: keyof CompanyInput, value: string) {
+    setValues((current) => ({
+      ...current,
+      [key]: value,
+      ...(key === 'state' ? { municipality: '' } : {}),
+    }));
+    setErrors((current) => ({
+      ...current,
+      [key]: '',
+      ...(key === 'state' ? { municipality: '' } : {}),
+    }));
+  }
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setErrors({});
+    const entries = fields
+      .filter(
+        ({ key }) =>
+          !company || (key !== 'cnpj' && values[key].trim() !== company[key]),
+      )
+      .map(({ key }) => [key, values[key].trim()]);
+    try {
+      if (company && !entries.length) {
+        onSave(company);
+        return;
+      }
+      const updated = await api.request<Company>(
+        company ? '/empresas/' + company.id : '/empresas',
+        {
+          method: company ? 'PATCH' : 'POST',
+          body: JSON.stringify(Object.fromEntries(entries)),
+        },
+      );
+      onSave(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Não foi possível salvar.');
+      if (err instanceof ApiError) setErrors(err.fields);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="company-page stack">
+      <div>
+        <h1>{company ? 'Perfil da empresa' : 'Cadastre sua empresa'}</h1>
+        <p>
+          {company
+            ? 'Revise os dados usados nas consultas e no assistente fiscal.'
+            : 'Preencha os dados cadastrais para abrir o painel da empresa.'}
+        </p>
+      </div>
+      <form className="panel company-form stack" onSubmit={save}>
+        <div className="section-line">
+          <Building2 size={20} />
+          <h2>Dados cadastrais</h2>
+        </div>
+        {!company && (
+          <p>
+            Consulta automática de CNPJ indisponível. Informe os dados conforme
+            seu cadastro.
+          </p>
+        )}
+        <div className="fields-grid">
+          {fields.map((field) => {
+            const { key, label, icon: Icon } = field;
+            const origin = company?.provenance[key];
+            const changed =
+              company && key !== 'cnpj' && values[key] !== company[key];
+            const helpId = 'company-' + key + '-help';
+            const shared = {
+              id: 'company-' + key,
+              required: true,
+              'aria-invalid': !!errors[key],
+              'aria-describedby': helpId,
+            };
+            return (
+              <div className="field" key={key}>
+                <label htmlFor={shared.id}>{label}</label>
+                <div className="company-control">
+                  <Icon size={18} aria-hidden="true" />
+                  {'mask' in field ? (
+                    <MaskedInput
+                      {...shared}
+                      value={values[key]}
+                      onChange={(value) => change(key, value)}
+                      mask={field.mask}
+                      placeholder={field.placeholder}
+                      readOnly={!!company && key === 'cnpj'}
+                    />
+                  ) : key === 'state' ? (
+                    <select
+                      {...shared}
+                      autoComplete="address-level1"
+                      value={values.state}
+                      onChange={(e) => change(key, e.target.value)}
+                    >
+                      <option value="">Selecione a UF</option>
+                      {company &&
+                        !locations.some(
+                          (item) => item.code === company.state,
+                        ) && (
+                          <option value={company.state}>
+                            {company.state} (cadastrada)
+                          </option>
+                        )}
+                      {locations.map((item) => (
+                        <option key={item.code} value={item.code}>
+                          {item.code} — {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : key === 'municipality' ? (
+                    <select
+                      {...shared}
+                      autoComplete="address-level2"
+                      value={values.municipality}
+                      disabled={!values.state}
+                      onChange={(e) => change(key, e.target.value)}
+                    >
+                      <option value="">
+                        {values.state
+                          ? 'Selecione o município'
+                          : 'Selecione primeiro a UF'}
+                      </option>
+                      {legacyCity && (
+                        <option value={company.municipality}>
+                          {company.municipality} (cadastrado)
+                        </option>
+                      )}
+                      {cities.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      {...shared}
+                      maxLength={'max' in field ? field.max : undefined}
+                      placeholder={
+                        'placeholder' in field ? field.placeholder : undefined
+                      }
+                      value={values[key]}
+                      onChange={(e) => change(key, e.target.value)}
+                    />
+                  )}
+                </div>
+                <small id={helpId} role={errors[key] ? 'alert' : undefined}>
+                  {errors[key] ||
+                    (changed || !origin
+                      ? 'Informado por você'
+                      : (origin.origin === 'declared'
+                          ? 'Declarado'
+                          : 'Consulta cadastral') +
+                        ' · ' +
+                        new Date(origin.updated_at).toLocaleDateString(
+                          'pt-BR',
+                        ))}
+                </small>
+              </div>
+            );
+          })}
+        </div>
+        {error && (
+          <p role="alert" className="notice">
+            {error}
+          </p>
+        )}
+        <div className="actions">
+          {onCancel && (
+            <button type="button" onClick={onCancel} className="secondary">
+              Cancelar
+            </button>
+          )}
+          <button disabled={busy} className="primary">
+            <Save size={16} />
+            {busy
+              ? 'Salvando…'
+              : company
+                ? 'Salvar alterações'
+                : 'Salvar e abrir painel'}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}

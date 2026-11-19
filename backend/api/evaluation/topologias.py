@@ -12,6 +12,7 @@ import os
 from app.errors import dependency_errors
 from app.models import prepare_sources
 from app.schemas import QueryResponse
+
 from evaluation.adapter import InternalRagClient
 
 SISTEMA_LLM_PURA = (
@@ -48,9 +49,16 @@ class TopologiaClient(InternalRagClient):
                     ],
                     stream=False,
                     think=False,
-                    options={"num_ctx": s.num_ctx, "num_predict": s.num_predict, "temperature": 0, "seed": 42},
+                    options={
+                        "num_ctx": s.num_ctx,
+                        "num_predict": s.num_predict,
+                        "temperature": 0,
+                        "seed": 42,
+                    },
                 )
-            return QueryResponse(status="answered", answer=(r.message.content or "").strip(), sources=[])
+            return QueryResponse(
+                status="answered", answer=(r.message.content or "").strip(), sources=[]
+            )
         if self.topologia == "rag_sem_llm":
             fontes = self._densa(question, 3)
             if not fontes:
@@ -63,13 +71,18 @@ class TopologiaClient(InternalRagClient):
             )
         if self.topologia == "naive_rag":
             fontes = prepare_sources(
-                self._densa(question, s.top_k), s.max_context_chars,
-                question=question, num_ctx=s.num_ctx, num_predict=s.num_predict,
+                self._densa(question, s.top_k),
+                s.max_context_chars,
+                question=question,
+                num_ctx=s.num_ctx,
+                num_predict=s.num_predict,
             )
             if not fontes:
                 return SEM_CONTEXTO
             return QueryResponse(
-                status="answered", answer=self.service.models.answer(question, fontes), sources=fontes
+                status="answered",
+                answer=self.service.models.answer(question, fontes),
+                sources=fontes,
             )
         raise ValueError(f"topologia desconhecida: {self.topologia}")
 
