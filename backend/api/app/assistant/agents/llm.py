@@ -1,9 +1,8 @@
 import json
 import time
 
-import ollama
-
 from app.assistant.agents.prompts import PROMPTS, VERSION
+from app.llm_client import chat
 
 
 def transport_schema(value):
@@ -23,9 +22,10 @@ def transport_schema(value):
 
 
 class AgentModel:
-    def __init__(self, settings, client=None):
+    def __init__(self, settings, client=None, http_client=None):
         self.settings = settings
         self.client = client
+        self.http_client = http_client
 
     def generate(self, role, schema, payload, timeout, output_tokens):
         prompt = PROMPTS[role]
@@ -37,35 +37,25 @@ class AgentModel:
             > self.settings.num_ctx - output_tokens - 256
         ):
             raise ValueError("Contexto dos agentes excede orçamento")
-        owned = self.client is None
-        client = self.client or ollama.Client(host=str(self.settings.ollama_url), timeout=timeout)
         started = time.monotonic()
-        try:
-            response = client.chat(
-                model=self.settings.generation_model,
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": content},
-                ],
-                format=grammar,
-                stream=False,
-                think=False,
-                options={
-                    "temperature": 0,
-                    "seed": 42,
-                    "num_ctx": self.settings.num_ctx,
-                    "num_predict": output_tokens,
-                },
-            )
-            result = schema.model_validate_json(response.message.content)
-            return result, {
-                "model": self.settings.generation_model,
-                "prompt_version": VERSION,
-                "input_tokens": response.prompt_eval_count,
-                "output_tokens": response.eval_count,
-                "latency_ms": round((time.monotonic() - started) * 1000),
-                "monetary_cost": None,
-            }
-        finally:
-            if owned:
-                client.close()
+        response = chat(
+            self.settings,
+            [
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": content},
+            ],
+            max_tokens=output_tokens,
+            schema=grammar,
+            timeout=timeout,
+            ollama_client=self.client,
+            http_client=self.http_client,
+        )
+        result = schema.model_validate_json(response.texto)
+        return result, {
+            "model": self.settings.generation_model,
+            "prompt_version": VERSION,
+            "input_tokens": response.tokens_in,
+            "output_tokens": response.tokens_out,
+            "latency_ms": round((time.monotonic() - started) * 1000),
+            "monetary_cost": None,
+        }

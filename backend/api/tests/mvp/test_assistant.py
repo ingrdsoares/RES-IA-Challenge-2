@@ -308,3 +308,33 @@ def test_unused_invented_reference_is_rejected():
         validate_answer_citations(
             "Texto [1]", [1, 99], [{"document_id": "d", "version_id": "v", "anchor_id": "a"}]
         )
+
+
+def test_assistente_via_nuvem():
+    import json as _json
+    from types import SimpleNamespace
+
+    import httpx
+    from app.assistant.orchestrator import synthesize
+    from app.config import Settings
+
+    rascunho = {"answer": "Resposta [1]", "cited_indices": [1], "next_steps": []}
+
+    def respond(request):
+        corpo = _json.loads(request.content)
+        assert corpo["response_format"]["type"] == "json_object"
+        return httpx.Response(
+            200, json={"choices": [{"message": {"content": _json.dumps(rascunho)}}]}
+        )
+
+    settings = Settings(llm_provider="google", google_api_key="k", generation_model="gemini-x")
+    model = SimpleNamespace(
+        client=None, http_client=httpx.Client(transport=httpx.MockTransport(respond))
+    )
+    db = SimpleNamespace(scalars=lambda query: [])
+    user = SimpleNamespace(text="Pergunta", context={}, created_at=date.today(), id=uuid4())
+    passages = [
+        {"text": "Trecho normativo.", "document_id": "d", "version_id": "v", "anchor_id": "a"}
+    ]
+    draft, _ = synthesize(db, user, SimpleNamespace(id=uuid4()), passages, settings, model, None)
+    assert draft.answer.startswith("Resposta [1]")

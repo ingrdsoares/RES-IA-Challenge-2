@@ -2,7 +2,6 @@ import json
 from typing import Annotated
 from uuid import UUID
 
-import ollama
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from qdrant_client import QdrantClient
 from sqlalchemy import select, tuple_
@@ -16,6 +15,7 @@ from app.fiscal.schemas import CalculationInput
 from app.fiscal.service import calculate
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
+from app.llm_client import chat
 from app.models import LocalModels
 from app.serialization import record
 
@@ -252,32 +252,18 @@ def synthesize(db, user, conversation, passages, settings, model, generate):
     if generate:
         draft = AssistantDraft.model_validate(generate(content))
     else:
-        client = (
-            model.client
-            if model
-            else ollama.Client(host=str(settings.ollama_url), timeout=settings.ollama_timeout)
+        response = chat(
+            settings,
+            [
+                {"role": "system", "content": SYSTEM},
+                {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
+            ],
+            max_tokens=settings.num_predict,
+            schema=transport_schema(),
+            ollama_client=model.client if model else None,
+            http_client=model.http_client if model else None,
         )
-        try:
-            response = client.chat(
-                model=settings.generation_model,
-                messages=[
-                    {"role": "system", "content": SYSTEM},
-                    {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
-                ],
-                format=transport_schema(),
-                stream=False,
-                think=False,
-                options={
-                    "temperature": 0,
-                    "seed": 42,
-                    "num_ctx": settings.num_ctx,
-                    "num_predict": settings.num_predict,
-                },
-            )
-            draft = AssistantDraft.model_validate_json(response.message.content)
-        finally:
-            if model is None:
-                client.close()
+        draft = AssistantDraft.model_validate_json(response.texto)
     citations = validate_answer_citations(draft.answer, draft.cited_indices, passages)
     return draft, citations
 

@@ -88,3 +88,22 @@ def test_reset_delivery_settings():
     assert str(external.frontend_url) == "https://fiscal.example.com/"
     with pytest.raises(ValueError, match="STARTTLS"):
         Settings(smtp_host="smtp.example.com", smtp_starttls=False)
+
+
+def test_provedor_padrao_e_ollama():
+    assert Settings().llm_provider == "ollama"
+
+
+@pytest.mark.parametrize("provedor", ["google", "deepseek"])
+def test_provedor_de_nuvem_exige_chave(provedor):
+    with pytest.raises(ValidationError):
+        Settings(llm_provider=provedor)
+    assert Settings(llm_provider=provedor, **{f"{provedor}_api_key": "k"}).llm_provider == provedor
+
+
+def test_chave_nao_aparece_no_repr():
+    settings = Settings(llm_provider="google", google_api_key="segredo")
+    assert "segredo" not in repr(settings)
+    with pytest.raises(ValidationError) as erro:
+        Settings(llm_provider="deepseek", google_api_key="segredo")
+    assert "segredo" not in str(erro.value)

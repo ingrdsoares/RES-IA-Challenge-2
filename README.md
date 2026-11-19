@@ -36,6 +36,28 @@ Abra a [plataforma em localhost:3000](http://localhost:3000), crie uma conta e c
 
 Para testar o percurso com citação, ingira o excerto de referência da LC 123/2006 e pergunte ao assistente sobre a periodicidade do recolhimento pelo documento único de arrecadação. A referência e o comando de ingestão estão no [roteiro de reprodução local](docs/superpowers/plans/2026-11-17-integracao-multiagente.md#reprodução-local-da-primeira-entrega). Consulte o [guia do backend](backend/README.md) para configurar o Ollama, publicar outras normas e rodar os testes de integração.
 
+### Usar Gemini ou DeepSeek na geração
+
+Por padrão, as respostas são geradas pelo Qwen no Ollama. Para gerá-las por uma API na nuvem, defina em `backend/.env`:
+
+```env
+LLM_PROVIDER=google            # ou deepseek
+GOOGLE_API_KEY=sua-chave       # ou DEEPSEEK_API_KEY=sua-chave
+GENERATION_MODEL=gemini-3.5-flash   # ou deepseek-chat
+```
+
+A pergunta e os trechos recuperados do acervo passam a ser enviados ao provedor escolhido. Os embeddings e o reranker continuam locais, então o Ollama segue necessário, só com o modelo de embedding. Os limites de contexto (`NUM_CTX`, `MAX_CONTEXT_CHARS`) não mudam com o provedor.
+
+No Gemini, os modelos que raciocinam por padrão gastam nisso parte do limite de tokens da resposta, que pode sair cortada. `GOOGLE_REASONING_EFFORT` define o nível enviado; vazio (padrão) usa o do modelo. Os níveis aceitos variam por modelo. Testado em 19/11/2026:
+
+| Modelo | Valor recomendado |
+|--------|-------------------|
+| `gemini-3.5-flash` | `minimal` (sem ele, cerca de 600 tokens vão para o raciocínio) |
+| `gemini-3.1-flash-lite`, `gemini-3.5-flash-lite` | vazio ou `minimal` (não raciocinam por padrão) |
+| `gemini-3.8-flash`, `gemini-flash-latest` | não aceitam `minimal`; deixe vazio |
+
+O `gemini-2.5-flash` não está mais disponível para contas novas.
+
 ## Como funciona
 
 1. O **frontend React + TypeScript** envia a pergunta à API e acompanha o processamento sem perder o contexto da conversa.

@@ -28,6 +28,7 @@ from app.assistant.agents.validation import render_answer, validate_results
 from app.assistant.models import Conversation, Message
 from app.companies.service import require_company
 from app.config import Settings
+from app.errors import DependencyUnavailable
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
 
@@ -122,7 +123,7 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             )
             finish_step(factory, step.id, step.token, result.model_dump(mode="json"), usage)
             return result, step
-        except (httpx.HTTPError, ConnectionError, TimeoutError):
+        except (httpx.HTTPError, ConnectionError, TimeoutError, DependencyUnavailable):
             fail_step(factory, step.id, step.token, "dependency_unavailable", True)
             raise JobDeferred() from None
         except (ValueError, ValidationError):

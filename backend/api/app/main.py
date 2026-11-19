@@ -141,7 +141,9 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             detail = "A coleção vetorial é incompatível com a configuração do backend."
         elif isinstance(exc, QueryBusy):
             detail = "Já existe uma consulta em andamento. Tente novamente após sua conclusão."
-        logger.warning("Falha de dependência na rota %s: %s", request.url.path, type(exc).__name__)
+        logger.warning(
+            "Falha de dependência na rota %s: %s: %s", request.url.path, type(exc).__name__, exc
+        )
         return JSONResponse(status_code=status, content={"detail": detail})
 
     @app.get("/health")

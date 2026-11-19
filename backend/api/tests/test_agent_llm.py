@@ -69,3 +69,29 @@ def test_transport_keeps_title_field_while_removing_schema_title_annotation():
         "type": "object",
         "properties": {"title": {"type": "string"}},
     }
+
+
+def test_agent_model_via_nuvem_registra_tokens_reais():
+    from app.assistant.agents.contracts import SupervisorPlan
+    from app.assistant.agents.llm import AgentModel
+
+    def respond(request):
+        return httpx.Response(
+            200,
+            json={
+                "choices": [{"message": {"content": '{"intent":"legal","agents":["legal"]}'}}],
+                "usage": {"prompt_tokens": 31, "completion_tokens": 9},
+            },
+        )
+
+    settings = Settings(
+        llm_provider="deepseek", deepseek_api_key="k", generation_model="deepseek-chat"
+    )
+    model = AgentModel(settings, http_client=httpx.Client(transport=httpx.MockTransport(respond)))
+    result, usage = model.generate("plan", SupervisorPlan, {"question": "MEI"}, 10, 256)
+    assert result.agents == ["legal"]
+    assert (usage["input_tokens"], usage["output_tokens"], usage["model"]) == (
+        31,
+        9,
+        "deepseek-chat",
+    )
