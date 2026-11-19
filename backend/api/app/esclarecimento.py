@@ -67,7 +67,9 @@ def _tipo(pergunta: str) -> str | None:
         return "anexo"
     if _SIMPLES.search(pergunta) and _PROPRIA.search(pergunta) and _ELEGIBILIDADE.search(pergunta):
         return "simples"
-    if _IMPOSTO.search(pergunta):
+    if _IMPOSTO.search(pergunta) and not re.search(
+        r"\b(mei|simei|microempreendedor)\b", pergunta, re.I
+    ):
         return "imposto"
     if _ATRASO.search(pergunta) and _JUROS.search(pergunta):
         return "juros"
