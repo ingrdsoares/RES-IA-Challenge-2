@@ -59,6 +59,8 @@ RERANKER_URL=http://reranker:8080
 RERANKER_TIMEOUT=60
 ```
 
+Use `deepseek-chat`, e não `deepseek-flash`, mesmo que o `/models` da conta liste só `deepseek-flash` e `deepseek-v4-pro`. Os dois nomes chegam ao mesmo modelo, mas `deepseek-chat` é o modo **sem raciocínio**. Com `deepseek-flash`, o modelo raciocina antes de responder e pode gastar todo o `NUM_PREDICT` (1024 tokens) nisso. A resposta então volta vazia e a API devolve 503 com `O modelo não retornou uma resposta utilizável.`. Em 19/11/2026, isso aconteceu em 3 de 3 tentativas com "Débito com a Receita pode excluir a empresa do Simples Nacional?".
+
 No Mac, use `RERANKER_URL=http://host.docker.internal:18080` (o reranker roda fora do Docker, seção 3). Sem `RERANKER_URL`, a busca funciona, mas com recall menor: o log do worker avisa `RERANKER_URL não definida`.
 
 - **A chave:** não compartilhe e não commite. O `backend/.env` já está no `.gitignore`. Cópias como `.env.bak` **não** estão, então não deixe cópias dentro do repositório.
@@ -263,6 +265,7 @@ docker logs socio-digital-worker-1 --tail 30
 | `DeepSeek respondeu HTTP 402` | Conta sem crédito | Adicione saldo na plataforma |
 | `DeepSeek respondeu HTTP 429` | Limite de requisições | Espere e tente de novo |
 | `DeepSeek respondeu HTTP 400` | Nome de modelo inválido | Confira `GENERATION_MODEL` na documentação do DeepSeek |
+| 503 `O modelo não retornou uma resposta utilizável.` em perguntas longas | `GENERATION_MODEL=deepseek-flash`, que raciocina e esgota os tokens | Use `deepseek-chat` (seção 2) |
 | `Tempo de espera excedido: DeepSeek.` | Resposta passou de `OLLAMA_TIMEOUT` (120 s) | Tente de novo ou aumente `OLLAMA_TIMEOUT` no `.env` (máximo 600) |
 | `/ready` com 503 | Ollama fechado ou base sem coleção | Abra o Ollama, confira com `curl.exe http://localhost:11434/api/tags` e a seção 4 |
 | `empty_knowledge_base` | Coleção vazia | Seção 4 |
