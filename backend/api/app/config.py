@@ -1,11 +1,13 @@
 from ipaddress import ip_address
+from typing import Literal
 
 from pydantic import Field, HttpUrl, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=None, extra="ignore")
+    # Erros de validação não ecoam a entrada: ela carrega chaves e senhas.
+    model_config = SettingsConfigDict(env_file=None, extra="ignore", hide_input_in_errors=True)
 
     s3_endpoint: str = "http://localhost:9000"
     s3_public_endpoint: str = "http://localhost:9000"
@@ -78,6 +80,12 @@ class Settings(BaseSettings):
     ollama_url: HttpUrl = "http://localhost:11434"
     embedding_model: str = Field(default="qwen3-embedding:0.6b", min_length=1)
     generation_model: str = Field(default="qwen3:8b", min_length=1)
+    # Geração: ollama (local) ou API na nuvem. Embeddings e reranker seguem locais.
+    llm_provider: Literal["ollama", "google", "deepseek"] = "ollama"
+    google_api_key: SecretStr = SecretStr("")
+    deepseek_api_key: SecretStr = SecretStr("")
+    google_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    deepseek_base_url: str = "https://api.deepseek.com"
     collection_name: str = Field(default="knowledge_base", min_length=1, max_length=255)
     embedding_dimensions: int = Field(default=1024, ge=32, le=4096)
     top_k: int = Field(default=8, ge=1, le=10)
@@ -118,6 +126,14 @@ class Settings(BaseSettings):
     @classmethod
     def optional_url(cls, value):
         return value or None
+
+    @model_validator(mode="after")
+    def validate_llm_provider(self):
+        if self.llm_provider != "ollama":
+            chave = getattr(self, f"{self.llm_provider}_api_key")
+            if not chave.get_secret_value():
+                raise ValueError(f"Defina {self.llm_provider.upper()}_API_KEY para LLM_PROVIDER.")
+        return self
 
     @model_validator(mode="after")
     def validate_embedding_dimensions(self):
