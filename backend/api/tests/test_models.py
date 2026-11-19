@@ -240,3 +240,54 @@ def test_dados_faltantes_nao_bloqueia_quando_ollama_falha():
         return httpx.Response(500, json={"error": "falhou"})
 
     assert make_models(handler).dados_faltantes("Posso ser MEI?") == []
+
+
+def _deepseek(handler):
+    settings = Settings(
+        llm_provider="deepseek", deepseek_api_key="k", generation_model="deepseek-chat"
+    )
+
+    def sem_ollama(request):
+        pytest.fail(f"Ollama não deveria ser chamado: {request.url.path}")
+
+    return LocalModels(
+        settings,
+        ollama.Client(host="http://ollama.test", transport=httpx.MockTransport(sem_ollama)),
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+
+def _openai(content):
+    return httpx.Response(200, json={"choices": [{"message": {"content": content}}]})
+
+
+def test_answer_via_deepseek():
+    def handler(request):
+        corpo = json.loads(request.content)
+        assert corpo["model"] == "deepseek-chat"
+        assert "Trecho para responder." in corpo["messages"][1]["content"]
+        return _openai(" Resposta [1] ")
+
+    assert _deepseek(handler).answer("Pergunta", [source()]) == "Resposta [1]"
+
+
+def test_dados_faltantes_via_nuvem():
+    resposta = json.dumps({"precisa_dados": True, "faltam": ["CNAE"]})
+    assert _deepseek(lambda request: _openai(resposta)).dados_faltantes("Posso ser MEI?") == [
+        "CNAE"
+    ]
+    falha = _deepseek(lambda request: httpx.Response(500, json={}))
+    assert falha.dados_faltantes("Posso ser MEI?") == []
+
+
+def test_check_models_nuvem_nao_exige_modelo_de_geracao_no_ollama():
+    settings = Settings(llm_provider="google", google_api_key="k", generation_model="gemini-x")
+    client = ollama.Client(
+        host="http://ollama.test",
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200, json={"models": [{"model": "qwen3-embedding:0.6b"}]}
+            )
+        ),
+    )
+    LocalModels(settings, client).check_models()

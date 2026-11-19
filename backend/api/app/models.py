@@ -8,6 +8,7 @@ import ollama
 
 from app.config import Settings
 from app.errors import DependencyUnavailable, dependency_errors
+from app.llm_client import chat
 from app.normas import nome_norma
 from app.schemas import Source
 
@@ -143,8 +144,19 @@ def prepare_sources(
 
 
 class LocalModels:
-    def __init__(self, settings: Settings, client: ollama.Client | None = None):
+    def __init__(
+        self,
+        settings: Settings,
+        client: ollama.Client | None = None,
+        http_client: httpx.Client | None = None,
+    ):
         self.settings = settings
+        # Só para geração na nuvem (LLM_PROVIDER google/deepseek); embeddings seguem no Ollama.
+        self.http_client = http_client or (
+            httpx.Client(timeout=settings.ollama_timeout)
+            if settings.llm_provider != "ollama"
+            else None
+        )
         self.client = (
             client
             if client is not None
@@ -157,7 +169,10 @@ class LocalModels:
     def check_models(self) -> None:
         with dependency_errors("Ollama"):
             available = {item.model for item in self.client.list().models}
-        if not {self.settings.embedding_model, self.settings.generation_model} <= available:
+        required = {self.settings.embedding_model}
+        if self.settings.llm_provider == "ollama":
+            required.add(self.settings.generation_model)
+        if not required <= available:
             raise DependencyUnavailable("Os modelos configurados não estão instalados no Ollama.")
 
     def embed_question(self, question: str) -> list[float]:
@@ -188,23 +203,16 @@ class LocalModels:
             > self.settings.num_ctx - self.settings.num_predict - 256
         ):
             raise DependencyUnavailable("O contexto ultrapassa o limite configurado para geração.")
-        with dependency_errors("Ollama"):
-            response = self.client.chat(
-                model=self.settings.generation_model,
-                messages=_messages(question, sources, ausentes),
-                stream=False,
-                think=False,
-                options={
-                    "num_ctx": self.settings.num_ctx,
-                    "num_predict": self.settings.num_predict,
-                    "temperature": 0,
-                    "seed": 42,
-                },
-            )
-            content = response.message.content
-            if not content or not content.strip():
-                raise DependencyUnavailable("O modelo não retornou uma resposta utilizável.")
-            return content.strip()
+        content = chat(
+            self.settings,
+            _messages(question, sources, ausentes),
+            max_tokens=self.settings.num_predict,
+            ollama_client=self.client,
+            http_client=self.http_client,
+        ).texto
+        if not content or not content.strip():
+            raise DependencyUnavailable("O modelo não retornou uma resposta utilizável.")
+        return content.strip()
 
     def dados_faltantes(self, question: str) -> list[str]:
         """Dados do caso que faltam para responder, segundo o modelo; [] se não faltam.
@@ -213,24 +221,22 @@ class LocalModels:
         este filtro nunca impede uma resposta por erro próprio.
         """
         try:
-            response = self.client.chat(
-                model=self.settings.generation_model,
-                messages=[
+            resposta = chat(
+                self.settings,
+                [
                     {"role": "system", "content": ESCLARECIMENTO_PROMPT},
                     {"role": "user", "content": question},
                 ],
-                stream=False,
+                max_tokens=1024 if self.settings.esclarecimento_raciocinio else 128,
+                schema=_FORMATO_ESCLARECIMENTO,
                 think=self.settings.esclarecimento_raciocinio,
-                format=_FORMATO_ESCLARECIMENTO,
-                options={
-                    "num_ctx": 2048,
-                    "num_predict": 1024 if self.settings.esclarecimento_raciocinio else 128,
-                    "temperature": 0,
-                    "seed": 42,
-                },
+                num_ctx=2048,
+                ollama_client=self.client,
+                http_client=self.http_client,
             )
-            dados = json.loads(response.message.content or "")
+            dados = json.loads(resposta.texto)
         except (
+            DependencyUnavailable,
             ollama.ResponseError,
             httpx.HTTPError,
             ConnectionError,
@@ -248,3 +254,5 @@ class LocalModels:
 
     def close(self) -> None:
         self.client.close()
+        if self.http_client is not None:
+            self.http_client.close()
