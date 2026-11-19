@@ -1,6 +1,6 @@
 # Guia: usar o DeepSeek no Sócio Digital
 
-Passo a passo para gerar as respostas do RAG e do assistente pelo DeepSeek, no Windows (PowerShell), a partir da branch `main`.
+Passo a passo para gerar as respostas do RAG e do assistente pelo DeepSeek, a partir da branch `main`. Os comandos estão em PowerShell (Windows) e, onde diferem, em zsh/bash (Mac).
 
 **O que fica onde**
 
@@ -8,6 +8,7 @@ Passo a passo para gerar as respostas do RAG e do assistente pelo DeepSeek, no W
 |---|---|
 | Geração de respostas e agentes | DeepSeek (API na nuvem) |
 | Embedding das perguntas e da base | Local, `qwen3-embedding:0.6b` no Ollama (a pergunta roda em CPU) |
+| Reranker (`bge-reranker-v2-m3`) | Local: Docker com GPU NVIDIA no Windows, nativo com GPU da Apple no Mac |
 | Qdrant, Postgres, Redis, storage | Docker local |
 
 A pergunta do usuário e os trechos recuperados do acervo são enviados ao DeepSeek.
@@ -24,6 +25,7 @@ cd E:\RES-IA-Challenge-2
 
 - **Docker Desktop** aberto.
 - **Ollama** instalado e aberto. Se `ollama` não estiver no PATH, use `& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe"` no lugar.
+- **Só no Mac:** [uv](https://docs.astral.sh/uv/), para o reranker nativo (seção 3).
 - **Chave do DeepSeek:** crie em https://platform.deepseek.com/api_keys. A API é paga, então a conta precisa ter crédito. Sem crédito, a API responde `HTTP 402`.
 
 ```powershell
@@ -53,7 +55,11 @@ DEEPSEEK_API_KEY=sua-chave-aqui
 GENERATION_MODEL=deepseek-chat
 EMBEDDING_MODEL=qwen3-embedding:0.6b
 COLLECTION_NAME=knowledge_base_v2
+RERANKER_URL=http://reranker:8080
+RERANKER_TIMEOUT=60
 ```
+
+No Mac, use `RERANKER_URL=http://host.docker.internal:18080` (o reranker roda fora do Docker, seção 3). Sem `RERANKER_URL`, a busca funciona, mas com recall menor: o log do worker avisa `RERANKER_URL não definida`.
 
 - **A chave:** não compartilhe e não commite. O `backend/.env` já está no `.gitignore`. Cópias como `.env.bak` **não** estão, então não deixe cópias dentro do repositório.
 - **Voltar para o Gemini:** troque `LLM_PROVIDER=google`, com `GOOGLE_API_KEY` preenchida. As duas chaves podem ficar no arquivo ao mesmo tempo.
@@ -71,6 +77,16 @@ docker compose @compose up -d --build --wait api worker dispatcher frontend
 curl.exe -i http://localhost:8000/ready
 ```
 
+No Mac (zsh), troque a variável `$compose` por uma função:
+
+```bash
+dc() { docker compose --env-file backend/.env -f backend/compose.yaml "$@"; }
+dc up -d --wait postgres redis storage qdrant
+dc run --rm --build api alembic upgrade head
+dc up -d --build --wait api worker dispatcher frontend
+curl -i http://localhost:8000/ready
+```
+
 O `/ready` deve responder `HTTP/1.1 200`. Com o DeepSeek, ele confere só o Qdrant, a coleção e o modelo de embedding no Ollama. Ele não chama o DeepSeek.
 
 Sempre que mudar o `backend/.env`, recrie os containers para que leiam a nova configuração:
@@ -78,6 +94,24 @@ Sempre que mudar o `backend/.env`, recrie os containers para que leiam a nova co
 ```powershell
 docker compose @compose up -d api worker
 ```
+
+### Reranker
+
+O reranker reordena os candidatos da busca antes de escolher os trechos que vão ao DeepSeek. O primeiro uso baixa o modelo (~2,3 GB).
+
+**Windows (GPU NVIDIA):**
+
+```powershell
+docker compose @compose --profile gpu up -d --build reranker
+```
+
+**Mac:** o Docker do Mac não acessa a GPU da Apple, e em CPU o reranker leva ~0,9 s por trecho, lento demais. Rode-o nativo, num terminal à parte, que fica aberto:
+
+```bash
+scripts/reranker-mac.sh
+```
+
+Ele deve responder `{"status":"ok","dispositivo":"mps"}` em `curl http://localhost:18080/health`. Com MPS, 40 trechos levam ~5 s.
 
 ### Se o `alembic upgrade head` falhar com `Can't locate revision identified by '0011_password_recovery'`
 
@@ -114,6 +148,19 @@ backend\api\.venv\Scripts\python.exe -u -m src.rag.csv_para_qdrant --csv data\re
 - **Tempo:** de 3,5 a 5 horas numa RTX 3060 de notebook, se a GPU estiver livre. Feche Wallpaper Engine, Godot, Steam, Parsec e o overlay da NVIDIA, e deixe o notebook na tomada. Com esses programas abertos, a carga chega a 11 horas.
 - **Se parar no meio:** rode o último comando de novo. O `--retomar` continua de onde parou.
 - **Durante a carga:** o RAG já funciona, mas só com os documentos gravados até o momento.
+- **Mac:** use `backend/api/.venv/bin/python` no lugar de `backend\api\.venv\Scripts\python.exe`, e `curl -X DELETE` no lugar do `Invoke-RestMethod -Method Delete`.
+
+### Catálogo jurídico do assistente
+
+O assistente com agentes **não** usa a coleção acima. Ele consulta o catálogo de normas versionadas (Postgres e coleção `legal_versions_v1`). Com o catálogo vazio, toda pergunta normativa termina em `Não encontrei contexto normativo publicado e vigente suficiente para responder.`, mesmo com o DeepSeek funcionando.
+
+Para o teste da seção 5, ingira o excerto de referência da LC 123/2006:
+
+```powershell
+docker compose @compose run --rm -v "${PWD}/data/referencias:/ref:ro" api python -m app.legal.cli ingest --file /ref/lc123-art13.md --metadata /ref/lc123-art13.json --key lc123-art13-caput-2007-07
+```
+
+No Mac, troque `docker compose @compose` por `dc` e `${PWD}` por `$PWD`. O comando imprime o UUID da versão, e o worker a publica em segundos. Repetir o comando não duplica a norma. Para publicar outras normas, veja "Ingestão administrativa de normas versionadas" em `backend/README.md`.
 
 ---
 
@@ -154,9 +201,37 @@ $estado.run.stages | ForEach-Object { "  $($_.name): $($_.status) | $($_.model) 
 (Invoke-Api Get "/conversas/$($conversa.id)/mensagens" $null).items | Where-Object role -eq "assistant" | ForEach-Object { $_.text }
 ```
 
+No Mac, o mesmo teste em bash (salve, por exemplo, em `$TMPDIR/testar-deepseek.sh` e rode com `bash "$TMPDIR/testar-deepseek.sh"`):
+
+```bash
+set -euo pipefail
+A=http://localhost:8000; J=$(mktemp)
+csrf() { curl -s -b "$J" -c "$J" "$A/auth/csrf" | python3 -c 'import sys,json;print(json.load(sys.stdin)["csrf_token"])'; }
+post() { curl -s -b "$J" -c "$J" -H "Origin: $A" -H "X-CSRF-Token: $(csrf)" -H 'Content-Type: application/json' "${@:2}" -X POST "$A$1"; }
+get()  { curl -s -b "$J" -c "$J" "$A$1"; }
+j()    { python3 -c "import sys,json;d=json.load(sys.stdin);$1"; }
+Q="Qual a periodicidade do recolhimento pelo DAS no Simples Nacional?"
+
+CONTA='{"email":"teste-llm@example.com","password":"SenhaDeTeste#2026"}'
+post /auth/login -d "$CONTA" | grep -q '"detail"' && post /auth/register -d "$CONTA" >/dev/null
+
+# 1) RAG direto
+post /rag/query -m 300 -d "{\"question\":\"$Q\"}" | j 'print("RAG:",d["status"],len(d["sources"]),"fontes");print(d["answer"])'
+
+# 2) Assistente com agentes (empresa -> conversa -> mensagem -> worker)
+E=$(get /empresas | j 'print(d["items"][0]["id"] if d.get("items") else "")')
+[ -z "$E" ] && E=$(post /empresas -d '{"cnpj":"11222333000181","cnae":"6201501","size":"ME","regime":"simples","municipality":"Brasília","state":"DF"}' | j 'print(d["id"])')
+CV=$(post "/empresas/$E/conversas" -d '{"title":"Teste DeepSeek"}' | j 'print(d["id"])')
+OP=$(post "/conversas/$CV/mensagens" -H "Idempotency-Key: $(uuidgen)" -d "{\"text\":\"$Q\"}" | j 'print(d["operation_id"])')
+for _ in $(seq 200); do sleep 3; st=$(get "/operacoes/$OP" | j 'print(d["status"])'); [[ $st == queued || $st == running ]] || break; done
+echo "Assistente: $st"
+get "/operacoes/$OP" | j '[print(" ",s["name"],s["status"],s.get("model"),(s.get("usage") or {}).get("input_tokens"),"+",(s.get("usage") or {}).get("output_tokens"),"tokens") for s in d["run"]["stages"]]'
+get "/conversas/$CV/mensagens" | j '[print(m["text"]) for m in d["items"] if m["role"]=="assistant"]'
+```
+
 **Resultado esperado:**
-- **RAG:** `answered`, com citações `[1]`, `[2]`.
-- **Assistente:** `succeeded`, com os estágios `plan`, `legal` e `synthesis`, cada um mostrando `deepseek-chat` e a contagem de tokens.
+- **RAG:** `answered`, com citações `[1]`, `[2]`. Se a busca não trouxer o trecho certo, o status é `insufficient_context`.
+- **Assistente:** `succeeded`, com os estágios `plan`, `legal` e `synthesis`, cada um mostrando `deepseek-chat` e a contagem de tokens. A resposta cita a LC 123/2006: recolhimento mensal, por documento único de arrecadação.
 
 Também dá para testar pela interface em http://localhost:3000.
 
@@ -191,10 +266,14 @@ docker logs socio-digital-worker-1 --tail 30
 | `Tempo de espera excedido: DeepSeek.` | Resposta passou de `OLLAMA_TIMEOUT` (120 s) | Tente de novo ou aumente `OLLAMA_TIMEOUT` no `.env` (máximo 600) |
 | `/ready` com 503 | Ollama fechado ou base sem coleção | Abra o Ollama, confira com `curl.exe http://localhost:11434/api/tags` e a seção 4 |
 | `empty_knowledge_base` | Coleção vazia | Seção 4 |
+| Assistente: `Não encontrei contexto normativo publicado e vigente suficiente para responder.` | Catálogo jurídico vazio | Seção 4, "Catálogo jurídico do assistente" |
+| Log: `RERANKER_URL não definida` ou `Reranker indisponível` | Reranker desligado ou fora do ar | Seção 3, "Reranker"; a busca segue sem ele, com recall menor |
+| Mac: reranker no Docker muito lento ou `could not select device driver` | O Docker do Mac não acessa GPU | Rode `scripts/reranker-mac.sh` (seção 3) |
 | Erro 500 com `column ... does not exist` | Banco sem as migrações desta branch | Seção 3 (alembic) |
 | Mensagens de erro do assistente sem detalhe | O worker só registra o tipo do erro | Veja o log do worker e a etapa com `status: failed` em `/operacoes/<id>` |
 
 **Limitações conhecidas:**
 - **Sem nova tentativa automática:** o código não tenta de novo uma chamada que falhou por um motivo passageiro, como um 429 ou 503. No assistente, cada etapa dos agentes tem até 2 tentativas.
 - **JSON vazio:** no modo JSON, o DeepSeek às vezes devolve conteúdo vazio. O código trata isso como erro, `O modelo não retornou uma resposta utilizável.`, e basta repetir a pergunta.
+- **Recall do `/rag/query`:** o trecho que responde pode ficar fora dos `CANDIDATE_K=30` candidatos, e então o DeepSeek diz que os documentos não tratam do ponto. Na pergunta de teste, o trecho do Q&A do Simples Nacional com o prazo do DAS fica na posição 81 da busca. Não suba `CANDIDATE_K` para 100: no benchmark de 12/11/2026 isso piorou `artigo_esperado` (0,794 → 0,752) e o Recall@8. O assistente com agentes não depende disso, porque consulta o catálogo jurídico.
 - **Limites de contexto:** `NUM_CTX` e `MAX_CONTEXT_CHARS` continuam os do modelo local e não aproveitam a janela maior do DeepSeek.
