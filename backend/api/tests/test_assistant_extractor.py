@@ -1,8 +1,10 @@
 """Testes unitários para o Extrator de Entidades Fiscais e Guardrails do Assistente."""
 
+from datetime import datetime, timezone
 from unittest.mock import MagicMock
 from uuid import uuid4
 
+from app.assistant.context import resolve_context
 from app.assistant.extractor import FiscalExtractionResult, TaxEntityExtractor
 from app.assistant.orchestrator import answer_message
 from app.assistant.schemas import MessageInput
@@ -69,6 +71,30 @@ def test_resolve_context_enriches_with_extraction():
     assert "extraction" in decision.context
     assert "query_expandida" in decision.context
     assert decision.context["extraction"]["intencao_primaria"] == "calculo_simples"
+
+
+def test_resolve_context_does_not_block_mei_queries_with_false_period():
+    snapshot = CompanySnapshot(
+        id=uuid4(),
+        cnpj="11222333000181",
+        cnae="4781000",
+        state="DF",
+        municipality="Brasília",
+        size="mei",
+        regime="mei",
+        provenance={"cnpj": "test"},
+        created_at=datetime.now(timezone.utc),
+    )
+    # Perguntas conceituais de MEI não devem travar pedindo period AAAA-MM
+    msg1 = MessageInput(text="Qual o dia de vencimento da guia DAS do MEI?")
+    dec1 = resolve_context(snapshot, msg1)
+    assert dec1.state == "ready"
+    assert "period" not in dec1.missing_fields
+
+    msg2 = MessageInput(text="Quanto o MEI paga de imposto por mês?")
+    dec2 = resolve_context(snapshot, msg2)
+    assert dec2.state == "ready"
+    assert "period" not in dec2.missing_fields
 
 
 def test_answer_message_abstains_on_fraud():

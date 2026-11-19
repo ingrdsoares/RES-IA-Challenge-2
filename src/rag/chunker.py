@@ -222,6 +222,23 @@ class LegalHierarchicalChunker:
                 effective_date=effective_date,
             )
 
+    def _normalize_legal_text(self, text: str) -> str:
+        """Normaliza quebras de linha entre prefixos jurídicos ('Art.', '§') e números."""
+        # Junta "Art.\n1º", "### Art.\n  1º", "ART.\n10", etc.
+        text = re.sub(
+            r"((?:^|\n)(?:#{1,4}\s*)?(?:Art|ART)\.)\s*\n\s*(\d+[-A-Za-zºo°\.]*)",
+            r"\1 \2",
+            text,
+        )
+        # Junta "§\n1º", "§\n  2º", "§\núnico", etc.
+        text = re.sub(
+            r"((?:^|\n)(?:#{1,4}\s*)?§)\s*\n\s*(\d+[-A-Za-zºo°\.]*|único)",
+            r"\1 \2",
+            text,
+            flags=re.IGNORECASE,
+        )
+        return text
+
     def _chunk_legislative_document(
         self,
         text: str,
@@ -232,6 +249,7 @@ class LegalHierarchicalChunker:
         effective_date: Optional[str],
     ) -> List[LegalChunk]:
         """Segmentação de diplomas legislativos por Artigos, Caputs e Parágrafos."""
+        text = self._normalize_legal_text(text)
         chunks: List[LegalChunk] = []
         sections = self._split_by_articles(text)
 
@@ -308,6 +326,7 @@ class LegalHierarchicalChunker:
 
     def _split_by_articles(self, text: str) -> List[Dict[str, str]]:
         """Extrai os blocos correspondentes a cada artigo no markdown."""
+        text = self._normalize_legal_text(text)
         lines = text.split("\n")
         articles = []
         current_artigo = "Preâmbulo / Introdução"

@@ -65,3 +65,30 @@ def test_mesmo_segmento_com_corpo_diferente_nao_e_perdido():
 def test_texto_antes_do_primeiro_segmento_e_sem_segmento_ficam_iguais():
     assert limpar_segmentos("Sem segmentos.\n") == "Sem segmentos.\n"
     assert limpar_segmentos("Início.\n\n## Segmento 1 — versão 1\n\nA.\n").startswith("Início.")
+
+
+def test_artigo_com_quebra_de_linha_vira_rotulo():
+    texto = (
+        "# Lei Complementar nº 214/2025\n"
+        "### Art.\n"
+        "1º Esta Lei Complementar regulamenta o CG-IBS.\n"
+        "Art.\n"
+        "12. As microempresas manterão apuração simplificada.\n"
+    )
+    chunks = LegalHierarchicalChunker().chunk_document(texto, "LC 214/2025")
+    artigos = [c.artigo for c in chunks]
+    assert "Art. 1º" in artigos
+    assert "Art. 12." in artigos
+
+
+def test_paragrafo_com_quebra_de_linha_e_reconhecido():
+    texto = (
+        "Art. 1º Regra geral sobre tributação.\n\n"
+        "§\n"
+        "1º O disposto neste artigo aplica-se a ME e EPP.\n\n"
+        "§\n"
+        "2º Fica vedada a dedução indevida.\n"
+    )
+    chunks = LegalHierarchicalChunker(max_chunk_chars=100).chunk_document(texto, "Norma")
+    paragrafos = [c.paragrafo for c in chunks]
+    assert any("§ 1º" in p or "1" in p for p in paragrafos)
