@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import {
+  AlertTriangle,
   ArrowRight,
   Building2,
   CalendarDays,
+  Edit3,
   FileBadge2,
   ListChecks,
   MessageSquare,
+  TrendingUp,
 } from 'lucide-react';
 import { formatCnpj } from '../components/Sidebar';
 import { api } from '../services/api';
@@ -242,6 +245,220 @@ function Simulator({ company }: { company: Company }) {
   );
 }
 
+function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
+  if (!tasks?.length) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const critical = tasks
+    .filter((t) => t.due_date && !t.completed)
+    .map((t) => {
+      const due = new Date(t.due_date + 'T00:00:00');
+      const diffMs = due.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      return { task: t, diffDays };
+    })
+    .filter((item) => item.diffDays <= 7)
+    .sort((a, b) => a.diffDays - b.diffDays);
+
+  if (!critical.length) return null;
+
+  const overdue = critical.filter((c) => c.diffDays < 0);
+  const isUrgent = overdue.length > 0;
+
+  return (
+    <aside
+      role="alert"
+      className={
+        'rounded-xl border p-4 text-sm ' +
+        (isUrgent
+          ? 'border-rose-300 bg-rose-50 text-rose-950'
+          : 'border-amber-300 bg-amber-50 text-amber-950')
+      }
+    >
+      <div className="flex items-center gap-2 font-bold">
+        <AlertTriangle
+          size={18}
+          className={isUrgent ? 'text-rose-600' : 'text-amber-600'}
+        />
+        <span>
+          {isUrgent
+            ? `Atenção: ${overdue.length} obrigação(ões) em atraso!`
+            : `Próximos vencimentos críticos nesta semana (${critical.length})`}
+        </span>
+      </div>
+      <ul className="mt-3 divide-y divide-black/10">
+        {critical.slice(0, 3).map(({ task, diffDays }) => (
+          <li
+            key={task.id}
+            className="flex flex-wrap items-center justify-between gap-2 py-2"
+          >
+            <div className="min-w-0">
+              <strong className="block truncate">{task.title}</strong>
+              <small className="text-black/70">
+                Prazo oficial: {task.due_date ? dateLabel(task.due_date) : '-'}
+              </small>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={
+                  'rounded-full px-2.5 py-0.5 text-xs font-semibold ' +
+                  (diffDays < 0
+                    ? 'bg-rose-600 text-white'
+                    : diffDays === 0
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-amber-200 text-amber-900')
+                }
+              >
+                {diffDays < 0
+                  ? `Atrasado há ${Math.abs(diffDays)} dia(s)`
+                  : diffDays === 0
+                    ? 'Vence hoje'
+                    : diffDays === 1
+                      ? 'Vence amanhã'
+                      : `Vence em ${diffDays} dias`}
+              </span>
+              <a
+                href={`#tarefas?task=${task.id}`}
+                className="font-semibold underline hover:opacity-80"
+              >
+                Ver tarefa
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
+function RevenueThermometer({ company }: { company: Company }) {
+  const regime = company.regime.toLowerCase();
+  const isMei =
+    /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
+
+  const limit = isMei ? 81000 : 4800000;
+
+  const storageKey = 'revenue:' + company.id;
+  const [revenue, setRevenue] = useState<number>(() => {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? Number(saved) : isMei ? 48500 : 850000;
+  });
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(String(revenue));
+
+  function save(e: FormEvent) {
+    e.preventDefault();
+    const val = Number(inputVal) || 0;
+    setRevenue(val);
+    localStorage.setItem(storageKey, String(val));
+    setEditing(false);
+  }
+
+  const pct = Math.min(100, Math.round((revenue / limit) * 100));
+  const remaining = Math.max(0, limit - revenue);
+
+  const statusColor =
+    pct < 70
+      ? 'bg-emerald-500'
+      : pct < 90
+        ? 'bg-amber-500'
+        : 'bg-rose-600';
+
+  return (
+    <section className="panel space-y-4" aria-label="Termômetro de Faturamento">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="rounded-lg bg-info p-2 text-link">
+            <TrendingUp size={20} />
+          </span>
+          <div>
+            <h2 className="font-bold text-ink">
+              Termômetro de Limite de Faturamento Anual
+            </h2>
+            <p className="text-xs text-ink-muted">
+              {isMei
+                ? 'Teto do MEI: R$ 81.000,00/ano (média R$ 6.750,00/mês)'
+                : 'Teto Simples Nacional: R$ 4.800.000,00/ano (sublimite R$ 3.600.000,00)'}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setInputVal(String(revenue));
+            setEditing(!editing);
+          }}
+          className="secondary inline-flex items-center gap-1.5 text-xs font-semibold"
+        >
+          <Edit3 size={14} /> {editing ? 'Cancelar' : 'Ajustar receita informada'}
+        </button>
+      </div>
+
+      {editing && (
+        <form onSubmit={save} className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-surface-muted p-3">
+          <label className="field text-xs">
+            Receita Bruta Acumulada no Ano (R$)
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={inputVal}
+              onChange={(e) => setInputVal(e.target.value)}
+              required
+              className="text-sm font-semibold"
+            />
+          </label>
+          <button className="primary text-xs py-2">Salvar valor</button>
+        </form>
+      )}
+
+      <div>
+        <div className="mb-2 flex flex-wrap items-center justify-between text-sm">
+          <span>
+            Faturamento acumulado: <strong>{money.format(revenue)}</strong>
+          </span>
+          <span className="font-semibold text-ink">
+            {pct}% do teto ({money.format(limit)})
+          </span>
+        </div>
+        <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
+          <div
+            className={`h-full transition-all duration-500 ${statusColor}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 text-xs">
+        <div className="rounded-lg bg-surface-muted p-3">
+          <span className="block text-ink-muted">Saldo restante até o teto</span>
+          <strong className="text-base text-ink">{money.format(remaining)}</strong>
+        </div>
+        <div className="rounded-lg bg-surface-muted p-3">
+          <span className="block text-ink-muted">Diagnóstico preventivo</span>
+          <span
+            className={
+              'font-semibold ' +
+              (pct < 70
+                ? 'text-emerald-700'
+                : pct < 90
+                  ? 'text-amber-700'
+                  : 'text-rose-700')
+            }
+          >
+            {pct < 70
+              ? 'Faixa segura de faturamento no período.'
+              : pct < 90
+                ? 'Atenção: aproximando-se do teto anual do regime.'
+                : 'Alerta crítico: risco iminente de desenquadramento fiscal!'}
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Dashboard({ company }: PageProps) {
   const base = `/empresas/${company.id}`;
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
@@ -252,6 +469,7 @@ export function Dashboard({ company }: PageProps) {
     .slice(0, 4);
   return (
     <div className="stack">
+      <UrgentAlertBanner tasks={tasks.data} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Visão geral</h1>
@@ -302,6 +520,7 @@ export function Dashboard({ company }: PageProps) {
         })}
       </section>
       {status.error && <Feedback error={status.error} retry={status.refresh} />}
+      <RevenueThermometer company={company} />
       <section className="panel space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">Próximas tarefas</h2>
