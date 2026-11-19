@@ -61,6 +61,25 @@ CHUNKER_ARTIGO: LegalHierarchicalChunker | None = None
 # Naturezas tratadas como legislação no corte por artigo: leis grandes (ex.: Lei 9.249) vêm
 # como "nao_informada" no CSV. Só vale se o texto tiver "Art. N" (senão o chunker não muda).
 NATUREZAS_ARTIGO = frozenset({"legislacao", "nao_informada", "ato_normativo_administrativo"})
+# Título de norma legal: leis, decretos, MPs, Constituição/emendas e ajustes/convênios do CONFAZ.
+TITULO_LEGISLACAO = re.compile(
+    r"^\s*(lei(\s+complementar)?|decreto(-lei)?|medida\s+provis[oó]ria|"
+    r"constitui[cç][aã]o|emenda\s+constitucional|ajuste\s+sinief|conv[eê]nio\s+icms)\b",
+    re.IGNORECASE,
+)
+
+
+def natureza_do_documento(titulo: str | None, natureza: str | None) -> str | None:
+    """Natureza gravada no payload; "nao_informada" com título de lei vira "legislacao".
+
+    Sem isso, as leis federais centrais (LC 123, CTN, Lei 9.249...) ficam fora dos reforços
+    de legislação da busca e do reranker, que só valem para natureza "legislacao".
+    """
+    if natureza in (None, "", "nao_informada") and titulo and TITULO_LEGISLACAO.match(titulo):
+        return "legislacao"
+    return natureza or None
+
+
 # Marca gravada no payload só nos modos novos; --retomar só pula ponto da mesma configuração.
 CARGA = ""
 # Ligada por --vigencia-do-titulo: CSV sem vigencia_fonte ganha a data do ato (título/DODF).
@@ -318,7 +337,7 @@ def itens_do_documento(
                 "norma": chaves_normas(linha["titulo"]),
                 "artigo": chave_artigo(chunk.artigo),
                 "frente": linha.get("frente") or None,
-                "natureza": linha.get("natureza") or None,
+                "natureza": natureza_do_documento(linha["titulo"], linha.get("natureza")),
                 "ordem": indice,
             }
             if CARGA:

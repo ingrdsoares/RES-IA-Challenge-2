@@ -11,7 +11,7 @@ from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
 from app.reranker import Reranker
 from app.schemas import QueryResponse, Source
-from app.vector_store import VectorStore
+from app.vector_store import NATUREZA_NORMA, VectorStore
 
 
 def _corpo(fonte: Source) -> str:
@@ -49,6 +49,36 @@ def combinar(
         else:
             sobras.append(fonte)
     return (saida + sobras)[:top_k] if len(saida) < top_k else saida[:top_k]
+
+
+def legislacao_reservada(ordem: list[Source], quantidade: int) -> list[Source]:
+    """Os `quantidade` primeiros trechos de legislação na ordem do reranker.
+
+    O reranker favorece soluções de consulta que repetem a pergunta; sem vaga reservada, a
+    regra geral da lei pode ficar fora do contexto e o modelo generaliza a exceção da consulta
+    (ex.: 8%/12% de serviços hospitalares no lugar dos 32% do art. 15, §1º, III da Lei 9.249).
+    """
+    if quantidade <= 0:
+        return []
+    return [f for f in ordem if f.natureza == NATUREZA_NORMA][:quantidade]
+
+
+def artigos_mais_citados(
+    fontes: list[Source], minimo: int = 2, maximo: int = 2
+) -> list[tuple[str, str]]:
+    """Pares (norma, artigo) citados por pelo menos `minimo` fontes diferentes, do mais citado.
+
+    Soluções de consulta citam a lei que aplicam ("Lei nº 9.249, de 1995, art. 15"), mesmo
+    quando o texto da lei não usa as palavras da pergunta e a busca não o encontra. Exigir
+    mais de uma fonte filtra atribuições erradas do extrator (artigo ligado à norma vizinha).
+    """
+    contagem: dict[tuple[str, str], int] = {}
+    for fonte in fontes:
+        for par in set(artigos_citados(fonte.text)):
+            contagem[par] = contagem.get(par, 0) + 1
+    pares = [par for par, n in contagem.items() if n >= minimo]
+    pares.sort(key=lambda par: -contagem[par])
+    return pares[:maximo]
 
 
 def juntar_continuacoes(fontes: list[Source], seguintes: dict) -> list[Source]:
@@ -173,9 +203,10 @@ class RagService:
         citados = self.store.search_articles(vector, artigos_citados(question)) + citados
         candidatos = combinar([], citados + self.store.search(vector, question), 1000)
         ordem = self.reranker.reordenar(question, candidatos)
+        seguidos, reserva = self._legislacao(question, vector, ordem)
         escolhidos = combinar(
             citados,
-            ordem[:2] + self._por_parte(question) + ordem,
+            ordem[:2] + seguidos + reserva + self._por_parte(question) + ordem,
             self.settings.top_k,
             self.settings.max_trechos_por_documento,
         )
@@ -210,6 +241,29 @@ class RagService:
             return sources, answer
         nova, _ = citacoes_validas(self.models.answer(question, novas, ausentes), len(novas))
         return (sources, answer) if e_recusa(nova) else (novas, nova)
+
+    def _legislacao(
+        self, question: str, vector: list[float], ordem: list[Source]
+    ) -> tuple[list[Source], list[Source]]:
+        """Vagas de legislação: (artigo que as melhores fontes citam, lei mais bem colocada).
+
+        Ambas entram logo depois dos dois melhores trechos do reranker. Pôr a lei em [1] foi
+        pior na q08: o qwen3:8b leu o caput (8%, comércio) como regra geral de serviços.
+        """
+        quantidade = self.settings.min_trechos_legislacao
+        if quantidade <= 0:
+            return [], []
+        pares = artigos_mais_citados(ordem[: self.settings.top_k])
+        seguidos = [
+            f
+            for f in (self.store.search_articles(vector, pares) if pares else [])
+            if f.natureza == NATUREZA_NORMA
+        ]
+        if seguidos:
+            # Artigo longo vira várias janelas; o reranker escolhe a que responde à pergunta.
+            seguidos = self.reranker.reordenar(question, seguidos)[:quantidade]
+        reserva = legislacao_reservada(ordem, quantidade - len(seguidos))
+        return seguidos, reserva
 
     def _por_parte(self, question: str) -> list[Source]:
         """Em pergunta composta, os melhores trechos de cada parte, alternados."""

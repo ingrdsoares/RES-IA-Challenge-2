@@ -32,7 +32,14 @@ curl -X POST "http://127.0.0.1:6333/collections/knowledge_base_v2/snapshots/uplo
 
 # 4. Conferir
 curl -s http://127.0.0.1:6333/collections/knowledge_base_v2   # points_count = 155781
+
+# 5. Corrigir a natureza das leis (o snapshot de 12/11 traz 16 leis como "nao_informada")
+python scripts/corrigir_natureza_qdrant.py --colecao knowledge_base_v2            # simula
+python scripts/corrigir_natureza_qdrant.py --colecao knowledge_base_v2 --aplicar  # 3.867 pontos
 ```
+
+O passo 5 só muda o payload `natureza` (sem reembedar nem mudar ids). Sem ele, os reforços de
+legislação da busca e do reranker não valem para LC 123, CTN, Lei 9.249, RIR e outras.
 
 Para usar a v3 na API, defina `COLLECTION_NAME=knowledge_base_v3` em `backend/.env`.
 

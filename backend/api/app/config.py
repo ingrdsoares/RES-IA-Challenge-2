@@ -86,6 +86,8 @@ class Settings(BaseSettings):
     legislation_boost: float = Field(default=0.2, ge=0, le=2, allow_inf_nan=False)
     # Somado ao score do reranker para trechos de legislação; 0 desliga.
     rerank_legislation_boost: float = Field(default=0.0, ge=0, le=1, allow_inf_nan=False)
+    # Trechos de legislação garantidos no top-k (logo após os 2 melhores do reranker); 0 desliga.
+    min_trechos_legislacao: int = Field(default=1, ge=0, le=10)
     # Caracteres de trechos vizinhos do mesmo documento somados a cada fonte; 0 desliga.
     context_window_chars: int = Field(default=0, ge=0, le=8000)
     # Máximo de trechos do mesmo documento no top-k (variedade de fontes); 0 desliga.

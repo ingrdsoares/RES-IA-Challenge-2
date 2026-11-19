@@ -103,6 +103,9 @@ Com 20 perguntas, "18 de 20" tem intervalo de confiança de cerca de 68% a 99%. 
 | Temperatura e semente | 0 e 42 | Respostas repetíveis entre rodadas |
 
 | `LEGISLATION_BOOST` | 0,2 | Multiplica por 1,2 o score híbrido de trechos com `natureza = legislacao`, para a lei vencer documento secundário quando a relevância é próxima (n11, n03). Com o reranker ligado, só afeta os dois trechos que entram antes dele; 0 desliga. A medir com os serviços no ar: 0, 0,2 e 0,4 |
+| `MIN_TRECHOS_LEGISLACAO` | 1 | Vagas de legislação garantidas no top-k, logo após os dois melhores trechos do reranker. Primeiro entra o artigo de lei citado por pelo menos duas das melhores fontes (ex.: as soluções de consulta da q08 citam o art. 15 da Lei 9.249, que a busca não acha por vocabulário); sem isso, a lei mais bem colocada pelo reranker. 0 desliga |
+
+Até 19/11/2026, 16 leis centrais (LC 123, CTN, LC 87, LC 116, Lei 9.249, Lei 9.430, RIR, entre outras) estavam na `knowledge_base_v2` com `natureza = nao_informada` e ficavam fora dos dois reforços acima. A carga (`src/rag/csv_para_qdrant.py`) agora infere `legislacao` pelo título; coleções já carregadas são corrigidas com `scripts/corrigir_natureza_qdrant.py` (ver `docs/dados/restaurar-qdrant.md`).
 
 Sem `RERANKER_URL`, a API registra um aviso na partida: a busca fica só na ordem híbrida, pior que a do reranker (seção 3). No `compose.yaml` de desenvolvimento, o reranker só sobe com o perfil `gpu`.
 

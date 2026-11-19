@@ -23,7 +23,10 @@ SYSTEM_PROMPT = (
     "não é negação: se os documentos não tratam do ponto, diga que não tratam, sem concluir "
     "que algo não existe ou não é assegurado. Só responda sim ou não se um documento decidir "
     "exatamente esse ponto; regra de outro regime ou tributo não decide. Regra de caso específico "
-    "não é regra geral: diga a que caso ela se aplica. A pedido de ajuda para sonegar, fraudar ou "
+    "não é regra geral: diga a que caso ela se aplica. Se um percentual, alíquota ou prazo valer "
+    "só para certa atividade ou condição, diga qual na mesma frase e, se houver, dê antes a regra "
+    'geral da lei. Para a regra geral, prefira o documento de tipo "lei ou norma"; solução de '
+    "consulta decide o caso concreto do consulente. A pedido de ajuda para sonegar, fraudar ou "
     'esconder algo do fisco, responda apenas: "Não posso ajudar com sonegação ou fraude fiscal." '
     "Se a resposta depender de dados do caso do usuário que ele não informou, como regime, atividade, receita ou "
     "qual declaração, peça esses dados antes de citar valores. Se faltarem informações, diga isso "
@@ -78,6 +81,14 @@ def _aviso_ausentes(ausentes: Sequence[str]) -> str:
     )
 
 
+# Rótulo do campo "tipo" mostrado ao modelo; natureza fora da lista vai como está.
+TIPOS_DOCUMENTO = {
+    "legislacao": "lei ou norma",
+    "interpretacao_administrativa": "solução de consulta (caso concreto)",
+    "consulta_tributaria": "solução de consulta (caso concreto)",
+}
+
+
 def _messages(
     question: str, sources: list[Source], ausentes: Sequence[str] = ()
 ) -> list[dict[str, str]]:
@@ -87,6 +98,7 @@ def _messages(
             "text": s.text,
             "source": s.source,
             "title": s.title,
+            "tipo": TIPOS_DOCUMENTO.get(s.natureza or "", s.natureza),
             "reference_date": str(s.reference_date) if s.reference_date else None,
             "effective_date": str(s.effective_date) if s.effective_date else None,
         }
