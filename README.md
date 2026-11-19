@@ -43,12 +43,20 @@ Por padrão, as respostas são geradas pelo Qwen no Ollama. Para gerá-las por u
 ```env
 LLM_PROVIDER=google            # ou deepseek
 GOOGLE_API_KEY=sua-chave       # ou DEEPSEEK_API_KEY=sua-chave
-GENERATION_MODEL=gemini-2.5-flash   # ou deepseek-chat
+GENERATION_MODEL=gemini-3.5-flash   # ou deepseek-chat
 ```
 
 A pergunta e os trechos recuperados do acervo passam a ser enviados ao provedor escolhido. Os embeddings e o reranker continuam locais, então o Ollama segue necessário, só com o modelo de embedding. Os limites de contexto (`NUM_CTX`, `MAX_CONTEXT_CHARS`) não mudam com o provedor.
 
-No Gemini, `GOOGLE_REASONING_EFFORT=none` (padrão) desliga o raciocínio do 2.5 Flash, que senão consome o limite de tokens da resposta. Para 2.5 Pro ou Gemini 3, que não aceitam `none`, deixe a variável vazia.
+No Gemini, os modelos que raciocinam por padrão gastam nisso parte do limite de tokens da resposta, que pode sair cortada. `GOOGLE_REASONING_EFFORT` define o nível enviado; vazio (padrão) usa o do modelo. Os níveis aceitos variam por modelo. Testado em 19/11/2026:
+
+| Modelo | Valor recomendado |
+|--------|-------------------|
+| `gemini-3.5-flash` | `minimal` (sem ele, cerca de 600 tokens vão para o raciocínio) |
+| `gemini-3.1-flash-lite`, `gemini-3.5-flash-lite` | vazio ou `minimal` (não raciocinam por padrão) |
+| `gemini-3.8-flash`, `gemini-flash-latest` | não aceitam `minimal`; deixe vazio |
+
+O `gemini-2.5-flash` não está mais disponível para contas novas.
 
 ## Como funciona
 

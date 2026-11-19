@@ -131,7 +131,7 @@ def test_nuvem_resposta_vazia(corpo):
         chat(settings, MENSAGENS, max_tokens=64, http_client=http)
 
 
-def test_google_desliga_raciocinio_salvo_quando_pedido_ou_configurado():
+def test_google_so_envia_reasoning_effort_configurado_sem_think():
     corpos = []
 
     def respond(request):
@@ -139,18 +139,15 @@ def test_google_desliga_raciocinio_salvo_quando_pedido_ou_configurado():
         return httpx.Response(200, json=_resposta_openai())
 
     settings, http = _nuvem("google", respond)
+    minimal = settings.model_copy(update={"google_reasoning_effort": "minimal"})
+    # Cada modelo aceita um conjunto diferente de níveis: o padrão não envia nada.
     chat(settings, MENSAGENS, max_tokens=64, http_client=http)
-    chat(settings, MENSAGENS, max_tokens=64, think=True, http_client=http)
-    chat(
-        settings.model_copy(update={"google_reasoning_effort": ""}),
-        MENSAGENS,
-        max_tokens=64,
-        http_client=http,
-    )
-    padrao, pensando, sem_campo = corpos
-    assert padrao["reasoning_effort"] == "none"
+    chat(minimal, MENSAGENS, max_tokens=64, http_client=http)
+    chat(minimal, MENSAGENS, max_tokens=64, think=True, http_client=http)
+    padrao, configurado, pensando = corpos
+    assert "reasoning_effort" not in padrao
+    assert configurado["reasoning_effort"] == "minimal"
     assert "reasoning_effort" not in pensando
-    assert "reasoning_effort" not in sem_campo
 
 
 def test_deepseek_nao_recebe_reasoning_effort():

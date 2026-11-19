@@ -77,7 +77,7 @@ def _nuvem(settings, messages, max_tokens, schema, think, timeout, client):
         "temperature": 0,
     }
     if provedor == "google" and not think and settings.google_reasoning_effort:
-        # Gemini 2.5 Flash raciocina por padrão e gasta max_tokens nisso.
+        # Modelos que raciocinam por padrão gastam max_tokens nisso (ex.: gemini-3.5-flash).
         corpo["reasoning_effort"] = settings.google_reasoning_effort
     if schema is not None:
         # Os schemas do Pydantic ($defs, anyOf, pattern) não passam em todo provedor:
