@@ -43,7 +43,7 @@ Por padrão, as respostas são geradas pelo Qwen no Ollama. Para gerá-las por u
 ```env
 LLM_PROVIDER=google            # ou deepseek
 GOOGLE_API_KEY=sua-chave       # ou DEEPSEEK_API_KEY=sua-chave
-GENERATION_MODEL=gemini-3.5-flash   # ou deepseek-flash
+GENERATION_MODEL=gemini-3.5-flash   # ou deepseek-chat
 ```
 
 A pergunta e os trechos recuperados do acervo passam a ser enviados ao provedor escolhido. Os embeddings e o reranker continuam locais, então o Ollama segue necessário, só com o modelo de embedding. Os limites de contexto (`NUM_CTX`, `MAX_CONTEXT_CHARS`) não mudam com o provedor.

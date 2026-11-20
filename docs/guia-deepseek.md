@@ -52,14 +52,14 @@ Deixe estas linhas assim. Cada variável deve aparecer **uma vez só**: se repet
 ```env
 LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=sua-chave-aqui
-GENERATION_MODEL=deepseek-flash
+GENERATION_MODEL=deepseek-chat
 EMBEDDING_MODEL=qwen3-embedding:0.6b
 COLLECTION_NAME=knowledge_base_v2
 RERANKER_URL=http://reranker:8080
 RERANKER_TIMEOUT=60
 ```
 
-Use o nome do modelo como aparece na lista de modelos da conta: `curl -H "Authorization: Bearer $DEEPSEEK_API_KEY" https://api.deepseek.com/models` (em 19/11/2026: `deepseek-flash` e `deepseek-v4-pro`). O antigo `deepseek-chat` ainda é aceito como alias do `deepseek-flash`, mas a telemetria registra o alias, não o modelo que respondeu.
+Use `deepseek-chat`, e não `deepseek-flash`, mesmo que o `/models` da conta liste só `deepseek-flash` e `deepseek-v4-pro`. Os dois nomes chegam ao mesmo modelo, mas `deepseek-chat` é o modo **sem raciocínio**. Com `deepseek-flash`, o modelo raciocina antes de responder e pode gastar todo o `NUM_PREDICT` (1024 tokens) nisso. A resposta então volta vazia e a API devolve 503 com `O modelo não retornou uma resposta utilizável.`. Em 19/11/2026, isso aconteceu em 3 de 3 tentativas com "Débito com a Receita pode excluir a empresa do Simples Nacional?".
 
 No Mac, use `RERANKER_URL=http://host.docker.internal:18080` (o reranker roda fora do Docker, seção 3). Sem `RERANKER_URL`, a busca funciona, mas com recall menor: o log do worker avisa `RERANKER_URL não definida`.
 
@@ -233,7 +233,7 @@ get "/conversas/$CV/mensagens" | j '[print(m["text"]) for m in d["items"] if m["
 
 **Resultado esperado:**
 - **RAG:** `answered`, com citações `[1]`, `[2]`. Se a busca não trouxer o trecho certo, o status é `insufficient_context`.
-- **Assistente:** `succeeded`, com os estágios `plan`, `legal` e `synthesis`, cada um mostrando `deepseek-flash` e a contagem de tokens. A resposta cita a LC 123/2006: recolhimento mensal, por documento único de arrecadação.
+- **Assistente:** `succeeded`, com os estágios `plan`, `legal` e `synthesis`, cada um mostrando `deepseek-chat` e a contagem de tokens. A resposta cita a LC 123/2006: recolhimento mensal, por documento único de arrecadação.
 
 Também dá para testar pela interface em http://localhost:3000.
 
@@ -245,7 +245,7 @@ docker exec socio-digital-worker-1 sh -c 'echo "$LLM_PROVIDER $GENERATION_MODEL"
 ollama ps
 ```
 
-O primeiro e o segundo comandos devem mostrar `deepseek deepseek-flash`. O `ollama ps` deve mostrar só o `qwen3-embedding:0.6b`.
+O primeiro e o segundo comandos devem mostrar `deepseek deepseek-chat`. O `ollama ps` deve mostrar só o `qwen3-embedding:0.6b`.
 
 ---
 
@@ -265,6 +265,7 @@ docker logs socio-digital-worker-1 --tail 30
 | `DeepSeek respondeu HTTP 402` | Conta sem crédito | Adicione saldo na plataforma |
 | `DeepSeek respondeu HTTP 429` | Limite de requisições | Espere e tente de novo |
 | `DeepSeek respondeu HTTP 400` | Nome de modelo inválido | Confira `GENERATION_MODEL` na documentação do DeepSeek |
+| 503 `O modelo não retornou uma resposta utilizável.` em perguntas longas | `GENERATION_MODEL=deepseek-flash`, que raciocina e esgota os tokens | Use `deepseek-chat` (seção 2) |
 | `Tempo de espera excedido: DeepSeek.` | Resposta passou de `OLLAMA_TIMEOUT` (120 s) | Tente de novo ou aumente `OLLAMA_TIMEOUT` no `.env` (máximo 600) |
 | `/ready` com 503 | Ollama fechado ou base sem coleção | Abra o Ollama, confira com `curl.exe http://localhost:11434/api/tags` e a seção 4 |
 | `empty_knowledge_base` | Coleção vazia | Seção 4 |
