@@ -252,57 +252,20 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             {"question": question, "legal": legal, "fiscal": fiscal, "actions": actions},
         )
         final = result.model_dump(mode="json")
-        specialist_used = {
-            ref
-            for specialist in (legal, fiscal)
-            for claim in specialist.get("claims", [])
-            for ref in claim.get("support_ids", [])
-        }
-
-        if "legal" in plan.agents and not legal.get("claims") and "fiscal" not in plan.agents:
-            # Legal context insufficient: reject invented synthesis claims
-            final["legal_claims"] = []
-            final["support_ids"] = []
-            final["answer"] = render_answer(final, support, False, True)
-        elif "fiscal" in plan.agents:
+        if "fiscal" in plan.agents:
             # Validate the text actually published, rather than discarded fiscal prose.
             final["legal_claims"] = legal["claims"]
-            final["answer"] = render_answer(final, support, True, "legal" in plan.agents)
+            final["answer"] = render_answer(final, support, True)
             final["support_ids"] = sorted(
                 {
                     ref
-                    for res in (legal, fiscal)
-                    for claim in res.get("claims", [])
+                    for result in (legal, fiscal)
+                    for claim in result.get("claims", [])
                     for ref in claim["support_ids"]
                 }
             )
-        else:
-            final["legal_claims"] = legal.get("claims", [])
-            synthesis_refs = [ref for ref in final.get("support_ids", []) if ref in specialist_used]
-            legal_refs = sorted(
-                {
-                    ref
-                    for claim in legal.get("claims", [])
-                    for ref in claim.get("support_ids", [])
-                    if ref.startswith("legal:")
-                }
-            )
-            final["support_ids"] = sorted(set(synthesis_refs) | set(legal_refs))
-            final["answer"] = render_answer(final, support, False, "legal" in plan.agents)
-
-        try:
-            validate_results(support, legal, fiscal, actions, final)
-        except ValueError as err:
-            if "Síntese sem suporte" in str(err) and "legal" in plan.agents:
-                final["legal_claims"] = []
-                final["support_ids"] = []
-                final["answer"] = (
-                    "Não encontrei contexto normativo publicado e vigente suficiente para responder."
-                )
-            else:
-                raise
-
-        final["legal_claims"] = legal.get("claims", [])
+        validate_results(support, legal, fiscal, actions, final)
+        final["legal_claims"] = legal["claims"]
         text = render_answer(final, support, "fiscal" in plan.agents, "legal" in plan.agents)
         with factory.begin() as db:
             current = db.scalar(select(AgentRun).where(AgentRun.id == run_id).with_for_update())
