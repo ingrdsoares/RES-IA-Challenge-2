@@ -110,3 +110,23 @@ test('parar de aguardar libera o envio', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeEnabled();
   await expect(page.getByText('Você parou de acompanhar esta consulta')).toBeVisible();
 });
+
+test('falha explica o motivo e reenvia a mesma pergunta', async ({ page }) => {
+  await openChat(page, {
+    messages: [{ ...userMsg, status: 'failed' }],
+    operations: {
+      op1: {
+        operation_id: 'op1', status: 'failed', error: 'agent_execution_failed',
+        run: { status: 'failed', stages: [
+          { name: 'legal', status: 'failed', attempts: 1, error: 'invalid_agent_result' },
+        ] },
+      },
+    },
+  });
+  await expect(page.getByRole('alert')).toContainText('não passou na conferência de fontes');
+  const sent = page.waitForRequest(
+    (r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'),
+  );
+  await page.getByRole('button', { name: 'Tentar de novo' }).click();
+  expect(JSON.parse((await sent).postData()!)).toEqual({ text: userMsg.text });
+});

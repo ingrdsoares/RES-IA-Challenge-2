@@ -17,6 +17,7 @@ import type { Company, Page } from '../types';
 import { citationHref, type Citation } from './assistente/citacoes';
 import { AnswerText } from './assistente/AnswerText';
 import { OperationProgress } from './assistente/OperationProgress';
+import { FailedNotice } from './assistente/FailedNotice';
 import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
 type Conversation = { id: string; title: string; company_id: string };
@@ -799,16 +800,12 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               )}
             </article>
             {message.status === 'failed' && (
-              <p className="notice" role="status">
-                A consulta falhou.{' '}
-                <button
-                  className="underline"
-                  disabled={busy}
-                  onClick={() => setDraft(message.text)}
-                >
-                  Copiar pergunta para tentar novamente
-                </button>
-              </p>
+              <FailedNotice
+                operationId={message.operation_id}
+                busy={busy}
+                onRetry={() => send({ text: message.text })}
+                onCopy={() => setDraft(message.text)}
+              />
             )}
             {outstanding?.id === message.id &&
               operationStatus === 'awaiting_data' && (
