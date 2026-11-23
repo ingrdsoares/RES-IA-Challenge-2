@@ -14,18 +14,10 @@ import { api } from '../services/api';
 import { formatCnpj } from '../components/Sidebar';
 import { Leitor } from './Leitor';
 import type { Company, Page } from '../types';
+import { citationHref, type Citation } from './assistente/citacoes';
+import { AnswerText } from './assistente/AnswerText';
 
 type Conversation = { id: string; title: string; company_id: string };
-type Citation = {
-  document_id: string;
-  version_id: string;
-  anchor_id: string;
-  title: string;
-  text: string;
-  official_url: string;
-  effective_from?: string;
-  citation_index?: number;
-};
 type Evidence = {
   kind: string;
   period?: string;
@@ -167,13 +159,6 @@ function Answer({
             <BookOpen size={16} /> Fontes citadas
           </h4>
           {message.citations.map((source, index) => {
-            const query = new URLSearchParams({
-              document_id: source.document_id,
-              version_id: source.version_id,
-              anchor_id: source.anchor_id,
-              conversa: message.conversation_id,
-              mensagem: message.id,
-            });
             const article =
               /^\s*(?:#+\s*)?(Art(?:igo)?\.?\s+\d+[º°o]?(?:[-–][\p{L}\d]+)?)/iu.exec(
                 source.text,
@@ -182,7 +167,7 @@ function Answer({
               <a
                 key={source.version_id + source.anchor_id}
                 className="assistant-citation"
-                href={'#assistente?' + query}
+                href={citationHref(message.conversation_id, message.id, source)}
               >
                 <BookOpen size={15} aria-hidden />
                 <span>[{source.citation_index ?? index + 1}] {source.title}
@@ -786,7 +771,16 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               <h3 className="font-semibold">
                 {message.role === 'user' ? 'Você' : 'Assistente fiscal'}
               </h3>
-              <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+              {message.role === 'assistant' ? (
+                <AnswerText
+                  text={message.text}
+                  citations={message.citations}
+                  conversationId={message.conversation_id}
+                  messageId={message.id}
+                />
+              ) : (
+                <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+              )}
               {message.role === 'assistant' && (
                 <Answer message={message} companyId={companyId} />
               )}
