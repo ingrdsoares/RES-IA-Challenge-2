@@ -71,6 +71,7 @@ const MONEY_FIELDS: Record<string, string> = {
   rbt12: 'Receita dos últimos 12 meses (R$)',
   payroll12: 'Folha dos últimos 12 meses (R$)',
 };
+const MONEY_PATTERN = /^[0-9]+([.,][0-9]{1,2})?$/;
 const FIELD_NAMES: Record<string, string> = {
   period: 'competência',
   regime: 'regime',
@@ -318,6 +319,7 @@ function Confirmation({
     const data = new FormData(event.currentTarget);
     const confirmation: Record<string, string | boolean> = {};
     const empty: string[] = [];
+    const malformed: string[] = [];
     for (const field of fields) {
       if (field === 'conditions_confirmed') {
         if (!data.has(field)) empty.push('confirmação das condições');
@@ -329,11 +331,21 @@ function Confirmation({
         empty.push(FIELD_NAMES[field] ?? field.replace(/_/g, ' '));
         continue;
       }
+      // noValidate disables the input pattern, so money is checked here: "1.500"
+      // would otherwise reach the backend as R$ 1,50.
+      if (field in MONEY_FIELDS && !MONEY_PATTERN.test(value)) {
+        malformed.push(FIELD_NAMES[field]);
+        continue;
+      }
       // Money goes as a decimal string; the backend rejects floats.
       confirmation[field] = field in MONEY_FIELDS ? value.replace(',', '.') : value;
     }
     if (empty.length) {
       setMissing('Preencha: ' + empty.join(', ') + '.');
+      return;
+    }
+    if (malformed.length) {
+      setMissing('Corrija: ' + malformed.join(', ') + ' (use o formato 1500,00).');
       return;
     }
     setMissing('');
@@ -657,22 +669,42 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
     return () => controller.abort();
   }, [path, reload]);
 
+  // Operations the user stopped following; they never become the tracked one again.
+  const [stopped, setStopped] = useState<string[]>([]);
   const outstanding = messages.find(
     (message) =>
       message.role === 'user' &&
-      ['awaiting_data', 'queued', 'running'].includes(message.status),
+      ['awaiting_data', 'queued', 'running'].includes(message.status) &&
+      !stopped.includes(message.operation_id ?? ''),
   );
   const operationId =
     explicitOperation?.operation_id ?? outstanding?.operation_id;
   const operationStatus = explicitOperation?.status ?? outstanding?.status;
   const [operation, setOperation] = useState<OperationDetail | null>(null);
-  const [waitStart, setWaitStart] = useState(() => Date.now());
-  const [stopped, setStopped] = useState<string | null>(null);
-  const watching = !!operationId && operationId !== stopped;
+  const [waitKey, setWaitKey] = useState(0);
+  const [slow, setSlow] = useState(false);
+  const watching = !!operationId;
   useEffect(() => {
     setOperation(null);
-    setWaitStart(Date.now());
   }, [operationId]);
+  // A timer, not a render-time check, so the warning shows even if polling hangs.
+  useEffect(() => {
+    setSlow(false);
+    if (!watching) return;
+    const timer = setTimeout(() => setSlow(true), SLOW_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [watching, operationId, waitKey]);
+  const stopWaiting = () => {
+    if (operationId) setStopped((ids) => [...ids, operationId]);
+    setExplicitOperation(null);
+  };
+  const stoppedPending =
+    !watching &&
+    messages.some(
+      (message) =>
+        stopped.includes(message.operation_id ?? '') &&
+        ['queued', 'running'].includes(message.status),
+    );
   useEffect(() => {
     if (!watching || !['queued', 'running'].includes(operationStatus ?? ''))
       return;
@@ -767,8 +799,6 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
   const welcome = !loading && !readError && !messages.length;
   const period = messages.at(-1)?.context.period;
   const busy = sending || loading || watching || !!readError;
-  // Re-evaluated on every poll response, which re-renders the thread.
-  const slow = Date.now() - waitStart > SLOW_AFTER_MS;
   return (
     <section className={'assistant-thread' + (welcome ? ' is-welcome' : '')}>
       {welcome && (
@@ -866,11 +896,11 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
             <OperationProgress
               operation={operation}
               slow={slow}
-              onKeepWaiting={() => setWaitStart(Date.now())}
-              onStopWaiting={() => setStopped(operationId ?? null)}
+              onKeepWaiting={() => setWaitKey((value) => value + 1)}
+              onStopWaiting={stopWaiting}
             />
           )}
-        {stopped && stopped === operationId && (
+        {stoppedPending && (
           <p className="notice" role="status">
             Você parou de acompanhar esta consulta. Se a resposta ficar pronta, ela aparece aqui.{' '}
             <button className="underline" onClick={() => setReload((value) => value + 1)}>
@@ -886,7 +916,18 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               onClick={() => setReviewKey((value) => value + 1)}
             >
               Verificar operação novamente
-            </button>
+            </button>{' '}
+            {watching && (
+              <button
+                className="underline"
+                onClick={() => {
+                  setPollError('');
+                  stopWaiting();
+                }}
+              >
+                Parar de aguardar
+              </button>
+            )}
           </p>
         )}
         <div ref={threadEnd} />

@@ -150,3 +150,56 @@ test('confirmação exige escolha explícita e mostra o que falta', async ({ pag
   await form.getByRole('button', { name: 'Confirmar contexto' }).click();
   await expect(form.getByRole('alert')).toHaveText('Preencha: tipo de simulação, confirmação das condições.');
 });
+
+test('valor em formato errado não passa na confirmação', async ({ page }) => {
+  await openChat(page, {
+    messages: [{ ...userMsg, status: 'awaiting_data', context: { missing_fields: ['revenue'] } }],
+    operations: { op1: { operation_id: 'op1', status: 'awaiting_data', error: null, run: null } },
+  });
+  const form = page.getByRole('form', { name: 'Confirmação de contexto' });
+  await form.getByLabel('Receita da competência (R$)').fill('1.500');
+  let posted = false;
+  page.on('request', (r) => { if (r.method() === 'POST') posted = true; });
+  await form.getByRole('button', { name: 'Confirmar contexto' }).click();
+  await expect(form.getByRole('alert')).toHaveText('Corrija: receita da competência (use o formato 1500,00).');
+  expect(posted).toBe(false);
+});
+
+test('depois de parar de aguardar, a nova pergunta é acompanhada', async ({ page }) => {
+  await page.clock.install();
+  const mock = {
+    messages: [{ ...userMsg, status: 'running' }] as unknown[],
+    operations: {
+      op1: { operation_id: 'op1', status: 'running', error: null, run: null },
+      op2: { operation_id: 'op2', status: 'running', error: null,
+        run: { status: 'running', stages: [{ name: 'plan', status: 'running', attempts: 1, error: null }] } },
+    } as Record<string, unknown>,
+  };
+  await openChat(page, mock);
+  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toBeVisible();
+  await page.clock.fastForward('03:01');
+  await page.getByRole('button', { name: 'Parar de aguardar' }).click();
+  mock.messages.push({ ...userMsg, id: 'm3', operation_id: 'op2', status: 'running', text: 'Outra pergunta' });
+  await page.getByRole('textbox', { name: 'Mensagem' }).fill('Outra pergunta');
+  await page.getByRole('button', { name: 'Enviar', exact: true }).click();
+  await page.clock.fastForward('00:02');
+  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toContainText('Entendendo a pergunta');
+  await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeDisabled();
+});
+
+test('polling pendurado ainda oferece parar de aguardar', async ({ page }) => {
+  await page.clock.install();
+  await openChat(page, { messages: [{ ...userMsg, status: 'running' }] });
+  await page.route('**/api/operacoes/*', () => { /* nunca responde */ });
+  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toBeVisible();
+  await page.clock.fastForward('03:01');
+  await expect(page.getByRole('button', { name: 'Parar de aguardar' })).toBeVisible();
+});
+
+test('erro no polling ainda permite parar de aguardar', async ({ page }) => {
+  await openChat(page, { messages: [{ ...userMsg, status: 'running' }] });
+  await page.route('**/api/operacoes/*', (route) => route.fulfill({ status: 500, json: { detail: 'Falha interna' } }));
+  await page.getByRole('button', { name: 'Parar de aguardar' }).click();
+  await page.getByRole('textbox', { name: 'Mensagem' }).fill('Outra pergunta');
+  await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeEnabled();
+});
