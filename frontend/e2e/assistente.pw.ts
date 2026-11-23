@@ -130,3 +130,23 @@ test('falha explica o motivo e reenvia a mesma pergunta', async ({ page }) => {
   await page.getByRole('button', { name: 'Tentar de novo' }).click();
   expect(JSON.parse((await sent).postData()!)).toEqual({ text: userMsg.text });
 });
+
+test('confirmação exige escolha explícita e mostra o que falta', async ({ page }) => {
+  await openChat(page, {
+    messages: [{
+      ...userMsg,
+      status: 'awaiting_data',
+      context: {
+        missing_fields: ['regime', 'kind', 'conditions_confirmed'],
+        company: { regime: 'Simples Nacional', municipality: 'Brasília', state: 'DF' },
+      },
+    }],
+    operations: { op1: { operation_id: 'op1', status: 'awaiting_data', error: null, run: null } },
+  });
+  const form = page.getByRole('form', { name: 'Confirmação de contexto' });
+  await expect(form.getByLabel('Qual é o regime da empresa?')).toBeFocused();
+  await expect(form.getByLabel('Qual é o regime da empresa?')).toHaveValue('Simples Nacional');
+  await expect(form.getByLabel('Qual simulação deseja fazer?')).toHaveValue('');
+  await form.getByRole('button', { name: 'Confirmar contexto' }).click();
+  await expect(form.getByRole('alert')).toHaveText('Preencha: tipo de simulação, confirmação das condições.');
+});

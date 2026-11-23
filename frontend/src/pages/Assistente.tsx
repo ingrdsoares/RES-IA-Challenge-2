@@ -18,6 +18,7 @@ import { citationHref, type Citation } from './assistente/citacoes';
 import { AnswerText } from './assistente/AnswerText';
 import { OperationProgress } from './assistente/OperationProgress';
 import { FailedNotice } from './assistente/FailedNotice';
+import { suggestions } from './Empresas';
 import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
 type Conversation = { id: string; title: string; company_id: string };
@@ -306,21 +307,36 @@ function Confirmation({
   busy: boolean;
 }) {
   const fields = message.context.missing_fields ?? [];
+  const [missing, setMissing] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    formRef.current?.querySelector<HTMLElement>('input, select')?.focus();
+  }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!message.operation_id) return;
     const data = new FormData(event.currentTarget);
     const confirmation: Record<string, string | boolean> = {};
+    const empty: string[] = [];
     for (const field of fields) {
       if (field === 'conditions_confirmed') {
+        if (!data.has(field)) empty.push('confirmação das condições');
         confirmation[field] = data.has(field);
         continue;
       }
       const value = String(data.get(field) ?? '').trim();
-      if (!value) return;
+      if (!value) {
+        empty.push(FIELD_NAMES[field] ?? field.replace(/_/g, ' '));
+        continue;
+      }
       // Money goes as a decimal string; the backend rejects floats.
       confirmation[field] = field in MONEY_FIELDS ? value.replace(',', '.') : value;
     }
+    if (empty.length) {
+      setMissing('Preencha: ' + empty.join(', ') + '.');
+      return;
+    }
+    setMissing('');
     const description = fields
       .filter((field) => field !== 'conditions_confirmed')
       .map((field) => (FIELD_NAMES[field] ?? field) + ' ' + confirmation[field])
@@ -333,10 +349,15 @@ function Confirmation({
   }
   return (
     <form
+      ref={formRef}
+      noValidate
+      aria-labelledby={'confirmacao-' + message.id}
       className="space-y-3 rounded-xl border border-accent bg-notice p-4"
       onSubmit={submit}
     >
-      <h3 className="font-semibold text-ink">Confirmação de contexto</h3>
+      <h3 id={'confirmacao-' + message.id} className="font-semibold text-ink">
+        Confirmação de contexto
+      </h3>
       {fields.includes('period') && (
         <label className="block text-sm">
           Qual competência deseja consultar?
@@ -346,19 +367,28 @@ function Confirmation({
       {fields.includes('regime') && (
         <label className="block text-sm">
           Qual é o regime da empresa?
-          <input
+          <select
             name="regime"
             required
-            maxLength={40}
-            defaultValue={message.context.company?.regime}
+            defaultValue={
+              suggestions.regime.includes(message.context.company?.regime ?? '')
+                ? message.context.company?.regime
+                : ''
+            }
             className="field"
-          />
+          >
+            <option value="">Selecione…</option>
+            {suggestions.regime.map((regime) => (
+              <option key={regime}>{regime}</option>
+            ))}
+          </select>
         </label>
       )}
       {fields.includes('kind') && (
         <label className="block text-sm">
           Qual simulação deseja fazer?
-          <select name="kind" required className="field">
+          <select name="kind" required defaultValue="" className="field">
+            <option value="">Selecione…</option>
             <option value="mei">MEI</option>
             <option value="simples">Simples Nacional</option>
           </select>
@@ -367,7 +397,8 @@ function Confirmation({
       {fields.includes('activity') && (
         <label className="block text-sm">
           Qual é a atividade da empresa?
-          <select name="activity" required className="field">
+          <select name="activity" required defaultValue="" className="field">
+            <option value="">Selecione…</option>
             <option value="trade">Comércio</option>
             <option value="services">Serviços</option>
             <option value="mixed">Comércio e serviços</option>
@@ -393,7 +424,7 @@ function Confirmation({
         .filter((field) => !(field in FIELD_NAMES) && field !== 'conditions_confirmed')
         .map((field) => (
           <label key={field} className="block text-sm">
-            {field}
+            Informe {field.replace(/_/g, ' ')}
             <input name={field} required maxLength={200} className="field" />
           </label>
         ))}
@@ -403,6 +434,7 @@ function Confirmation({
           dados e condições informados para esta simulação.
         </label>
       )}
+      {missing && <p role="alert">{missing}</p>}
       <button className="primary" disabled={busy}>
         Confirmar contexto
       </button>

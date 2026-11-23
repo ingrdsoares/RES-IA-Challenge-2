@@ -57,7 +57,7 @@ const fields = [
   { key: 'state', label: 'UF', icon: Map },
   { key: 'municipality', label: 'Município', icon: MapPin },
 ] as const;
-const suggestions = {
+export const suggestions = {
   size: ['MEI', 'ME', 'EPP', 'Demais'],
   regime: ['SIMEI', 'Simples Nacional', 'Lucro Presumido', 'Lucro Real'],
 };
