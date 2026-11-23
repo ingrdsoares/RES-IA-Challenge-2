@@ -8,6 +8,8 @@ import { Fiscal } from './pages/Fiscal';
 import { Tarefas } from './pages/Tarefas';
 import { Biblioteca } from './pages/Biblioteca';
 import { Leitor } from './pages/Leitor';
+import { Obrigacoes } from './pages/Obrigacoes';
+import { Ajuda } from './pages/Ajuda';
 import { Empresas } from './pages/Empresas';
 import { clearChatDrafts } from './services/chatDrafts';
 import { RecuperarSenha } from './pages/RecuperarSenha';
@@ -141,6 +143,8 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
           {page === 'dashboard' && props && <Dashboard {...props} />}
           {page === 'fiscal' && props && <Fiscal {...props} />}
           {page === 'tarefas' && props && <Tarefas {...props} />}
+          {page === 'obrigacoes' && props && <Obrigacoes {...props} />}
+          {page === 'ajuda' && <Ajuda />}
           {page === 'assistente' && company && (
             <Assistente accountId={user.id} company={company} params={params} />
           )}
