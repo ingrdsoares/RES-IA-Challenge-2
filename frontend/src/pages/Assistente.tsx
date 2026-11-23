@@ -16,6 +16,8 @@ import { Leitor } from './Leitor';
 import type { Company, Page } from '../types';
 import { citationHref, type Citation } from './assistente/citacoes';
 import { AnswerText } from './assistente/AnswerText';
+import { OperationProgress } from './assistente/OperationProgress';
+import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
 type Conversation = { id: string; title: string; company_id: string };
 type Evidence = {
@@ -630,18 +632,27 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
   const operationId =
     explicitOperation?.operation_id ?? outstanding?.operation_id;
   const operationStatus = explicitOperation?.status ?? outstanding?.status;
+  const [operation, setOperation] = useState<OperationDetail | null>(null);
+  const [waitStart, setWaitStart] = useState(() => Date.now());
+  const [stopped, setStopped] = useState<string | null>(null);
+  const watching = !!operationId && operationId !== stopped;
   useEffect(() => {
-    if (!operationId || !['queued', 'running'].includes(operationStatus ?? ''))
+    setOperation(null);
+    setWaitStart(Date.now());
+  }, [operationId]);
+  useEffect(() => {
+    if (!watching || !['queued', 'running'].includes(operationStatus ?? ''))
       return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     setPollError('');
     async function poll() {
       try {
-        const op = await api.request<Operation>('/operacoes/' + operationId, {
+        const op = await api.request<OperationDetail>('/operacoes/' + operationId, {
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
+        setOperation(op);
         if (['queued', 'running'].includes(op.status))
           timer = setTimeout(poll, 1600);
         else setReload((value) => value + 1);
@@ -654,7 +665,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
       controller.abort();
       clearTimeout(timer);
     };
-  }, [operationId, operationStatus, reviewKey]);
+  }, [watching, operationId, operationStatus, reviewKey]);
 
   useEffect(() => {
     if (loading || !messages.length) return;
@@ -722,7 +733,9 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
 
   const welcome = !loading && !readError && !messages.length;
   const period = messages.at(-1)?.context.period;
-  const busy = sending || loading || !!operationId || !!readError;
+  const busy = sending || loading || watching || !!readError;
+  // Re-evaluated on every poll response, which re-renders the thread.
+  const slow = Date.now() - waitStart > SLOW_AFTER_MS;
   return (
     <section className={'assistant-thread' + (welcome ? ' is-welcome' : '')}>
       {welcome && (
@@ -819,11 +832,23 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
           </p>
         )}
         {!pollError &&
+          watching &&
           ['queued', 'running'].includes(operationStatus ?? '') && (
-            <p className="text-sm text-link" role="status">
-              Processando sua consulta…
-            </p>
+            <OperationProgress
+              operation={operation}
+              slow={slow}
+              onKeepWaiting={() => setWaitStart(Date.now())}
+              onStopWaiting={() => setStopped(operationId ?? null)}
+            />
           )}
+        {stopped && stopped === operationId && (
+          <p className="notice" role="status">
+            Você parou de acompanhar esta consulta. Se a resposta ficar pronta, ela aparece aqui.{' '}
+            <button className="underline" onClick={() => setReload((value) => value + 1)}>
+              Recarregar
+            </button>
+          </p>
+        )}
         {pollError && (
           <p className="notice" role="alert">
             {pollError}{' '}

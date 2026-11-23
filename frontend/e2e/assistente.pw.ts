@@ -78,3 +78,35 @@ test('recusa aparece como aviso com caminho para a Biblioteca', async ({ page })
   await expect(page.getByRole('note')).toContainText('Ainda não há norma publicada');
   await expect(page.getByRole('link', { name: 'Ver normas disponíveis' })).toHaveAttribute('href', '#normas');
 });
+
+test('mostra as etapas dos agentes enquanto a consulta roda', async ({ page }) => {
+  await openChat(page, {
+    messages: [{ ...userMsg, status: 'running' }],
+    operations: {
+      op1: {
+        operation_id: 'op1', status: 'running', error: null,
+        run: { status: 'running', stages: [
+          { name: 'plan', status: 'succeeded', attempts: 1, error: null },
+          { name: 'legal', status: 'running', attempts: 1, error: null },
+        ] },
+      },
+    },
+  });
+  const progress = page.getByRole('status', { name: 'Andamento da consulta' });
+  await expect(progress).toContainText('Entendendo a pergunta');
+  await expect(progress).toContainText('Buscando normas vigentes');
+});
+
+test('parar de aguardar libera o envio', async ({ page }) => {
+  await page.clock.install();
+  await openChat(page, {
+    messages: [{ ...userMsg, status: 'running' }],
+    operations: { op1: { operation_id: 'op1', status: 'running', error: null, run: null } },
+  });
+  await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeDisabled();
+  await page.clock.fastForward('03:01');
+  await page.getByRole('button', { name: 'Parar de aguardar' }).click();
+  await page.getByRole('textbox', { name: 'Mensagem' }).fill('Outra pergunta');
+  await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeEnabled();
+  await expect(page.getByText('Você parou de acompanhar esta consulta')).toBeVisible();
+});
