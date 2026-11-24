@@ -431,38 +431,38 @@ def generate_document():
     )
 
     doc.draw_bullet(
-        "Chunking Hierárquico Jurídico (src/rag/chunker.py):",
-        "Particionamento de normas (LC 123/2006, CGSN 140/2018) respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (Context Injection) para eliminar chunks descontextualizados.",
-    )
-    doc.draw_bullet(
-        "Vector Store Híbrido com Fallback (src/rag/vector_store.py):",
-        "Persistência em banco SQLite combinando busca por similaridade de cosseno (embeddings densos MiniLM) com 30% de correspondência léxica e suporte a fallback offline.",
+        "Chunking & Vector Store (src/rag/chunker.py, vector_store.py):",
+        "Particionamento hierárquico de normas (LC 123/2006, CGSN 140/2018) com injeção de contexto e busca híbrida (cosseno + léxica) em SQLite com fallback offline.",
     )
     doc.draw_bullet(
         "Extrator de Entidades Fiscais - NER (src/rag/entity_extractor.py):",
-        "Classificação de intenções tributárias, extração automatizada de CNAEs, CNPJs, valores monetários (R$) e expansão de queries com sinônimos legais da Receita Federal.",
+        "Classificação de intenções tributárias, extração de CNAEs, CNPJs, valores monetários (R$) e expansão semântica de queries com sinônimos legais da Receita Federal.",
     )
     doc.draw_bullet(
-        "RAGService com Guardrails (src/rag/service.py, prompts.py):",
-        "Orquestrador central que une o RAG ao motor determinístico de cálculo, impondo formatação mandatória em planos de 3 passos, citações oficiais e abstenção contra fraudes.",
+        "RAGService & Guardrails Calibrados (src/rag/service.py, prompts.py, models.py):",
+        "Orquestrador central unindo RAG ao motor fiscal. Calibração de prompts para mitigar falsos esclarecimentos em direitos em tese e garantia de planos em 3 passos com citações oficiais.",
+    )
+    doc.draw_bullet(
+        "Avaliação Experimental & Slots de Citação (docs/avaliacao/metricas-avaliacao-rag.md):",
+        "Formalização da política ótima slots=6 com retry em recusa (reduz falsas recusas em até 33%) e validação de 100% de acerto em pedidos determinísticos de esclarecimento.",
     )
 
     doc.draw_card(
         "Suítes de Testes e Validação Entregues por Jhessica",
         [
             (
-                "test_pipeline.py:",
-                "4/4 casos de recuperação canônica aprovados com 100% de precisão de contexto.",
+                "RAG Canônico & NER (test_pipeline.py, test_entity_extractor.py):",
+                "100% de aprovação na recuperação vetorial e extração de entidades fiscais com integração tripla.",
                 True,
             ),
             (
-                "test_entity_extractor.py:",
-                "5/5 casos de extração NER e teste de integração tripla aprovados.",
+                "RAGService & Governança (test_rag_service.py):",
+                "100% de conformidade em fidelidade factual (faithfulness), planos estruturados e abstenção ética mandatória.",
                 True,
             ),
             (
-                "test_rag_service.py:",
-                "5/5 casos de governança, fidelidade factual (faithfulness) e abstenção ética aprovados.",
+                "Suíte Backend de Guardrails & RAG (88 testes):",
+                "28/28 casos canônicos de guardrails/esclarecimento aprovados; 88/88 testes do backend 100% verdes.",
                 True,
             ),
         ],
@@ -621,9 +621,9 @@ def generate_document():
             "100% Concluído",
         ],
         [
-            "RAGService",
+            "RAGService & Avaliação",
             "Jhessica",
-            "Une Vector Store ao Motor Fiscal e gera 3 passos.",
+            "Une RAG ao Motor Fiscal, slots=6 e 88 testes.",
             "100% Concluído",
         ],
         [
