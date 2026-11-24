@@ -11,12 +11,12 @@ import {
   ListChecks,
   MessagesSquare,
   Plus,
-  Search,
   Send,
   ThumbsDown,
   ThumbsUp,
 } from 'lucide-react';
 import { api } from '../services/api';
+import { ConversationHistory } from './assistente/ConversationHistory';
 import { formatCnpj } from '../components/Sidebar';
 import { Leitor } from './Leitor';
 import type { Company, Page } from '../types';
@@ -29,7 +29,12 @@ import { GuideReadingCard, guideHref, type GuideReading } from './assistente/Gui
 import { suggestions } from './Empresas';
 import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
-type Conversation = { id: string; title: string; company_id: string };
+type Conversation = {
+  id: string;
+  title: string;
+  company_id: string;
+  archived_at?: string | null;
+};
 type Evidence = {
   kind: string;
   period?: string;
@@ -102,7 +107,10 @@ async function allPages<T>(path: string, signal: AbortSignal) {
   do {
     const query = new URLSearchParams({ limit: '100' });
     if (cursor) query.set('cursor', cursor);
-    const page: Page<T> = await api.request(path + '?' + query, { signal });
+    const page: Page<T> = await api.request(
+      path + (path.includes('?') ? '&' : '?') + query,
+      { signal },
+    );
     rows.push(...page.items);
     cursor = page.next_cursor;
   } while (cursor);
@@ -1276,7 +1284,6 @@ function CompanyAssistant({
   const id = params.get('conversa');
   const reading = !!(id && params.get('version_id') && params.get('document_id'));
   const [history, setHistory] = useState<Conversation[]>([]);
-  const [historySearch, setHistorySearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -1285,7 +1292,7 @@ function CompanyAssistant({
     setLoading(true);
     setError('');
     allPages<Conversation>(
-      '/empresas/' + companyId + '/conversas',
+      '/empresas/' + companyId + '/conversas?include_archived=true',
       controller.signal,
     )
       .then((rows) => {
@@ -1311,7 +1318,8 @@ function CompanyAssistant({
     if (selected) sessionStorage.setItem(resumeKey, selected.id);
   }, [resumeKey, selected]);
   const lastVisited = sessionStorage.getItem(resumeKey);
-  const recent = history.find((chat) => chat.id === lastVisited) ?? history[0];
+  const visible = history.filter((chat) => !chat.archived_at);
+  const recent = visible.find((chat) => chat.id === lastVisited) ?? visible[0];
   return (
     <div className={'assistant-layout' + (reading && selected ? ' with-reader' : '')}>
       <div className="assistant-main">
@@ -1339,41 +1347,17 @@ function CompanyAssistant({
             <p className="text-sm text-slate-500">Nenhuma conversa salva.</p>
           )}
           {history.length > 0 && (
-            <div className="my-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs">
-              <Search size={14} className="shrink-0 text-slate-400" />
-              <input
-                type="search"
-                value={historySearch}
-                onChange={(e) => setHistorySearch(e.target.value)}
-                placeholder="Filtrar conversas…"
-                className="w-full border-0 bg-transparent p-0 text-xs outline-none"
-              />
-            </div>
+            <ConversationHistory
+              conversations={history}
+              currentId={id}
+              href={chatLink}
+              changed={(chat) =>
+                setHistory((current) =>
+                  current.map((item) => (item.id === chat.id ? { ...item, ...chat } : item)),
+                )
+              }
+            />
           )}
-          <nav
-            className="max-h-60 space-y-1 overflow-auto lg:max-h-[58vh]"
-            aria-label="Histórico de conversas"
-          >
-            {history
-              .filter((c) =>
-                c.title.toLowerCase().includes(historySearch.toLowerCase()),
-              )
-              .map((chat) => (
-                <a
-                  key={chat.id}
-                  href={chatLink(chat.id)}
-                  aria-current={chat.id === id ? 'page' : undefined}
-                  className={
-                    'block break-words rounded-lg px-3 py-2 text-sm hover:bg-slate-100 ' +
-                    (chat.id === id
-                      ? 'bg-info font-semibold text-ink'
-                      : 'text-slate-700')
-                  }
-                >
-                  <span className="line-clamp-2">{chat.title}</span>
-                </a>
-              ))}
-          </nav>
           </details>
         </div>
         {!id || selected ? (

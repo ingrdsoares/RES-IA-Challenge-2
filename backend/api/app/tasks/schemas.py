@@ -19,6 +19,13 @@ class TaskInput(BaseModel):
     source_step_index: int | None = Field(None, ge=0, le=2)
 
 
+class TaskEdit(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+    period: Period | None = None
+    due_date: date | None = None
+
+
 class TaskPatch(BaseModel):
     model_config = ConfigDict(extra="forbid")
     completed: bool

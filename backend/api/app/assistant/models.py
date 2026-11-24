@@ -12,6 +12,7 @@ class Conversation(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     company_id: Mapped[UUID] = mapped_column(ForeignKey("companies.id"), index=True)
     title: Mapped[str] = mapped_column(String(120))
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
