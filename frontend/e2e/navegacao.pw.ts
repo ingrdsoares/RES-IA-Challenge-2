@@ -68,7 +68,7 @@ test('o assistente recupera o rascunho somente no contexto em que foi escrito', 
   await expect(question).toHaveValue('Preciso conferir a guia.');
   await page.getByRole('link', { name: 'Continuar de onde parei' }).click();
   await expect(question).toHaveValue('');
-  await page.getByRole('link', { name: 'Nova pergunta' }).click();
+  await page.getByRole('main').getByRole('link', { name: 'Nova pergunta' }).click();
   await page.getByLabel('Empresa ativa').selectOption('outra-empresa');
   await expect(question).toHaveValue('');
   await page.getByLabel('Empresa ativa').selectOption(company.id);
