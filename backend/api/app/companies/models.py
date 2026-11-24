@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
+from decimal import Decimal
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, DateTime, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -22,3 +23,11 @@ class Company(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
+
+
+class CompanyRevenue(Base):
+    __tablename__ = "company_revenues"
+    company_id: Mapped[UUID] = mapped_column(ForeignKey("companies.id"), primary_key=True)
+    year: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
