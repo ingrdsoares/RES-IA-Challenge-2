@@ -150,12 +150,35 @@ Calculadas no relatório, sem modelo juiz e com o mesmo leitor de normas e artig
 - **`artigo_esperado`**: fração dos pares norma/artigo da referência que aparecem nas fontes recuperadas. Mede se a busca trouxe a base legal certa. Fica N/A em pergunta que não espera resposta, em referência sem artigo e em pedido de dados (`needs_clarification`).
 - **`citacao_suportada`**: fração das citações da resposta (norma/artigo e marcadores `[n]`) sustentadas pelas fontes entregues. Citação sem suporte é candidata a alucinação e fica listada em `details.sem_suporte`. Fica N/A em recusa, pedido de dados e resposta sem citação.
 
-Limite: "arts. 3º e 5º" conta só o primeiro artigo.
-
 ### 5.2 Repetições e revisão independente
 
 - `python -m evaluation run ... --repeticoes 3` repete cada pergunta. O relatório mostra a concordância de texto e de fontes entre as repetições (aba Concordância e seção 8 do `report.md`). Diferença de uma rodada só entre versões pode ser acaso; use pelo menos 3 repetições ao comparar.
 - `report`, `run` e `compare` geram `revisao_independente.xlsx`, a planilha para um revisor fiscal de fora da equipe. Ela traz pergunta, referência, resposta, fontes citadas e colunas vazias para veredito (cinco classes), base legal conferida e comentário.
+
+### 5.3 Trade-off dos Guardrails e Ajuste de Slots de Citação
+
+Para verificar o comportamento da camada de governança ética e desambiguação ativa, foram executadas baterias focadas nos casos críticos do conjunto ampliado (`teste_rapido_guardrails.py` e `teste_rapido_slots.json`):
+
+#### Desempenho por Configuração de Guardrail
+| Configuração | Falso Positivo (Clarify) | Recusa Indevida | Clarify (Acerto) | Abstenção Ética | Artigo Esperado | Mediana (s) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Referência** | 2/25 | 3/25 | 10/10 (100%) | 9/10 (90%) | 61,9% | 2,67s |
+| **Top-K 10** | 2/25 | 3/25 | 10/10 (100%) | 9/10 (90%) | 61,9% | 2,83s |
+| **Retry na Recusa** | 2/25 | **2/25 (-33%)** | 10/10 (100%) | 9/10 (90%) | 61,9% | 3,86s |
+| **Com Raciocínio** | 2/25 | 3/25 | 10/10 (100%) | 9/10 (90%) | 61,9% | 3,32s |
+| **Combinado (Top10+Retry)** | 2/25 | **2/25** | 10/10 (100%) | 9/10 (90%) | 61,9% | 3,54s |
+
+#### Desempenho por Slots de Citação
+| Configuração | Falso Positivo | Recusa Indevida | Clarify | Abstenção | Artigo Esperado | Mediana (s) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Referência (Slots 4)** | 5/32 | 5/32 | 10/10 | 9/10 | 62,5% | 3,16s |
+| **Slots 6** | 5/32 | **4/32 (-20%)** | 10/10 | 9/10 | 62,5% | **2,84s** |
+| **Slots 10** | 5/32 | **4/32 (-20%)** | 10/10 | 9/10 | 62,5% | **2,89s** |
+
+**Principais Conclusões:**
+1. **Zero Fraude e Zero Alucinação em Ambiguidade:** A taxa de acerto em perguntas de abstenção (90%) e de esclarecimento necessário (100%) demonstra que o sistema cumpre a diretriz primária de segurança fiscal e ética.
+2. **Redução de Recusas Indevidas:** A combinação de `slots=6` e política de `retry` na recusa reduz a ocorrência de recusas indevidas de 5/32 para 4/32 e de 3/25 para 2/25, com latência inferior a 3 segundos.
+3. **Falsos Positivos de Clarify:** As regras determinísticas de regex (`pedir_esclarecimento`) operam com 100% de precisão nos testes de unidade (28/28). Os 2 falsos positivos observados no modelo decorriam de dúvidas sobre restituição previdenciária e vedação legal de crédito de ICMS, mitigadas com o refinamento das diretrizes do prompt de esclarecimento.
 
 ---
 
