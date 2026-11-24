@@ -1,4 +1,4 @@
-from test_access import csrf, register
+from test_access import PASSWORD, csrf, register
 
 DATA = {
     "cnpj": "11222333000181",
@@ -84,3 +84,61 @@ def test_oversized_profile_fields_rejected(client):
             "/empresas", json={**DATA, field: "x" * length}, headers=csrf(client)
         )
         assert response.status_code == 422
+
+
+def test_revenue_starts_without_value(client):
+    register(client)
+    company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
+    response = client.get(f"/empresas/{company['id']}/faturamento/2026")
+    assert response.status_code == 200
+    assert response.json() == {"year": 2026, "amount": None, "updated_at": None}
+
+
+def test_revenue_is_kept_after_new_login(client):
+    register(client)
+    company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
+    url = f"/empresas/{company['id']}/faturamento/2026"
+    saved = client.put(url, json={"amount": "48500.10"}, headers=csrf(client))
+    assert saved.status_code == 200
+    client.post("/auth/logout", headers=csrf(client))
+    client.cookies.clear()
+    client.post(
+        "/auth/login",
+        json={"email": "person@example.com", "password": PASSWORD},
+        headers=csrf(client),
+    )
+    body = client.get(url).json()
+    assert body["amount"] == "48500.10"
+    assert body["updated_at"]
+
+
+def test_revenue_put_replaces_value_of_same_year_only(client):
+    register(client)
+    company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
+    url = f"/empresas/{company['id']}/faturamento/"
+    client.put(url + "2025", json={"amount": "10.00"}, headers=csrf(client))
+    client.put(url + "2026", json={"amount": "20.00"}, headers=csrf(client))
+    client.put(url + "2026", json={"amount": "30.00"}, headers=csrf(client))
+    assert client.get(url + "2025").json()["amount"] == "10.00"
+    assert client.get(url + "2026").json()["amount"] == "30.00"
+
+
+def test_revenue_of_other_owner_gets_404(client):
+    register(client)
+    company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
+    url = f"/empresas/{company['id']}/faturamento/2026"
+    client.post("/auth/logout", headers=csrf(client))
+    register(client, "other@example.com")
+    assert client.get(url).status_code == 404
+    assert client.put(url, json={"amount": "1.00"}, headers=csrf(client)).status_code == 404
+
+
+def test_invalid_revenue_rejected(client):
+    register(client)
+    company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
+    url = f"/empresas/{company['id']}/faturamento/"
+    for amount in ("-1.00", "1.001", "abc", 10.5, None):
+        response = client.put(url + "2026", json={"amount": amount}, headers=csrf(client))
+        assert response.status_code == 422, amount
+    for year in ("1999", "2101", "abc"):
+        assert client.get(url + year).status_code == 422, year

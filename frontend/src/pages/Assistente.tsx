@@ -3,12 +3,18 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
-  MessagesSquare,
-  History,
+  Check,
+  CheckCircle2,
+  Download,
   FileCheck2,
+  History,
   ListChecks,
+  MessagesSquare,
   Plus,
+  Search,
   Send,
+  ThumbsDown,
+  ThumbsUp,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { formatCnpj } from '../components/Sidebar';
@@ -133,6 +139,94 @@ const kindLabels: Record<string, string> = {
   other: 'Documento',
 };
 
+const FEEDBACK_REASONS = [
+  { id: 'incorreta', label: 'Informação incorreta' },
+  { id: 'incompleta', label: 'Resposta incompleta' },
+  { id: 'desatualizada', label: 'Regra desatualizada' },
+  { id: 'sem_fonte', label: 'Sem citação da lei' },
+  { id: 'confusa', label: 'Difícil de entender' },
+  { id: 'outro', label: 'Outro motivo' },
+] as const;
+
+function FeedbackWidget({ message }: { message: Message }) {
+  const [showReasons, setShowReasons] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  async function sendFeedback(useful: boolean, reason?: string) {
+    setSubmitting(true);
+    try {
+      await api
+        .request('/rag/feedback', {
+          method: 'POST',
+          body: JSON.stringify({
+            request_id: message.operation_id || message.id,
+            useful,
+            reason: reason || null,
+          }),
+        })
+        .catch(() => {});
+      setSubmitted(true);
+      setShowReasons(false);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="flex items-center gap-1.5 pt-2 text-xs text-ink-muted">
+        <Check size={14} className="text-link" />
+        <span>Obrigado pela sua avaliação!</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-t border-slate-200 pt-2 text-xs">
+      <div className="flex flex-wrap items-center gap-2 text-slate-500">
+        <span>Esta orientação foi útil?</span>
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => sendFeedback(true)}
+          className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+          title="Sim, foi útil"
+        >
+          <ThumbsUp size={12} /> Sim
+        </button>
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => setShowReasons(true)}
+          className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+          title="Não foi útil"
+        >
+          <ThumbsDown size={12} /> Não
+        </button>
+      </div>
+      {showReasons && (
+        <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs space-y-1.5">
+          <p className="font-semibold text-slate-700">Por que não ajudou?</p>
+          <div className="flex flex-wrap gap-1">
+            {FEEDBACK_REASONS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                disabled={submitting}
+                onClick={() => sendFeedback(false, r.id)}
+                className="rounded border border-slate-300 bg-white px-2 py-0.5 text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Answer({
   message,
   companyId,
@@ -142,7 +236,29 @@ function Answer({
 }) {
   const [tasks, setTasks] = useState<Record<number, string>>({});
   const [taskError, setTaskError] = useState('');
+  const [wholeTaskState, setWholeTaskState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const { calculation, fiscal_status, guide_reading } = message.context;
+
+  async function createWholeTask() {
+    setTaskError('');
+    setWholeTaskState('saving');
+    try {
+      const firstLine = message.text.split('\n')[0].replace(/^#+\s*/, '').trim();
+      const title = firstLine.length > 5 ? firstLine.slice(0, 140) : 'Orientação fiscal do assistente';
+      await api.request('/empresas/' + companyId + '/tarefas', {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+          source_message_id: message.id,
+          period: message.context.period || null,
+        }),
+      });
+      setWholeTaskState('saved');
+    } catch (error) {
+      setWholeTaskState('idle');
+      setTaskError(errorText(error));
+    }
+  }
 
   async function createTask(index: number) {
     setTaskError('');
@@ -298,6 +414,32 @@ function Answer({
           {taskError && <p role="alert">{taskError}</p>}
         </section>
       )}
+      {message.next_steps.length === 0 && (
+        <div className="pt-1">
+          {wholeTaskState === 'saved' ? (
+            <a
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-link underline"
+              href="#tarefas"
+            >
+              <Check size={14} /> Tarefa criada · Ver em Tarefas
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-link hover:underline"
+              disabled={wholeTaskState === 'saving'}
+              onClick={createWholeTask}
+            >
+              <Plus size={14} />
+              {wholeTaskState === 'saving'
+                ? 'Criando tarefa…'
+                : 'Transformar esta orientação em tarefa'}
+            </button>
+          )}
+          {taskError && <p role="alert">{taskError}</p>}
+        </div>
+      )}
+      <FeedbackWidget message={message} />
       <p className="border-t border-slate-200 pt-2 text-xs text-slate-600">
         Orientação informativa. Valide decisões fiscais e a escrituração com um
         profissional registrado no CRC.
@@ -825,6 +967,42 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
     }
   }
 
+  function exportChat() {
+    if (!messages.length) return;
+    const title = conversation?.title || 'conversa-fiscal';
+    const dateStr = new Date().toLocaleDateString('pt-BR');
+    let md = `# Sócio Digital - Consulta Fiscal\n\n`;
+    md += `**Título:** ${title}\n`;
+    md += `**Data da consulta:** ${dateStr}\n\n`;
+    md += `---\n\n`;
+    for (const m of messages) {
+      const role = m.role === 'user' ? 'Você (Empresa)' : 'Assistente Fiscal';
+      md += `### ${role}\n\n${m.text}\n\n`;
+      if (m.citations && m.citations.length > 0) {
+        md += `**Fontes citadas:**\n`;
+        for (const c of m.citations) {
+          md += `- [${c.title}](${c.official_url || '#'}): ${c.text.slice(0, 140)}...\n`;
+        }
+        md += `\n`;
+      }
+      if (m.next_steps && m.next_steps.length > 0) {
+        md += `**Próximos passos recomendados:**\n`;
+        for (const s of m.next_steps) {
+          md += `1. ${s}\n`;
+        }
+        md += `\n`;
+      }
+      md += `---\n\n`;
+    }
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'conversa'}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const welcome = !loading && !readError && !messages.length;
   const period = messages.at(-1)?.context.period;
   const busy = sending || loading || watching || !!readError;
@@ -836,12 +1014,26 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
           <h2>O que você precisa resolver hoje?</h2>
         </header>
       )}
-      {conversation && <header className="border-b border-slate-200 pb-3">
-        <h2 className="break-words text-lg font-semibold">
-          {conversation.title}
-        </h2>
-        {period && <p className="text-sm text-slate-600">Competência · {period}</p>}
-      </header>}
+      {conversation && (
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <div>
+            <h2 className="break-words text-lg font-semibold">
+              {conversation.title}
+            </h2>
+            {period && <p className="text-sm text-slate-600">Competência · {period}</p>}
+          </div>
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={exportChat}
+              className="secondary inline-flex items-center gap-1.5 py-1 px-2.5 text-xs font-semibold"
+              title="Baixar conversa em arquivo Markdown"
+            >
+              <Download size={14} /> Exportar conversa (.md)
+            </button>
+          )}
+        </header>
+      )}
       {readError && (
         <p className="notice" role="alert">
           {readError}{' '}
@@ -998,11 +1190,65 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
           onClick={() => setGuideOpen(true)} disabled={busy}>Conferir uma guia</button>
       )}
       {welcome && (
-            <div className="assistant-choices">
-              <button type="button" onClick={() => setGuideOpen(true)} disabled={busy || guideOpen}><FileCheck2 /> Conferir uma guia</button>
-              <button type="button" onClick={() => { setDraft('Quero entender a regra sobre '); document.getElementById('chat-question')?.focus(); }}><BookOpen /> Entender uma regra</button>
-              <a href="#tarefas"><ListChecks /> Consultar minhas tarefas</a>
-            </div>
+        <div className="assistant-choices">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            disabled={busy || guideOpen}
+          >
+            <FileCheck2 /> Conferir uma guia
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              send({ text: 'Como emitir a guia DAS da minha empresa este mês?' })
+            }
+            disabled={busy}
+          >
+            <FileCheck2 /> Como emitir o DAS?
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              send({
+                text: 'Qual o limite de faturamento anual do MEI e o que acontece se estourar o teto?',
+              })
+            }
+            disabled={busy}
+          >
+            <BookOpen /> Limite de faturamento do MEI
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              send({
+                text: 'Como funciona o cálculo do Fator R no Simples Nacional para saber se fico no Anexo III ou V?',
+              })
+            }
+            disabled={busy}
+          >
+            <MessagesSquare /> Como calcular o Fator R?
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ text: 'Paguei a guia da minha empresa?' })}
+            disabled={busy}
+          >
+            <CheckCircle2 /> Conferir pagamento de guia
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setDraft('Quero entender a regra sobre ');
+              document.getElementById('chat-question')?.focus();
+            }}
+          >
+            <BookOpen /> Entender uma regra específica
+          </button>
+          <a href="#tarefas">
+            <ListChecks /> Consultar minhas tarefas
+          </a>
+        </div>
       )}
     </section>
   );
@@ -1021,6 +1267,7 @@ function CompanyAssistant({
   const id = params.get('conversa');
   const reading = !!(id && params.get('version_id') && params.get('document_id'));
   const [history, setHistory] = useState<Conversation[]>([]);
+  const [historySearch, setHistorySearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -1082,25 +1329,41 @@ function CompanyAssistant({
           {!loading && !error && !history.length && (
             <p className="text-sm text-slate-500">Nenhuma conversa salva.</p>
           )}
+          {history.length > 0 && (
+            <div className="my-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs">
+              <Search size={14} className="shrink-0 text-slate-400" />
+              <input
+                type="search"
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                placeholder="Filtrar conversas…"
+                className="w-full border-0 bg-transparent p-0 text-xs outline-none"
+              />
+            </div>
+          )}
           <nav
             className="max-h-60 space-y-1 overflow-auto lg:max-h-[58vh]"
             aria-label="Histórico de conversas"
           >
-            {history.map((chat) => (
-              <a
-                key={chat.id}
-                href={chatLink(chat.id)}
-                aria-current={chat.id === id ? 'page' : undefined}
-                className={
-                  'block break-words rounded-lg px-3 py-2 text-sm hover:bg-slate-100 ' +
-                  (chat.id === id
-                    ? 'bg-info font-semibold text-ink'
-                    : 'text-slate-700')
-                }
-              >
-                <span className="line-clamp-2">{chat.title}</span>
-              </a>
-            ))}
+            {history
+              .filter((c) =>
+                c.title.toLowerCase().includes(historySearch.toLowerCase()),
+              )
+              .map((chat) => (
+                <a
+                  key={chat.id}
+                  href={chatLink(chat.id)}
+                  aria-current={chat.id === id ? 'page' : undefined}
+                  className={
+                    'block break-words rounded-lg px-3 py-2 text-sm hover:bg-slate-100 ' +
+                    (chat.id === id
+                      ? 'bg-info font-semibold text-ink'
+                      : 'text-slate-700')
+                  }
+                >
+                  <span className="line-clamp-2">{chat.title}</span>
+                </a>
+              ))}
           </nav>
           </details>
         </div>

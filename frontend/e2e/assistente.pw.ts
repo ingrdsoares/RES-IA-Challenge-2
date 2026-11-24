@@ -258,6 +258,14 @@ test('envia pergunta com a guia selecionada e mostra os dados lidos', async ({ p
   await expect(reading).toContainText(/R\$\s81,05/);
   await expect(reading.getByRole('link', { name: 'Ver guia na tela Fiscal' }))
     .toHaveAttribute('href', '#fiscal?scope=obligations&evidence=' + guideId);
+
+  await page.route('**/api/empresas/empresa-teste/tarefas', (route) => {
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject({ source_message_id: answerMsg.id });
+    return route.fulfill({ status: 201, json: { id: 'tarefa-da-guia' } });
+  });
+  await page.getByRole('button', { name: 'Transformar esta orientação em tarefa' }).click();
+  await expect(page.locator('article a[href="#tarefas"]')).toBeVisible();
 });
 
 test('mantém a guia ao tentar novamente e preserva o chat por texto', async ({ page }) => {
