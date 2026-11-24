@@ -349,7 +349,7 @@ O `scripts/experimentos.py` não usa Docker. Ele roda a avaliação no próprio 
 - vale uma avaliação por conta e consulta (a nova substitui a anterior), e as avaliações são apagadas junto com a conta.
 
 **Contrato para o botão do frontend.**
-- Ler o cabeçalho `X-Request-ID` da resposta de `/rag/query`.
+- Em `/rag/query`, ler o cabeçalho `X-Request-ID` da resposta. No assistente, usar o `operation_id` da resposta, aceito só para a conta que a recebeu.
 - Mandar o `POST /rag/feedback`, que responde 204.
 - Mostrar a lista de motivos só em "não útil".
 - Erros: 404 para `request_id` desconhecido e 422 para motivo inválido.

@@ -204,6 +204,34 @@ test('erro no polling ainda permite parar de aguardar', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Enviar', exact: true })).toBeEnabled();
 });
 
+test('avaliação da resposta envia a operação e confirma só depois de salvar', async ({ page }) => {
+  let body: unknown;
+  await openChat(page, { messages: [userMsg, answerMsg] });
+  await page.route('**/api/rag/feedback', (route) => {
+    body = route.request().postDataJSON();
+    return route.fulfill({ status: 204 });
+  });
+  await page.getByRole('button', { name: 'Não', exact: true }).click();
+  await page.getByRole('button', { name: 'Difícil de entender' }).click();
+  await expect(page.getByText('Obrigado pela sua avaliação!')).toBeVisible();
+  expect(body).toEqual({ request_id: 'op1', useful: false, reason: 'confusa' });
+});
+
+test('avaliação que falha mostra o erro e permite tentar de novo', async ({ page }) => {
+  let status = 404;
+  await openChat(page, { messages: [userMsg, answerMsg] });
+  await page.route('**/api/rag/feedback', (route) =>
+    status === 404
+      ? route.fulfill({ status, json: { detail: 'Consulta não encontrada' } })
+      : route.fulfill({ status }));
+  await page.getByRole('button', { name: 'Sim', exact: true }).click();
+  await expect(page.getByText('Não foi possível salvar sua avaliação. Tente novamente.')).toBeVisible();
+  await expect(page.getByText('Obrigado pela sua avaliação!')).toHaveCount(0);
+  status = 204;
+  await page.getByRole('button', { name: 'Sim', exact: true }).click();
+  await expect(page.getByText('Obrigado pela sua avaliação!')).toBeVisible();
+});
+
 const guideId = 'evidence-guide-id';
 const guideFields = { evidence_id: guideId, period: '2026-10', due_date: '2026-11-20', amount: '81.05' };
 
