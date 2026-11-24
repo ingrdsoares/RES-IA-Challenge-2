@@ -10,7 +10,6 @@ from app.evidence.models import Evidence, Obligation
 from app.jobs.service import enqueue
 from app.serialization import record
 
-
 GUIDE_IMAGE_SIGNATURES = {
     "image/png": b"\x89PNG\r\n\x1a\n",
     "image/jpeg": b"\xff\xd8\xff",
