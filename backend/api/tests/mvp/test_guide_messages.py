@@ -141,18 +141,28 @@ class GuideOnly:
     "payment_question",
     [
         "Paguei esta guia em 2026-11?",
-        "Paguei a guia de novembro de 2026?",
         "Paguei a guia de novembro?",
     ],
 )
 def test_worker_reads_guide_before_supervisor_and_reuses_reading_after_confirmation(
     client, monkeypatch, payment_question
 ):
+    from app.assistant.context import resolve_context
+    from app.assistant.schemas import MessageInput
+    from app.companies.schemas import CompanySnapshot
     from test_multiagent_workflow import Model
 
     company, chat = conversation(client)
     enable(client, monkeypatch)
     guide = attach(client, company, "worker-guide", "image/png", PNG)
+    if payment_question == "Paguei esta guia em 2026-11?":
+        named_month = resolve_context(
+            CompanySnapshot.model_validate(company),
+            MessageInput(text="Paguei a guia de novembro de 2026?", evidence_id=guide),
+        )
+        assert named_month.context["period"] == "2026-11"
+        assert not named_month.context.get("guide_period_ambiguous")
+        assert named_month.missing_fields == []
     calls = []
     fields = {"period": "2026-10", "due_date": "2026-11-20", "amount": "81.05"}
     mock_reading(monkeypatch, fields, calls)

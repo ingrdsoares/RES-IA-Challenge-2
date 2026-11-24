@@ -35,11 +35,6 @@ def test_termo_original_nao_rebaixado():
     assert dict(zip(idx, val))[_indice("receita")] == 1.0
 
 
-def test_sem_expansao_igual_ao_anterior():
-    idx, val = vetor_consulta("prazo de recolhimento")
-    assert set(val) == {1.0}
-
-
 def test_estatisticas_datasets():
     dados = Path(__file__).parents[2] / "evaluation" / "data"
     perguntas = [

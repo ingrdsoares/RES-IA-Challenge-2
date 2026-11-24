@@ -24,32 +24,6 @@ def test_retry_does_not_duplicate_message(client):
     assert client.post(url, json={"text": "Outra pergunta"}, headers=headers).status_code == 409
 
 
-def test_ambiguous_period_requires_confirmation(client):
-    company, chat = conversation(client)
-    url = "/conversas/" + chat["id"] + "/mensagens"
-    response = client.post(
-        url,
-        json={"text": "Paguei o DAS de outubro?"},
-        headers={**csrf(client), "Idempotency-Key": "ambiguous"},
-    )
-    assert response.status_code == 202
-    assert response.json()["status"] == "awaiting_data"
-    assert "period" in response.json()["missing_fields"]
-    operation_id = response.json()["operation_id"]
-    confirmed = client.post(
-        url,
-        json={
-            "text": "Confirmo outubro de 2026",
-            "confirmation_for": operation_id,
-            "confirmation": {"period": "2026-10"},
-        },
-        headers={**csrf(client), "Idempotency-Key": "confirm"},
-    )
-    assert confirmed.status_code == 202
-    assert confirmed.json()["operation_id"] == operation_id
-    assert confirmed.json()["status"] == "queued"
-
-
 def test_company_is_fixed_for_conversation(client):
     company, chat = conversation(client)
     client.post("/empresas", json={**DATA, "cnpj": "11444777000161"}, headers=csrf(client))

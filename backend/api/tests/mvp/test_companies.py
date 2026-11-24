@@ -10,17 +10,6 @@ DATA = {
 }
 
 
-def test_account_has_multiple_profiles(client):
-    assert register(client).status_code == 201
-    one = client.post("/empresas", json=DATA, headers=csrf(client))
-    assert one.status_code == 201
-    two = client.post("/empresas", json={**DATA, "cnpj": "11444777000161"}, headers=csrf(client))
-    assert two.status_code == 201
-    rows = client.get("/empresas").json()["items"]
-    assert len(rows) == 2
-    assert rows[0]["id"] != rows[1]["id"]
-
-
 def test_other_owner_gets_404(client):
     register(client)
     company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
@@ -74,9 +63,13 @@ def test_invalid_cnpj_rejected(client):
 
 
 def test_company_pagination(client):
-    register(client)
-    client.post("/empresas", json=DATA, headers=csrf(client))
-    client.post("/empresas", json={**DATA, "cnpj": "11444777000161"}, headers=csrf(client))
+    assert register(client).status_code == 201
+    one = client.post("/empresas", json=DATA, headers=csrf(client))
+    two = client.post("/empresas", json={**DATA, "cnpj": "11444777000161"}, headers=csrf(client))
+    assert one.status_code == two.status_code == 201
+    rows = client.get("/empresas").json()["items"]
+    assert len(rows) == 2
+    assert {row["id"] for row in rows} == {one.json()["id"], two.json()["id"]}
     first = client.get("/empresas?limit=1").json()
     assert first["next_cursor"]
     second = client.get("/empresas", params={"limit": 1, "cursor": first["next_cursor"]}).json()

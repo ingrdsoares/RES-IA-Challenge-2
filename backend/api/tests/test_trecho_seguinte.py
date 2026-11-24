@@ -47,20 +47,20 @@ def test_continuacao_e_o_proximo_trecho_do_mesmo_documento():
     assert {k: v.text for k, v in seguintes.items()} == {1: SEGUINTE}
 
 
-def test_juntar_so_estende_trecho_que_termina_em_dois_pontos():
-    cortado, completo = fonte(1, CORTADO), fonte(4, "Termina com ponto final.")
-    juntos = juntar_continuacoes([cortado, completo], {1: fonte(2, SEGUINTE)})
+def test_juntar_so_estende_trecho_com_dois_pontos_e_continuacao():
+    cortado = fonte(1, CORTADO)
+    completo = fonte(4, "Termina com ponto final.")
+    sem_seguinte = fonte(5, "Aplica-se o seguinte:")
+    juntos = juntar_continuacoes(
+        [cortado, completo, sem_seguinte],
+        {1: fonte(2, SEGUINTE), 4: fonte(6, "Outro trecho.")},
+    )
     assert (
         juntos[0].text
         == CORTADO + "\nArt. 1º O imposto tem como fato gerador a prestação de serviços."
     )
     assert juntos[0].id == 1
-    assert juntos[1] == completo
-
-
-def test_sem_continuacao_mantem_o_trecho():
-    cortado = fonte(1, CORTADO)
-    assert juntar_continuacoes([cortado], {}) == [cortado]
+    assert juntos[1:] == [completo, sem_seguinte]
 
 
 class Store:

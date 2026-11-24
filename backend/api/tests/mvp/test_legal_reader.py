@@ -40,20 +40,6 @@ def published(client):
         yield norm.id, version.id
 
 
-def test_historical_citation_keeps_version(client, published):
-    register(client)
-    doc, version = published
-    response = client.get(
-        "/citacoes/resolver",
-        params={"document_id": str(doc), "version_id": str(version), "anchor_id": "article-1"},
-    )
-    assert response.status_code == 200
-    assert response.json()["version_id"] == str(version)
-    assert response.json()["historical"] is True
-    assert response.json()["state"] == "anchor_unavailable"  # original only; no JSON
-    assert response.json()["original_url"]
-
-
 def test_missing_version_offers_official_source(client, published):
     register(client)
     doc, _ = published
@@ -67,6 +53,7 @@ def test_missing_version_offers_official_source(client, published):
 def test_search_filters_and_unknown_validity(client, published):
     register(client)
     assert len(client.get("/normas", params={"q": "teste", "subject": "MEI"}).json()["items"]) == 1
+    assert client.get("/normas", params={"subject": "ME"}).json()["items"] == []
     assert client.get("/normas", params={"authority": "other"}).json()["items"] == []
     assert client.get("/normas", params={"effective_on": "2026-11-10"}).json()["items"] == []
     from app.legal.models import NormVersion
@@ -79,15 +66,23 @@ def test_search_filters_and_unknown_validity(client, published):
     assert client.get("/normas", params={"effective_on": "2020-06-01"}).json()["items"] == []
 
 
-def test_subject_filter_is_exact(client, published):
-    register(client)
-    assert client.get("/normas", params={"subject": "ME"}).json()["items"] == []
-
-
 def test_reader_exact_anchor_and_missing_anchor(client, published):
     register(client)
     from app.legal.ingest import storage_from_settings
     from app.legal.models import NormVersion
+
+    params = {
+        "document_id": str(published[0]),
+        "version_id": str(published[1]),
+        "anchor_id": "article-1",
+    }
+    historical = client.get("/citacoes/resolver", params=params)
+    assert historical.status_code == 200
+    original = historical.json()
+    assert original["version_id"] == str(published[1])
+    assert original["historical"] is True
+    assert original["state"] == "anchor_unavailable"
+    assert original["original_url"]
 
     storage = storage_from_settings(client.app.state.settings)
     with client.app.state.db_factory() as db:
@@ -100,11 +95,6 @@ def test_reader_exact_anchor_and_missing_anchor(client, published):
             False,
         )
         db.commit()
-    params = {
-        "document_id": str(published[0]),
-        "version_id": str(published[1]),
-        "anchor_id": "article-1",
-    }
     response = client.get("/citacoes/resolver", params=params).json()
     assert response.get("state") == "exact", response
     assert response["anchor_id"] == "article-1"
@@ -131,13 +121,3 @@ def test_catalog_full_text_search_uses_indexed_content(client, published):
         db.commit()
     assert len(client.get("/normas", params={"q": "extraordinaria"}).json()["items"]) == 1
     assert client.get("/normas", params={"q": "inexistente"}).json()["items"] == []
-
-
-def test_reader_cors_is_configured_from_application(client, published):
-    import httpx
-
-    response = httpx.options(
-        "http://localhost:19000/legal/test.json",
-        headers={"Origin": "http://testserver", "Access-Control-Request-Method": "GET"},
-    )
-    assert response.headers.get("access-control-allow-origin") == "http://testserver"

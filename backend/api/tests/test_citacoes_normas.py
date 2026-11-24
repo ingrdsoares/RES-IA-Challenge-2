@@ -1,4 +1,4 @@
-from app.citacoes_normas import avisar_sem_suporte, pares_fontes, sem_suporte
+from app.citacoes_normas import avisar_sem_suporte, sem_suporte
 from app.schemas import Source
 
 FONTE = {
@@ -9,8 +9,10 @@ FONTE = {
 
 
 def test_abreviacao_e_nome_por_extenso_casam():
-    assert sem_suporte("Veja o art. 18-A da LC 123.", [FONTE]) == []
-    assert sem_suporte("Conforme o artigo 18-A da Lei Complementar nº 123/2006.", [FONTE]) == []
+    fonte_api = Source(id=1, score=1.0, **FONTE)
+    for fonte in (FONTE, fonte_api):
+        assert sem_suporte("Veja o art. 18-A da LC 123.", [fonte]) == []
+        assert sem_suporte("Conforme o artigo 18-A da Lei Complementar nº 123/2006.", [fonte]) == []
 
 
 def test_artigo_ou_norma_diferente_sem_suporte():
@@ -21,11 +23,6 @@ def test_artigo_ou_norma_diferente_sem_suporte():
 def test_artigo_so_no_texto_vizinho_conta():
     fonte = {"text": "Art. 17. Vedações.\n\nArt. 18. Alíquotas.", "title": "LC 123", "source": "x"}
     assert sem_suporte("O art. 18 da LC 123.", [fonte]) == []
-
-
-def test_aceita_source_do_pydantic():
-    s = Source(id=1, text=FONTE["text"], source="lc123.pdf", score=1.0, title=FONTE["title"])
-    assert ("lc:123", "18-a") in pares_fontes([s])
 
 
 def test_sem_citacao_nao_altera():
