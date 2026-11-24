@@ -58,6 +58,8 @@ def test_deepseek_vision_sends_instruction_and_image():
     [
         {"period": "2026-13"},
         {"due_date": "2026-02-31"},
+        {"due_date": 0},
+        {"due_date": "20261120"},
         {"amount": 81.05},
         {"amount": "-1"},
     ],
@@ -85,3 +87,35 @@ def test_guide_provider_error_does_not_echo_response():
                 http_client=client,
             )
     assert "image-and-api-key" not in str(error.value)
+
+
+@pytest.mark.parametrize(
+    ("question", "period", "ambiguous"),
+    [
+        ("Paguei a guia de novembro de 2026?", "2026-11", False),
+        ("Paguei a guia de novembro?", None, True),
+    ],
+)
+def test_document_question_preserves_named_period(question, period, ambiguous):
+    from datetime import UTC, datetime
+    from uuid import uuid4
+
+    from app.assistant.context import resolve_context
+    from app.assistant.schemas import MessageInput
+    from app.companies.schemas import CompanySnapshot
+
+    company = CompanySnapshot(
+        id=uuid4(),
+        cnpj="11222333000181",
+        cnae="6201501",
+        size="ME",
+        regime="simples",
+        municipality="Brasília",
+        state="DF",
+        provenance={},
+        created_at=datetime.now(UTC),
+    )
+    message = MessageInput(text=question, evidence_id=uuid4())
+    result = resolve_context(company, message)
+    assert result.context.get("period") == period
+    assert result.context.get("guide_period_ambiguous", False) is ambiguous

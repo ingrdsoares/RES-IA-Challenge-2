@@ -97,6 +97,8 @@ def submit_message(
                 else {}
             )
             candidate.update(original.context.get("calculation_input", {}))
+            if context.get("evidence_id") and candidate:
+                context.setdefault("guide_retry_calculation", dict(candidate))
             candidate.update(
                 {name: value for name, value in values.items() if name in calculation_fields}
             )

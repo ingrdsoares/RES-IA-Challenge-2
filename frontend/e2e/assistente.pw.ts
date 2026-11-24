@@ -261,9 +261,10 @@ test('envia pergunta com a guia selecionada e mostra os dados lidos', async ({ p
 });
 
 test('mantém a guia ao tentar novamente e preserva o chat por texto', async ({ page }) => {
+  const calculation = { kind: 'mei', period: '2026-10', activity: 'services', conditions_confirmed: true };
   await openChat(page, {
     messages: [
-      { ...userMsg, status: 'failed', context: { evidence_id: guideId } },
+      { ...userMsg, status: 'failed', context: { evidence_id: guideId, calculation_input: calculation } },
       {
         ...answerMsg, citations: [], context: {
           guide_reading: { evidence_id: guideId, period: null, due_date: null, amount: null },
@@ -284,7 +285,7 @@ test('mantém a guia ao tentar novamente e preserva o chat por texto', async ({ 
 
   const retried = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
   await page.getByRole('button', { name: 'Tentar de novo' }).click();
-  expect((await retried).postDataJSON()).toEqual({ text: userMsg.text, evidence_id: guideId });
+  expect((await retried).postDataJSON()).toEqual({ text: userMsg.text, evidence_id: guideId, calculation });
 
   await page.getByRole('button', { name: 'Conferir uma guia' }).click();
   await expect(page.getByText('A leitura por imagem está indisponível.')).toBeVisible();
@@ -315,4 +316,15 @@ test('limpa a guia selecionada ao trocar de empresa', async ({ page }) => {
   await expect(page.getByLabel('Guia cadastrada')).toHaveCount(0);
   await page.getByRole('button', { name: 'Conferir uma guia' }).click();
   await expect(page.getByText('Nenhuma guia em PNG ou JPEG.')).toBeVisible();
+});
+
+
+test('mostra a competência da pergunta e da guia antes de confirmar', async ({ page }) => {
+  await openChat(page, { messages: [{
+    ...userMsg, status: 'awaiting_data',
+    context: { evidence_id: guideId, period: '2026-11', guide_reading: guideFields, missing_fields: ['period'] },
+  }] });
+  const confirmation = page.getByRole('form', { name: 'Confirmação de contexto' });
+  await expect(confirmation).toContainText('A guia indica 10/2026. A pergunta indica 11/2026.');
+  await expect(confirmation.getByLabel('Qual competência deseja consultar?')).toHaveValue('');
 });

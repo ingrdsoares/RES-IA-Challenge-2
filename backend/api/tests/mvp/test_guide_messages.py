@@ -1,3 +1,4 @@
+import pytest
 from test_access import csrf, register
 from test_companies import DATA
 from test_conversations import conversation
@@ -136,8 +137,16 @@ class GuideOnly:
         return schema(intent="Ler guia", agents=[]), {}
 
 
+@pytest.mark.parametrize(
+    "payment_question",
+    [
+        "Paguei esta guia em 2026-11?",
+        "Paguei a guia de novembro de 2026?",
+        "Paguei a guia de novembro?",
+    ],
+)
 def test_worker_reads_guide_before_supervisor_and_reuses_reading_after_confirmation(
-    client, monkeypatch
+    client, monkeypatch, payment_question
 ):
     from test_multiagent_workflow import Model
 
@@ -168,12 +177,14 @@ def test_worker_reads_guide_before_supervisor_and_reuses_reading_after_confirmat
         client,
         chat,
         "different",
-        text="Paguei esta guia em 2026-11?",
+        text=payment_question,
         evidence_id=guide,
     ).json()
     status = run_guide(client, submitted, FiscalModel())
     assert status["status"] == "awaiting_data"
     assert status["result"]["missing_fields"] == ["period"]
+    pending = client.get(url).json()["items"][-1]
+    assert pending["context"]["guide_reading"] == {"evidence_id": guide, **fields}
     confirmed = post_message(
         client,
         chat,

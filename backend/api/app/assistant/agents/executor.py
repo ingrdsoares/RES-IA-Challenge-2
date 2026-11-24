@@ -160,7 +160,10 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             if current.revision != revision:
                 raise StaleLease("Contexto alterado")
             current.status = "awaiting_data"
-            current.context = {**current.context, "missing_fields": fields}
+            paused_context = {**current.context, "missing_fields": fields}
+            if "guide_reading" in context:
+                paused_context["guide_reading"] = context["guide_reading"]
+            current.context = paused_context
             op = db.get(Operation, operation_id)
             op.status, op.result = (
                 "awaiting_data",
@@ -196,11 +199,16 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                     generate=lambda timeout: _read_stored_guide(settings, evidence, timeout),
                 )
             context["guide_reading"] = {**document_input, **reading.model_dump(mode="json")}
-            if reading.period and not context.get("guide_period_confirmed"):
+            if not context.get("guide_period_confirmed"):
                 period_conflicts = bool(
-                    context.get("period") and context["period"] != reading.period
+                    context.get("guide_period_ambiguous")
+                    or (
+                        reading.period
+                        and context.get("period")
+                        and context["period"] != reading.period
+                    )
                 )
-                if not context.get("period"):
+                if reading.period and not context.get("period") and not period_conflicts:
                     context["period"] = reading.period
 
         plan, _ = stage(

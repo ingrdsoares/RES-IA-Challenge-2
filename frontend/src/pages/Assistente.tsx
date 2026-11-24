@@ -54,6 +54,8 @@ type Message = {
     missing_fields?: string[];
     evidence_id?: string;
     guide_reading?: GuideReading;
+    guide_retry_calculation?: Record<string, unknown>;
+    calculation_input?: Record<string, unknown>;
     period?: string;
     regime?: string;
     company?: { regime: string; municipality: string; state: string };
@@ -377,10 +379,21 @@ function Confirmation({
         Confirmação de contexto
       </h3>
       {fields.includes('period') && (
-        <label className="block text-sm">
-          Qual competência deseja consultar?
-          <input type="month" name="period" required className="field" />
-        </label>
+        <>
+          {message.context.guide_reading && (
+            <p className="text-sm">
+              {message.context.guide_reading.period
+                ? 'A guia indica ' + message.context.guide_reading.period.split('-').reverse().join('/') + '.'
+                : 'A competência da guia está ilegível ou ausente.'}
+              {message.context.period && message.context.period !== message.context.guide_reading.period &&
+                ' A pergunta indica ' + message.context.period.split('-').reverse().join('/') + '.'}
+            </p>
+          )}
+          <label className="block text-sm">
+            Qual competência deseja consultar?
+            <input type="month" name="period" required className="field" />
+          </label>
+        </>
       )}
       {fields.includes('regime') && (
         <label className="block text-sm">
@@ -886,7 +899,11 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               <FailedNotice
                 operationId={message.operation_id}
                 busy={busy}
-                onRetry={() => send({ text: message.text, evidence_id: message.context.evidence_id })}
+                onRetry={() => send({
+                  text: message.text,
+                  evidence_id: message.context.evidence_id,
+                  calculation: message.context.guide_retry_calculation ?? message.context.calculation_input,
+                })}
                 onCopy={() => setDraft(message.text)}
               />
             )}

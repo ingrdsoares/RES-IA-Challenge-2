@@ -24,7 +24,13 @@ class GuideReading(Contract):
     @field_validator("due_date", mode="before")
     @classmethod
     def parse_date(cls, value):
-        return date.fromisoformat(value) if isinstance(value, str) else value
+        if value is None or type(value) is date:
+            return value
+        if isinstance(value, str):
+            parsed = date.fromisoformat(value)
+            if parsed.isoformat() == value:
+                return parsed
+        raise ValueError("Use uma data em AAAA-MM-DD")
 
     @field_validator("amount", mode="before")
     @classmethod
@@ -64,7 +70,10 @@ def read_guide(
                 "role": "user",
                 "content": [
                     {"type": "text", "text": "Leia a competência, o vencimento e o valor da guia."},
-                    {"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{encoded}"}},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{media_type};base64,{encoded}"},
+                    },
                 ],
             },
         ],
