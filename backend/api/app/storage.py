@@ -77,6 +77,16 @@ class ObjectStorage:
             ExpiresIn=300,
         )
 
+    def content_type(self, key: str, private: bool) -> str | None:
+        self.validate_key(key)
+        try:
+            response = self.client.head_object(Bucket="private" if private else "legal", Key=key)
+        except ClientError as exc:
+            if exc.response["Error"]["Code"] in {"404", "NoSuchKey", "NotFound"}:
+                return None
+            raise
+        return response.get("ContentType")
+
     def get(self, key: str, private: bool) -> bytes:
         self.validate_key(key)
         return self.client.get_object(Bucket="private" if private else "legal", Key=key)[

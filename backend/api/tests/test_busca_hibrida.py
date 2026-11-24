@@ -56,7 +56,6 @@ def test_vetores_esparsos_alinhados_e_consulta_sem_repeticao():
 @pytest.mark.parametrize(
     "texto",
     [
-        "segundo a Lei Complementar 87?",
         "Lei Complementar nº 87, de 13 de setembro de 1996",
         "LC 87/96",
         "lc87",

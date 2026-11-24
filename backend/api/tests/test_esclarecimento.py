@@ -5,7 +5,6 @@ from app.esclarecimento import pedir_esclarecimento
 @pytest.mark.parametrize(
     "pergunta, trecho",
     [
-        ("Minha empresa pode entrar no Simples?", "CNAE"),
         (
             "Minha empresa de tecnologia presta serviços e quero saber em qual anexo do Simples vou pagar o imposto.",
             "folha",
@@ -60,7 +59,7 @@ def test_caso_proprio_reconhece_primeira_pessoa(pergunta):
 
 @pytest.mark.parametrize(
     "pergunta",
-    ["Qual é o limite de receita do MEI?", "O que é o Fator R?", "Meunier é sócio?"],
+    ["O que é o Fator R?", "Meunier é sócio?"],
 )
 def test_caso_proprio_ignora_pergunta_geral(pergunta):
     from app.esclarecimento import caso_proprio

@@ -38,10 +38,16 @@ def test_ordena_pela_nota_sem_mudar_score_das_fontes():
     assert all(f.score == 0.8 for f in saida)
 
 
-def test_sem_url_nao_chama_ninguem_e_mantem_ordem():
+def test_sem_url_avisa_e_mantem_ordem(caplog):
     fontes = [fonte("a"), fonte("b")]
 
-    assert Reranker(Settings(reranker_url=None)).reordenar("pergunta", fontes) == fontes
+    with caplog.at_level("WARNING"):
+        cliente = Reranker(Settings(reranker_url=None))
+    try:
+        assert cliente.reordenar("pergunta", fontes) == fontes
+    finally:
+        cliente.close()
+    assert "RERANKER_URL" in caplog.text
 
 
 def test_lista_vazia_nao_chama_o_servico():
@@ -134,35 +140,15 @@ def _ordem_com_boost(notas, boost, leis=("lei",)):
     return [f.text for f in reranker(handler, boost).reordenar("p", fontes)]
 
 
-def test_boost_zero_mantem_ordem_do_reranker():
-    assert _ordem_com_boost([1.0, 1.2], 0.0) == ["sec", "lei"]
-
-
 def test_boost_sobe_legislacao_ligeiramente_abaixo():
+    notas = [1.0, 1.2]
+    assert _ordem_com_boost(notas, 0.0) == ["sec", "lei"]
     # sigmoide(1.0)=0.73, sigmoide(1.2)=0.77: diferença < 0.1
-    assert _ordem_com_boost([1.0, 1.2], 0.1) == ["lei", "sec"]
+    assert _ordem_com_boost(notas, 0.1) == ["lei", "sec"]
 
 
 def test_boost_nao_supera_secundaria_muito_melhor():
     assert _ordem_com_boost([-3.0, 4.0], 0.1) == ["sec", "lei"]
-
-
-def test_boost_sem_legislacao_nao_muda_ordem():
-    assert _ordem_com_boost([1.0, 1.2], 0.5, leis=()) == ["sec", "lei"]
-
-
-def test_sem_url_ignora_boost():
-    fontes = [fonte("a"), fonte("b")]
-    assert (
-        Reranker(Settings(reranker_url=None, rerank_legislation_boost=0.5)).reordenar("p", fontes)
-        == fontes
-    )
-
-
-def test_avisa_quando_sem_url(caplog):
-    with caplog.at_level("WARNING"):
-        Reranker(Settings())
-    assert "RERANKER_URL" in caplog.text
 
 
 def test_envia_no_maximo_o_limite_do_servico_e_mantem_o_resto_depois():

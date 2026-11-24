@@ -359,6 +359,46 @@ docker compose -f backend/compose.yaml --profile test rm -sf postgres-test redis
 
 Use `rm -sf` com os nomes dos serviços, e não `down`, que derruba o projeto inteiro (API, Qdrant e bancos).
 
+## Leitura de guias no Assistente
+
+Em `backend/.env` ou no ambiente do Compose, defina `GUIDE_VISION_ENABLED=true` e
+`DEEPSEEK_API_KEY` com uma chave válida. Recrie a API e o worker com a configuração.
+O modelo `deepseek-flash` recebe a imagem escolhida e a instrução de leitura.
+`LLM_PROVIDER` continua definindo o provedor das consultas de texto.
+
+Para homologar:
+
+1. Na [tela Fiscal](http://localhost:3000/#fiscal?scope=obligations), abra o escopo
+   **Obrigações**, adicione um documento do tipo **Guia** e anexe o
+   [DAS fictício em PNG](../docs/media/das-ficticio.png).
+2. No Assistente, abra **Conferir uma guia**, selecione a evidência e pergunte
+   “Qual a competência e o valor desta guia?”.
+3. Confira competência `10/2026`, vencimento `20/11/2026` e valor `R$ 81,05`.
+   Abra a evidência pelo link da resposta. Pergunte sobre pagamento para conferir
+   a indicação de que a situação permanece sem verificação oficial.
+4. Envie também uma pergunta comum por texto. A interface de anexos aceita um PNG
+   ou JPEG por mensagem, com até 10 MiB.
+
+A imagem selecionada sai do bucket privado na chamada de leitura. Os campos
+validados ficam no histórico da conversa e em uma etapa da execução. Os testes
+automatizados simulam a resposta do provedor. Para checar a API com uma chave
+válida isoladamente, rode em `backend/api`:
+
+```bash
+../../.venv/bin/python - <<'PYTEST'
+from pathlib import Path
+from app.assistant.agents.guide_vision import read_guide
+from app.config import Settings
+
+sample = Path("../../docs/media/das-ficticio.png").read_bytes()
+reading, usage = read_guide(Settings(), sample, "image/png", timeout=45)
+assert reading.model_dump(mode="json") == {
+    "period": "2026-10", "due_date": "2026-11-20", "amount": "81.05",
+}
+print(usage["model"], usage["latency_ms"], "ms")
+PYTEST
+```
+
 ## Jobs e armazenamento S3 local
 
 O serviço `storage` usa SeaweedFS 4.53 (compatível com S3). A proposta inicial

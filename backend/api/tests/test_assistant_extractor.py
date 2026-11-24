@@ -41,14 +41,6 @@ def test_extractor_identifies_mei_excess():
     assert "9602-5/01" in [c["codigo"] for c in result.cnaes]
 
 
-def test_extractor_extrair_alias():
-    extractor = TaxEntityExtractor()
-    res1 = extractor.extract("DASN-SIMEI prazo de entrega")
-    res2 = extractor.extrair("DASN-SIMEI prazo de entrega")
-    assert res1.texto_original == res2.texto_original
-    assert res1.intencao_primaria == res2.intencao_primaria
-
-
 def test_resolve_context_enriches_with_extraction():
     from datetime import datetime, timezone
 

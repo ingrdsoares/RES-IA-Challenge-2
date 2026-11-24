@@ -6,11 +6,21 @@ from sqlalchemy.orm import Session
 
 from app.access.models import Account
 from app.assistant.models import Conversation, Message
-from app.assistant.schemas import ConversationInput, ConversationView, MessageInput, MessageView
+from app.assistant.schemas import (
+    ConversationInput,
+    ConversationView,
+    GuideOption,
+    GuideOptionsView,
+    MessageInput,
+    MessageView,
+)
 from app.assistant.service import require_conversation, submit_message
 from app.companies.service import require_company
 from app.db import get_db
 from app.dependencies import require_account
+from app.evidence.models import Evidence
+from app.evidence.service import GUIDE_IMAGE_SIGNATURES, guide_attachment_media_type
+from app.legal.ingest import storage_from_settings
 from app.pagination import page
 from app.rate_limit import RateLimiter
 
@@ -48,6 +58,40 @@ def conversations(
         limit,
         cursor,
     )
+
+
+@router.get("/empresas/{company_id}/guias-para-assistente", response_model=GuideOptionsView)
+def guide_options(
+    company_id: UUID,
+    request: Request,
+    limit: int = Query(20, ge=1, le=100),
+    cursor: str | None = Query(None, max_length=100),
+    db: Session = Depends(get_db),
+    account: Account = Depends(require_account),
+):
+    require_company(db, account.id, company_id)
+    settings = request.app.state.settings
+    if not settings.guide_vision_available:
+        return GuideOptionsView(enabled=False, items=[], next_cursor=None)
+    candidates = page(
+        db,
+        select(Evidence).where(
+            Evidence.company_id == company_id,
+            Evidence.kind == "guide",
+            Evidence.storage_key.is_not(None),
+        ),
+        Evidence,
+        lambda row: row,
+        limit,
+        cursor,
+    )
+    storage = storage_from_settings(settings)
+    items = [
+        GuideOption.model_validate(row)
+        for row in candidates["items"]
+        if guide_attachment_media_type(storage, row.storage_key) in GUIDE_IMAGE_SIGNATURES
+    ]
+    return GuideOptionsView(enabled=True, items=items, next_cursor=candidates["next_cursor"])
 
 
 @router.get("/conversas/{conversation_id}", response_model=ConversationView)

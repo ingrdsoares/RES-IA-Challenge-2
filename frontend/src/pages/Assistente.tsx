@@ -24,6 +24,8 @@ import { citationHref, type Citation } from './assistente/citacoes';
 import { AnswerText } from './assistente/AnswerText';
 import { OperationProgress } from './assistente/OperationProgress';
 import { FailedNotice } from './assistente/FailedNotice';
+import { GuidePicker } from './assistente/GuidePicker';
+import { GuideReadingCard, guideHref, type GuideReading } from './assistente/GuideReading';
 import { suggestions } from './Empresas';
 import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
@@ -56,6 +58,10 @@ type Message = {
   next_steps: string[];
   context: {
     missing_fields?: string[];
+    evidence_id?: string;
+    guide_reading?: GuideReading;
+    guide_retry_calculation?: Record<string, unknown>;
+    calculation_input?: Record<string, unknown>;
     period?: string;
     regime?: string;
     company?: { regime: string; municipality: string; state: string };
@@ -68,6 +74,7 @@ type Message = {
 type Payload = {
   text: string;
   calculation?: Record<string, unknown>;
+  evidence_id?: string;
   confirmation_for?: string;
   confirmation?: Record<string, string | boolean>;
 };
@@ -230,7 +237,7 @@ function Answer({
   const [tasks, setTasks] = useState<Record<number, string>>({});
   const [taskError, setTaskError] = useState('');
   const [wholeTaskState, setWholeTaskState] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const { calculation, fiscal_status } = message.context;
+  const { calculation, fiscal_status, guide_reading } = message.context;
 
   async function createWholeTask() {
     setTaskError('');
@@ -274,6 +281,7 @@ function Answer({
 
   return (
     <>
+      {guide_reading && <GuideReadingCard reading={guide_reading} />}
       {message.citations.length > 0 && (
         <section className="space-y-2 border-t border-slate-200 pt-3">
           <h4 className="flex items-center gap-2 text-sm font-semibold">
@@ -513,10 +521,21 @@ function Confirmation({
         Confirmação de contexto
       </h3>
       {fields.includes('period') && (
-        <label className="block text-sm">
-          Qual competência deseja consultar?
-          <input type="month" name="period" required className="field" />
-        </label>
+        <>
+          {message.context.guide_reading && (
+            <p className="text-sm">
+              {message.context.guide_reading.period
+                ? 'A guia indica ' + message.context.guide_reading.period.split('-').reverse().join('/') + '.'
+                : 'A competência da guia está ilegível ou ausente.'}
+              {message.context.period && message.context.period !== message.context.guide_reading.period &&
+                ' A pergunta indica ' + message.context.period.split('-').reverse().join('/') + '.'}
+            </p>
+          )}
+          <label className="block text-sm">
+            Qual competência deseja consultar?
+            <input type="month" name="period" required className="field" />
+          </label>
+        </>
       )}
       {fields.includes('regime') && (
         <label className="block text-sm">
@@ -601,11 +620,13 @@ function Composer({
   busy,
   draft,
   setDraft,
+  guideId,
 }: {
   send: (payload: Payload) => void;
   busy: boolean;
   draft: string;
   setDraft: (text: string) => void;
+  guideId: string;
 }) {
   const [kind, setKind] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -628,7 +649,7 @@ function Composer({
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     if (!kind) {
-      if (draft.trim()) send({ text: draft.trim() });
+      if (draft.trim()) send({ text: draft.trim(), evidence_id: guideId || undefined });
       return;
     }
     const period = String(data.get('period'));
@@ -651,6 +672,7 @@ function Composer({
           ' para ' +
           period,
       calculation,
+      evidence_id: guideId || undefined,
     });
   }
   return (
@@ -763,6 +785,12 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
   const [reload, setReload] = useState(0);
   const [loading, setLoading] = useState(!!conversation);
   const [sending, setSending] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guideId, setGuideId] = useState('');
+  function closeGuide() {
+    setGuideId('');
+    setGuideOpen(false);
+  }
   const draftKey = chatDraftKey(accountId, companyId, conversation?.id);
   const [draft, updateDraft] = useState(() => sessionStorage.getItem(draftKey) || '');
   function setDraft(text: string) {
@@ -925,6 +953,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
       if (signal.aborted) return;
       requestRef.current = null;
       setDraft('');
+      closeGuide();
       if (!conversation) window.location.hash = chatLink(target.id);
       else {
         setExplicitOperation(receipt);
@@ -1047,7 +1076,12 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
                   messageId={message.id}
                 />
               ) : (
-                <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+                <>
+                  <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+                  {message.context.evidence_id && (
+                    <a className="underline" href={guideHref(message.context.evidence_id)}>Guia anexada</a>
+                  )}
+                </>
               )}
               {message.role === 'assistant' && (
                 <Answer message={message} companyId={companyId} />
@@ -1057,7 +1091,11 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               <FailedNotice
                 operationId={message.operation_id}
                 busy={busy}
-                onRetry={() => send({ text: message.text })}
+                onRetry={() => send({
+                  text: message.text,
+                  evidence_id: message.context.evidence_id,
+                  calculation: message.context.guide_retry_calculation ?? message.context.calculation_input,
+                })}
                 onCopy={() => setDraft(message.text)}
               />
             )}
@@ -1129,15 +1167,37 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
           {sendError}
         </p>
       )}
+      {guideOpen && (
+        <GuidePicker
+          companyId={companyId}
+          selectedId={guideId}
+          onSelect={setGuideId}
+          onClose={closeGuide}
+          onAskPayment={() => send({ text: 'Paguei a guia da minha empresa?', evidence_id: guideId || undefined })}
+          disabled={busy}
+        />
+      )}
       <Composer
         key={reload}
         send={send}
         busy={busy}
         draft={draft}
         setDraft={setDraft}
+        guideId={guideId}
       />
+      {!welcome && !guideOpen && (
+        <button className="text-link self-start text-sm underline" type="button"
+          onClick={() => setGuideOpen(true)} disabled={busy}>Conferir uma guia</button>
+      )}
       {welcome && (
         <div className="assistant-choices">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            disabled={busy || guideOpen}
+          >
+            <FileCheck2 /> Conferir uma guia
+          </button>
           <button
             type="button"
             onClick={() =>

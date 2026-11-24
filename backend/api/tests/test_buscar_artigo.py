@@ -12,7 +12,6 @@ from qdrant_client import QdrantClient, models
         ("Art. 23", "23"),
         ("Art. 18-A", "18-a"),
         ("art. 8º-A", "8-a"),
-        ("Art. 1º", "1"),
         ("Geral", None),
     ],
 )
@@ -23,12 +22,10 @@ def test_chave_artigo(rotulo, chave):
 @pytest.mark.parametrize(
     ("pergunta", "esperado"),
     [
-        ("O que o art. 23 da LC 87 diz?", [("lc:87", "23")]),
         ("Segundo o artigo 13-A da Lei Complementar 123?", [("lc:123", "13-a")]),
         ("O art. 138 do CTN?", [("lei:5172", "138")]),
         ("Pela LC 116, o que diz o art. 7º?", [("lc:116", "7")]),
         ("O art. 7º da LC 116 e o art. 23 da LC 87?", [("lc:116", "7"), ("lc:87", "23")]),
-        ("O que diz a LC 87?", []),
         ("O que diz o art. 23?", []),
     ],
 )

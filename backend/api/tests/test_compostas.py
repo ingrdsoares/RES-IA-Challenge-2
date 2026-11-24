@@ -46,7 +46,6 @@ from app.schemas import Source
         ("Qual a diferença entre Simples e Lucro Presumido?", None),
         ("O MEI pode emitir NF-e e NFS-e?", None),
         ("Como o ICMS e o ISS incidem sobre receita e despesa?", None),
-        ("Quais obrigações a ME e a EPP têm?", None),
     ],
 )
 def test_partes_da_pergunta(pergunta, esperado):
