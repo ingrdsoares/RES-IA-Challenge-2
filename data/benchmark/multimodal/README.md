@@ -24,7 +24,7 @@ Os documentos aqui presentes representam a declaração oficial da **DASN-SIMEI 
 
 ## 3. Campos Mapeados para Extração
 
-Qualquer extrator (PyPDF, pdfplumber, Gemini Vision ou LLM) deve mapear os seguintes campos a partir do documento:
+Qualquer extrator (PyPDF, pdfplumber, DeepSeek Flash ou outra LLM) deve mapear os seguintes campos a partir do documento:
 
 1. `numero_recibo`: Código identificador da transmissão.
 2. `ano_calendario`: Ano fiscal de referência (ex.: `2025`).

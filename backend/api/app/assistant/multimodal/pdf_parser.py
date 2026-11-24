@@ -6,10 +6,11 @@ Sócio Digital — RES-IA Challenge 2 (Grupo 08).
 import io
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Optional, Union
 
 try:
     import pypdf
+
     PYPDF_AVAILABLE = True
 except ImportError:
     PYPDF_AVAILABLE = False
@@ -44,7 +45,9 @@ class MultimodalPDFParser:
     def extract_text(self, source: Union[str, Path, bytes, io.BytesIO]) -> str:
         """Extrai texto integral do arquivo PDF."""
         if not PYPDF_AVAILABLE:
-            raise RuntimeError("A biblioteca 'pypdf' é necessária para processamento de arquivos PDF.")
+            raise RuntimeError(
+                "A biblioteca 'pypdf' é necessária para processamento de arquivos PDF."
+            )
 
         if isinstance(source, (str, Path)):
             with open(source, "rb") as f:
@@ -106,7 +109,9 @@ class MultimodalPDFParser:
         ano_match = re.search(r"Ano-Calend[aá]rio:\s*(\d{4})", raw_text, re.IGNORECASE)
         ano_calendario = int(ano_match.group(1)) if ano_match else None
 
-        tipo_dec_match = re.search(r"Tipo de Declara[çc][aã]o:\s*([A-Za-z]+)", raw_text, re.IGNORECASE)
+        tipo_dec_match = re.search(
+            r"Tipo de Declara[çc][aã]o:\s*([A-Za-z]+)", raw_text, re.IGNORECASE
+        )
         tipo_declaracao = tipo_dec_match.group(1).strip() if tipo_dec_match else "Original"
 
         cnpj_match = re.search(r"(\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})", raw_text)
@@ -117,7 +122,9 @@ class MultimodalPDFParser:
         )
         razao_social = razao_match.group(1).strip() if razao_match else None
 
-        cnae_match = re.search(r"CNAE Principal:\s*([0-9]{4}-[0-9]/[0-9]{2})", raw_text, re.IGNORECASE)
+        cnae_match = re.search(
+            r"CNAE Principal:\s*([0-9]{4}-[0-9]/[0-9]{2})", raw_text, re.IGNORECASE
+        )
         cnae = cnae_match.group(1).strip() if cnae_match else None
 
         emp_match = re.search(r"Possuiu Empregado:\s*(Sim|N[aã]o)", raw_text, re.IGNORECASE)

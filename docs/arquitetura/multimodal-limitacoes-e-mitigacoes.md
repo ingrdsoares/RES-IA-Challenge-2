@@ -76,7 +76,7 @@ Como premissa de integridade acadêmica e transparência técnica, a equipe mape
 
 | Limitação Conhecida | Descrição da Restrição | Impacto Operacional |
 | :--- | :--- | :--- |
-| **L1. PDFs digitalizados como imagem pura (< 150 DPI)** | Documentos obtidos por foto de celular sem camada de texto vetorial embutida não possuem texto direto para extração pelo `pypdf`. | Necessita de etapa prévia de OCR ou uso do modelo multimodal em nuvem (ex.: Gemini 2.5 Flash). |
+| **L1. PDFs digitalizados como imagem pura (< 150 DPI)** | Documentos obtidos por foto de celular sem camada de texto vetorial embutida não possuem texto direto para extração pelo `pypdf`. | Necessita de etapa prévia de OCR ou uso do modelo multimodal em nuvem (DeepSeek Flash). |
 | **L2. Arquivos protegidos por senha do contribuinte** | PDFs da DASN criptografados com senha pessoal do certificado digital da empresa. | O parser rejeita o arquivo antes de carregar na memória para evitar sobrecarga de decodificação. |
 | **L3. Declarações com múltiplos anos-calendários mesclados** | Arquivos contendo múltiplos recibos consolidados em um único arquivo de impressão. | O parser processa o primeiro recibo detectado como ano-base preponderante. |
 | **L4. Limite de tamanho de arquivo (Upload Payload)** | Restrição máxima de 10 MB por documento para uploads via API web. | Evita ataques de negação de serviço (DoS) por alocação excessiva de memória no servidor FastAPI. |

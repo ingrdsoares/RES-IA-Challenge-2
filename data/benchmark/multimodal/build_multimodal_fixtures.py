@@ -5,14 +5,14 @@ Cria arquivos PDF padronizados da DASN-SIMEI (Declaração Anual do MEI) para te
 """
 
 import os
-import sys
+
 
 class PDFCanvas:
     def __init__(self, filename):
         self.filename = filename
         self.pages = []
         self.current_page_ops = []
-        self.width = 595.28   # A4
+        self.width = 595.28  # A4
         self.height = 841.89
 
     def new_page(self):
@@ -42,8 +42,12 @@ class PDFCanvas:
         obj_catalog = f"<< /Type /Catalog /Pages {pages_id} 0 R >>"
         kids_str = " ".join([f"{pid} 0 R" for pid in page_obj_ids])
         obj_pages = f"<< /Type /Pages /Kids [{kids_str}] /Count {total_pages} >>"
-        obj_font_reg = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"
-        obj_font_bold = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"
+        obj_font_reg = (
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"
+        )
+        obj_font_bold = (
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"
+        )
 
         objs = [obj_catalog, obj_pages, obj_font_reg, obj_font_bold]
 
@@ -116,29 +120,51 @@ def generate_dasn_pdf(filename, data):
     ops.append("q 0.08 0.20 0.40 rg 45 745 505.28 65 re f Q")
     ops.append("q 1 0.80 0 rg 45 807 505.28 3 re f Q")
 
-    ops.append(f"BT /F2 13 Tf 1 1 1 rg 60 782 Td ({escape_pdf('SECRETARIA DA RECEITA FEDERAL DO BRASIL')}) Tj ET")
-    ops.append(f"BT /F2 10 Tf 0.90 0.95 1 rg 60 766 Td ({escape_pdf('SIMPLES NACIONAL \x97 SISTEMA DE RECOLHIMENTO EM VALORES FIXOS (SIMEI)')}) Tj ET")
-    ops.append(f"BT /F1 8.5 Tf 0.80 0.88 0.98 rg 60 752 Td ({escape_pdf('DASN-SIMEI \x97 DECLARA\xc7\xc3O ANUAL SIMPLIFICADA PARA O MEI')}) Tj ET")
+    ops.append(
+        f"BT /F2 13 Tf 1 1 1 rg 60 782 Td ({escape_pdf('SECRETARIA DA RECEITA FEDERAL DO BRASIL')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F2 10 Tf 0.90 0.95 1 rg 60 766 Td ({escape_pdf('SIMPLES NACIONAL \x97 SISTEMA DE RECOLHIMENTO EM VALORES FIXOS (SIMEI)')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8.5 Tf 0.80 0.88 0.98 rg 60 752 Td ({escape_pdf('DASN-SIMEI \x97 DECLARA\xc7\xc3O ANUAL SIMPLIFICADA PARA O MEI')}) Tj ET"
+    )
 
     y = 720
 
     def draw_section_box(title, y_top, height):
-        ops.append(f"q 0.94 0.96 0.98 rg 0.70 0.78 0.88 RG 0.75 w 45 {y_top - height} 505.28 {height} re B Q")
+        ops.append(
+            f"q 0.94 0.96 0.98 rg 0.70 0.78 0.88 RG 0.75 w 45 {y_top - height} 505.28 {height} re B Q"
+        )
         ops.append(f"q 0.10 0.25 0.50 rg 45 {y_top - 16} 505.28 16 re f Q")
         ops.append(f"BT /F2 8.5 Tf 1 1 1 rg 55 {y_top - 11.5} Td ({escape_pdf(title)}) Tj ET")
 
     # 1. Identificação da Declaração e Recibo
     draw_section_box("1. IDENTIFICA\xc7\xc3O DA DECLARA\xc7\xc3O E RECIBO DE ENTREGA", y, 55)
     y -= 28
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('N\xfamero do Recibo:')}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('N\xfamero do Recibo:')}) Tj ET"
+    )
     ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['recibo'])}) Tj ET")
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 330 {y} Td ({escape_pdf('Data/Hora de Transmiss\xe3o:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 445 {y} Td ({escape_pdf(data['data_transmissao'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 330 {y} Td ({escape_pdf('Data/Hora de Transmiss\xe3o:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 445 {y} Td ({escape_pdf(data['data_transmissao'])}) Tj ET"
+    )
     y -= 14
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Tipo de Declara\xe7\xe3o:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['tipo_declaracao'])}) Tj ET")
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 330 {y} Td ({escape_pdf('Ano-Calend\xe1rio:')}) Tj ET")
-    ops.append(f"BT /F2 8 Tf 0.10 0.35 0.70 rg 445 {y} Td ({escape_pdf(str(data['ano_calendario']))}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Tipo de Declara\xe7\xe3o:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['tipo_declaracao'])}) Tj ET"
+    )
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 330 {y} Td ({escape_pdf('Ano-Calend\xe1rio:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F2 8 Tf 0.10 0.35 0.70 rg 445 {y} Td ({escape_pdf(str(data['ano_calendario']))}) Tj ET"
+    )
     y -= 25
 
     # 2. Dados do Contribuinte (MEI)
@@ -148,33 +174,55 @@ def generate_dasn_pdf(filename, data):
     ops.append(f"BT /F2 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['cnpj'])}) Tj ET")
     y -= 14
     ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Raz\xe3o Social:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['razao_social'])}) Tj ET")
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['razao_social'])}) Tj ET"
+    )
     y -= 25
 
     # 3. Informações de Atividade e Pessoal
     draw_section_box("3. ATIVIDADE ECON\xd4MICA E OCUPA\xc7\xc3O", y, 55)
     y -= 28
     ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('CNAE Principal:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['cnae_principal'])}) Tj ET")
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['cnae_principal'])}) Tj ET"
+    )
     y -= 14
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Possuiu Empregado:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['possui_empregado'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Possuiu Empregado:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['possui_empregado'])}) Tj ET"
+    )
     y -= 25
 
     # 4. Demonstração de Receita Bruta (Valores Oficiais)
     draw_section_box("4. DEMONSTRA\xc7\xc3O DA RECEITA BRUTA DECLARADA", y, 110)
     y -= 28
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Campo 01 \x97 Receita Bruta de Com\xe9rcio / Ind\xfasteia:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 380 {y} Td ({escape_pdf(data['receita_comercio'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Campo 01 \x97 Receita Bruta de Com\xe9rcio / Ind\xfasteia:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 380 {y} Td ({escape_pdf(data['receita_comercio'])}) Tj ET"
+    )
     y -= 16
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Campo 02 \x97 Receita Bruta de Presta\xe7\xe3o de Servi\xe7os:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 380 {y} Td ({escape_pdf(data['receita_servicos'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Campo 02 \x97 Receita Bruta de Presta\xe7\xe3o de Servi\xe7os:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 380 {y} Td ({escape_pdf(data['receita_servicos'])}) Tj ET"
+    )
     y -= 16
     ops.append("q 0.70 0.78 0.88 RG 0.5 w 55 " + str(y + 4) + " m 535 " + str(y + 4) + " l S Q")
-    ops.append(f"BT /F2 8.5 Tf 0.10 0.25 0.50 rg 55 {y - 4} Td ({escape_pdf('TOTAL DA RECEITA BRUTA DECLARADA:')}) Tj ET")
-    ops.append(f"BT /F2 8.5 Tf 0.10 0.25 0.50 rg 380 {y - 4} Td ({escape_pdf(data['receita_total'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8.5 Tf 0.10 0.25 0.50 rg 55 {y - 4} Td ({escape_pdf('TOTAL DA RECEITA BRUTA DECLARADA:')}) Tj ET"
+    )
+    ops.append(
+        f"BT /F2 8.5 Tf 0.10 0.25 0.50 rg 380 {y - 4} Td ({escape_pdf(data['receita_total'])}) Tj ET"
+    )
     y -= 22
-    ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Limite Legal do MEI (Art. 18-A LC 123/2006):')}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Limite Legal do MEI (Art. 18-A LC 123/2006):')}) Tj ET"
+    )
     ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 380 {y} Td ({escape_pdf('R$ 81.000,00')}) Tj ET")
     y -= 30
 
@@ -182,13 +230,19 @@ def generate_dasn_pdf(filename, data):
     draw_section_box("5. SITUA\xc7\xc3O FISCAL IDENTIFICADA PELO ENQUADRAMENTO", y, 70)
     y -= 28
     ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Diagn\xf3stico:')}) Tj ET")
-    ops.append(f"BT /F2 8 Tf 0.70 0.15 0.15 rg 145 {y} Td ({escape_pdf(data['diagnostico_status'])}) Tj ET")
+    ops.append(
+        f"BT /F2 8 Tf 0.70 0.15 0.15 rg 145 {y} Td ({escape_pdf(data['diagnostico_status'])}) Tj ET"
+    )
     y -= 14
     ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Excesso Apurado:')}) Tj ET")
-    ops.append(f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['excesso_apurado'])}) Tj ET")
+    ops.append(
+        f"BT /F1 8 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['excesso_apurado'])}) Tj ET"
+    )
     y -= 14
     ops.append(f"BT /F2 8 Tf 0.15 0.20 0.30 rg 55 {y} Td ({escape_pdf('Efeito Legal:')}) Tj ET")
-    ops.append(f"BT /F1 7.5 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['efeito_legal'])}) Tj ET")
+    ops.append(
+        f"BT /F1 7.5 Tf 0.10 0.10 0.10 rg 145 {y} Td ({escape_pdf(data['efeito_legal'])}) Tj ET"
+    )
     y -= 25
 
     canvas.save()
@@ -214,7 +268,7 @@ if __name__ == "__main__":
         "receita_total": "R$ 92.000,00",
         "diagnostico_status": "EXCESSO DE FATURAMENTO IDENTIFICADO (< 20%)",
         "excesso_apurado": "R$ 11.000,00 (13,58% acima do teto de R$ 81.000,00)",
-        "efeito_legal": "Desenquadramento do SIMEI a partir de 01/01 do ano subsequente (Art. 115 CGSN 140/2018)"
+        "efeito_legal": "Desenquadramento do SIMEI a partir de 01/01 do ano subsequente (Art. 115 CGSN 140/2018)",
     }
     generate_dasn_pdf(os.path.join(out_dir, "dasn_simei_excesso_92k.pdf"), doc1_data)
 
@@ -233,6 +287,6 @@ if __name__ == "__main__":
         "receita_total": "R$ 60.000,00",
         "diagnostico_status": "REGULAR \x97 DENTRO DO LIMITE LEGAL",
         "excesso_apurado": "R$ 0,00 (Faturamento dentro do teto de R$ 81.000,00)",
-        "efeito_legal": "Perman\xeancia assegurada no SIMEI para o exerc\xedcio seguinte"
+        "efeito_legal": "Perman\xeancia assegurada no SIMEI para o exerc\xedcio seguinte",
     }
     generate_dasn_pdf(os.path.join(out_dir, "extrato_das_regular_60k.pdf"), doc2_data)
