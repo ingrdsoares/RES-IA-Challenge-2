@@ -17,8 +17,8 @@ Este documento consolida uma análise detalhada da estrutura atual do frontend d
 
 ### 2.1. Assistente Fiscal (`frontend/src/pages/Assistente.tsx`)
 
-* [ ] **Feedback Explícito de Qualidade de Resposta:** _Parcial: há botões e motivos prontos; falta o comentário livre._
-  * Integrar botões de avaliação (*Útil* / *Não útil* com campo de comentário rápido opcional) consumindo a rota existente `POST /rag/feedback`.
+* [x] **Feedback Explícito de Qualidade de Resposta:**
+  * Integrar botões de avaliação (*Útil* / *Não útil* com lista de motivos, sem texto livre por LGPD) consumindo a rota existente `POST /rag/feedback`.
 * [x] **Transformação de Resposta em Tarefa com 1 Clique:**
   * Adicionar botão de ação direta nos itens de `next_steps` e orientações práticas para disparar a criação de tarefas sem necessidade de redigitação pelo usuário.
 * [ ] **Histórico Lateral de Conversas:** _Parcial: lista e busca prontas; faltam renomear e arquivar._

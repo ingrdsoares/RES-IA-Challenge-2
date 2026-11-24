@@ -141,26 +141,28 @@ const FEEDBACK_REASONS = [
   { id: 'outro', label: 'Outro motivo' },
 ] as const;
 
-function FeedbackWidget({ message }: { message: Message }) {
+function FeedbackWidget({ operationId }: { operationId: string }) {
   const [showReasons, setShowReasons] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function sendFeedback(useful: boolean, reason?: string) {
     setSubmitting(true);
+    setFailed(false);
     try {
-      await api
-        .request('/rag/feedback', {
-          method: 'POST',
-          body: JSON.stringify({
-            request_id: message.operation_id || message.id,
-            useful,
-            reason: reason || null,
-          }),
-        })
-        .catch(() => {});
+      await api.request('/rag/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          request_id: operationId,
+          useful,
+          reason: reason || null,
+        }),
+      });
       setSubmitted(true);
       setShowReasons(false);
+    } catch {
+      setFailed(true);
     } finally {
       setSubmitting(false);
     }
@@ -215,6 +217,11 @@ function FeedbackWidget({ message }: { message: Message }) {
             ))}
           </div>
         </div>
+      )}
+      {failed && (
+        <p role="alert" className="mt-2 text-red-700">
+          Não foi possível salvar sua avaliação. Tente novamente.
+        </p>
       )}
     </div>
   );
@@ -431,7 +438,9 @@ function Answer({
           {taskError && <p role="alert">{taskError}</p>}
         </div>
       )}
-      <FeedbackWidget message={message} />
+      {message.operation_id && (
+        <FeedbackWidget operationId={message.operation_id} />
+      )}
       <p className="border-t border-slate-200 pt-2 text-xs text-slate-600">
         Orientação informativa. Valide decisões fiscais e a escrituração com um
         profissional registrado no CRC.
