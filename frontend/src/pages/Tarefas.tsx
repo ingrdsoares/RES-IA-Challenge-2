@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { RecordDetail, useRecordNavigation } from './RecordDetail';
 import { api } from '../services/api';
+import { annualTasks, missingTasks } from './obrigacoesAno';
 import {
   dateLabel,
   Feedback,
@@ -100,66 +101,34 @@ function GenerateAnnualTasksDialog({
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
 
-  const year = new Date().getFullYear();
+  const existing = useRead<Task[]>(url, readList);
+  const today = new Date();
+  const year = today.getFullYear();
   const regime = company.regime.toLowerCase();
   const isMei =
     /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
-
-  const templateTasks = [
-    // 12 DAS Mensais
-    ...Array.from({ length: 12 }, (_, i) => {
-      const m = i + 1;
-      const monthStr = String(m).padStart(2, '0');
-      const nextMonth = m === 12 ? 1 : m + 1;
-      const nextYear = m === 12 ? year + 1 : year;
-      const dueStr = `${nextYear}-${String(nextMonth).padStart(2, '0')}-20`;
-      return {
-        title: `Pagar guia DAS mensal (competência ${monthStr}/${year})`,
-        period: `${year}-${monthStr}`,
-        due_date: dueStr,
-      };
-    }),
-    // Declaração Anual
-    isMei
-      ? {
-          title: `Entregar Declaração Anual do Simples Nacional (DASN-SIMEI ${year})`,
-          period: `${year}-12`,
-          due_date: `${year}-05-31`,
-        }
-      : {
-          title: `Entregar Declaração de Informações Socioeconômicas e Fiscais (DEFIS ${year})`,
-          period: `${year}-12`,
-          due_date: `${year}-03-31`,
-        },
-    // Certidões Semestrais
-    {
-      title: `Renovar Certidão Negativa de Débitos Federais (CND - 1º Semestre ${year})`,
-      period: null,
-      due_date: `${year}-06-30`,
-    },
-    {
-      title: `Renovar Certidão Negativa de Débitos Federais (CND - 2º Semestre ${year})`,
-      period: null,
-      due_date: `${year}-12-31`,
-    },
-  ];
+  const pending = existing.data
+    ? missingTasks(annualTasks(today, isMei), existing.data)
+    : [];
+  const [total, setTotal] = useState(0);
 
   async function generate() {
     setBusy(true);
     setError('');
-    let count = 0;
+    setProgress(0);
+    setTotal(pending.length);
     try {
-      for (const t of templateTasks) {
+      for (const task of pending) {
         await api.request(url, {
           method: 'POST',
-          body: JSON.stringify(t),
+          body: JSON.stringify(task),
         });
-        count++;
-        setProgress(count);
+        setProgress((count) => count + 1);
       }
       done();
     } catch (err) {
       setError(problem(err));
+      existing.refresh();
     } finally {
       setBusy(false);
     }
@@ -173,26 +142,27 @@ function GenerateAnnualTasksDialog({
     >
       <div className="space-y-4 text-sm">
         <p className="text-slate-600">
-          Esta ação cria automaticamente o calendário fiscal padrão de {year}{' '}
-          para sua empresa ({isMei ? 'MEI' : 'Simples Nacional'}):
+          Serão criadas as obrigações ainda não vencidas de {year} (
+          {isMei ? 'MEI' : 'Simples Nacional'}) que sua empresa ainda não tem:
         </p>
+        {existing.loading && <p role="status">Conferindo tarefas…</p>}
+        {existing.error && (
+          <Feedback error={existing.error} retry={existing.refresh} />
+        )}
+        {existing.data && pending.length === 0 && (
+          <p>Todas as obrigações do período já estão nas suas tarefas.</p>
+        )}
         <ul className="list-disc space-y-1 pl-5 text-xs text-slate-700">
-          <li>
-            <strong>12 Guias DAS mensais</strong> (vencimento todo dia 20).
-          </li>
-          <li>
-            <strong>1 Declaração Anual</strong> (
-            {isMei ? 'DASN-SIMEI até 31/05' : 'DEFIS até 31/03'}).
-          </li>
-          <li>
-            <strong>2 Renovações semestrais de CND Federal</strong> (junho e
-            dezembro).
-          </li>
+          {pending.map((task) => (
+            <li key={task.title}>
+              {task.title}: prazo {dateLabel(task.due_date)}
+            </li>
+          ))}
         </ul>
 
         {busy && (
           <div className="rounded-lg bg-info/10 p-3 text-xs font-medium text-link">
-            Gerando obrigação {progress} de {templateTasks.length}…
+            Gerando obrigação {progress} de {total}…
           </div>
         )}
 
@@ -210,12 +180,12 @@ function GenerateAnnualTasksDialog({
           <button
             type="button"
             onClick={generate}
-            disabled={busy}
+            disabled={busy || pending.length === 0}
             className="primary"
           >
             {busy
               ? 'Gerando…'
-              : `Confirmar e Gerar ${templateTasks.length} Obrigações`}
+              : `Confirmar e Gerar ${pending.length} Obrigações`}
           </button>
         </div>
       </div>
