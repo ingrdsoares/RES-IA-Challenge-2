@@ -17,11 +17,11 @@ Este documento consolida uma análise detalhada da estrutura atual do frontend d
 
 ### 2.1. Assistente Fiscal (`frontend/src/pages/Assistente.tsx`)
 
-* [x] **Feedback Explícito de Qualidade de Resposta:**
+* [ ] **Feedback Explícito de Qualidade de Resposta:** _Parcial: há botões e motivos prontos; falta o comentário livre._
   * Integrar botões de avaliação (*Útil* / *Não útil* com campo de comentário rápido opcional) consumindo a rota existente `POST /rag/feedback`.
 * [x] **Transformação de Resposta em Tarefa com 1 Clique:**
   * Adicionar botão de ação direta nos itens de `next_steps` e orientações práticas para disparar a criação de tarefas sem necessidade de redigitação pelo usuário.
-* [x] **Histórico Lateral de Conversas:**
+* [ ] **Histórico Lateral de Conversas:** _Parcial: lista e busca prontas; faltam renomear e arquivar._
   * Implementar gaveta/painel lateral retrátil listando as conversas anteriores da empresa (`GET /empresas/{company_id}/conversas`), com busca textual, opção de renomear e arquivar.
 * [x] **Atalhos Rápidos de Perguntas Frequentes (Pills):**
   * Cards clicáveis antes da primeira mensagem (*"Como emitir meu DAS este mês?"*, *"Qual o limite de faturamento anual?"*, *"O que é o Fator R no meu CNAE?"*).
@@ -36,16 +36,16 @@ Este documento consolida uma análise detalhada da estrutura atual do frontend d
   * Barra de progresso visual para acompanhamento da receita bruta acumulada em relação ao teto do MEI (R$ 81.000,00) ou faixas do Simples Nacional, alertando sobre risco de desenquadramento.
 * [x] **Card de Alerta de Urgência (D-Day):**
   * Banner no topo destacando obrigações fiscais ou certidões que vencem nos próximos 5 a 7 dias, com contagem regressiva e atalho para regularização.
-* [x] **Desacoplamento do Simulador Tributário:**
+* [ ] **Desacoplamento do Simulador Tributário:** _Pendente: o formulário completo continua no dashboard._
   * Reduzir o formulário de simulação no dashboard a um widget compacto de chamada e criar uma visão completa dedicada à simulação e planejamento.
 
 ---
 
 ### 2.3. Situação Fiscal & Evidências (`frontend/src/pages/Fiscal.tsx` e `RecordDetail.tsx`)
 
-* [x] **Área de Drag-and-Drop e Pré-visualização de Arquivos:**
+* [ ] **Área de Drag-and-Drop e Pré-visualização de Arquivos:** _Parcial: dropzone e preview de imagem prontos; falta o preview de PDF._
   * Substituir o campo de arquivo padrão por uma dropzone intuitiva com preview de PDF e imagens antes do envio para `/evidencias/{evidence_id}/arquivo`.
-* [x] **Semáforo de Validade de Certidões Negativas (CNDs):**
+* [ ] **Semáforo de Validade de Certidões Negativas (CNDs):** _Parcial: status e atalho da CND federal prontos; falta o atalho da Caixa/FGTS._
   * Adicionar indicador de status temporal (Válida, Vence em menos de 30 dias, Expirada), com botão de atalho para os órgãos emissores (Receita Federal, Caixa/FGTS, PGFN).
 * [x] **Filtros por Exercício e Agrupamento:**
   * Permitir filtrar histórico de evidências por ano-calendário e por competência específica.
@@ -57,17 +57,17 @@ Este documento consolida uma análise detalhada da estrutura atual do frontend d
 * [x] **Alternância de Visualização (Lista vs. Calendário):**
   * Permitir alternar entre a exibição tabular/lista atual e uma visualização em grade de calendário mensal.
 * [x] **Geração Automática de Obrigações do Ano:**
-  * Botão *"Gerar calendário padrão"* que cria em lote as 12 tarefas de pagamento de DAS mensal (dia 20 de cada mês), a declaração anual (DASN-SIMEI) e as renovações de certidões.
-* [x] **Tags e Categorias de Tarefas:**
+  * Botão *"Gerar obrigações do ano"* que cria em lote as obrigações ainda não vencidas: DAS mensal (dia 20), declaração anual (DASN-SIMEI ou DEFIS) e renovações de certidões, sem repetir tarefas existentes.
+* [ ] **Tags e Categorias de Tarefas:** _Parcial: falta a categoria Cadastral._
   * Distinção visual entre tarefas de natureza `Tributária`, `Trabalhista/Previdenciária`, `Cadastral` e `Certidões`.
 
 ---
 
 ### 2.5. Perfil e Cadastro da Empresa (`frontend/src/pages/Empresas.tsx`)
 
-* [x] **Autopreenchimento Inteligente por CNPJ:**
+* [ ] **Autopreenchimento Inteligente por CNPJ:** _Pendente._
   * Integração com serviço de consulta pública de CNPJ (ex: BrasilAPI / ReceitaWS) para autopreencher Razão Social, Nome Fantasia, CNAEs e endereço ao digitar os 14 dígitos.
-* [x] **Suporte a Múltiplos CNAEs Secundários:**
+* [ ] **Suporte a Múltiplos CNAEs Secundários:** _Pendente._
   * Permitir cadastrar e visualizar a lista completa de atividades secundárias permitidas, fundamentais para a análise tributária correta.
 
 ---
