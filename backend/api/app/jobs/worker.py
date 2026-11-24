@@ -63,9 +63,11 @@ def run_operation(operation_id: str) -> None:
     from app.companies import models as company_models  # noqa: F401
     from app.legal import models as legal_models  # noqa: F401
     from app.legal.ingest import handle_ingestion
+    from app.reminders import service as reminders
 
     HANDLERS["assistant.answer"] = answer_message
     HANDLERS["legal.ingest"] = handle_ingestion
+    HANDLERS[reminders.KIND] = reminders.send
     settings = Settings()
     factory = session_factory(settings.database_url)
     try:

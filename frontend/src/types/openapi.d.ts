@@ -106,6 +106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Preferences */
+        patch: operations["preferences_auth_preferences_patch"];
+        trace?: never;
+    };
     "/auth/logout": {
         parameters: {
             query?: never;
@@ -157,6 +174,59 @@ export interface paths {
         head?: never;
         /** Patch */
         patch: operations["patch_empresas__company_id__patch"];
+        trace?: never;
+    };
+    "/empresas/{company_id}/faturamento/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Revenue */
+        get: operations["get_revenue_empresas__company_id__faturamento__year__get"];
+        /** Put Revenue */
+        put: operations["put_revenue_empresas__company_id__faturamento__year__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/empresas/{company_id}/faturamento-mensal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Months */
+        get: operations["list_months_empresas__company_id__faturamento_mensal_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/empresas/{company_id}/faturamento-mensal/{period}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Month */
+        put: operations["put_month_empresas__company_id__faturamento_mensal__period__put"];
+        post?: never;
+        /** Delete Month */
+        delete: operations["delete_month_empresas__company_id__faturamento_mensal__period__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/operacoes/{operation_id}": {
@@ -276,7 +346,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Patch */
+        patch: operations["patch_conversas__conversation_id__patch"];
         trace?: never;
     };
     "/conversas/{conversation_id}/mensagens": {
@@ -310,6 +381,24 @@ export interface paths {
         /** Create Obligation */
         post: operations["create_obligation_empresas__company_id__obrigacoes_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/obrigacoes/{obligation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Obligation */
+        put: operations["put_obligation_obrigacoes__obligation_id__put"];
+        post?: never;
+        /** Remove Obligation */
+        delete: operations["remove_obligation_obrigacoes__obligation_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -395,9 +484,11 @@ export interface paths {
         };
         /** Get */
         get: operations["get_tarefas__task_id__get"];
-        put?: never;
+        /** Put */
+        put: operations["put_tarefas__task_id__put"];
         post?: never;
-        delete?: never;
+        /** Remove */
+        delete: operations["remove_tarefas__task_id__delete"];
         options?: never;
         head?: never;
         /** Patch */
@@ -570,6 +661,8 @@ export interface components {
             id: string;
             /** Email */
             email: string;
+            /** Reminders Enabled */
+            reminders_enabled: boolean;
         };
         /** CalculationInput */
         CalculationInput: {
@@ -653,6 +746,18 @@ export interface components {
         };
         /** ContextConfirmation */
         ContextConfirmation: {
+            /** Kind */
+            kind?: ("mei" | "simples") | null;
+            /** Revenue */
+            revenue?: number | string | null;
+            /** Rbt12 */
+            rbt12?: number | string | null;
+            /** Payroll12 */
+            payroll12?: number | string | null;
+            /** Activity */
+            activity?: ("trade" | "services" | "mixed") | null;
+            /** Conditions Confirmed */
+            conditions_confirmed?: boolean | null;
             /** Period */
             period?: string | null;
             /** Regime */
@@ -666,6 +771,19 @@ export interface components {
              */
             title: string;
         };
+        /** ConversationPatch */
+        ConversationPatch: {
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+            /**
+             * Archived
+             * @default false
+             */
+            archived: boolean;
+        };
         /** ConversationView */
         ConversationView: {
             /**
@@ -678,6 +796,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Archived At */
+            archived_at: string | null;
             /**
              * Company Id
              * Format: uuid
@@ -769,6 +889,50 @@ export interface components {
             confirmation_for?: string | null;
             confirmation?: components["schemas"]["ContextConfirmation"] | null;
         };
+        /** MonthlyRevenueInput */
+        MonthlyRevenueInput: {
+            /** Trade Without Invoice */
+            trade_without_invoice: number | string;
+            /** Trade With Invoice */
+            trade_with_invoice: number | string;
+            /** Industry Without Invoice */
+            industry_without_invoice: number | string;
+            /** Industry With Invoice */
+            industry_with_invoice: number | string;
+            /** Services Without Invoice */
+            services_without_invoice: number | string;
+            /** Services With Invoice */
+            services_with_invoice: number | string;
+        };
+        /** MonthlyRevenueList */
+        MonthlyRevenueList: {
+            /** Items */
+            items: components["schemas"]["MonthlyRevenueView"][];
+        };
+        /** MonthlyRevenueView */
+        MonthlyRevenueView: {
+            /** Trade Without Invoice */
+            trade_without_invoice: string;
+            /** Trade With Invoice */
+            trade_with_invoice: string;
+            /** Industry Without Invoice */
+            industry_without_invoice: string;
+            /** Industry With Invoice */
+            industry_with_invoice: string;
+            /** Services Without Invoice */
+            services_without_invoice: string;
+            /** Services With Invoice */
+            services_with_invoice: string;
+            /** Period */
+            period: string;
+            /** Total */
+            total: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** NewPassword */
         NewPassword: {
             /** Token */
@@ -784,6 +948,11 @@ export interface components {
             period?: string | null;
             /** Due Date */
             due_date?: string | null;
+        };
+        /** Preferences */
+        Preferences: {
+            /** Reminders Enabled */
+            reminders_enabled: boolean;
         };
         /** QueryRequest */
         QueryRequest: {
@@ -801,6 +970,22 @@ export interface components {
             answer: string;
             /** Sources */
             sources: components["schemas"]["Source"][];
+        };
+        /** RevenueInput */
+        RevenueInput: {
+            /** Amount */
+            amount: number | string;
+        };
+        /** RevenueView */
+        RevenueView: {
+            /** Year */
+            year: number;
+            /** Amount */
+            amount?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Source */
+            source?: string | null;
         };
         /** Source */
         Source: {
@@ -824,6 +1009,15 @@ export interface components {
             reference_date?: string | null;
             /** Effective Date */
             effective_date?: string | null;
+        };
+        /** TaskEdit */
+        TaskEdit: {
+            /** Title */
+            title: string;
+            /** Period */
+            period?: string | null;
+            /** Due Date */
+            due_date?: string | null;
         };
         /** TaskInput */
         TaskInput: {
@@ -1029,6 +1223,39 @@ export interface operations {
             };
         };
     };
+    preferences_auth_preferences_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Preferences"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     logout_auth_logout_post: {
         parameters: {
             query?: never;
@@ -1178,6 +1405,174 @@ export interface operations {
             };
         };
     };
+    get_revenue_empresas__company_id__faturamento__year__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                year: number;
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_revenue_empresas__company_id__faturamento__year__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                year: number;
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevenueInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_months_empresas__company_id__faturamento_mensal_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlyRevenueList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_month_empresas__company_id__faturamento_mensal__period__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MonthlyRevenueInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlyRevenueView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_month_empresas__company_id__faturamento_mensal__period__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_operation_operacoes__operation_id__get: {
         parameters: {
             query?: never;
@@ -1314,6 +1709,7 @@ export interface operations {
     conversations_empresas__company_id__conversas_get: {
         parameters: {
             query?: {
+                include_archived?: boolean;
                 limit?: number;
                 cursor?: string | null;
             };
@@ -1424,6 +1820,41 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_conversas__conversation_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConversationPatch"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -1573,6 +2004,70 @@ export interface operations {
                 content: {
                     "application/json": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_obligation_obrigacoes__obligation_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                obligation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObligationInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_obligation_obrigacoes__obligation_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                obligation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -1838,6 +2333,70 @@ export interface operations {
                 content: {
                     "application/json": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_tarefas__task_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_tarefas__task_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

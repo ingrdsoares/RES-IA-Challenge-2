@@ -11,6 +11,7 @@ import type { TaskCategory } from './tarefas/categorias';
 import { GenerateAnnualTasksDialog } from './tarefas/GenerateAnnualTasks';
 import { ObligationDetails } from './tarefas/ObligationDetails';
 import { RecordForm } from './tarefas/RecordForm';
+import { Reminders } from './tarefas/Reminders';
 import type { RecordKind } from './tarefas/RecordForm';
 import { TaskDetails } from './tarefas/TaskDetails';
 
@@ -347,6 +348,7 @@ export function Tarefas({ company, params }: PageProps) {
           </RecordDetail>
         )}
       </div>
+      <Reminders />
       {creating && (
         <RecordForm<{ id: string }>
           key={creating}

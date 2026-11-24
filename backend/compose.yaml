@@ -92,6 +92,11 @@ services:
       ESCLARECIMENTO_MODELO: ${ESCLARECIMENTO_MODELO:-false}
       CONFERIR_CITACOES: ${CONFERIR_CITACOES:-false}
       PESO_EXPANSAO: ${PESO_EXPANSAO:-0.5}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_STARTTLS: "false"
+      SMTP_FROM: acesso@sociodigital.test
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     depends_on:
       postgres:

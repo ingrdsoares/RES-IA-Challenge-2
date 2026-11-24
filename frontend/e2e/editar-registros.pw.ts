@@ -85,3 +85,28 @@ test('renomeia, arquiva e restaura uma conversa', async ({ page }) => {
   await page.getByLabel('Mostrar arquivadas').uncheck();
   await expect(history.getByRole('link', { name: 'DAS de outubro' })).toBeVisible();
 });
+
+test('lembretes começam desligados, são ativados e mostram falha', async ({ page }) => {
+  await mock(page);
+  let enabled = false;
+  let status = 503;
+  await page.route('**/api/auth/session', (r) =>
+    r.fulfill({ json: { id: 'conta', email: 'teste@example.invalid', reminders_enabled: enabled } }));
+  await page.route('**/api/auth/preferences', (r) => {
+    if (status !== 200) return r.fulfill({ status, json: { detail: 'Lembretes por e-mail indisponíveis no momento.' } });
+    enabled = r.request().postDataJSON().reminders_enabled;
+    return r.fulfill({ json: { id: 'conta', email: 'teste@example.invalid', reminders_enabled: enabled } });
+  });
+  await page.goto('/#tarefas');
+  const toggle = page.getByLabel('Receber lembretes por e-mail');
+  await expect(toggle).not.toBeChecked();
+  await toggle.click();
+  await expect(page.getByText('Lembretes por e-mail indisponíveis no momento.')).toBeVisible();
+  await expect(toggle).not.toBeChecked();
+  status = 200;
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await expect(page.getByText('teste@example.invalid', { exact: false }).last()).toBeVisible();
+  await page.reload();
+  await expect(toggle).toBeChecked();
+});

@@ -2,7 +2,7 @@ import re
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
+from pydantic import BaseModel, ConfigDict, StrictBool, StringConstraints, field_validator
 
 Password = Annotated[str, StringConstraints(min_length=12, max_length=128)]
 
@@ -34,3 +34,9 @@ class AccountView(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     email: str
+    reminders_enabled: bool
+
+
+class Preferences(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reminders_enabled: StrictBool

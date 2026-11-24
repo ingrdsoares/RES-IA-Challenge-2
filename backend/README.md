@@ -333,6 +333,14 @@ Aplique a migração com `docker compose exec api alembic upgrade head` na pasta
 solicite um link em **Esqueci minha senha** e consulte a [caixa local](http://localhost:8025).
 O último link solicitado vale por 30 minutos. Redefinir a senha encerra as sessões da conta.
 
+### Lembretes de vencimento
+
+Ficam desligados até a pessoa ativar em **Tarefas e obrigações**. O `dispatcher` verifica a cada
+dez minutos, das 8h às 20h de Brasília, e o `worker` envia no máximo um e-mail por conta e por dia,
+com pendências que vencem em 7 dias, amanhã ou hoje. Como o cadastro não confirma o e-mail, a
+mensagem leva só datas e quantidades. Os dois serviços precisam das variáveis `SMTP_*` e de
+`FRONTEND_URL`; sem SMTP, nada é agendado.
+
 A API executada fora do Compose pode usar a mesma caixa com `SMTP_HOST=127.0.0.1`,
 `SMTP_PORT=1025`, `SMTP_STARTTLS=false` e `SMTP_FROM=acesso@sociodigital.test`.
 Configure `FRONTEND_URL` com a URL do frontend usado para abrir o link (padrão
@@ -604,7 +612,7 @@ são strings decimais; confirmações nunca editam o perfil da empresa automatic
 São permitidas até duas confirmações, duas tentativas por etapa e dez minutos por rodada,
 com uma execução ativa por empresa. As variáveis `AGENT_*` estão em `.env.example`.
 
-Conectores oficiais e lembretes permanecem fora desta entrega. Evidências são declaradas;
+Conectores oficiais permanecem fora desta entrega. Evidências são declaradas;
 regras fiscais precisam de revisão humana. O texto de fatos fiscais e valores é montado
 pelo servidor; a validação de IDs e âncoras não prova toda interpretação jurídica do modelo.
 
