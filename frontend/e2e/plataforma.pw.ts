@@ -65,7 +65,10 @@ test('empresa acompanha uma tarefa, registra evidência e recupera a sessão', a
   await page
     .getByRole('link', { name: 'Situação fiscal', exact: true })
     .click();
-  await page.getByRole('link', { name: 'Obrigações', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Escopo fiscal' })
+    .getByRole('link', { name: 'Obrigações', exact: true })
+    .click();
   await expect(page.getByText('Pagamento não verificado', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Adicionar documento' }).click();
   await page.getByRole('button', { name: 'Registrar evidência' }).click();
