@@ -4,6 +4,7 @@ import { Header, Brand } from './components/Header';
 import { Sidebar, titles } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { Assistente } from './pages/Assistente';
+import { Faturamento } from './pages/Faturamento';
 import { Fiscal } from './pages/Fiscal';
 import { Tarefas } from './pages/Tarefas';
 import { Biblioteca } from './pages/Biblioteca';
@@ -143,6 +144,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
             />
           )}
           {page === 'dashboard' && props && <Dashboard {...props} />}
+          {page === 'faturamento' && props && <Faturamento {...props} />}
           {page === 'fiscal' && props && <Fiscal {...props} />}
           {page === 'tarefas' && props && <Tarefas {...props} />}
           {page === 'ajuda' && <Ajuda />}

@@ -91,7 +91,7 @@ def test_revenue_starts_without_value(client):
     company = client.post("/empresas", json=DATA, headers=csrf(client)).json()
     response = client.get(f"/empresas/{company['id']}/faturamento/2026")
     assert response.status_code == 200
-    assert response.json() == {"year": 2026, "amount": None, "updated_at": None}
+    assert response.json() == {"year": 2026, "amount": None, "updated_at": None, "source": None}
 
 
 def test_revenue_is_kept_after_new_login(client):

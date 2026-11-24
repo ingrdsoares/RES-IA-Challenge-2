@@ -4,11 +4,13 @@ import {
   LayoutDashboard,
   ListChecks,
   MessagesSquare,
+  TrendingUp,
 } from 'lucide-react';
 
 const areas = [
   ['assistente', MessagesSquare, 'Assistente fiscal', 'Faça perguntas sobre MEI e Simples Nacional. Cada resposta cita a norma que a sustenta.'],
   ['dashboard', LayoutDashboard, 'Visão geral', 'Resumo da situação da empresa, pendências e simulação de valores.'],
+  ['faturamento', TrendingUp, 'Faturamento', 'Lance a receita de cada mês, acompanhe o limite anual e, no MEI, imprima o relatório mensal.'],
   ['fiscal', Landmark, 'Situação fiscal', 'Registre guias, comprovantes e certidões para manter as evidências em dia.'],
   ['tarefas', ListChecks, 'Tarefas e obrigações', 'Acompanhe em uma só lista o vencimento do DAS, da DASN e das tarefas criadas por você ou pelo assistente.'],
   ['normas', BookOpen, 'Biblioteca de normas', 'Consulte as leis e resoluções vigentes usadas nas respostas.'],

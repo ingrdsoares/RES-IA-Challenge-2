@@ -14,6 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.access.router import router as access_router
 from app.assistant.router import router as assistant_router
+from app.companies.revenue import router as revenue_router
 from app.companies.router import router as companies_router
 from app.config import Settings
 from app.db import session_factory
@@ -73,6 +74,7 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
 
     app.include_router(access_router)
     app.include_router(companies_router)
+    app.include_router(revenue_router)
     app.include_router(jobs_router)
     app.include_router(legal_router)
     app.include_router(assistant_router)

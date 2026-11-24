@@ -12,6 +12,7 @@ import {
   X,
   Plus,
   SquarePen,
+  TrendingUp,
 } from 'lucide-react';
 import { Brand } from './Header';
 import { api } from '../services/api';
@@ -25,6 +26,7 @@ const groups: readonly (readonly [string, readonly NavItem[]])[] = [
     'Empresa',
     [
       ['dashboard', 'Visão geral', LayoutDashboard],
+      ['faturamento', 'Faturamento', TrendingUp],
       ['fiscal', 'Situação fiscal', Landmark],
       ['tarefas', 'Tarefas e obrigações', ListChecks],
       ['perfil', 'Perfil da empresa', Building2],

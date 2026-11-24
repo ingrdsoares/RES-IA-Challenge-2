@@ -1,28 +1,19 @@
 from datetime import UTC, datetime
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, tuple_
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.access.models import Account
-from app.companies.models import Company, CompanyRevenue
-from app.companies.schemas import (
-    CompanyInput,
-    CompanyPatch,
-    CompanyView,
-    RevenueInput,
-    RevenueView,
-)
+from app.companies.models import Company
+from app.companies.schemas import CompanyInput, CompanyPatch, CompanyView
 from app.companies.service import require_company
 from app.db import get_db
 from app.dependencies import require_account
 
 router = APIRouter(prefix="/empresas", tags=["Empresas"])
-Year = Annotated[int, Path(ge=2000, le=2100)]
 
 
 def provenance(fields):
@@ -97,33 +88,3 @@ def patch(
     company.provenance = {**company.provenance, **provenance(changes)}
     db.commit()
     return company
-
-
-@router.get("/{company_id}/faturamento/{year}", response_model=RevenueView)
-def get_revenue(
-    company_id: UUID,
-    year: Year,
-    account: Account = Depends(require_account),
-    db: Session = Depends(get_db),
-):
-    require_company(db, account.id, company_id)
-    return db.get(CompanyRevenue, (company_id, year)) or RevenueView(year=year)
-
-
-@router.put("/{company_id}/faturamento/{year}", response_model=RevenueView)
-def put_revenue(
-    company_id: UUID,
-    year: Year,
-    data: RevenueInput,
-    account: Account = Depends(require_account),
-    db: Session = Depends(get_db),
-):
-    require_company(db, account.id, company_id)
-    values = {"amount": data.amount, "updated_at": datetime.now(UTC)}
-    db.execute(
-        insert(CompanyRevenue)
-        .values(company_id=company_id, year=year, **values)
-        .on_conflict_do_update(index_elements=["company_id", "year"], set_=values)
-    )
-    db.commit()
-    return db.get(CompanyRevenue, (company_id, year))

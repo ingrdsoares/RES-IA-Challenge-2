@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../../services/api';
 import { dateLabel, Feedback, FormDialog, problem, readList, useRead } from '../fiscal-data';
 import type { PageProps, Task } from '../fiscal-data';
+import { isMei } from '../regime';
 import { annualTasks, missingTasks } from '../obrigacoesAno';
 
 export function GenerateAnnualTasksDialog({
@@ -22,11 +23,9 @@ export function GenerateAnnualTasksDialog({
   const existing = useRead<Task[]>(url, readList);
   const today = new Date();
   const year = today.getFullYear();
-  const regime = company.regime.toLowerCase();
-  const isMei =
-    /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
+  const mei = isMei(company);
   const pending = existing.data
-    ? missingTasks(annualTasks(today, isMei), existing.data)
+    ? missingTasks(annualTasks(today, mei), existing.data)
     : [];
   const [total, setTotal] = useState(0);
 
@@ -61,7 +60,7 @@ export function GenerateAnnualTasksDialog({
       <div className="space-y-4 text-sm">
         <p className="text-slate-600">
           Serão criadas as obrigações ainda não vencidas de {year} (
-          {isMei ? 'MEI' : 'Simples Nacional'}) que sua empresa ainda não tem:
+          {mei ? 'MEI' : 'Simples Nacional'}) que sua empresa ainda não tem:
         </p>
         {existing.loading && <p role="status">Conferindo tarefas…</p>}
         {existing.error && (
