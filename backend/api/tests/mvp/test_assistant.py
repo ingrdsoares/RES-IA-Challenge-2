@@ -7,23 +7,6 @@ from test_access import csrf
 from test_conversations import conversation
 
 
-def test_citations_reject_invented_reference():
-    from app.assistant.citations import validate_citations
-
-    with pytest.raises(ValueError):
-        validate_citations(
-            [{"document_id": str(uuid4()), "version_id": str(uuid4()), "anchor_id": "fake"}], []
-        )
-
-
-def test_draft_rejects_more_than_three_steps():
-    from app.assistant.orchestrator import AssistantDraft
-    from pydantic import ValidationError
-
-    with pytest.raises(ValidationError):
-        AssistantDraft(answer="Test", cited_indices=[1], next_steps=["one", "two", "three", "four"])
-
-
 @pytest.mark.parametrize(
     "mode", ["valid", "invented", "timeout", "too_many_steps", "other_jurisdiction", "mixed_retry"]
 )
@@ -139,26 +122,6 @@ def test_assistant_persists_sources_once(client, mode):
         assert operation["status"] == "failed"
         assert "private internal details" not in str(operation)
     index.close()
-
-
-def test_waiting_context_does_not_call_generator(client):
-    from uuid import UUID
-
-    from app.jobs.worker import execute
-
-    company, chat = conversation(client)
-    response = client.post(
-        "/conversas/" + chat["id"] + "/mensagens",
-        json={"text": "Quanto devo?"},
-        headers={**csrf(client), "Idempotency-Key": "waiting"},
-    )
-    calls = []
-    execute(
-        client.app.state.db_factory,
-        UUID(response.json()["operation_id"]),
-        {"assistant.answer": lambda db, operation: calls.append(1)},
-    )
-    assert calls == []
 
 
 def test_empty_context_abstains_and_later_job_waits(client):

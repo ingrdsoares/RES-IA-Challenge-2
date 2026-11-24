@@ -1,6 +1,16 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { FileText, Plus, RefreshCw } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  FileText,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  UploadCloud,
+} from 'lucide-react';
 import { RecordDetail, useRecordNavigation } from './RecordDetail';
 import { api } from '../services/api';
 import {
@@ -27,6 +37,12 @@ const kindsByScope: Record<Scope, (keyof typeof kindNames)[]> = {
 };
 const acceptedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
 
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 function NewEvidence({
   scope,
   base,
@@ -43,13 +59,36 @@ function NewEvidence({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [evidenceId, setEvidenceId] = useState<string>();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const request = useRef<{ body: string; key: string }>();
+
+  function handleFile(file: File | null) {
+    if (!file) {
+      setSelectedFile(null);
+      setFilePreview(null);
+      return;
+    }
+    if (!acceptedTypes.includes(file.type) || file.size > 10 * 1024 * 1024 || !file.size) {
+      setError('Selecione um PDF, PNG ou JPEG com conteúdo e até 10 MiB.');
+      return;
+    }
+    setError('');
+    setSelectedFile(file);
+    if (file.type.startsWith('image/')) {
+      setFilePreview(URL.createObjectURL(file));
+    } else {
+      setFilePreview(null);
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
     const data = new FormData(event.currentTarget);
-    const file = data.get('file');
-    const attachment = file instanceof File && file.name ? file : null;
+    const attachment = selectedFile;
     if (
       attachment &&
       (!acceptedTypes.includes(attachment.type) ||
@@ -126,19 +165,86 @@ function NewEvidence({
             <input type="date" name="valid_until" />
           </label>
         </fieldset>
-        <label className="field">
-          Arquivo {evidenceId ? '' : '(opcional)'}
-          <input
-            name="file"
-            type="file"
-            accept={acceptedTypes.join(',')}
-            required={!!evidenceId}
-            disabled={busy}
-          />
-          <small className="font-normal text-slate-500">
-            PDF, PNG ou JPEG de até 10 MiB.
-          </small>
-        </label>
+
+        <div className="space-y-2">
+          <span className="block text-sm font-semibold">
+            Arquivo {evidenceId ? '' : '(opcional)'}
+          </span>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              const f = e.dataTransfer.files[0];
+              if (f) handleFile(f);
+            }}
+            onClick={() => fileInputRef.current?.click()}
+            className={
+              'flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-4 text-center cursor-pointer transition-colors ' +
+              (isDragging
+                ? 'border-link bg-info/10'
+                : 'border-slate-300 bg-surface-muted hover:border-slate-400')
+            }
+          >
+            <UploadCloud size={28} className="text-slate-400" />
+            <p className="text-xs text-slate-600">
+              <strong className="text-link">Clique para selecionar</strong> ou
+              arraste o arquivo aqui
+            </p>
+            <small className="text-[11px] text-slate-500">
+              PDF, PNG ou JPEG de até 10 MiB.
+            </small>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={acceptedTypes.join(',')}
+              className="hidden"
+              onChange={(e) => handleFile(e.target.files?.[0] || null)}
+              disabled={busy}
+            />
+          </div>
+
+          {selectedFile && (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-2.5 text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                {filePreview ? (
+                  <img
+                    src={filePreview}
+                    alt="Pré-visualização"
+                    className="h-10 w-10 rounded object-cover border"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded bg-slate-100 font-bold text-slate-600">
+                    PDF
+                  </div>
+                )}
+                <div className="min-w-0 truncate">
+                  <strong className="block truncate">{selectedFile.name}</strong>
+                  <span className="text-slate-500">
+                    {formatFileSize(selectedFile.size)}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                className="text-slate-400 hover:text-rose-600 p-1"
+                title="Remover anexo"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+
         {error && <Feedback error={error} />}
         <button className="primary" disabled={busy}>
           {busy
@@ -152,10 +258,41 @@ function NewEvidence({
   );
 }
 
+function getValidityStatus(validUntil?: string | null) {
+  if (!validUntil) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(validUntil + 'T00:00:00');
+  const diffDays = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) {
+    return {
+      state: 'expired' as const,
+      label: `Expirada (venceu há ${Math.abs(diffDays)} dia${Math.abs(diffDays) === 1 ? '' : 's'})`,
+      className: 'bg-rose-100 text-rose-800 border-rose-200',
+      diffDays,
+    };
+  }
+  if (diffDays <= 30) {
+    return {
+      state: 'warning' as const,
+      label: `Atenção: vence em ${diffDays} dia${diffDays === 1 ? '' : 's'} (renovação recomendada)`,
+      className: 'bg-amber-100 text-amber-800 border-amber-200',
+      diffDays,
+    };
+  }
+  return {
+    state: 'valid' as const,
+    label: `Válida (restam ${diffDays} dias)`,
+    className: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    diffDays,
+  };
+}
+
 function EvidenceDetail({ evidence }: { evidence: Evidence }) {
   const [busy, setBusy] = useState(false);
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+  const validity = getValidityStatus(evidence.valid_until);
   async function locateFile() {
     setBusy(true);
     setError('');
@@ -175,9 +312,21 @@ function EvidenceDetail({ evidence }: { evidence: Evidence }) {
   }
   return (
     <>
-      <p className="font-semibold text-link">
-        {kindNames[evidence.kind]}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-semibold text-link">{kindNames[evidence.kind]}</p>
+        {validity && (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${validity.className}`}
+          >
+            {validity.state === 'valid' ? (
+              <CheckCircle2 size={13} />
+            ) : (
+              <AlertTriangle size={13} />
+            )}
+            {validity.label}
+          </span>
+        )}
+      </div>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
         <dt>Origem</dt>
         <dd>{originLabel(evidence)}</dd>
@@ -223,12 +372,37 @@ export function Fiscal({ company, params }: PageProps) {
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
   const evidence = useRead<Evidence[]>(base + '/evidencias', readList);
   const [showForm, setShowForm] = useState(false);
+  const [yearFilter, setYearFilter] = useState('all');
+  const [textSearch, setTextSearch] = useState('');
   const selected = params.get('evidence');
   const listHref = evidenceHref(scope);
   const navigation = useRecordNavigation(company.id, listHref, selected, !evidence.loading);
   const [notice, setNotice] = useState('');
   const items = evidence.data?.filter((item) => item.scope === scope).reverse();
-  const active = selected === null ? items?.[0] : items?.find((item) => item.id === selected);
+
+  const availableYears = Array.from(
+    new Set(
+      items
+        ?.map((it) => (it.period || it.created_at || '').slice(0, 4))
+        .filter(Boolean),
+    ),
+  ).sort().reverse();
+
+  const filteredItems = items?.filter((item) => {
+    if (yearFilter !== 'all') {
+      const itemYear = (item.period || item.created_at || '').slice(0, 4);
+      if (itemYear !== yearFilter) return false;
+    }
+    if (textSearch.trim()) {
+      const term = textSearch.toLowerCase();
+      const matchKind = (kindNames[item.kind] || '').toLowerCase().includes(term);
+      const matchPeriod = (item.period || '').includes(term);
+      if (!matchKind && !matchPeriod) return false;
+    }
+    return true;
+  });
+
+  const active = selected === null ? filteredItems?.[0] : items?.find((item) => item.id === selected);
   const missing = selected !== null && !!items && !active;
   function refresh() {
     status.refresh();
@@ -261,6 +435,26 @@ export function Fiscal({ company, params }: PageProps) {
           </a>
         ))}
       </nav>
+
+      {scope === 'federal_certificate' && (
+        <aside className="rounded-xl border border-sky-200 bg-sky-50/70 p-4 text-xs text-sky-950 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <strong className="block text-sm font-semibold">Emissão Oficial da CND Federal</strong>
+            <span className="text-slate-600">
+              Certidão conjunta de débitos da Receita Federal e Procuradoria-Geral da Fazenda Nacional (PGFN).
+            </span>
+          </div>
+          <a
+            href="https://solucoes.receita.fazenda.gov.br/servicos/certidaointernet/pj/emitir"
+            target="_blank"
+            rel="noreferrer"
+            className="primary inline-flex items-center gap-1.5 py-1.5 px-3 text-xs font-semibold"
+          >
+            Emitir CND no portal oficial <ExternalLink size={13} />
+          </a>
+        </aside>
+      )}
+
       <section className="record-list-context panel space-y-3">
         <h2 className="text-lg font-bold">{scopeNames[scope]}</h2>
         {status.loading && <p role="status">Carregando indicador…</p>}
@@ -294,41 +488,86 @@ export function Fiscal({ company, params }: PageProps) {
               <Plus size={16} /> Adicionar documento
             </button>
           </div>
+
+          {items && items.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 min-w-[140px] flex-1">
+                <Search size={14} className="text-slate-400 shrink-0" />
+                <input
+                  type="search"
+                  value={textSearch}
+                  onChange={(e) => setTextSearch(e.target.value)}
+                  placeholder="Buscar documento ou competência…"
+                  className="w-full border-0 bg-transparent p-0 text-xs outline-none"
+                />
+              </div>
+              {availableYears.length > 1 && (
+                <select
+                  value={yearFilter}
+                  onChange={(e) => setYearFilter(e.target.value)}
+                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs"
+                >
+                  <option value="all">Todos os anos</option>
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>
+                      Ano {yr}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
           {evidence.loading && <p role="status">Carregando evidências…</p>}
           {evidence.error && (
             <Feedback error={evidence.error} retry={evidence.refresh} />
           )}
-          {items?.length === 0 && (
+          {filteredItems?.length === 0 && (
             <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
-              Nenhuma evidência registrada neste escopo.
+              Nenhuma evidência encontrada neste escopo.
             </p>
           )}
           <ul ref={navigation.list} className="space-y-2">
-            {items?.map((item) => (
-              <li key={item.id}>
-                <a
-                  href={evidenceHref(scope, item.id)}
-                  data-record-id={item.id}
-                  onClick={navigation.openRecord}
-                  aria-current={active?.id === item.id ? 'true' : undefined}
-                  className="record-option flex w-full items-start gap-3 rounded-lg border p-3 text-sm"
-                >
-                  <FileText
-                    size={18}
-                    className="mt-0.5 shrink-0 text-link"
-                  />
-                  <span>
-                    <strong className="block">
-                      {kindNames[item.kind]}
-                      {item.period && ' · ' + periodLabel(item.period)}
-                    </strong>
-                    <span className="text-slate-600">
-                      {originLabel(item)} · {dateLabel(item.created_at)}
+            {filteredItems?.map((item) => {
+              const validity = getValidityStatus(item.valid_until);
+              return (
+                <li key={item.id}>
+                  <a
+                    href={evidenceHref(scope, item.id)}
+                    data-record-id={item.id}
+                    onClick={navigation.openRecord}
+                    aria-current={active?.id === item.id ? 'true' : undefined}
+                    className="record-option flex w-full items-start gap-3 rounded-lg border p-3 text-sm"
+                  >
+                    <FileText
+                      size={18}
+                      className="mt-0.5 shrink-0 text-link"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <strong className="block truncate">
+                        {kindNames[item.kind]}
+                        {item.period && ' · ' + periodLabel(item.period)}
+                      </strong>
+                      <span className="block text-slate-600">
+                        {originLabel(item)} · {dateLabel(item.created_at)}
+                      </span>
+                      {validity && (
+                        <span
+                          className={`mt-1.5 inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-semibold border ${validity.className}`}
+                        >
+                          {validity.state === 'valid' ? (
+                            <CheckCircle2 size={12} />
+                          ) : (
+                            <AlertTriangle size={12} />
+                          )}
+                          {validity.label}
+                        </span>
+                      )}
                     </span>
-                  </span>
-                </a>
-              </li>
-            ))}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </section>
         {(active || selected !== null) && <RecordDetail

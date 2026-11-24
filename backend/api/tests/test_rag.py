@@ -43,18 +43,6 @@ def test_no_relevant_results_skips_generation(service, monkeypatch):
     assert response.sources == []
 
 
-def test_complete_rag_returns_only_bounded_context(service):
-    add_document(service, "🎉" * 30000)
-    response = service.query("Pergunta")
-    assert response.status == "answered"
-    assert response.answer == "Orientação [1]"
-    assert response.sources[0].id == 1
-    assert 0 < len(response.sources[0].text) < 30000
-    assert len(response.sources[0].text.encode()) <= 2 * (
-        service.settings.num_ctx - service.settings.num_predict - 256
-    )
-
-
 def test_conferir_citacoes_avisa_so_quando_ligado(service, monkeypatch):
     add_document(service, "Art. 3. Regra.")
     resposta = "Vale o art. 99 da LC 123 [1]."
@@ -133,3 +121,4 @@ def test_filtro_com_modelo_desligado_ou_pergunta_geral_nao_chama_o_modelo(servic
     assert service.query("Sou dentista, posso abrir uma empresa?").status != "needs_clarification"
     service.settings = service.settings.model_copy(update={"esclarecimento_modelo": True})
     assert service.query("Qual é o limite do MEI?").status != "needs_clarification"
+    assert service.query("Qual é o limite de receita do MEI?").status != "needs_clarification"

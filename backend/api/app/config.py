@@ -84,6 +84,7 @@ class Settings(BaseSettings):
     llm_provider: Literal["ollama", "google", "deepseek"] = "ollama"
     google_api_key: SecretStr = SecretStr("")
     deepseek_api_key: SecretStr = SecretStr("")
+    guide_vision_enabled: bool = False
     google_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     deepseek_base_url: str = "https://api.deepseek.com"
     # Enviado ao Gemini quando o raciocínio não foi pedido; vazio não envia. Os níveis aceitos
@@ -129,6 +130,10 @@ class Settings(BaseSettings):
     @classmethod
     def optional_url(cls, value):
         return value or None
+
+    @property
+    def guide_vision_available(self) -> bool:
+        return self.guide_vision_enabled and bool(self.deepseek_api_key.get_secret_value().strip())
 
     @model_validator(mode="after")
     def validate_llm_provider(self):

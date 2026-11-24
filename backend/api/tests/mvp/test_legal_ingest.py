@@ -28,20 +28,6 @@ def test_empty_content_is_rejected():
         normalize(b"   ", "text/markdown")
 
 
-def test_unknown_validity_is_not_assumed_current():
-    from app.legal.schemas import IngestMetadata
-
-    metadata = IngestMetadata(
-        document_key="test",
-        title="Test",
-        official_url="https://example.org/law",
-        version_label="original",
-        authority="Test",
-        norm_type="lei",
-    )
-    assert metadata.effective_from is None
-
-
 def test_pdf_without_text_requires_manual_treatment():
     from io import BytesIO
 

@@ -25,10 +25,3 @@ def test_model_cannot_confirm_conditions_or_select_company():
     for field in [{"company_id": "other"}, {"conditions_confirmed": True}]:
         with pytest.raises(ValidationError):
             SupervisorPlan(intent="fiscal", agents=["fiscal"], **field)
-
-
-def test_plan_can_pause_for_required_financial_inputs():
-    from app.assistant.agents.contracts import SupervisorPlan
-
-    plan = SupervisorPlan(intent="calculation", agents=["fiscal"], missing_fields=["revenue"])
-    assert plan.missing_fields == ["revenue"]

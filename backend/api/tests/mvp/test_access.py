@@ -24,8 +24,12 @@ def test_register_login_logout(client):
     cookie = response.headers["set-cookie"].lower()
     assert "httponly" in cookie and "samesite=lax" in cookie
     assert client.get("/auth/session").json()["email"] == "person@example.com"
+    session_cookie = client.cookies["sd_session"]
     assert client.post("/auth/logout", headers=csrf(client)).status_code == 204
     assert client.get("/auth/session").status_code == 401
+    client.cookies.set("sd_session", session_cookie)
+    assert client.get("/auth/session").status_code == 401
+    client.cookies.clear()
     login = client.post(
         "/auth/login",
         json={"email": "person@example.com", "password": PASSWORD},
@@ -117,14 +121,6 @@ def test_session_token_stored_hashed(client):
         assert PASSWORD not in account.password_hash
         assert session.token_hash != client.cookies["sd_session"]
         assert len(session.token_hash) == 64
-
-
-def test_logout_revokes_stolen_cookie(client):
-    assert register(client).status_code == 201
-    stolen = client.cookies["sd_session"]
-    assert client.post("/auth/logout", headers=csrf(client)).status_code == 204
-    client.cookies.set("sd_session", stolen)
-    assert client.get("/auth/session").status_code == 401
 
 
 def test_legacy_rag_requires_session(client):

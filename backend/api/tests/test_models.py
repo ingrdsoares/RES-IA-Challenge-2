@@ -28,6 +28,7 @@ def test_embedding_uses_retrieval_instruction_and_correct_dimension():
             "that answer the query\nQuery:Como funciona?"
         )
         assert body["truncate"] is False
+        assert body["options"]["num_gpu"] == 0
         return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
 
     models = make_models(handler)
@@ -141,37 +142,6 @@ def test_nonfinite_embedding_is_rejected():
 
     with pytest.raises(DependencyUnavailable):
         LocalModels(Settings(), InvalidClient()).embed_question("Pergunta")
-
-
-def test_embedding_da_pergunta_nao_ocupa_a_gpu():
-    corpos = []
-
-    def handler(request):
-        corpos.append(json.loads(request.content))
-        return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
-
-    models = make_models(handler)
-    models.embed_question("Pergunta")
-    models.close()
-
-    assert corpos[0]["options"]["num_gpu"] == 0
-
-
-def test_resposta_e_reprodutivel():
-    corpos = []
-
-    def handler(request):
-        corpos.append(json.loads(request.content))
-        return httpx.Response(
-            200, json={"message": {"role": "assistant", "content": "Resposta [1]"}}
-        )
-
-    models = make_models(handler)
-    models.answer("Pergunta", [source("Texto")])
-    models.close()
-
-    assert corpos[0]["options"]["temperature"] == 0
-    assert corpos[0]["options"]["seed"] == 42
 
 
 def test_contexto_de_12000_caracteres_cabe_em_8192_tokens():

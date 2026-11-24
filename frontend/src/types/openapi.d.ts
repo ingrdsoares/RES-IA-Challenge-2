@@ -245,6 +245,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/empresas/{company_id}/guias-para-assistente": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Guide Options */
+        get: operations["guide_options_empresas__company_id__guias_para_assistente_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/conversas/{conversation_id}": {
         parameters: {
             query?: never;
@@ -712,6 +729,30 @@ export interface components {
             /** Reason */
             reason?: ("incorreta" | "incompleta" | "desatualizada" | "sem_fonte" | "confusa" | "outro") | null;
         };
+        /** GuideOption */
+        GuideOption: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Period */
+            period: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** GuideOptionsView */
+        GuideOptionsView: {
+            /** Enabled */
+            enabled: boolean;
+            /** Items */
+            items: components["schemas"]["GuideOption"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -722,6 +763,8 @@ export interface components {
             /** Text */
             text: string;
             calculation?: components["schemas"]["CalculationInput"] | null;
+            /** Evidence Id */
+            evidence_id?: string | null;
             /** Confirmation For */
             confirmation_for?: string | null;
             confirmation?: components["schemas"]["ContextConfirmation"] | null;
@@ -1324,6 +1367,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConversationView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    guide_options_empresas__company_id__guias_para_assistente_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuideOptionsView"];
                 };
             };
             /** @description Validation Error */

@@ -29,10 +29,22 @@ def test_full_run_persists_checkpoints_and_replay_has_one_answer(client):
     ).json()
     factory = client.app.state.db_factory
     operation_id = UUID(response["operation_id"])
-    execute_run(factory, operation_id, model=Model(), settings=client.app.state.settings)
-    execute_run(factory, operation_id, model=Model(), settings=client.app.state.settings)
+
+    class Prose(Model):
+        def generate(self, role, schema, payload, timeout, output_tokens):
+            if role == "synthesis":
+                return schema.model_validate(
+                    {"answer": "Valor inventado R$ 999 [1]", "support_ids": []}
+                ), {}
+            return super().generate(role, schema, payload, timeout, output_tokens)
+
+    execute_run(factory, operation_id, model=Prose(), settings=client.app.state.settings)
+    execute_run(factory, operation_id, model=Prose(), settings=client.app.state.settings)
+    assert client.get(response["status_url"]).json()["status"] == "succeeded"
     messages = client.get(url).json()["items"]
     assert len(messages) == 2
+    assert "999" not in messages[-1]["text"]
+    assert "[1]" not in messages[-1]["text"]
     assert "não verificada" in messages[-1]["text"]
     # The interface renders the deterministic fiscal facts next to the answer.
     assert set(messages[-1]["context"]["fiscal_status"]) >= {"registration", "obligations"}
@@ -47,15 +59,30 @@ def test_full_run_persists_checkpoints_and_replay_has_one_answer(client):
 def test_run_awaits_and_resumes_same_identity(client):
     from app.assistant.agents.executor import execute_run
     from app.assistant.agents.models import AgentRun
+    from app.jobs.worker import execute
     from sqlalchemy import select
 
-    company, chat = conversation(client)
+    class UnexpectedInference:
+        def generate(self, *args):
+            raise AssertionError("A operação ainda aguarda confirmação")
+
+    _, chat = conversation(client)
     url = "/conversas/" + chat["id"] + "/mensagens"
     response = client.post(
-        url, json={"text": "Paguei o DAS?"}, headers={**csrf(client), "Idempotency-Key": "await"}
-    ).json()
+        url,
+        json={"text": "Paguei o DAS de outubro?"},
+        headers={**csrf(client), "Idempotency-Key": "await"},
+    )
+    assert response.status_code == 202
+    receipt = response.json()
+    assert receipt["status"] == "awaiting_data"
+    assert "period" in receipt["missing_fields"]
     factory = client.app.state.db_factory
-    operation_id = UUID(response["operation_id"])
+    operation_id = UUID(receipt["operation_id"])
+    execute_run(
+        factory, operation_id, model=UnexpectedInference(), settings=client.app.state.settings
+    )
+    assert client.get(receipt["status_url"]).json()["status"] == "awaiting_data"
     with factory() as db:
         run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation_id))
         assert run.status == "awaiting_data"
@@ -70,12 +97,27 @@ def test_run_awaits_and_resumes_same_identity(client):
         headers={**csrf(client), "Idempotency-Key": "confirmation"},
     )
     assert confirmed.status_code == 202
+    assert confirmed.json()["operation_id"] == receipt["operation_id"]
+    assert confirmed.json()["status"] == "queued"
     execute_run(factory, operation_id, model=Model(), settings=client.app.state.settings)
     with factory() as db:
         run = db.get(AgentRun, run_id)
         assert run.status == "succeeded"
         assert run.revision == 1
         assert run.context["period"] == "2026-10"
+
+    financial = client.post(
+        url, json={"text": "Quanto devo?"}, headers={**csrf(client), "Idempotency-Key": "waiting"}
+    )
+    assert financial.status_code == 202
+    assert financial.json()["status"] == "awaiting_data"
+    calls = []
+    execute(
+        factory,
+        UUID(financial.json()["operation_id"]),
+        {"assistant.answer": lambda db, operation: calls.append(1)},
+    )
+    assert calls == []
 
 
 def test_api_exposes_run_summary_without_private_checkpoints(client):
@@ -94,33 +136,55 @@ def test_api_exposes_run_summary_without_private_checkpoints(client):
 
 
 def test_financial_confirmation_preserves_decimal_and_updates_snapshot_only(client):
+    from app.assistant.agents.executor import execute_run
     from app.assistant.agents.models import AgentRun
-    from app.assistant.models import Message
     from app.jobs.models import Operation
     from sqlalchemy import select
 
+    class FinancialPlan:
+        def generate(self, role, schema, payload, timeout, output_tokens):
+            assert role == "plan"
+            return schema(
+                intent="calculation",
+                agents=["fiscal"],
+                missing_fields=[
+                    "period",
+                    "kind",
+                    "revenue",
+                    "rbt12",
+                    "conditions_confirmed",
+                    "regime",
+                ],
+            ), {}
+
     company, chat = conversation(client)
+    company_url = "/empresas/" + company["id"]
+    assert (
+        client.patch(company_url, json={"regime": "mei"}, headers=csrf(client)).status_code == 200
+    )
     url = "/conversas/" + chat["id"] + "/mensagens"
     response = client.post(
-        url, json={"text": "Quanto devo?"}, headers={**csrf(client), "Idempotency-Key": "financial"}
-    ).json()
+        url,
+        json={"text": "Quanto devo em 2026-10?"},
+        headers={**csrf(client), "Idempotency-Key": "financial"},
+    )
+    assert response.status_code == 202
+    receipt = response.json()
+    assert receipt["status"] == "queued"
     factory = client.app.state.db_factory
-    operation_id = UUID(response["operation_id"])
-    with factory.begin() as db:
-        run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation_id))
-        run.context = {
-            **run.context,
-            "missing_fields": [
-                "period",
-                "kind",
-                "revenue",
-                "rbt12",
-                "conditions_confirmed",
-                "regime",
-            ],
-        }
-        user = db.scalar(select(Message).where(Message.operation_id == operation_id))
-        user.context = run.context
+    operation_id = UUID(receipt["operation_id"])
+    execute_run(factory, operation_id, model=FinancialPlan(), settings=client.app.state.settings)
+
+    status = client.get(receipt["status_url"]).json()
+    assert status["status"] == "awaiting_data"
+    assert status["result"]["missing_fields"] == [
+        "period",
+        "kind",
+        "revenue",
+        "rbt12",
+        "conditions_confirmed",
+        "regime",
+    ]
     confirm = {
         "period": "2026-10",
         "kind": "simples",
@@ -144,6 +208,7 @@ def test_financial_confirmation_preserves_decimal_and_updates_snapshot_only(clie
         assert run.context["calculation_input"]["revenue"] == "1000.00"
         assert run.context["company"]["regime"] == "simples"
         assert db.get(Operation, operation_id).status == "queued"
+    assert client.get(company_url).json()["regime"] == "mei"
 
 
 def test_failed_stage_is_retryable_without_repeating_completed_plan(client):
@@ -170,31 +235,6 @@ def test_failed_stage_is_retryable_without_repeating_completed_plan(client):
                 raise httpx.ConnectError("secret")
             return super().generate(role, schema, payload, timeout, output_tokens)
 
-    model = Flaky()
-    execute_run(factory, operation_id, model=model, settings=client.app.state.settings)
-    execute_run(factory, operation_id, model=model, settings=client.app.state.settings)
-    with factory() as db:
-        run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation_id))
-        assert run.status == "succeeded"
-        steps = {s.name: s for s in db.scalars(select(AgentStep).where(AgentStep.run_id == run.id))}
-        assert steps["plan"].attempts == 1
-        assert steps["fiscal"].attempts == 2
-
-
-def test_tool_snapshot_is_reused_when_inference_retries(client):
-    import httpx
-    from app.assistant.agents.executor import execute_run
-    from app.assistant.agents.models import AgentRun
-    from sqlalchemy import select
-
-    company, chat = conversation(client)
-    response = client.post(
-        "/conversas/" + chat["id"] + "/mensagens",
-        json={"text": "Situação?"},
-        headers={**csrf(client), "Idempotency-Key": "snapshot-retry"},
-    ).json()
-    factory = client.app.state.db_factory
-
     class Tools:
         def fiscal_status(self, period):
             return {
@@ -202,31 +242,23 @@ def test_tool_snapshot_is_reused_when_inference_retries(client):
                 for scope in ("registration", "federal_certificate", "obligations")
             }
 
-    class Broken(Model):
-        def generate(self, role, schema, payload, timeout, output_tokens):
-            if role == "fiscal":
-                raise httpx.ConnectError("transient")
-            return super().generate(role, schema, payload, timeout, output_tokens)
-
-    operation_id = UUID(response["operation_id"])
-    execute_run(
-        factory, operation_id, model=Broken(), tools=Tools(), settings=client.app.state.settings
-    )
-
     class ChangedTools:
         def fiscal_status(self, period):
             raise AssertionError("Snapshot should be preserved")
 
+    model = Flaky()
     execute_run(
-        factory,
-        operation_id,
-        model=Model(),
-        tools=ChangedTools(),
-        settings=client.app.state.settings,
+        factory, operation_id, model=model, tools=Tools(), settings=client.app.state.settings
+    )
+    execute_run(
+        factory, operation_id, model=model, tools=ChangedTools(), settings=client.app.state.settings
     )
     with factory() as db:
         run = db.scalar(select(AgentRun).where(AgentRun.operation_id == operation_id))
         assert run.status == "succeeded"
+        steps = {s.name: s for s in db.scalars(select(AgentStep).where(AgentStep.run_id == run.id))}
+        assert steps["plan"].attempts == 1
+        assert steps["fiscal"].attempts == 2
 
 
 def test_restart_after_synthesis_checkpoint_publishes_once(client, monkeypatch):
@@ -267,38 +299,6 @@ def test_restart_after_synthesis_checkpoint_publishes_once(client, monkeypatch):
     executor.execute_run(factory, operation_id, model=Model(), settings=client.app.state.settings)
     assert client.get(response["status_url"]).json()["status"] == "succeeded"
     assert len(client.get(url).json()["items"]) == 2
-
-
-def test_discarded_fiscal_prose_does_not_override_server_rendering(client):
-    from app.assistant.agents.executor import execute_run
-
-    company, chat = conversation(client)
-    url = "/conversas/" + chat["id"] + "/mensagens"
-    receipt = client.post(
-        url,
-        json={"text": "Minha situação fiscal?"},
-        headers={**csrf(client), "Idempotency-Key": "fiscal-render"},
-    ).json()
-
-    class Prose(Model):
-        def generate(self, role, schema, payload, timeout, output_tokens):
-            if role == "synthesis":
-                return schema.model_validate(
-                    {"answer": "Valor inventado R$ 999 [1]", "support_ids": []}
-                ), {}
-            return super().generate(role, schema, payload, timeout, output_tokens)
-
-    execute_run(
-        client.app.state.db_factory,
-        UUID(receipt["operation_id"]),
-        model=Prose(),
-        settings=client.app.state.settings,
-    )
-    assert client.get(receipt["status_url"]).json()["status"] == "succeeded"
-    answer = client.get(url).json()["items"][-1]
-    assert "999" not in answer["text"]
-    assert "[1]" not in answer["text"]
-    assert "não verificada" in answer["text"]
 
 
 def test_legal_citations_keep_inline_numbering(client):

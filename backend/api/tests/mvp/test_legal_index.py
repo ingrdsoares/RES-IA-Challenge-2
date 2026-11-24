@@ -27,6 +27,7 @@ def test_ingest_publish_and_retry_are_idempotent(client, tmp_path):
         version_label="v1",
         official_url="https://example.org/law",
     )
+    assert metadata.effective_from is None
     with client.app.state.db_factory() as db:
         first = ingest_file(path, metadata, "ingest-law", db=db, storage=storage)
         db.commit()
@@ -34,6 +35,7 @@ def test_ingest_publish_and_retry_are_idempotent(client, tmp_path):
         assert first == second
         version = db.get(NormVersion, first)
         assert version.status == "received"
+        assert version.effective_from is None
         assert len(list(db.scalars(select(Operation)))) == 1
         index = QdrantClient(":memory:")
         process_version(db, version, storage, index, lambda text: [1.0, 0.0], dimensions=2)

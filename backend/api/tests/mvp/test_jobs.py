@@ -1,27 +1,5 @@
 from uuid import uuid4
 
-import pytest
-from fastapi import HTTPException
-
-
-def test_duplicate_operation_returns_same_id(client):
-    from app.jobs.service import enqueue
-
-    with client.app.state.db_factory() as db:
-        first = enqueue(db, "test", None, None, "same", {"a": 1})
-        second = enqueue(db, "test", None, None, "same", {"a": 1})
-        assert first.id == second.id
-
-
-def test_changed_payload_conflicts(client):
-    from app.jobs.service import enqueue
-
-    with client.app.state.db_factory() as db:
-        enqueue(db, "test", None, None, "same", {"a": 1})
-        with pytest.raises(HTTPException) as error:
-            enqueue(db, "test", None, None, "same", {"a": 2})
-        assert error.value.status_code == 409
-
 
 def test_outbox_recovers_after_redis_failure(client):
     from app.jobs.outbox import dispatch

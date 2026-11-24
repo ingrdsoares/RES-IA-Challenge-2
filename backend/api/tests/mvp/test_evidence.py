@@ -61,10 +61,11 @@ def test_private_download_is_owner_scoped(client):
     )
     import httpx
 
-    assert (
-        httpx.get(client.get("/evidencias/" + evidence["id"] + "/arquivo").json()["url"]).content
-        == body
-    )
+    signed_url = httpx.URL(client.get("/evidencias/" + evidence["id"] + "/arquivo").json()["url"])
+    assert httpx.get(signed_url.copy_with(query=None)).status_code == 403
+    download = httpx.get(signed_url)
+    assert download.status_code == 200
+    assert download.content == body
     client.post("/auth/logout", headers=csrf(client))
     from test_access import register
 

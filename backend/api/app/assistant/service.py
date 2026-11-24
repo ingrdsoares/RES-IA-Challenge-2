@@ -8,8 +8,14 @@ from app.assistant.models import Conversation, Message
 from app.assistant.schemas import MessageInput
 from app.companies.service import require_company, snapshot
 from app.config import Settings
+from app.evidence.service import (
+    GUIDE_IMAGE_SIGNATURES,
+    guide_attachment_media_type,
+    require_guide_attachment,
+)
 from app.jobs.models import Operation
 from app.jobs.service import enqueue
+from app.legal.ingest import storage_from_settings
 
 
 def require_conversation(db, account_id, conversation_id, lock=False):
@@ -29,7 +35,13 @@ def submit_message(
     settings = settings or Settings()
     conversation, company = require_conversation(db, account_id, conversation_id, lock=True)
     # Immutable request body is the idempotency fingerprint, including conversation scope.
-    payload = {"conversation_id": str(conversation.id), "request": request.model_dump(mode="json")}
+    if request.confirmation_for and request.evidence_id:
+        raise HTTPException(422, "A confirmação usa a guia da consulta original")
+    excluded = {"evidence_id"} if request.evidence_id is None else set()
+    payload = {
+        "conversation_id": str(conversation.id),
+        "request": request.model_dump(mode="json", exclude=excluded),
+    }
     receipt = enqueue(
         db,
         "assistant.confirm" if request.confirmation_for else "assistant.answer",
@@ -61,6 +73,8 @@ def submit_message(
         if set(values) != set(missing):
             raise HTTPException(422, "Confirme somente os campos solicitados")
         context = {**original.context, **values, "missing_fields": []}
+        if "period" in values and context.get("evidence_id"):
+            context["guide_period_confirmed"] = True
         if "regime" in values:
             context["company"] = {**context["company"], "regime": values["regime"]}
         calculation_fields = {
@@ -83,6 +97,8 @@ def submit_message(
                 else {}
             )
             candidate.update(original.context.get("calculation_input", {}))
+            if context.get("evidence_id") and candidate:
+                context.setdefault("guide_retry_calculation", dict(candidate))
             candidate.update(
                 {name: value for name, value in values.items() if name in calculation_fields}
             )
@@ -100,8 +116,24 @@ def submit_message(
         if request.confirmation:
             raise HTTPException(422, "Confirmação exige operação de origem")
         operation = receipt
+        if request.evidence_id:
+            if not settings.guide_vision_available:
+                raise HTTPException(503, "Leitura de guias indisponível")
+            evidence = require_guide_attachment(db, account_id, company.id, request.evidence_id)
+            media_type = guide_attachment_media_type(
+                storage_from_settings(settings), evidence.storage_key
+            )
+            if media_type is None:
+                raise HTTPException(404, "Imagem da guia não encontrada")
+            if media_type not in GUIDE_IMAGE_SIGNATURES:
+                raise HTTPException(422, "Selecione uma guia em PNG ou JPEG")
         decision = resolve_context(snapshot(company), request)
+        if request.evidence_id and "period" in decision.missing_fields:
+            decision.missing_fields.remove("period")
+            decision.context["guide_needs_period"] = True
         context = {**decision.context, "missing_fields": decision.missing_fields}
+        if request.evidence_id:
+            context["evidence_id"] = str(request.evidence_id)
         if request.calculation:
             context["calculation_input"] = request.calculation.model_dump(mode="json")
         operation.status = "awaiting_data" if decision.missing_fields else "queued"
