@@ -27,6 +27,10 @@ def require_evidence(db, account_id, evidence_id, lock=False):
     return evidence
 
 
+def obligation_record(obligation):
+    return {**record(obligation), "completed": obligation.completed}
+
+
 def require_obligation(db, account_id, obligation_id):
     obligation = db.scalar(
         select(Obligation).where(Obligation.id == obligation_id).with_for_update()

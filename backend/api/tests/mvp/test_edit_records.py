@@ -167,3 +167,23 @@ def test_task_from_assistant_can_be_recreated_after_delete(client):
     first = create(client, company, "tarefas", source)
     client.delete(f"/tarefas/{first['id']}", headers=csrf(client))
     assert create(client, company, "tarefas", source)["id"] != first["id"]
+
+
+def obligation_state(client, company):
+    (item,) = client.get(f"/empresas/{company['id']}/obrigacoes").json()["items"]
+    return item["completed"]
+
+
+def test_obligation_is_completed_by_linked_payment(client):
+    company, _ = conversation(client)
+    item = create(client, company, "obrigacoes", OBLIGATION)
+    assert item["completed"] is False
+    link_evidence(client, company, item)
+    assert obligation_state(client, company) is True
+
+
+def test_guide_does_not_complete_obligation(client):
+    company, _ = conversation(client)
+    item = create(client, company, "obrigacoes", OBLIGATION)
+    link_evidence(client, company, item, kind="guide")
+    assert obligation_state(client, company) is False

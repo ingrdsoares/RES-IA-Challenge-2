@@ -1,8 +1,8 @@
 from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Date, DateTime, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Date, DateTime, ForeignKey, String, exists
+from sqlalchemy.orm import Mapped, column_property, mapped_column
 
 from app.db import Base
 
@@ -34,3 +34,12 @@ class Evidence(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
+
+
+# Guia é cobrança, não comprovante: só pagamento ou declaração concluem a obrigação.
+COMPLETING_KINDS = ("payment", "declaration")
+Obligation.completed = column_property(
+    exists()
+    .where(Evidence.obligation_id == Obligation.id, Evidence.kind.in_(COMPLETING_KINDS))
+    .correlate_except(Evidence)
+)

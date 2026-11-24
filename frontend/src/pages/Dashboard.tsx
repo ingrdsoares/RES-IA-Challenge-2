@@ -12,6 +12,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { formatCnpj } from '../components/Sidebar';
+import { agendaHref, buildAgenda, daysUntil } from './tarefas/agenda';
+import type { AgendaItem, Obligation } from './tarefas/agenda';
 import { revenueSummary } from './faturamento';
 import type { Revenue } from './faturamento';
 import { api } from '../services/api';
@@ -247,21 +249,11 @@ function Simulator({ company }: { company: Company }) {
   );
 }
 
-function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
-  if (!tasks?.length) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const critical = tasks
-    .filter((t) => t.due_date && !t.completed)
-    .map((t) => {
-      const due = new Date(t.due_date + 'T00:00:00');
-      const diffMs = due.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return { task: t, diffDays };
-    })
-    .filter((item) => item.diffDays <= 7)
-    .sort((a, b) => a.diffDays - b.diffDays);
+function UrgentAlertBanner({ items }: { items: AgendaItem[] }) {
+  const critical = items.flatMap((item) => {
+    const diffDays = item.due_date ? daysUntil(item.due_date) : Infinity;
+    return diffDays <= 7 ? [{ item, diffDays }] : [];
+  });
 
   if (!critical.length) return null;
 
@@ -285,20 +277,20 @@ function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
         />
         <span>
           {isUrgent
-            ? `Atenção: ${overdue.length} obrigação(ões) em atraso!`
+            ? `Atenção: ${overdue.length} item(ns) em atraso!`
             : `Próximos vencimentos críticos nesta semana (${critical.length})`}
         </span>
       </div>
       <ul className="mt-3 divide-y divide-black/10">
-        {critical.slice(0, 3).map(({ task, diffDays }) => (
+        {critical.slice(0, 3).map(({ item, diffDays }) => (
           <li
-            key={task.id}
+            key={item.kind + item.id}
             className="flex flex-wrap items-center justify-between gap-2 py-2"
           >
             <div className="min-w-0">
-              <strong className="block truncate">{task.title}</strong>
+              <strong className="block truncate">{item.title}</strong>
               <small className="text-black/70">
-                Prazo oficial: {task.due_date ? dateLabel(task.due_date) : '-'}
+                Prazo: {item.due_date ? dateLabel(item.due_date) : '-'}
               </small>
             </div>
             <div className="flex items-center gap-2">
@@ -321,10 +313,10 @@ function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
                       : `Vence em ${diffDays} dias`}
               </span>
               <a
-                href={`#tarefas?task=${task.id}`}
+                href={agendaHref({}, item)}
                 className="font-semibold underline hover:opacity-80"
               >
-                Ver tarefa
+                Ver detalhes
               </a>
             </div>
           </li>
@@ -491,13 +483,13 @@ export function Dashboard({ company }: PageProps) {
   const base = `/empresas/${company.id}`;
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
   const tasks = useRead<Task[]>(base + '/tarefas?completed=false', readList);
-  const upcoming = tasks.data
-    ?.slice()
-    .sort((a, b) => (a.due_date || '9999').localeCompare(b.due_date || '9999'))
-    .slice(0, 4);
+  const obligations = useRead<Obligation[]>(base + '/obrigacoes', readList);
+  const loading = tasks.loading || obligations.loading;
+  const agenda = buildAgenda(tasks.data ?? [], obligations.data ?? [], { status: 'pending' });
+  const upcoming = agenda.slice(0, 4);
   return (
     <div className="stack">
-      <UrgentAlertBanner tasks={tasks.data} />
+      <UrgentAlertBanner items={agenda} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Visão geral</h1>
@@ -551,39 +543,42 @@ export function Dashboard({ company }: PageProps) {
       <RevenueThermometer key={company.id} company={company} />
       <section className="panel space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Próximas tarefas</h2>
+          <h2 className="text-lg font-bold">Próximos vencimentos</h2>
           <a
             href="#tarefas"
             className="touch-link inline-flex items-center gap-2 text-sm font-semibold text-link"
           >
-            Ver todas as tarefas <ArrowRight size={15} />
+            Ver tarefas e obrigações <ArrowRight size={15} />
           </a>
         </div>
-        {tasks.loading && <p role="status">Carregando tarefas…</p>}
+        {loading && <p role="status">Carregando vencimentos…</p>}
         {tasks.error && <Feedback error={tasks.error} retry={tasks.refresh} />}
-        {upcoming?.length === 0 && (
+        {obligations.error && (
+          <Feedback error={obligations.error} retry={obligations.refresh} />
+        )}
+        {!loading && !tasks.error && !obligations.error && upcoming.length === 0 && (
           <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
-            Nenhuma tarefa pendente para esta empresa.
+            Nenhuma tarefa ou obrigação pendente para esta empresa.
           </p>
         )}
         <ul className="divide-y divide-subtle">
-          {upcoming?.map((task) => (
-            <li key={task.id}>
+          {upcoming.map((item) => (
+            <li key={item.kind + item.id}>
               <a
-                href={`#tarefas?task=${task.id}`}
+                href={agendaHref({}, item)}
                 className="flex items-center gap-3 py-3 hover:text-link"
               >
                 <CalendarDays size={18} className="shrink-0 text-ink-muted" />
                 <span className="min-w-0">
                   <strong className="block break-words text-sm">
-                    {task.title}
+                    {item.title}
                   </strong>
                   <small className="text-ink-muted">
-                    {task.due_date
-                      ? 'Prazo ' + dateLabel(task.due_date)
+                    {item.due_date
+                      ? 'Prazo ' + dateLabel(item.due_date)
                       : 'Prazo não informado'}
-                    {task.period &&
-                      ' · Competência ' + periodLabel(task.period)}
+                    {item.period &&
+                      ' · Competência ' + periodLabel(item.period)}
                   </small>
                 </span>
               </a>

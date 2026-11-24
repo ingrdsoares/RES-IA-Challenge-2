@@ -15,6 +15,7 @@ from app.evidence.service import (
     delete_obligation,
     edit_obligation,
     get_fiscal_status,
+    obligation_record,
     record_evidence,
     require_evidence,
     require_obligation,
@@ -38,7 +39,7 @@ def create_obligation(
     item = Obligation(company_id=company_id, **data.model_dump())
     db.add(item)
     db.commit()
-    return record(item)
+    return obligation_record(item)
 
 
 @router.get("/empresas/{company_id}/obrigacoes")
@@ -54,7 +55,7 @@ def obligations(
         db,
         select(Obligation).where(Obligation.company_id == company_id),
         Obligation,
-        record,
+        obligation_record,
         limit,
         cursor,
     )
@@ -68,7 +69,7 @@ def put_obligation(
     db: Session = Depends(get_db),
 ):
     obligation = require_obligation(db, account.id, obligation_id)
-    return record(edit_obligation(db, obligation, data))
+    return obligation_record(edit_obligation(db, obligation, data))
 
 
 @router.delete("/obrigacoes/{obligation_id}", status_code=204)

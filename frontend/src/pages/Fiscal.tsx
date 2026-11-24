@@ -49,12 +49,16 @@ function NewEvidence({
   close,
   saved,
   recorded,
+  obligationId,
+  period,
 }: {
   scope: Scope;
   base: string;
   close: () => void;
   saved: (id: string) => void;
   recorded: () => void;
+  obligationId?: string | null;
+  period?: string | null;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -108,6 +112,7 @@ function NewEvidence({
           scope,
           period: data.get('period') || null,
           valid_until: data.get('valid_until') || null,
+          ...(obligationId && { obligation_id: obligationId }),
         });
         if (request.current?.body !== body)
           request.current = { body, key: crypto.randomUUID() };
@@ -148,7 +153,7 @@ function NewEvidence({
         <fieldset disabled={busy || !!evidenceId} className="space-y-3">
           <label className="field">
             Tipo de documento
-            <select name="kind">
+            <select name="kind" defaultValue={obligationId ? 'payment' : undefined}>
               {kindsByScope[scope].map((kind) => (
                 <option key={kind} value={kind}>
                   {kindNames[kind]}
@@ -158,7 +163,7 @@ function NewEvidence({
           </label>
           <label className="field">
             Competência (opcional)
-            <input type="month" name="period" />
+            <input type="month" name="period" defaultValue={period ?? ''} />
           </label>
           <label className="field">
             Validade (opcional)
@@ -371,7 +376,8 @@ export function Fiscal({ company, params }: PageProps) {
   const base = `/empresas/${company.id}`;
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
   const evidence = useRead<Evidence[]>(base + '/evidencias', readList);
-  const [showForm, setShowForm] = useState(false);
+  const obligationId = scope === 'obligations' ? params.get('obrigacao') : null;
+  const [showForm, setShowForm] = useState(!!obligationId);
   const [yearFilter, setYearFilter] = useState('all');
   const [textSearch, setTextSearch] = useState('');
   const selected = params.get('evidence');
@@ -587,7 +593,12 @@ export function Fiscal({ company, params }: PageProps) {
           key={base + scope}
           scope={scope}
           base={base}
-          close={() => setShowForm(false)}
+          obligationId={obligationId}
+          period={obligationId ? params.get('periodo') : null}
+          close={() => {
+            setShowForm(false);
+            if (obligationId) window.location.hash = evidenceHref(scope);
+          }}
           recorded={refresh}
           saved={(id) => {
             window.location.hash = evidenceHref(scope, id);

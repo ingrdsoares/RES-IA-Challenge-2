@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Task } from '../fiscal-data';
+import type { AgendaItem } from './agenda';
 
 export function CalendarView({
-  tasks,
-  activeTaskId,
-  onSelectTask,
+  items,
+  activeId,
+  onSelect,
 }: {
-  tasks: Task[];
-  activeTaskId?: string;
-  onSelectTask: (id: string) => void;
+  items: AgendaItem[];
+  activeId?: string;
+  onSelect: (item: AgendaItem) => void;
 }) {
   const [currentDate, setCurrentDate] = useState(() => {
     const d = new Date();
@@ -48,7 +48,7 @@ export function CalendarView({
   const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const blanks = Array.from({ length: firstDayOfWeek }, (_, i) => i);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const today = new Date();
 
   return (
     <div className="space-y-3">
@@ -93,8 +93,9 @@ export function CalendarView({
         ))}
         {daysArray.map((day) => {
           const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          const isToday = dayStr === todayStr;
-          const dayTasks = tasks.filter((t) => t.due_date === dayStr);
+          const isToday =
+            new Date(year, month, day).toDateString() === today.toDateString();
+          const dayTasks = items.filter((t) => t.due_date === dayStr);
 
           return (
             <div
@@ -121,10 +122,10 @@ export function CalendarView({
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => onSelectTask(t.id)}
+                    onClick={() => onSelect(t)}
                     className={
                       'block w-full truncate rounded px-1 py-0.5 text-left text-[10px] font-medium leading-tight ' +
-                      (t.id === activeTaskId
+                      (t.id === activeId
                         ? 'bg-link text-white'
                         : t.completed
                           ? 'bg-emerald-100 text-emerald-800'

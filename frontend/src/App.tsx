@@ -8,7 +8,6 @@ import { Fiscal } from './pages/Fiscal';
 import { Tarefas } from './pages/Tarefas';
 import { Biblioteca } from './pages/Biblioteca';
 import { Leitor } from './pages/Leitor';
-import { Obrigacoes } from './pages/Obrigacoes';
 import { Ajuda } from './pages/Ajuda';
 import { Empresas } from './pages/Empresas';
 import { clearChatDrafts } from './services/chatDrafts';
@@ -43,7 +42,9 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
     return () => controller.abort();
   }, [request]);
   const company = companies?.find((c) => c.id === id) || companies?.[0];
-  const [route, search = ''] = hash.slice(1).split('?');
+  const [requested, search = ''] = hash.slice(1).split('?');
+  // Obrigações foram unidas às tarefas; o endereço antigo abre a lista filtrada.
+  const route = requested === 'obrigacoes' ? 'tarefas' : requested;
   const page =
     company && Object.prototype.hasOwnProperty.call(titles, route)
       ? route
@@ -51,6 +52,7 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
         ? 'assistente'
         : 'cadastro';
   const params = new URLSearchParams(search);
+  if (requested === 'obrigacoes') params.set('tipo', 'obrigacoes');
   useEffect(() => {
     document.title = titles[page] + ' | Sócio Digital';
   }, [page]);
@@ -143,7 +145,6 @@ function Workspace({ user, onEnd }: { user: Account; onEnd: () => void }) {
           {page === 'dashboard' && props && <Dashboard {...props} />}
           {page === 'fiscal' && props && <Fiscal {...props} />}
           {page === 'tarefas' && props && <Tarefas {...props} />}
-          {page === 'obrigacoes' && props && <Obrigacoes {...props} />}
           {page === 'ajuda' && <Ajuda />}
           {page === 'assistente' && company && (
             <Assistente accountId={user.id} company={company} params={params} />
