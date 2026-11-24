@@ -31,6 +31,7 @@
   * [Modelagem de Ameaças (STRIDE & OWASP)](arquitetura/modelagem-ameacas.md)
   * [Plano de Resposta a Incidentes e Continuidade](arquitetura/plano-resposta-incidentes.md)
   * [Retomada na Máquina RTX 3080 Ti](arquitetura/retomada-rtx3080ti.md)
+  * [Assistente Multimodal: Limitações e Mitigações](arquitetura/multimodal-limitacoes-e-mitigacoes.md)
 
 * **Dados e Acervo**
   * [Exploração de Dados](dados/exploracao-dados.md)
