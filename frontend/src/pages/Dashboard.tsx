@@ -12,6 +12,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { formatCnpj } from '../components/Sidebar';
+import { revenueSummary } from './faturamento';
+import type { Revenue } from './faturamento';
 import { api } from '../services/api';
 import type { Company } from '../types';
 import {
@@ -339,24 +341,34 @@ function RevenueThermometer({ company }: { company: Company }) {
 
   const limit = isMei ? 81000 : 4800000;
 
-  const storageKey = 'revenue:' + company.id;
-  const [revenue, setRevenue] = useState<number>(() => {
-    const saved = localStorage.getItem(storageKey);
-    return saved ? Number(saved) : isMei ? 48500 : 850000;
-  });
+  const year = new Date().getFullYear();
+  const url = `/empresas/${company.id}/faturamento/${year}`;
+  const saved = useRead<Revenue>(url, readJson);
+  const summary = saved.data && revenueSummary(saved.data.amount, limit);
   const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState(String(revenue));
+  const [inputVal, setInputVal] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
-  function save(e: FormEvent) {
+  async function save(e: FormEvent) {
     e.preventDefault();
-    const val = Number(inputVal) || 0;
-    setRevenue(val);
-    localStorage.setItem(storageKey, String(val));
-    setEditing(false);
+    setBusy(true);
+    setError('');
+    try {
+      await api.request(url, {
+        method: 'PUT',
+        body: JSON.stringify({ amount: Number(inputVal).toFixed(2) }),
+      });
+      setEditing(false);
+      saved.refresh();
+    } catch (err) {
+      setError(problem(err));
+    } finally {
+      setBusy(false);
+    }
   }
 
-  const pct = Math.min(100, Math.round((revenue / limit) * 100));
-  const remaining = Math.max(0, limit - revenue);
+  const pct = summary?.pct ?? 0;
 
   const statusColor =
     pct < 70
@@ -386,9 +398,11 @@ function RevenueThermometer({ company }: { company: Company }) {
         <button
           type="button"
           onClick={() => {
-            setInputVal(String(revenue));
+            setInputVal(saved.data?.amount ?? '');
+            setError('');
             setEditing(!editing);
           }}
+          disabled={!saved.data || busy}
           className="secondary inline-flex items-center gap-1.5 text-xs font-semibold"
         >
           <Edit3 size={14} /> {editing ? 'Cancelar' : 'Ajustar receita informada'}
@@ -398,7 +412,7 @@ function RevenueThermometer({ company }: { company: Company }) {
       {editing && (
         <form onSubmit={save} className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-surface-muted p-3">
           <label className="field text-xs">
-            Receita Bruta Acumulada no Ano (R$)
+            Receita Bruta Acumulada em {year} (R$)
             <input
               type="number"
               step="0.01"
@@ -409,52 +423,66 @@ function RevenueThermometer({ company }: { company: Company }) {
               className="text-sm font-semibold"
             />
           </label>
-          <button className="primary text-xs py-2">Salvar valor</button>
+          <button className="primary text-xs py-2" disabled={busy}>
+            {busy ? 'Salvando…' : 'Salvar valor'}
+          </button>
+          {error && <Feedback error={error} />}
         </form>
       )}
 
-      <div>
-        <div className="mb-2 flex flex-wrap items-center justify-between text-sm">
-          <span>
-            Faturamento acumulado: <strong>{money.format(revenue)}</strong>
-          </span>
-          <span className="font-semibold text-ink">
-            {pct}% do teto ({money.format(limit)})
-          </span>
-        </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
-          <div
-            className={`h-full transition-all duration-500 ${statusColor}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      </div>
+      {saved.loading && <p role="status">Carregando faturamento…</p>}
+      {saved.error && <Feedback error={saved.error} retry={saved.refresh} />}
+      {summary === null && (
+        <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
+          Informe a receita acumulada em {year} para acompanhar o limite.
+        </p>
+      )}
+      {summary && (
+        <>
+          <div>
+            <div className="mb-2 flex flex-wrap items-center justify-between text-sm">
+              <span>
+                Faturamento acumulado: <strong>{money.format(summary.revenue)}</strong>
+              </span>
+              <span className="font-semibold text-ink">
+                {summary.pct}% do teto ({money.format(limit)})
+              </span>
+            </div>
+            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
+              <div
+                className={`h-full transition-all duration-500 ${statusColor}`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 text-xs">
-        <div className="rounded-lg bg-surface-muted p-3">
-          <span className="block text-ink-muted">Saldo restante até o teto</span>
-          <strong className="text-base text-ink">{money.format(remaining)}</strong>
-        </div>
-        <div className="rounded-lg bg-surface-muted p-3">
-          <span className="block text-ink-muted">Diagnóstico preventivo</span>
-          <span
-            className={
-              'font-semibold ' +
-              (pct < 70
-                ? 'text-emerald-700'
-                : pct < 90
-                  ? 'text-amber-700'
-                  : 'text-rose-700')
-            }
-          >
-            {pct < 70
-              ? 'Faixa segura de faturamento no período.'
-              : pct < 90
-                ? 'Atenção: aproximando-se do teto anual do regime.'
-                : 'Alerta crítico: risco iminente de desenquadramento fiscal!'}
-          </span>
-        </div>
-      </div>
+          <div className="grid gap-3 sm:grid-cols-2 text-xs">
+            <div className="rounded-lg bg-surface-muted p-3">
+              <span className="block text-ink-muted">Saldo restante até o teto</span>
+              <strong className="text-base text-ink">{money.format(summary.remaining)}</strong>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-3">
+              <span className="block text-ink-muted">Diagnóstico preventivo</span>
+              <span
+                className={
+                  'font-semibold ' +
+                  (pct < 70
+                    ? 'text-emerald-700'
+                    : pct < 90
+                      ? 'text-amber-700'
+                      : 'text-rose-700')
+                }
+              >
+                {pct < 70
+                  ? 'Faixa segura de faturamento no período.'
+                  : pct < 90
+                    ? 'Atenção: aproximando-se do teto anual do regime.'
+                    : 'Alerta crítico: risco iminente de desenquadramento fiscal!'}
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }
@@ -520,7 +548,7 @@ export function Dashboard({ company }: PageProps) {
         })}
       </section>
       {status.error && <Feedback error={status.error} retry={status.refresh} />}
-      <RevenueThermometer company={company} />
+      <RevenueThermometer key={company.id} company={company} />
       <section className="panel space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">Próximas tarefas</h2>
