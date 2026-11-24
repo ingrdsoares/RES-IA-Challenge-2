@@ -11,6 +11,12 @@ from app.jobs.service import enqueue
 from app.serialization import record
 
 
+GUIDE_IMAGE_SIGNATURES = {
+    "image/png": b"\x89PNG\r\n\x1a\n",
+    "image/jpeg": b"\xff\xd8\xff",
+}
+
+
 def require_evidence(db, account_id, evidence_id, lock=False):
     query = select(Evidence).where(Evidence.id == evidence_id)
     if lock:
@@ -20,6 +26,20 @@ def require_evidence(db, account_id, evidence_id, lock=False):
         raise HTTPException(404, "Evidência não encontrada")
     require_company(db, account_id, evidence.company_id)
     return evidence
+
+
+def require_guide_attachment(db, account_id, company_id, evidence_id) -> Evidence:
+    evidence = require_evidence(db, account_id, evidence_id)
+    if evidence.company_id != company_id or evidence.kind != "guide" or not evidence.storage_key:
+        raise HTTPException(404, "Imagem da guia não encontrada")
+    return evidence
+
+
+def guide_attachment_media_type(storage, key: str) -> str | None:
+    try:
+        return storage.content_type(key, private=True)
+    except (BotoCoreError, ClientError):
+        raise HTTPException(503, "Armazenamento indisponível") from None
 
 
 def record_evidence(db, company_id, account_id, data, key):
@@ -47,8 +67,7 @@ def record_evidence(db, company_id, account_id, data, key):
 def store_file(db, evidence, content, content_type, storage):
     signatures = {
         "application/pdf": b"%PDF-",
-        "image/png": b"\x89PNG\r\n\x1a\n",
-        "image/jpeg": b"\xff\xd8\xff",
+        **GUIDE_IMAGE_SIGNATURES,
     }
     if content_type not in signatures or not content.startswith(signatures[content_type]):
         raise HTTPException(422, "Tipo ou assinatura do arquivo inválidos")
