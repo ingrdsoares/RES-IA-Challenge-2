@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -11,7 +11,16 @@ from app.db import get_db
 from app.dependencies import require_account
 from app.evidence.models import Evidence, Obligation
 from app.evidence.schemas import EvidenceInput, ObligationInput
-from app.evidence.service import get_fiscal_status, record_evidence, require_evidence, store_file
+from app.evidence.service import (
+    delete_obligation,
+    edit_obligation,
+    get_fiscal_status,
+    obligation_record,
+    record_evidence,
+    require_evidence,
+    require_obligation,
+    store_file,
+)
 from app.legal.ingest import storage_from_settings
 from app.pagination import page
 from app.serialization import record
@@ -30,7 +39,7 @@ def create_obligation(
     item = Obligation(company_id=company_id, **data.model_dump())
     db.add(item)
     db.commit()
-    return record(item)
+    return obligation_record(item)
 
 
 @router.get("/empresas/{company_id}/obrigacoes")
@@ -46,10 +55,31 @@ def obligations(
         db,
         select(Obligation).where(Obligation.company_id == company_id),
         Obligation,
-        record,
+        obligation_record,
         limit,
         cursor,
     )
+
+
+@router.put("/obrigacoes/{obligation_id}")
+def put_obligation(
+    obligation_id: UUID,
+    data: ObligationInput,
+    account: Account = Depends(require_account),
+    db: Session = Depends(get_db),
+):
+    obligation = require_obligation(db, account.id, obligation_id)
+    return obligation_record(edit_obligation(db, obligation, data))
+
+
+@router.delete("/obrigacoes/{obligation_id}", status_code=204)
+def remove_obligation(
+    obligation_id: UUID,
+    account: Account = Depends(require_account),
+    db: Session = Depends(get_db),
+):
+    delete_obligation(db, require_obligation(db, account.id, obligation_id))
+    return Response(status_code=204)
 
 
 @router.post("/empresas/{company_id}/evidencias", status_code=201)

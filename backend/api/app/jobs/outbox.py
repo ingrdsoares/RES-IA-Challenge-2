@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import UTC, datetime, timedelta
 
@@ -10,6 +11,10 @@ from app.assistant.agents.models import AgentRun, AgentStep
 from app.config import Settings
 from app.db import session_factory
 from app.jobs.models import Operation
+from app.reminders import service as reminders
+
+logger = logging.getLogger(__name__)
+REMINDER_INTERVAL = 600
 
 
 def dispatch(factory, redis: Redis) -> int:
@@ -65,11 +70,24 @@ def dispatch(factory, redis: Redis) -> int:
     return count
 
 
+def schedule_reminders(factory, settings: Settings) -> None:
+    """Falha de lembrete não pode parar o despacho das demais operações."""
+    try:
+        with factory.begin() as db:
+            reminders.schedule(db, settings)
+    except Exception:
+        logger.exception("Falha ao agendar lembretes de vencimento.")
+
+
 def main():
     settings = Settings()
     factory = session_factory(settings.database_url)
     redis = Redis.from_url(settings.redis_url, socket_timeout=3)
+    next_reminders = 0.0
     while True:
+        if time.monotonic() >= next_reminders:
+            next_reminders = time.monotonic() + REMINDER_INTERVAL
+            schedule_reminders(factory, settings)
         dispatch(factory, redis)
         time.sleep(1)
 

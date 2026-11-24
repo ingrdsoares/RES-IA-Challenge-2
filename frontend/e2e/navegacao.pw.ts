@@ -18,8 +18,9 @@ test('o destino interno sobrevive à troca de tela de acesso, recarga e expiraç
   });
   await page.route('**/api/empresas?*', route =>
     route.fulfill({ json: { items: [company], next_cursor: null } }));
-  await page.route('**/tarefas?*', route =>
-    route.fulfill({ json: { items: [], next_cursor: null } }));
+  for (const pattern of ['**/tarefas?*', '**/obrigacoes?*']) {
+    await page.route(pattern, route => route.fulfill({ json: { items: [], next_cursor: null } }));
+  }
   await page.goto('/' + returnTo);
   await page.getByRole('link', { name: 'Criar conta' }).click();
   await page.reload();
@@ -35,7 +36,7 @@ test('o destino interno sobrevive à troca de tela de acesso, recarga e expiraç
       await page.getByRole('button', { name: 'Entrar', exact: true }).click();
       await expect(page).toHaveURL(url => url.hash === returnTo, { timeout: 2000 });
     }).toPass({ timeout: 15000 });
-    await expect(page.getByRole('heading', { name: 'Tarefas', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tarefas e obrigações', exact: true })).toBeVisible();
   };
   await login();
   authenticated = false;
@@ -53,7 +54,7 @@ test('o assistente recupera o rascunho somente no contexto em que foi escrito', 
   await page.route('**/conversas?*', route => route.fulfill({ json: {
     items: [{ id: 'anterior', title: 'Conversa anterior' }], next_cursor: null,
   } }));
-  for (const pattern of ['**/tarefas?*', '**/mensagens?*']) {
+  for (const pattern of ['**/tarefas?*', '**/obrigacoes?*', '**/mensagens?*']) {
     await page.route(pattern, route => route.fulfill({ json: { items: [], next_cursor: null } }));
   }
   await page.route('**/api/auth/csrf', route => route.fulfill({ json: { csrf_token: 'teste' } }));

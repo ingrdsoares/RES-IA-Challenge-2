@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Query
+from fastapi import APIRouter, Depends, Header, Query, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,8 +11,14 @@ from app.dependencies import require_account
 from app.pagination import page
 from app.serialization import record
 from app.tasks.models import Task, TaskEvent
-from app.tasks.schemas import TaskInput, TaskPatch
-from app.tasks.service import complete_task, create_task, require_task
+from app.tasks.schemas import TaskEdit, TaskInput, TaskPatch
+from app.tasks.service import (
+    complete_task,
+    create_task,
+    delete_task,
+    edit_task,
+    require_task,
+)
 
 router = APIRouter(tags=["Tarefas"])
 
@@ -58,6 +64,24 @@ def patch(
 ):
     task = require_task(db, account.id, task_id, lock=True)
     return complete_task(db, task, account.id, data.completed, idempotency_key)
+
+
+@router.put("/tarefas/{task_id}")
+def put(
+    task_id: UUID,
+    data: TaskEdit,
+    account: Account = Depends(require_account),
+    db: Session = Depends(get_db),
+):
+    return record(edit_task(db, require_task(db, account.id, task_id, lock=True), data))
+
+
+@router.delete("/tarefas/{task_id}", status_code=204)
+def remove(
+    task_id: UUID, account: Account = Depends(require_account), db: Session = Depends(get_db)
+):
+    delete_task(db, require_task(db, account.id, task_id, lock=True))
+    return Response(status_code=204)
 
 
 @router.get("/tarefas/{task_id}/historico")

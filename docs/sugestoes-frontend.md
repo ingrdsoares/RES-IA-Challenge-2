@@ -21,7 +21,7 @@ Este documento consolida uma análise detalhada da estrutura atual do frontend d
   * Integrar botões de avaliação (*Útil* / *Não útil* com lista de motivos, sem texto livre por LGPD) consumindo a rota existente `POST /rag/feedback`.
 * [x] **Transformação de Resposta em Tarefa com 1 Clique:**
   * Adicionar botão de ação direta nos itens de `next_steps` e orientações práticas para disparar a criação de tarefas sem necessidade de redigitação pelo usuário.
-* [ ] **Histórico Lateral de Conversas:** _Parcial: lista e busca prontas; faltam renomear e arquivar._
+* [x] **Histórico Lateral de Conversas:**
   * Implementar gaveta/painel lateral retrátil listando as conversas anteriores da empresa (`GET /empresas/{company_id}/conversas`), com busca textual, opção de renomear e arquivar.
 * [x] **Atalhos Rápidos de Perguntas Frequentes (Pills):**
   * Cards clicáveis antes da primeira mensagem (*"Como emitir meu DAS este mês?"*, *"Qual o limite de faturamento anual?"*, *"O que é o Fator R no meu CNAE?"*).
@@ -95,6 +95,9 @@ graph TD
 ```
 
 ### 3.1. Calendário Fiscal Unificado (`#calendario`)
+
+> Parcial: lista e calendário de tarefas e obrigações em `#tarefas`. Falta exportar `.ics`.
+
 * **Objetivo:** Oferecer uma visão cronológica unificada de todas as datas críticas do ano da empresa.
 * **Funcionalidades:**
   * Grade mensal com destaques para: vencimento do DAS, entrega de declarações anuais (DASN-SIMEI, DEFIS), vencimento de alvarás e CNDs.
@@ -105,6 +108,9 @@ graph TD
 ---
 
 ### 3.2. Relatório Mensal das Receitas Brutas (`#relatorio-mensal`)
+
+> Feito em `#faturamento`. O relatório é impresso ou salvo em PDF pelo navegador.
+
 * **Objetivo:** Cumprimento da exigência legal para MEIs (Resolução CGSN nº 140/2018), que exige o preenchimento mensal desse relatório até o dia 20.
 * **Funcionalidades:**
   * Campos para informar receitas com e sem nota fiscal de:
@@ -146,6 +152,9 @@ graph TD
 ---
 
 ### 3.6. Central de Notificações & Configurações da Conta (`#configuracoes`)
+
+> Parcial: lembretes por e-mail em `#tarefas`. Faltam troca de e-mail e acesso do contador.
+
 * **Objetivo:** Gerenciar credenciais, preferências de avisos e acessos da empresa.
 * **Funcionalidades:**
   * Alteração de e-mail e redefinição de senha com base em `/auth/password-reset`.

@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import {
   AlertTriangle,
   ArrowRight,
   Building2,
   CalendarDays,
-  Edit3,
   FileBadge2,
   ListChecks,
   MessageSquare,
-  TrendingUp,
 } from 'lucide-react';
 import { formatCnpj } from '../components/Sidebar';
-import { revenueSummary } from './faturamento';
-import type { Revenue } from './faturamento';
+import { agendaHref, buildAgenda, daysUntil } from './tarefas/agenda';
+import type { AgendaItem, Obligation } from './tarefas/agenda';
+import { money, previousMonths, rbt12 } from './receita';
+import type { MonthlyRevenue } from './receita';
+import { RevenueThermometer } from './RevenueThermometer';
+import { isMei as isMeiCompany } from './regime';
 import { api } from '../services/api';
 import type { Company } from '../types';
 import {
@@ -35,10 +37,6 @@ const scopeIcons = {
   federal_certificate: FileBadge2,
   obligations: ListChecks,
 };
-const money = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-});
 const percent = new Intl.NumberFormat('pt-BR', {
   style: 'percent',
   maximumFractionDigits: 4,
@@ -62,8 +60,9 @@ function Simulator({ company }: { company: Company }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const regime = company.regime.toLowerCase();
-  const isMei =
-    /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
+  const isMei = isMeiCompany(company);
+  const form = useRef<HTMLFormElement>(null);
+  const [prefill, setPrefill] = useState('');
   const isSimples = regime.includes('simples');
   async function calculate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,6 +96,30 @@ function Simulator({ company }: { company: Company }) {
       setBusy(false);
     }
   }
+  async function fillFromLaunched() {
+    const fields = form.current!.elements;
+    const input = (name: string) => fields.namedItem(name) as HTMLInputElement;
+    const period = input('period').value;
+    setResponse(undefined);
+    setError('');
+    if (!period) {
+      setPrefill('Escolha a competência primeiro.');
+      return;
+    }
+    setPrefill('');
+    try {
+      const { items } = await api.request<{ items: MonthlyRevenue[] }>(
+        `/empresas/${company.id}/faturamento-mensal?from=${previousMonths(period)[0]}&to=${period}`,
+      );
+      const total = rbt12(items, period);
+      input('rbt12').value = total ?? '';
+      input('revenue').value = items.find((item) => item.period === period)?.total ?? '';
+      if (total === null)
+        setPrefill('Faltam meses lançados para calcular a receita de 12 meses.');
+    } catch (err) {
+      setError(problem(err));
+    }
+  }
   const result = response?.result;
   return (
     <details className="panel">
@@ -116,6 +139,7 @@ function Simulator({ company }: { company: Company }) {
             disponível.
           </p>
           <form
+            ref={form}
             onSubmit={calculate}
             onChange={() => {
               setResponse(undefined);
@@ -166,6 +190,12 @@ function Simulator({ company }: { company: Company }) {
                     Folha em 12 meses (R$), se houver Fator R
                     <input name="payroll12" type="number" min="0" step="0.01" />
                   </label>
+                  <div className="col-span-full flex flex-wrap items-center gap-3 text-sm">
+                    <button type="button" className="secondary" onClick={fillFromLaunched}>
+                      Usar faturamento lançado
+                    </button>
+                    {prefill && <span role="status">{prefill}</span>}
+                  </div>
                 </>
               )}
               <label className="col-span-full flex items-center gap-2 text-sm">
@@ -247,21 +277,11 @@ function Simulator({ company }: { company: Company }) {
   );
 }
 
-function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
-  if (!tasks?.length) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const critical = tasks
-    .filter((t) => t.due_date && !t.completed)
-    .map((t) => {
-      const due = new Date(t.due_date + 'T00:00:00');
-      const diffMs = due.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return { task: t, diffDays };
-    })
-    .filter((item) => item.diffDays <= 7)
-    .sort((a, b) => a.diffDays - b.diffDays);
+function UrgentAlertBanner({ items }: { items: AgendaItem[] }) {
+  const critical = items.flatMap((item) => {
+    const diffDays = item.due_date ? daysUntil(item.due_date) : Infinity;
+    return diffDays <= 7 ? [{ item, diffDays }] : [];
+  });
 
   if (!critical.length) return null;
 
@@ -285,20 +305,20 @@ function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
         />
         <span>
           {isUrgent
-            ? `Atenção: ${overdue.length} obrigação(ões) em atraso!`
+            ? `Atenção: ${overdue.length} item(ns) em atraso!`
             : `Próximos vencimentos críticos nesta semana (${critical.length})`}
         </span>
       </div>
       <ul className="mt-3 divide-y divide-black/10">
-        {critical.slice(0, 3).map(({ task, diffDays }) => (
+        {critical.slice(0, 3).map(({ item, diffDays }) => (
           <li
-            key={task.id}
+            key={item.kind + item.id}
             className="flex flex-wrap items-center justify-between gap-2 py-2"
           >
             <div className="min-w-0">
-              <strong className="block truncate">{task.title}</strong>
+              <strong className="block truncate">{item.title}</strong>
               <small className="text-black/70">
-                Prazo oficial: {task.due_date ? dateLabel(task.due_date) : '-'}
+                Prazo: {item.due_date ? dateLabel(item.due_date) : '-'}
               </small>
             </div>
             <div className="flex items-center gap-2">
@@ -321,10 +341,10 @@ function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
                       : `Vence em ${diffDays} dias`}
               </span>
               <a
-                href={`#tarefas?task=${task.id}`}
+                href={agendaHref({}, item)}
                 className="font-semibold underline hover:opacity-80"
               >
-                Ver tarefa
+                Ver detalhes
               </a>
             </div>
           </li>
@@ -334,170 +354,17 @@ function UrgentAlertBanner({ tasks }: { tasks?: Task[] | null }) {
   );
 }
 
-function RevenueThermometer({ company }: { company: Company }) {
-  const regime = company.regime.toLowerCase();
-  const isMei =
-    /\b(simei|mei)\b/.test(regime) || company.size.toLowerCase() === 'mei';
-
-  const limit = isMei ? 81000 : 4800000;
-
-  const year = new Date().getFullYear();
-  const url = `/empresas/${company.id}/faturamento/${year}`;
-  const saved = useRead<Revenue>(url, readJson);
-  const summary = saved.data && revenueSummary(saved.data.amount, limit);
-  const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-
-  async function save(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError('');
-    try {
-      await api.request(url, {
-        method: 'PUT',
-        body: JSON.stringify({ amount: Number(inputVal).toFixed(2) }),
-      });
-      setEditing(false);
-      saved.refresh();
-    } catch (err) {
-      setError(problem(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  const pct = summary?.pct ?? 0;
-
-  const statusColor =
-    pct < 70
-      ? 'bg-emerald-500'
-      : pct < 90
-        ? 'bg-amber-500'
-        : 'bg-rose-600';
-
-  return (
-    <section className="panel space-y-4" aria-label="Termômetro de Faturamento">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="rounded-lg bg-info p-2 text-link">
-            <TrendingUp size={20} />
-          </span>
-          <div>
-            <h2 className="font-bold text-ink">
-              Termômetro de Limite de Faturamento Anual
-            </h2>
-            <p className="text-xs text-ink-muted">
-              {isMei
-                ? 'Teto do MEI: R$ 81.000,00/ano (média R$ 6.750,00/mês)'
-                : 'Teto Simples Nacional: R$ 4.800.000,00/ano (sublimite R$ 3.600.000,00)'}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setInputVal(saved.data?.amount ?? '');
-            setError('');
-            setEditing(!editing);
-          }}
-          disabled={!saved.data || busy}
-          className="secondary inline-flex items-center gap-1.5 text-xs font-semibold"
-        >
-          <Edit3 size={14} /> {editing ? 'Cancelar' : 'Ajustar receita informada'}
-        </button>
-      </div>
-
-      {editing && (
-        <form onSubmit={save} className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-surface-muted p-3">
-          <label className="field text-xs">
-            Receita Bruta Acumulada em {year} (R$)
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
-              required
-              className="text-sm font-semibold"
-            />
-          </label>
-          <button className="primary text-xs py-2" disabled={busy}>
-            {busy ? 'Salvando…' : 'Salvar valor'}
-          </button>
-          {error && <Feedback error={error} />}
-        </form>
-      )}
-
-      {saved.loading && <p role="status">Carregando faturamento…</p>}
-      {saved.error && <Feedback error={saved.error} retry={saved.refresh} />}
-      {summary === null && (
-        <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
-          Informe a receita acumulada em {year} para acompanhar o limite.
-        </p>
-      )}
-      {summary && (
-        <>
-          <div>
-            <div className="mb-2 flex flex-wrap items-center justify-between text-sm">
-              <span>
-                Faturamento acumulado: <strong>{money.format(summary.revenue)}</strong>
-              </span>
-              <span className="font-semibold text-ink">
-                {summary.pct}% do teto ({money.format(limit)})
-              </span>
-            </div>
-            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
-              <div
-                className={`h-full transition-all duration-500 ${statusColor}`}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 text-xs">
-            <div className="rounded-lg bg-surface-muted p-3">
-              <span className="block text-ink-muted">Saldo restante até o teto</span>
-              <strong className="text-base text-ink">{money.format(summary.remaining)}</strong>
-            </div>
-            <div className="rounded-lg bg-surface-muted p-3">
-              <span className="block text-ink-muted">Diagnóstico preventivo</span>
-              <span
-                className={
-                  'font-semibold ' +
-                  (pct < 70
-                    ? 'text-emerald-700'
-                    : pct < 90
-                      ? 'text-amber-700'
-                      : 'text-rose-700')
-                }
-              >
-                {pct < 70
-                  ? 'Faixa segura de faturamento no período.'
-                  : pct < 90
-                    ? 'Atenção: aproximando-se do teto anual do regime.'
-                    : 'Alerta crítico: risco iminente de desenquadramento fiscal!'}
-              </span>
-            </div>
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
 export function Dashboard({ company }: PageProps) {
   const base = `/empresas/${company.id}`;
   const status = useRead<FiscalStatus>(base + '/situacao-fiscal', readJson);
   const tasks = useRead<Task[]>(base + '/tarefas?completed=false', readList);
-  const upcoming = tasks.data
-    ?.slice()
-    .sort((a, b) => (a.due_date || '9999').localeCompare(b.due_date || '9999'))
-    .slice(0, 4);
+  const obligations = useRead<Obligation[]>(base + '/obrigacoes', readList);
+  const loading = tasks.loading || obligations.loading;
+  const agenda = buildAgenda(tasks.data ?? [], obligations.data ?? [], { status: 'pending' });
+  const upcoming = agenda.slice(0, 4);
   return (
     <div className="stack">
-      <UrgentAlertBanner tasks={tasks.data} />
+      <UrgentAlertBanner items={agenda} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Visão geral</h1>
@@ -551,39 +418,42 @@ export function Dashboard({ company }: PageProps) {
       <RevenueThermometer key={company.id} company={company} />
       <section className="panel space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Próximas tarefas</h2>
+          <h2 className="text-lg font-bold">Próximos vencimentos</h2>
           <a
             href="#tarefas"
             className="touch-link inline-flex items-center gap-2 text-sm font-semibold text-link"
           >
-            Ver todas as tarefas <ArrowRight size={15} />
+            Ver tarefas e obrigações <ArrowRight size={15} />
           </a>
         </div>
-        {tasks.loading && <p role="status">Carregando tarefas…</p>}
+        {loading && <p role="status">Carregando vencimentos…</p>}
         {tasks.error && <Feedback error={tasks.error} retry={tasks.refresh} />}
-        {upcoming?.length === 0 && (
+        {obligations.error && (
+          <Feedback error={obligations.error} retry={obligations.refresh} />
+        )}
+        {!loading && !tasks.error && !obligations.error && upcoming.length === 0 && (
           <p className="rounded-lg bg-surface-muted p-4 text-sm text-ink-muted">
-            Nenhuma tarefa pendente para esta empresa.
+            Nenhuma tarefa ou obrigação pendente para esta empresa.
           </p>
         )}
         <ul className="divide-y divide-subtle">
-          {upcoming?.map((task) => (
-            <li key={task.id}>
+          {upcoming.map((item) => (
+            <li key={item.kind + item.id}>
               <a
-                href={`#tarefas?task=${task.id}`}
+                href={agendaHref({}, item)}
                 className="flex items-center gap-3 py-3 hover:text-link"
               >
                 <CalendarDays size={18} className="shrink-0 text-ink-muted" />
                 <span className="min-w-0">
                   <strong className="block break-words text-sm">
-                    {task.title}
+                    {item.title}
                   </strong>
                   <small className="text-ink-muted">
-                    {task.due_date
-                      ? 'Prazo ' + dateLabel(task.due_date)
+                    {item.due_date
+                      ? 'Prazo ' + dateLabel(item.due_date)
                       : 'Prazo não informado'}
-                    {task.period &&
-                      ' · Competência ' + periodLabel(task.period)}
+                    {item.period &&
+                      ' · Competência ' + periodLabel(item.period)}
                   </small>
                 </span>
               </a>

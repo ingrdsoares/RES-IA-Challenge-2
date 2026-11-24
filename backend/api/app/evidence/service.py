@@ -27,6 +27,44 @@ def require_evidence(db, account_id, evidence_id, lock=False):
     return evidence
 
 
+def obligation_record(obligation):
+    return {**record(obligation), "completed": obligation.completed}
+
+
+def require_obligation(db, account_id, obligation_id):
+    obligation = db.scalar(
+        select(Obligation).where(Obligation.id == obligation_id).with_for_update()
+    )
+    if not obligation:
+        raise HTTPException(404, "Obrigação não encontrada")
+    require_company(db, account_id, obligation.company_id)
+    return obligation
+
+
+def edit_obligation(db, obligation, data):
+    if data.period and db.scalar(
+        select(Evidence.id)
+        .where(
+            Evidence.obligation_id == obligation.id,
+            Evidence.period.is_not(None),
+            Evidence.period != data.period,
+        )
+        .limit(1)
+    ):
+        raise HTTPException(409, "Há evidência vinculada com outra competência")
+    for name, value in data.model_dump().items():
+        setattr(obligation, name, value)
+    db.commit()
+    return obligation
+
+
+def delete_obligation(db, obligation):
+    if db.scalar(select(Evidence.id).where(Evidence.obligation_id == obligation.id).limit(1)):
+        raise HTTPException(409, "Há evidência vinculada a esta obrigação")
+    db.delete(obligation)
+    db.commit()
+
+
 def require_guide_attachment(db, account_id, company_id, evidence_id) -> Evidence:
     evidence = require_evidence(db, account_id, evidence_id)
     if evidence.company_id != company_id or evidence.kind != "guide" or not evidence.storage_key:

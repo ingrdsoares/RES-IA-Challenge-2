@@ -1,0 +1,26 @@
+.report-line {
+  min-height: 1.4em;
+  border-bottom: 1px solid currentColor;
+}
+
+@media print {
+  .workspace:has(.print-report) .sidebar,
+  .workspace:has(.print-report) .workspace-body > header,
+  .stack:has(> .print-report) > :not(.print-report),
+  .print-report .no-print {
+    display: none !important;
+  }
+
+  .workspace:has(.print-report),
+  .workspace:has(.print-report) .workspace-body,
+  .workspace:has(.print-report) .page-body {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-report {
+    border: 0;
+    box-shadow: none;
+  }
+}

@@ -6,13 +6,13 @@ import {
   ListChecks,
   BookOpen,
   Building2,
-  CalendarClock,
   CircleHelp,
   LogOut,
   Menu,
   X,
   Plus,
   SquarePen,
+  TrendingUp,
 } from 'lucide-react';
 import { Brand } from './Header';
 import { api } from '../services/api';
@@ -26,9 +26,9 @@ const groups: readonly (readonly [string, readonly NavItem[]])[] = [
     'Empresa',
     [
       ['dashboard', 'Visão geral', LayoutDashboard],
+      ['faturamento', 'Faturamento', TrendingUp],
       ['fiscal', 'Situação fiscal', Landmark],
-      ['obrigacoes', 'Obrigações', CalendarClock],
-      ['tarefas', 'Tarefas', ListChecks],
+      ['tarefas', 'Tarefas e obrigações', ListChecks],
       ['perfil', 'Perfil da empresa', Building2],
     ],
   ],
@@ -72,8 +72,12 @@ function useSummary(companyId: string | undefined, page: string) {
         (rows) => update({ recent: rows.slice(-3).reverse() }),
         () => update({ recent: [] }),
       );
-      readList('/empresas/' + companyId + '/tarefas?completed=false', signal).then(
-        (rows) => update({ pending: rows.length }),
+      Promise.all([
+        readList('/empresas/' + companyId + '/tarefas?completed=false', signal),
+        readList<{ completed: boolean }>('/empresas/' + companyId + '/obrigacoes', signal),
+      ]).then(
+        ([tasks, obligations]) =>
+          update({ pending: tasks.length + obligations.filter((item) => !item.completed).length }),
         () => update({ pending: null }),
       );
     }

@@ -1,11 +1,12 @@
 from datetime import UTC, datetime
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from app.assistant.models import Message
 from app.assistant.service import require_conversation
 from app.companies.service import require_company
+from app.jobs.models import Operation
 from app.jobs.service import enqueue
 from app.serialization import record
 from app.tasks.models import Task, TaskEvent
@@ -84,3 +85,24 @@ def complete_task(db, task, account_id, completed, key):
     operation.result = record(task)
     db.commit()
     return operation.result
+
+
+def edit_task(db, task, data):
+    for name, value in data.model_dump().items():
+        setattr(task, name, value)
+    db.commit()
+    return task
+
+
+def delete_task(db, task):
+    db.execute(delete(TaskEvent).where(TaskEvent.task_id == task.id))
+    # Os recibos de conclusão guardam uma cópia da tarefa.
+    db.execute(
+        delete(Operation).where(
+            Operation.kind == "task.complete",
+            Operation.company_id == task.company_id,
+            Operation.payload["task_id"].as_string() == str(task.id),
+        )
+    )
+    db.delete(task)
+    db.commit()

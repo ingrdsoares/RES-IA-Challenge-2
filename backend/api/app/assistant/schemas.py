@@ -2,7 +2,15 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StringConstraints, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 
 from app.fiscal.schemas import CalculationInput, Money
 
@@ -15,6 +23,20 @@ class ConversationInput(BaseModel):
     title: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=120)
     ] = "Nova conversa"
+
+
+class ConversationPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=120)
+    ] = ""
+    archived: StrictBool = False
+
+    @model_validator(mode="after")
+    def something_to_change(self):
+        if not self.model_fields_set:
+            raise ValueError("Informe o que alterar")
+        return self
 
 
 class ContextConfirmation(BaseModel):
@@ -64,6 +86,7 @@ class GuideOptionsView(BaseModel):
 class ConversationView(ConversationInput):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
+    archived_at: datetime | None
     company_id: UUID
     created_at: datetime
 

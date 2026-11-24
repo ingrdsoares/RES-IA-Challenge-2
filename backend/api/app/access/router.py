@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.access import mail, service
 from app.access.models import Account, AuthSession
-from app.access.schemas import AccountView, Credentials, EmailInput, NewPassword
+from app.access.schemas import AccountView, Credentials, EmailInput, NewPassword, Preferences
 from app.db import get_db
 from app.dependencies import require_account
 from app.security import digest, require_csrf, token
@@ -130,6 +130,21 @@ def confirm_password_reset(data: NewPassword, request: Request, db: Session = De
 @router.get("/session", response_model=AccountView)
 def current(response: Response, account: Account = Depends(require_account)):
     response.headers["Cache-Control"] = "no-store"
+    return account
+
+
+@router.patch("/preferences", response_model=AccountView)
+def preferences(
+    data: Preferences,
+    request: Request,
+    account: Account = Depends(require_account),
+    db: Session = Depends(get_db),
+):
+    settings = request.app.state.settings
+    if data.reminders_enabled and not (settings.smtp_host and settings.smtp_from):
+        raise HTTPException(503, "Lembretes por e-mail indisponíveis no momento.")
+    account.reminders_enabled = data.reminders_enabled
+    db.commit()
     return account
 
 

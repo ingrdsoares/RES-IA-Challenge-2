@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Query, Request
@@ -8,6 +9,7 @@ from app.access.models import Account
 from app.assistant.models import Conversation, Message
 from app.assistant.schemas import (
     ConversationInput,
+    ConversationPatch,
     ConversationView,
     GuideOption,
     GuideOptionsView,
@@ -44,15 +46,19 @@ def create(
 @router.get("/empresas/{company_id}/conversas")
 def conversations(
     company_id: UUID,
+    include_archived: bool = False,
     limit: int = Query(20, ge=1, le=100),
     cursor: str | None = Query(None, max_length=100),
     db: Session = Depends(get_db),
     account: Account = Depends(require_account),
 ):
     require_company(db, account.id, company_id)
+    query = select(Conversation).where(Conversation.company_id == company_id)
+    if not include_archived:
+        query = query.where(Conversation.archived_at.is_(None))
     return page(
         db,
-        select(Conversation).where(Conversation.company_id == company_id),
+        query,
         Conversation,
         ConversationView,
         limit,
@@ -101,6 +107,22 @@ def get(
     account: Account = Depends(require_account),
 ):
     return require_conversation(db, account.id, conversation_id)[0]
+
+
+@router.patch("/conversas/{conversation_id}", response_model=ConversationView)
+def patch(
+    conversation_id: UUID,
+    data: ConversationPatch,
+    db: Session = Depends(get_db),
+    account: Account = Depends(require_account),
+):
+    conversation = require_conversation(db, account.id, conversation_id, lock=True)[0]
+    if "title" in data.model_fields_set:
+        conversation.title = data.title
+    if "archived" in data.model_fields_set:
+        conversation.archived_at = datetime.now(UTC) if data.archived else None
+    db.commit()
+    return conversation
 
 
 @router.get("/conversas/{conversation_id}/mensagens")

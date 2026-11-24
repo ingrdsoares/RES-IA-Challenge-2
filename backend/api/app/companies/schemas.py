@@ -1,10 +1,9 @@
 import re
 from datetime import datetime
-from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
+from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=120)]
 
@@ -56,22 +55,3 @@ class CompanyView(CompanyInput):
 
 class CompanySnapshot(CompanyView):
     pass
-
-
-class RevenueInput(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    amount: Annotated[Decimal, Field(ge=0, max_digits=18, decimal_places=2, allow_inf_nan=False)]
-
-    @field_validator("amount", mode="before")
-    @classmethod
-    def decimal_string(cls, value):
-        if isinstance(value, (float, bool)):
-            raise ValueError("Use strings decimais para valores monetários")
-        return value
-
-
-class RevenueView(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    year: int
-    amount: Decimal | None = None
-    updated_at: datetime | None = None

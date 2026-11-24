@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api/auth/session', route =>
     route.fulfill({ json: { id: 'conta', email: 'teste@example.invalid' } }));
   for (const [path, items] of [
-    ['/empresas', [company]], ['/empresas/empresa/tarefas', tasks],
+    ['/empresas', [company]], ['/empresas/empresa/tarefas', tasks], ['/empresas/empresa/obrigacoes', []],
     ['/empresas/empresa/evidencias', evidence], ['/tarefas/*/historico', []],
   ] as const) {
     await page.route('**/api' + path + '?*', route => route.fulfill({ json: { items, next_cursor: null } }));
@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const entry of [
-  { list: '#tarefas?filter=pending', field: 'task', id: 't-16', heading: 'Detalhe da tarefa', back: 'Voltar à lista de tarefas' },
+  { list: '#tarefas?filter=pending', field: 'task', id: 't-16', heading: 'Detalhe da tarefa', back: 'Voltar à lista' },
   { list: '#fiscal?scope=obligations', field: 'evidence', id: 'e-8', heading: 'Detalhe da evidência', back: 'Voltar à lista de evidências' },
 ]) {
   test(`${entry.heading} no celular restaura o item e a posição da lista`, async ({ page }) => {
@@ -59,10 +59,10 @@ for (const entry of [
 test('IDs indisponíveis não habilitam ações em outro registro', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/#tarefas?task=inexistente');
-  await expect(page.getByRole('heading', { name: 'Tarefa não encontrada' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Registro não encontrado' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Marcar como concluída' })).toHaveCount(0);
-  await page.getByRole('link', { name: 'Ver todas as tarefas' }).click();
-  const list = page.getByRole('region', { name: 'Lista de tarefas' });
+  await page.getByRole('link', { name: 'Ver tudo' }).click();
+  const list = page.getByRole('region', { name: 'Lista de tarefas e obrigações' });
   const panel = page.getByRole('complementary', { name: 'Detalhe da tarefa' });
   await expect(panel).toContainText('Conferir guia 0');
   expect((await list.boundingBox())!.x).toBeLessThan((await panel.boundingBox())!.x);
