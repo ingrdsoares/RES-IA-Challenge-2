@@ -23,6 +23,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Brand } from '../components/Header';
+import { MEI_DAS_YEAR, meiDas } from './das';
+import type { MeiActivity } from './das';
 import './landing.css';
 
 const views = [
@@ -272,9 +274,7 @@ function TrustSection() {
 
 function PublicSimulator({ action }: { action: string }) {
   const [regime, setRegime] = useState<'mei' | 'simples'>('mei');
-  const [meiActivity, setMeiActivity] = useState<
-    'comercio' | 'servico' | 'misto'
-  >('servico');
+  const [meiActivity, setMeiActivity] = useState<MeiActivity>('servico');
   const [monthlyRevenue, setMonthlyRevenue] = useState(15000);
   const [simplesType, setSimplesType] = useState<
     'comercio' | 'servico_anexo3' | 'servico_anexo5'
@@ -285,14 +285,7 @@ function PublicSimulator({ action }: { action: string }) {
     currency: 'BRL',
   });
 
-  const meiValues = {
-    comercio: { amount: 75.6, desc: 'INSS (R$ 74,60) + ICMS (R$ 1,00)' },
-    servico: { amount: 79.6, desc: 'INSS (R$ 74,60) + ISS (R$ 5,00)' },
-    misto: {
-      amount: 80.6,
-      desc: 'INSS (R$ 74,60) + ICMS (R$ 1,00) + ISS (R$ 5,00)',
-    },
-  };
+  const mei = meiDas(meiActivity);
 
   const simplesRates = {
     comercio: {
@@ -453,7 +446,7 @@ function PublicSimulator({ action }: { action: string }) {
               </span>
               <div className="my-2 text-4xl font-extrabold text-ink">
                 {regime === 'mei'
-                  ? money.format(meiValues[meiActivity].amount)
+                  ? money.format(mei.amount)
                   : money.format(calculatedSimples)}
                 <span className="text-sm font-normal text-slate-500">
                   {' '}
@@ -462,7 +455,7 @@ function PublicSimulator({ action }: { action: string }) {
               </div>
               <p className="mb-4 text-xs text-slate-600">
                 {regime === 'mei'
-                  ? `Composição: ${meiValues[meiActivity].desc}. Valor fixo independente do faturamento mensal.`
+                  ? `Valores de ${MEI_DAS_YEAR}. Composição: ${mei.desc}. Valor fixo independente do faturamento mensal.`
                   : `Estimativa para faturamento de ${money.format(monthlyRevenue)}. Alíquota efetiva calculada conforme o faturamento acumulado.`}
               </p>
 
