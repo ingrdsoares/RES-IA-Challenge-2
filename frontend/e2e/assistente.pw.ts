@@ -231,3 +231,136 @@ test('avaliação que falha mostra o erro e permite tentar de novo', async ({ pa
   await page.getByRole('button', { name: 'Sim', exact: true }).click();
   await expect(page.getByText('Obrigado pela sua avaliação!')).toBeVisible();
 });
+
+const guideId = 'evidence-guide-id';
+const guideFields = { evidence_id: guideId, period: '2026-10', due_date: '2026-11-20', amount: '81.05' };
+
+test('envia pergunta com a guia selecionada e mostra os dados lidos', async ({ page }) => {
+  const mock: Mock = { messages: [userMsg], operations: {} };
+  await openChat(page, mock);
+  await page.route('**/api/empresas/empresa-teste/guias-para-assistente**', (route) => {
+    const cursor = new URL(route.request().url()).searchParams.get('cursor');
+    return route.fulfill({ json: cursor ? {
+      enabled: true, items: [{ id: guideId, period: '2026-10', created_at: '2026-11-20T12:00:00Z' }],
+      next_cursor: null,
+    } : { enabled: true, items: [], next_cursor: 'segunda-pagina' } });
+  });
+
+  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
+  const guide = page.getByLabel('Guia cadastrada');
+  await expect(guide).toBeEnabled();
+  await expect(page.getByText(/imagem selecionada será enviada à DeepSeek/)).toBeVisible();
+  await guide.selectOption(guideId);
+  const question = 'Qual a competência e o valor desta guia?';
+  await page.getByRole('textbox', { name: 'Mensagem' }).fill(question);
+
+  mock.operations!.op2 = {
+    operation_id: 'op2', status: 'running', error: null,
+    run: { status: 'running', stages: [{ name: 'document', status: 'running', attempts: 1, error: null }] },
+  };
+  await page.route('**/api/conversas/c1/mensagens**', (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    mock.messages.push({
+      ...userMsg, id: 'm-guide', operation_id: 'op2', text: question, status: 'queued',
+      context: { evidence_id: guideId },
+    });
+    return route.fulfill({ status: 202, json: { operation_id: 'op2', status: 'queued' } });
+  });
+  const sent = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
+  await page.getByRole('button', { name: 'Enviar', exact: true }).click();
+  expect((await sent).postDataJSON()).toEqual({ text: question, evidence_id: guideId });
+  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toContainText('Lendo a guia');
+
+  mock.messages.splice(1, 1, {
+    ...userMsg, id: 'm-guide', operation_id: 'op2', text: question, status: 'answered',
+    context: { evidence_id: guideId },
+  }, {
+    ...answerMsg, text: 'O pagamento não foi verificado.', citations: [],
+    context: { guide_reading: guideFields },
+  });
+  mock.operations!.op2 = { operation_id: 'op2', status: 'succeeded', error: null, run: null };
+
+  const reading = page.getByRole('region', { name: 'Dados lidos na guia' });
+  await expect(reading).toContainText('10/2026');
+  await expect(reading).toContainText('20/11/2026');
+  await expect(reading).toContainText(/R\$\s81,05/);
+  await expect(reading.getByRole('link', { name: 'Ver guia na tela Fiscal' }))
+    .toHaveAttribute('href', '#fiscal?scope=obligations&evidence=' + guideId);
+
+  await page.route('**/api/empresas/empresa-teste/tarefas', (route) => {
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject({ source_message_id: answerMsg.id });
+    return route.fulfill({ status: 201, json: { id: 'tarefa-da-guia' } });
+  });
+  await page.getByRole('button', { name: 'Transformar esta orientação em tarefa' }).click();
+  await expect(page.locator('article a[href="#tarefas"]')).toBeVisible();
+});
+
+test('mantém a guia ao tentar novamente e preserva o chat por texto', async ({ page }) => {
+  const calculation = { kind: 'mei', period: '2026-10', activity: 'services', conditions_confirmed: true };
+  await openChat(page, {
+    messages: [
+      { ...userMsg, status: 'failed', context: { evidence_id: guideId, calculation_input: calculation } },
+      {
+        ...answerMsg, citations: [], context: {
+          guide_reading: { evidence_id: guideId, period: null, due_date: null, amount: null },
+        },
+      },
+    ],
+    operations: {
+      op1: { operation_id: 'op1', status: 'failed', error: 'agent_execution_failed',
+        run: { status: 'failed', stages: [{ name: 'document', status: 'failed', attempts: 1, error: 'invalid_agent_result' }] } },
+      op2: { operation_id: 'op2', status: 'succeeded', error: null, run: null },
+    },
+  });
+
+  await page.route('**/api/empresas/empresa-teste/guias-para-assistente**', (route) =>
+    route.fulfill({ json: { enabled: false, items: [], next_cursor: null } }));
+  await expect(page.getByText('Envie uma imagem mais nítida para conferir os campos ilegíveis.')).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('A leitura da guia falhou.');
+
+  const retried = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
+  await page.getByRole('button', { name: 'Tentar de novo' }).click();
+  expect((await retried).postDataJSON()).toEqual({ text: userMsg.text, evidence_id: guideId, calculation });
+
+  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
+  await expect(page.getByText('A leitura por imagem está indisponível.')).toBeVisible();
+  const sent = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
+  await page.getByRole('button', { name: 'Perguntar sobre pagamento' }).click();
+  expect((await sent).postDataJSON()).toEqual({ text: 'Paguei a guia da minha empresa?' });
+});
+
+
+test('limpa a guia selecionada ao trocar de empresa', async ({ page }) => {
+  await openChat(page, { messages: [] });
+  await page.route('**/api/empresas?*', (route) => route.fulfill({ json: {
+    items: [company, { ...company, id: 'outra-empresa', cnpj: '11444777000161' }], next_cursor: null,
+  } }));
+  await page.route('**/api/empresas/outra-empresa/conversas?*', (route) =>
+    route.fulfill({ json: { items: [], next_cursor: null } }));
+  await page.route('**/api/empresas/empresa-teste/guias-para-assistente**', (route) =>
+    route.fulfill({ json: {
+      enabled: true, items: [{ id: guideId, period: '2026-10', created_at: '2026-11-20T12:00:00Z' }],
+      next_cursor: null,
+    } }));
+  await page.route('**/api/empresas/outra-empresa/guias-para-assistente**', (route) =>
+    route.fulfill({ json: { enabled: true, items: [], next_cursor: null } }));
+  await page.reload();
+  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
+  await page.getByLabel('Guia cadastrada').selectOption(guideId);
+  await page.getByLabel('Empresa ativa').selectOption('outra-empresa');
+  await expect(page.getByLabel('Guia cadastrada')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
+  await expect(page.getByText('Nenhuma guia em PNG ou JPEG.')).toBeVisible();
+});
+
+
+test('mostra a competência da pergunta e da guia antes de confirmar', async ({ page }) => {
+  await openChat(page, { messages: [{
+    ...userMsg, status: 'awaiting_data',
+    context: { evidence_id: guideId, period: '2026-11', guide_reading: guideFields, missing_fields: ['period'] },
+  }] });
+  const confirmation = page.getByRole('form', { name: 'Confirmação de contexto' });
+  await expect(confirmation).toContainText('A guia indica 10/2026. A pergunta indica 11/2026.');
+  await expect(confirmation.getByLabel('Qual competência deseja consultar?')).toHaveValue('');
+});

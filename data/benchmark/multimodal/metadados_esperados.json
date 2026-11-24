@@ -1,0 +1,57 @@
+{
+  "versao_benchmark": "1.0.0",
+  "data_criacao": "2026-11-24",
+  "descricao": "Ground Truth oficial de metadados fiscais para benchmark do Assistente Multimodal (Challenge 2 - Grupo 08)",
+  "casos_teste": [
+    {
+      "id": "TC-MULTI-01",
+      "arquivo": "dasn_simei_excesso_92k.pdf",
+      "tipo_documento": "DASN-SIMEI",
+      "cenario": "Excesso de faturamento menor que 20% no MEI de servicos",
+      "dados_esperados": {
+        "numero_recibo": "98.76.54.32.10-99",
+        "ano_calendario": 2025,
+        "tipo_declaracao": "Original",
+        "cnpj": "12.345.678/0001-90",
+        "razao_social": "SILVA SERVICOS DE TECNOLOGIA LTDA MEI",
+        "cnae_principal": "6201-5/01",
+        "possui_empregado": false,
+        "receita_comercio": 0.0,
+        "receita_servicos": 92000.0,
+        "receita_total": 92000.0,
+        "limite_anual": 81000.0,
+        "excesso_valor": 11000.0,
+        "excesso_percentual": 13.58,
+        "faixa_excesso": "ate_20_porcento",
+        "efeito_enquadramento": "desenquadramento_ano_subsequente",
+        "data_efeito": "2026-01-01",
+        "fundamentacao_legal": "Art. 18-A da LC 123/2006 e Art. 115 da Resolução CGSN 140/2018"
+      }
+    },
+    {
+      "id": "TC-MULTI-02",
+      "arquivo": "extrato_das_regular_60k.pdf",
+      "tipo_documento": "DASN-SIMEI",
+      "cenario": "Faturamento regular dentro do limite anual do MEI",
+      "dados_esperados": {
+        "numero_recibo": "87.65.43.21.09-88",
+        "ano_calendario": 2025,
+        "tipo_declaracao": "Original",
+        "cnpj": "98.765.432/0001-10",
+        "razao_social": "OLIVEIRA COMERCIO E VAREJO MEI",
+        "cnae_principal": "4781-4/00",
+        "possui_empregado": false,
+        "receita_comercio": 60000.0,
+        "receita_servicos": 0.0,
+        "receita_total": 60000.0,
+        "limite_anual": 81000.0,
+        "excesso_valor": 0.0,
+        "excesso_percentual": 0.0,
+        "faixa_excesso": "dentro_do_limite",
+        "efeito_enquadramento": "manutencao_simei",
+        "data_efeito": null,
+        "fundamentacao_legal": "Art. 18-A da LC 123/2006"
+      }
+    }
+  ]
+}

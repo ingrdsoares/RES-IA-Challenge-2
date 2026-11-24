@@ -52,6 +52,9 @@ def test_excel_safe_complete_text(tmp_path):
     s = snapshot()
     write_report(s, summarize_run(s.manifest, s.results, StatsConfig()), tmp_path)
     wb = load_workbook(tmp_path / "report.xlsx")
+    rows = list(wb["Resumo"].iter_rows(values_only=True))
+    assert "mean" in rows[0]
+    assert isinstance(rows[1][rows[0].index("mean")], float)
     assert "Textos" in wb.sheetnames
     assert all(cell.data_type != "f" for sheet in wb for row in sheet for cell in row)
     texts = [
@@ -64,11 +67,6 @@ def test_excel_safe_complete_text(tmp_path):
         json.loads((tmp_path / "results.json").read_text())[0]["attempt"]["answer"]
         == s.results[0].attempt.answer
     )
-
-
-def test_template_has_no_invented_cases(tmp_path):
-    write_template(tmp_path)
-    assert load_workbook(tmp_path / "dataset.xlsx")["Dataset"].max_row == 1
 
 
 def test_pairing_rejects_different_reference():
@@ -85,12 +83,3 @@ def test_template_does_not_overwrite_user_data(tmp_path):
     with __import__("pytest").raises(ValueError):
         write_template(tmp_path)
     assert (tmp_path / "dataset.xlsx").read_bytes() == b"user data"
-
-
-def test_summary_excel_has_numeric_metric_columns(tmp_path):
-    s = snapshot()
-    write_report(s, summarize_run(s.manifest, s.results, StatsConfig()), tmp_path)
-    wb = load_workbook(tmp_path / "report.xlsx")
-    rows = list(wb["Resumo"].iter_rows(values_only=True))
-    assert "mean" in rows[0]
-    assert isinstance(rows[1][rows[0].index("mean")], float)

@@ -43,8 +43,22 @@ class MessageInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     text: Text
     calculation: CalculationInput | None = None
+    evidence_id: UUID | None = None
     confirmation_for: UUID | None = None
     confirmation: ContextConfirmation | None = None
+
+
+class GuideOption(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    period: Period | None
+    created_at: datetime
+
+
+class GuideOptionsView(BaseModel):
+    enabled: bool
+    items: list[GuideOption]
+    next_cursor: str | None
 
 
 class ConversationView(ConversationInput):

@@ -16,6 +16,11 @@ def test_security_headers_present():
         assert r.headers.get("referrer-policy") == "strict-origin-when-cross-origin"
         assert "content-security-policy" in r.headers
         assert "permissions-policy" in r.headers
+        assert len(r.headers["X-Request-ID"]) > 10
+        custom_id = "custom-trace-id-12345"
+        response = client.get("/health", headers={"X-Request-ID": custom_id})
+        assert response.status_code == 200
+        assert response.headers["X-Request-ID"] == custom_id
 
 
 def test_rate_limiter_allows_under_limit():

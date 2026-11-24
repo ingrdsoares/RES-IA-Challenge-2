@@ -1,13 +1,11 @@
 import io
 import logging
 
-from app.main import create_app
 from app.sanitizer import (
     LGPDSanitizingFormatter,
     sanitize_dict,
     sanitize_text,
 )
-from starlette.testclient import TestClient
 
 
 def test_sanitize_text_cpf():
@@ -72,20 +70,3 @@ def test_lgpd_formatter_redacts_logs():
     assert "999.888.777-66" not in output
     assert "[CNPJ REDIGIDO]" in output
     assert "[CPF REDIGIDO]" in output
-
-
-def test_request_id_in_response_headers():
-    app = create_app()
-    client = TestClient(app, raise_server_exceptions=False)
-
-    # 1. Sem passar X-Request-ID (gera automático)
-    resp = client.get("/health")
-    assert resp.status_code == 200
-    assert "X-Request-ID" in resp.headers
-    assert len(resp.headers["X-Request-ID"]) > 10
-
-    # 2. Passando X-Request-ID personalizado
-    custom_id = "custom-trace-id-12345"
-    resp2 = client.get("/health", headers={"X-Request-ID": custom_id})
-    assert resp2.status_code == 200
-    assert resp2.headers["X-Request-ID"] == custom_id

@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import dataclass
+from typing import Literal, TypedDict
 
 import httpx
 import ollama
@@ -10,6 +11,20 @@ from app.config import Settings
 from app.errors import DependencyUnavailable, dependency_errors
 
 _NOMES = {"ollama": "Ollama", "google": "Google Gemini", "deepseek": "DeepSeek"}
+
+
+class TextPart(TypedDict):
+    type: Literal["text"]
+    text: str
+
+
+class ImageURL(TypedDict):
+    url: str
+
+
+class ImagePart(TypedDict):
+    type: Literal["image_url"]
+    image_url: ImageURL
 
 
 @dataclass
@@ -21,7 +36,7 @@ class Resposta:
 
 def chat(
     settings: Settings,
-    messages: list[dict[str, str]],
+    messages: list[dict[str, str | list[TextPart | ImagePart]]],
     *,
     max_tokens: int,
     schema: dict | None = None,
@@ -30,6 +45,7 @@ def chat(
     timeout: float | None = None,
     ollama_client: ollama.Client | None = None,
     http_client: httpx.Client | None = None,
+    deepseek_thinking: bool | None = None,
 ) -> Resposta:
     """Uma rodada de chat com temperature 0. Falhas viram erro de dependência.
 
@@ -42,7 +58,9 @@ def chat(
             return _ollama(
                 settings, messages, max_tokens, schema, think, num_ctx, timeout, ollama_client
             )
-        return _nuvem(settings, messages, max_tokens, schema, think, timeout, http_client)
+        return _nuvem(
+            settings, messages, max_tokens, schema, think, timeout, http_client, deepseek_thinking
+        )
 
 
 def _ollama(settings, messages, max_tokens, schema, think, num_ctx, timeout, client):
@@ -68,7 +86,7 @@ def _ollama(settings, messages, max_tokens, schema, think, num_ctx, timeout, cli
     return Resposta(response.message.content or "", response.prompt_eval_count, response.eval_count)
 
 
-def _nuvem(settings, messages, max_tokens, schema, think, timeout, client):
+def _nuvem(settings, messages, max_tokens, schema, think, timeout, client, deepseek_thinking):
     provedor = settings.llm_provider
     corpo = {
         "model": settings.generation_model,
@@ -79,6 +97,8 @@ def _nuvem(settings, messages, max_tokens, schema, think, timeout, client):
     if provedor == "google" and not think and settings.google_reasoning_effort:
         # Modelos que raciocinam por padrão gastam max_tokens nisso (ex.: gemini-3.5-flash).
         corpo["reasoning_effort"] = settings.google_reasoning_effort
+    if provedor == "deepseek" and deepseek_thinking is not None:
+        corpo["thinking"] = {"type": "enabled" if deepseek_thinking else "disabled"}
     if schema is not None:
         # Os schemas do Pydantic ($defs, anyOf, pattern) não passam em todo provedor:
         # pede só JSON válido, o schema vai no prompt e o Pydantic valida depois.

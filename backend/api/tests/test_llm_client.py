@@ -86,6 +86,7 @@ def test_deepseek_usa_json_object_e_schema_no_prompt():
         return httpx.Response(200, json=_resposta_openai())
 
     settings, http = _nuvem("deepseek", respond)
+    settings = settings.model_copy(update={"google_reasoning_effort": "minimal"})
     chat(settings, MENSAGENS, max_tokens=64, schema=SCHEMA, http_client=http)
     chat(settings, MENSAGENS, max_tokens=64, http_client=http)
     com_schema, sem_schema = corpos
@@ -95,6 +96,8 @@ def test_deepseek_usa_json_object_e_schema_no_prompt():
     assert sistema.startswith("Sistema.") and "JSON" in sistema and json.dumps(SCHEMA) in sistema
     assert com_schema["messages"][1:] == MENSAGENS[1:]
     assert "response_format" not in sem_schema
+    assert "reasoning_effort" not in com_schema
+    assert "reasoning_effort" not in sem_schema
     assert sem_schema["messages"] == MENSAGENS
     assert MENSAGENS[0]["content"] == "Sistema."
 
@@ -148,18 +151,6 @@ def test_google_so_envia_reasoning_effort_configurado_sem_think():
     assert "reasoning_effort" not in padrao
     assert configurado["reasoning_effort"] == "minimal"
     assert "reasoning_effort" not in pensando
-
-
-def test_deepseek_nao_recebe_reasoning_effort():
-    corpos = []
-
-    def respond(request):
-        corpos.append(json.loads(request.content))
-        return httpx.Response(200, json=_resposta_openai())
-
-    settings, http = _nuvem("deepseek", respond)
-    chat(settings, MENSAGENS, max_tokens=64, http_client=http)
-    assert "reasoning_effort" not in corpos[0]
 
 
 def test_json_cortado_por_limite_vira_dependencia():

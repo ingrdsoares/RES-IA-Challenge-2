@@ -6,6 +6,18 @@ from app.assistant.extractor import TaxEntityExtractor
 from app.assistant.schemas import ContextDecision, MessageInput
 from app.companies.schemas import CompanySnapshot
 
+MONTH_NUMBERS = {
+    name: f"{index:02d}"
+    for index, name in enumerate(
+        "janeiro fevereiro março abril maio junho julho agosto setembro outubro novembro dezembro".split(),
+        1,
+    )
+}
+MONTH_NUMBERS["marco"] = MONTH_NUMBERS["março"]
+NAMED_MONTH = re.compile(
+    r"\b(" + "|".join(MONTH_NUMBERS) + r")\b(?:\s+(?:de\s+)?([0-9]{4})\b)?", re.I
+)
+
 
 def resolve_context(snapshot: CompanySnapshot, message: MessageInput) -> ContextDecision:
     context = {"company": snapshot.model_dump(mode="json")}
@@ -25,6 +37,13 @@ def resolve_context(snapshot: CompanySnapshot, message: MessageInput) -> Context
         context["period"] = period.group(0)
     elif reverse:
         context["period"] = f"{reverse[2]}-{reverse[1]}"
+    if message.evidence_id and "period" not in context:
+        mentioned_months = NAMED_MONTH.findall(message.text)
+        if len(mentioned_months) == 1 and mentioned_months[0][1]:
+            month, year = mentioned_months[0]
+            context["period"] = f"{year}-{MONTH_NUMBERS[month.casefold()]}"
+        elif mentioned_months:
+            context["guide_period_ambiguous"] = True
     if message.calculation:
         if context.get("period") and context["period"] != message.calculation.period:
             raise HTTPException(422, "Competência do cálculo diverge da mensagem")
