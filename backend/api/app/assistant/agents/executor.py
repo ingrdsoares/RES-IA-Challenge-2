@@ -1,9 +1,12 @@
 """Sequential orchestration; external calls never share a database transaction."""
 
+import hashlib
 import re
 from datetime import UTC, datetime
+from uuid import UUID
 
 import httpx
+from botocore.exceptions import BotoCoreError, ClientError
 from pydantic import ValidationError
 from sqlalchemy import select, tuple_
 
@@ -11,6 +14,7 @@ from app.assistant.agents.checkpoints import (
     StaleLease,
     claim_step,
     fail_step,
+    fingerprint,
     finish_step,
     save_tool_result,
 )
@@ -21,16 +25,19 @@ from app.assistant.agents.contracts import (
     LegalResult,
     SupervisorPlan,
 )
+from app.assistant.agents.guide_vision import GuideReading, read_guide
 from app.assistant.agents.llm import AgentModel
-from app.assistant.agents.models import AgentRun
+from app.assistant.agents.models import AgentRun, AgentStep
 from app.assistant.agents.tools import AgentTools
 from app.assistant.agents.validation import render_answer, validate_results
 from app.assistant.models import Conversation, Message
 from app.companies.service import require_company
 from app.config import Settings
 from app.errors import DependencyUnavailable
+from app.evidence.service import GUIDE_IMAGE_SIGNATURES, require_guide_attachment
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
+from app.legal.ingest import storage_from_settings
 
 
 def ensure_run(db, operation, conversation, context):
@@ -47,6 +54,23 @@ def ensure_run(db, operation, conversation, context):
         db.add(run)
         db.flush()
     return run
+
+
+def _read_stored_guide(settings, evidence, timeout):
+    if not settings.guide_vision_available:
+        raise DependencyUnavailable("Leitura de guias indisponível")
+    storage = storage_from_settings(settings)
+    try:
+        media_type = storage.content_type(evidence.storage_key, private=True)
+        signature = GUIDE_IMAGE_SIGNATURES.get(media_type)
+        if signature is None:
+            raise ValueError("Formato de guia incompatível")
+        image = storage.get(evidence.storage_key, private=True)
+    except (BotoCoreError, ClientError):
+        raise DependencyUnavailable("Armazenamento indisponível") from None
+    if not image.startswith(signature) or hashlib.sha256(image).hexdigest() != evidence.checksum:
+        raise ValueError("Imagem da guia inválida")
+    return read_guide(settings, image, media_type, timeout=timeout)
 
 
 def execute_run(factory, operation_id, model=None, tools=None, settings=None):
@@ -96,12 +120,14 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
         )
         history = [{"role": item.role, "text": item.text[:400]} for item in reversed(history)]
         owner_id, company_id = run.owner_id, run.company_id
-        calculation = operation.payload.get("request", {}).get("calculation")
+        request = operation.payload.get("request", {})
+        evidence_id = request.get("evidence_id")
+        calculation = request.get("calculation")
         if context.get("calculation_input"):
             calculation = context["calculation_input"]
     tools = tools or AgentTools(factory, owner_id, company_id, context, settings)
 
-    def stage(name, schema, payload, prepare=None):
+    def stage(name, schema, payload, prepare=None, *, generate=None):
         step = claim_step(factory, run_id, name, revision, payload, settings)
         if step.status == "succeeded":
             return schema.model_validate(step.result), step
@@ -111,16 +137,14 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                 actual = prepare(step) if prepare else payload
                 actual = save_tool_result(factory, step.id, step.token, actual)
                 step.tool_result = actual
-            result, usage = model.generate(
-                name,
-                schema,
-                actual,
-                min(
-                    settings.agent_timeout,
-                    max(1, (step.lease_until - datetime.now(UTC)).total_seconds() - 15),
-                ),
-                settings.num_predict,
+            timeout = min(
+                settings.agent_timeout,
+                max(1, (step.lease_until - datetime.now(UTC)).total_seconds() - 15),
             )
+            if generate is None:
+                result, usage = model.generate(name, schema, actual, timeout, settings.num_predict)
+            else:
+                result, usage = generate(timeout)
             finish_step(factory, step.id, step.token, result.model_dump(mode="json"), usage)
             return result, step
         except (httpx.HTTPError, ConnectionError, TimeoutError, DependencyUnavailable):
@@ -147,11 +171,44 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             message.status = "awaiting_data"
 
     try:
+        reading = None
+        period_conflicts = False
+        if evidence_id:
+            document_input = {"evidence_id": evidence_id}
+            with factory() as db:
+                evidence = require_guide_attachment(db, owner_id, company_id, UUID(evidence_id))
+                previous = db.scalar(
+                    select(AgentStep.result).where(
+                        AgentStep.run_id == run_id,
+                        AgentStep.revision < revision,
+                        AgentStep.name == "document",
+                        AgentStep.status == "succeeded",
+                        AgentStep.input_hash == fingerprint(document_input),
+                    )
+                )
+            if previous is not None:
+                reading = GuideReading.model_validate(previous)
+            else:
+                reading, _ = stage(
+                    "document",
+                    GuideReading,
+                    document_input,
+                    generate=lambda timeout: _read_stored_guide(settings, evidence, timeout),
+                )
+            context["guide_reading"] = {**document_input, **reading.model_dump(mode="json")}
+            if reading.period and not context.get("guide_period_confirmed"):
+                period_conflicts = bool(
+                    context.get("period") and context["period"] != reading.period
+                )
+                if not context.get("period"):
+                    context["period"] = reading.period
+
         plan, _ = stage(
             "plan", SupervisorPlan, {"question": question, "context": context, "history": history}
         )
         if (
             not plan.agents
+            and reading is None
             and not plan.missing_fields
             and not re.fullmatch(
                 r"(?:oi|olá|ola|bom dia|boa tarde|boa noite|obrigad[oa]|valeu)[!.\s]*",
@@ -162,8 +219,17 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
             raise ValueError("Pergunta exige especialista")
         if calculation and "fiscal" not in plan.agents:
             raise ValueError("Cálculo exige diagnóstico fiscal")
-        if plan.missing_fields:
-            pause(plan.missing_fields)
+        missing_fields = plan.missing_fields
+        if reading is not None:
+            if context.get("period"):
+                missing_fields = [field for field in missing_fields if field != "period"]
+            if "fiscal" in plan.agents and (
+                period_conflicts
+                or (context.get("guide_needs_period") and not context.get("period"))
+            ):
+                missing_fields = list(dict.fromkeys([*missing_fields, "period"]))
+        if missing_fields:
+            pause(missing_fields)
             return
         legal, fiscal, actions = {"claims": []}, {"claims": []}, {"actions": []}
         support = {}
@@ -246,11 +312,20 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                 "planning", ActionPlan, {"question": question, "legal": legal, "fiscal": fiscal}
             )
             actions = result.model_dump(mode="json")
-        result, final_step = stage(
-            "synthesis",
-            FinalAnswer,
-            {"question": question, "legal": legal, "fiscal": fiscal, "actions": actions},
-        )
+        if reading is not None and not plan.agents:
+            result = FinalAnswer(
+                answer=(
+                    "Consulte os dados lidos na guia. O pagamento não foi verificado."
+                    if any((reading.period, reading.due_date, reading.amount is not None))
+                    else "Não consegui ler os campos da guia. Envie uma imagem mais nítida."
+                )
+            )
+        else:
+            result, _ = stage(
+                "synthesis",
+                FinalAnswer,
+                {"question": question, "legal": legal, "fiscal": fiscal, "actions": actions},
+            )
         final = result.model_dump(mode="json")
         specialist_used = {
             ref

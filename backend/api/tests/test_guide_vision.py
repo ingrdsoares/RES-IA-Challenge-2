@@ -24,9 +24,24 @@ def test_deepseek_vision_sends_instruction_and_image():
             "type": "image_url",
             "image_url": {"url": "data:image/png;base64," + base64.b64encode(image).decode()},
         }
-        return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({
-            "period": "2026-10", "due_date": "2026-11-20", "amount": "81.05",
-        })}}]})
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "period": "2026-10",
+                                    "due_date": "2026-11-20",
+                                    "amount": "81.05",
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+        )
 
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
         reading, usage = read_guide(
@@ -38,9 +53,15 @@ def test_deepseek_vision_sends_instruction_and_image():
     assert usage["model"] == "deepseek-flash"
 
 
-@pytest.mark.parametrize("change", [
-    {"period": "2026-13"}, {"due_date": "2026-02-31"}, {"amount": 81.05}, {"amount": "-1"},
-])
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"period": "2026-13"},
+        {"due_date": "2026-02-31"},
+        {"amount": 81.05},
+        {"amount": "-1"},
+    ],
+)
 def test_guide_reading_handles_null_fields_and_rejects_invalid_values(change):
     fields = {"period": None, "due_date": None, "amount": None}
     assert GuideReading.model_validate(fields).model_dump() == fields
@@ -56,6 +77,11 @@ def test_guide_provider_error_does_not_echo_response():
 
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
         with pytest.raises(DependencyUnavailable, match="HTTP 503") as error:
-            read_guide(Settings(deepseek_api_key="test-key"), b"image", "image/png", timeout=2,
-                       http_client=client)
+            read_guide(
+                Settings(deepseek_api_key="test-key"),
+                b"image",
+                "image/png",
+                timeout=2,
+                http_client=client,
+            )
     assert "image-and-api-key" not in str(error.value)
