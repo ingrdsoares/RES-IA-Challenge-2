@@ -36,8 +36,9 @@ ESCLARECIMENTO_PROMPT = (
     "Você classifica perguntas fiscais de pequenas empresas brasileiras. Decida se a pergunta "
     "trata do caso concreto do usuário e só pode ser respondida com dados desse caso que ele "
     "NÃO informou (por exemplo: atividade ou CNAE, receita bruta, regime tributário, folha, "
-    "município, período, valor). Pergunta sobre regra geral, ou que já traz os dados "
-    "necessários, não precisa de dados. Na dúvida, responda que não precisa. "
+    "município, período, valor). Pergunta sobre regra geral, sobre vedação ou permissão legal "
+    "em tese (como direito a crédito ou restituição de benefício já caracterizados), ou que já "
+    "traz os dados necessários, não precisa de dados. Na dúvida, responda que não precisa. "
     'Responda só com JSON: {"precisa_dados": true|false, "faltam": ["dado 1", "dado 2"]}, '
     "com no máximo 4 itens curtos em português."
 )

@@ -13,10 +13,12 @@ MAX_TOKENS = 512
 TAMANHO_LOTE = 8
 
 GPU = torch.cuda.is_available()
-DISPOSITIVO = "cuda" if GPU else "cpu"
+# GPU da Apple (Mac M1+): só fora do Docker, que não enxerga o Metal.
+MPS = not GPU and torch.backends.mps.is_available()
+DISPOSITIVO = "cuda" if GPU else "mps" if MPS else "cpu"
 tokenizador = AutoTokenizer.from_pretrained(NOME, revision=REVISAO)
 modelo = AutoModelForSequenceClassification.from_pretrained(NOME, revision=REVISAO).eval()
-if GPU:
+if GPU or MPS:
     modelo = modelo.half()
 modelo = modelo.to(DISPOSITIVO)
 

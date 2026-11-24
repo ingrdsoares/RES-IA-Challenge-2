@@ -367,7 +367,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  margin: 0 0.3rem 1.15rem;
+  margin: 0 0.3rem 0.8rem;
 }
 .company-picker label,
 .company-picker strong {
@@ -412,8 +412,95 @@
   font-weight: 700;
 }
 .logout {
-  margin-top: auto;
   color: var(--ink-inverse-muted);
+  width: 100%;
+}
+.company-meta {
+  font-size: 0.76rem;
+  color: var(--ink-inverse-muted);
+}
+.sidebar nav .nav-new {
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 0.1rem 0.6rem;
+  background: var(--button-bg, var(--palette-apricot));
+  color: var(--ink);
+  font-weight: 700;
+}
+.sidebar nav .nav-new:hover {
+  background: var(--palette-orange);
+}
+.sidebar nav,
+.nav-group,
+.nav-group > * {
+  min-width: 0;
+}
+.nav-group {
+  display: grid;
+  gap: 1px;
+  margin-bottom: 0.35rem;
+}
+.nav-group-title {
+  padding: 0.35rem 0.9rem 0.1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-inverse-muted);
+}
+.sidebar nav a {
+  padding-block: 0.5rem;
+}
+.nav-badge {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--palette-honey);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+}
+.nav-recent {
+  display: grid;
+  gap: 1px;
+  margin: 0.15rem 0 0.2rem 1.55rem;
+  padding-left: 0.65rem;
+  border-left: 1px solid var(--border-control);
+}
+.nav-recent li {
+  min-width: 0;
+}
+.sidebar nav .nav-recent a {
+  display: block;
+  padding: 0.32rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--ink-inverse-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.side-foot {
+  margin-top: auto;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border-control);
+}
+.service-status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.9rem 0.5rem;
+  font-size: 0.78rem;
+  color: var(--ink-inverse-muted);
+}
+.service-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #4ade80;
+}
+.is-offline .service-dot {
+  background: var(--palette-orange);
 }
 .mobile-menu {
   display: none;

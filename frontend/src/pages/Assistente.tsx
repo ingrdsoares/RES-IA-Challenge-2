@@ -20,18 +20,14 @@ import { api } from '../services/api';
 import { formatCnpj } from '../components/Sidebar';
 import { Leitor } from './Leitor';
 import type { Company, Page } from '../types';
+import { citationHref, type Citation } from './assistente/citacoes';
+import { AnswerText } from './assistente/AnswerText';
+import { OperationProgress } from './assistente/OperationProgress';
+import { FailedNotice } from './assistente/FailedNotice';
+import { suggestions } from './Empresas';
+import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
 type Conversation = { id: string; title: string; company_id: string };
-type Citation = {
-  document_id: string;
-  version_id: string;
-  anchor_id: string;
-  title: string;
-  text: string;
-  official_url: string;
-  effective_from?: string;
-  citation_index?: number;
-};
 type Evidence = {
   kind: string;
   period?: string;
@@ -81,6 +77,7 @@ const MONEY_FIELDS: Record<string, string> = {
   rbt12: 'Receita dos últimos 12 meses (R$)',
   payroll12: 'Folha dos últimos 12 meses (R$)',
 };
+const MONEY_PATTERN = /^[0-9]+([.,][0-9]{1,2})?$/;
 const FIELD_NAMES: Record<string, string> = {
   period: 'competência',
   regime: 'regime',
@@ -283,13 +280,6 @@ function Answer({
             <BookOpen size={16} /> Fontes citadas
           </h4>
           {message.citations.map((source, index) => {
-            const query = new URLSearchParams({
-              document_id: source.document_id,
-              version_id: source.version_id,
-              anchor_id: source.anchor_id,
-              conversa: message.conversation_id,
-              mensagem: message.id,
-            });
             const article =
               /^\s*(?:#+\s*)?(Art(?:igo)?\.?\s+\d+[º°o]?(?:[-–][\p{L}\d]+)?)/iu.exec(
                 source.text,
@@ -298,7 +288,7 @@ function Answer({
               <a
                 key={source.version_id + source.anchor_id}
                 className="assistant-citation"
-                href={'#assistente?' + query}
+                href={citationHref(message.conversation_id, message.id, source)}
               >
                 <BookOpen size={15} aria-hidden />
                 <span>[{source.citation_index ?? index + 1}] {source.title}
@@ -460,21 +450,47 @@ function Confirmation({
   busy: boolean;
 }) {
   const fields = message.context.missing_fields ?? [];
+  const [missing, setMissing] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    formRef.current?.querySelector<HTMLElement>('input, select')?.focus();
+  }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!message.operation_id) return;
     const data = new FormData(event.currentTarget);
     const confirmation: Record<string, string | boolean> = {};
+    const empty: string[] = [];
+    const malformed: string[] = [];
     for (const field of fields) {
       if (field === 'conditions_confirmed') {
+        if (!data.has(field)) empty.push('confirmação das condições');
         confirmation[field] = data.has(field);
         continue;
       }
       const value = String(data.get(field) ?? '').trim();
-      if (!value) return;
+      if (!value) {
+        empty.push(FIELD_NAMES[field] ?? field.replace(/_/g, ' '));
+        continue;
+      }
+      // noValidate disables the input pattern, so money is checked here: "1.500"
+      // would otherwise reach the backend as R$ 1,50.
+      if (field in MONEY_FIELDS && !MONEY_PATTERN.test(value)) {
+        malformed.push(FIELD_NAMES[field]);
+        continue;
+      }
       // Money goes as a decimal string; the backend rejects floats.
       confirmation[field] = field in MONEY_FIELDS ? value.replace(',', '.') : value;
     }
+    if (empty.length) {
+      setMissing('Preencha: ' + empty.join(', ') + '.');
+      return;
+    }
+    if (malformed.length) {
+      setMissing('Corrija: ' + malformed.join(', ') + ' (use o formato 1500,00).');
+      return;
+    }
+    setMissing('');
     const description = fields
       .filter((field) => field !== 'conditions_confirmed')
       .map((field) => (FIELD_NAMES[field] ?? field) + ' ' + confirmation[field])
@@ -487,10 +503,15 @@ function Confirmation({
   }
   return (
     <form
+      ref={formRef}
+      noValidate
+      aria-labelledby={'confirmacao-' + message.id}
       className="space-y-3 rounded-xl border border-accent bg-notice p-4"
       onSubmit={submit}
     >
-      <h3 className="font-semibold text-ink">Confirmação de contexto</h3>
+      <h3 id={'confirmacao-' + message.id} className="font-semibold text-ink">
+        Confirmação de contexto
+      </h3>
       {fields.includes('period') && (
         <label className="block text-sm">
           Qual competência deseja consultar?
@@ -500,19 +521,28 @@ function Confirmation({
       {fields.includes('regime') && (
         <label className="block text-sm">
           Qual é o regime da empresa?
-          <input
+          <select
             name="regime"
             required
-            maxLength={40}
-            defaultValue={message.context.company?.regime}
+            defaultValue={
+              suggestions.regime.includes(message.context.company?.regime ?? '')
+                ? message.context.company?.regime
+                : ''
+            }
             className="field"
-          />
+          >
+            <option value="">Selecione…</option>
+            {suggestions.regime.map((regime) => (
+              <option key={regime}>{regime}</option>
+            ))}
+          </select>
         </label>
       )}
       {fields.includes('kind') && (
         <label className="block text-sm">
           Qual simulação deseja fazer?
-          <select name="kind" required className="field">
+          <select name="kind" required defaultValue="" className="field">
+            <option value="">Selecione…</option>
             <option value="mei">MEI</option>
             <option value="simples">Simples Nacional</option>
           </select>
@@ -521,7 +551,8 @@ function Confirmation({
       {fields.includes('activity') && (
         <label className="block text-sm">
           Qual é a atividade da empresa?
-          <select name="activity" required className="field">
+          <select name="activity" required defaultValue="" className="field">
+            <option value="">Selecione…</option>
             <option value="trade">Comércio</option>
             <option value="services">Serviços</option>
             <option value="mixed">Comércio e serviços</option>
@@ -547,7 +578,7 @@ function Confirmation({
         .filter((field) => !(field in FIELD_NAMES) && field !== 'conditions_confirmed')
         .map((field) => (
           <label key={field} className="block text-sm">
-            {field}
+            Informe {field.replace(/_/g, ' ')}
             <input name={field} required maxLength={200} className="field" />
           </label>
         ))}
@@ -557,6 +588,7 @@ function Confirmation({
           dados e condições informados para esta simulação.
         </label>
       )}
+      {missing && <p role="alert">{missing}</p>}
       <button className="primary" disabled={busy}>
         Confirmar contexto
       </button>
@@ -779,26 +811,55 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
     return () => controller.abort();
   }, [path, reload]);
 
+  // Operations the user stopped following; they never become the tracked one again.
+  const [stopped, setStopped] = useState<string[]>([]);
   const outstanding = messages.find(
     (message) =>
       message.role === 'user' &&
-      ['awaiting_data', 'queued', 'running'].includes(message.status),
+      ['awaiting_data', 'queued', 'running'].includes(message.status) &&
+      !stopped.includes(message.operation_id ?? ''),
   );
   const operationId =
     explicitOperation?.operation_id ?? outstanding?.operation_id;
   const operationStatus = explicitOperation?.status ?? outstanding?.status;
+  const [operation, setOperation] = useState<OperationDetail | null>(null);
+  const [waitKey, setWaitKey] = useState(0);
+  const [slow, setSlow] = useState(false);
+  const watching = !!operationId;
   useEffect(() => {
-    if (!operationId || !['queued', 'running'].includes(operationStatus ?? ''))
+    setOperation(null);
+  }, [operationId]);
+  // A timer, not a render-time check, so the warning shows even if polling hangs.
+  useEffect(() => {
+    setSlow(false);
+    if (!watching) return;
+    const timer = setTimeout(() => setSlow(true), SLOW_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [watching, operationId, waitKey]);
+  const stopWaiting = () => {
+    if (operationId) setStopped((ids) => [...ids, operationId]);
+    setExplicitOperation(null);
+  };
+  const stoppedPending =
+    !watching &&
+    messages.some(
+      (message) =>
+        stopped.includes(message.operation_id ?? '') &&
+        ['queued', 'running'].includes(message.status),
+    );
+  useEffect(() => {
+    if (!watching || !['queued', 'running'].includes(operationStatus ?? ''))
       return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     setPollError('');
     async function poll() {
       try {
-        const op = await api.request<Operation>('/operacoes/' + operationId, {
+        const op = await api.request<OperationDetail>('/operacoes/' + operationId, {
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
+        setOperation(op);
         if (['queued', 'running'].includes(op.status))
           timer = setTimeout(poll, 1600);
         else setReload((value) => value + 1);
@@ -811,7 +872,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
       controller.abort();
       clearTimeout(timer);
     };
-  }, [operationId, operationStatus, reviewKey]);
+  }, [watching, operationId, operationStatus, reviewKey]);
 
   useEffect(() => {
     if (loading || !messages.length) return;
@@ -915,7 +976,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
 
   const welcome = !loading && !readError && !messages.length;
   const period = messages.at(-1)?.context.period;
-  const busy = sending || loading || !!operationId || !!readError;
+  const busy = sending || loading || watching || !!readError;
   return (
     <section className={'assistant-thread' + (welcome ? ' is-welcome' : '')}>
       {welcome && (
@@ -978,22 +1039,27 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               <h3 className="font-semibold">
                 {message.role === 'user' ? 'Você' : 'Assistente fiscal'}
               </h3>
-              <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+              {message.role === 'assistant' ? (
+                <AnswerText
+                  text={message.text}
+                  citations={message.citations}
+                  conversationId={message.conversation_id}
+                  messageId={message.id}
+                />
+              ) : (
+                <p className="message-copy whitespace-pre-wrap">{message.text}</p>
+              )}
               {message.role === 'assistant' && (
                 <Answer message={message} companyId={companyId} />
               )}
             </article>
             {message.status === 'failed' && (
-              <p className="notice" role="status">
-                A consulta falhou.{' '}
-                <button
-                  className="underline"
-                  disabled={busy}
-                  onClick={() => setDraft(message.text)}
-                >
-                  Copiar pergunta para tentar novamente
-                </button>
-              </p>
+              <FailedNotice
+                operationId={message.operation_id}
+                busy={busy}
+                onRetry={() => send({ text: message.text })}
+                onCopy={() => setDraft(message.text)}
+              />
             )}
             {outstanding?.id === message.id &&
               operationStatus === 'awaiting_data' && (
@@ -1017,11 +1083,23 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
           </p>
         )}
         {!pollError &&
+          watching &&
           ['queued', 'running'].includes(operationStatus ?? '') && (
-            <p className="text-sm text-link" role="status">
-              Processando sua consulta…
-            </p>
+            <OperationProgress
+              operation={operation}
+              slow={slow}
+              onKeepWaiting={() => setWaitKey((value) => value + 1)}
+              onStopWaiting={stopWaiting}
+            />
           )}
+        {stoppedPending && (
+          <p className="notice" role="status">
+            Você parou de acompanhar esta consulta. Se a resposta ficar pronta, ela aparece aqui.{' '}
+            <button className="underline" onClick={() => setReload((value) => value + 1)}>
+              Recarregar
+            </button>
+          </p>
+        )}
         {pollError && (
           <p className="notice" role="alert">
             {pollError}{' '}
@@ -1030,7 +1108,18 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
               onClick={() => setReviewKey((value) => value + 1)}
             >
               Verificar operação novamente
-            </button>
+            </button>{' '}
+            {watching && (
+              <button
+                className="underline"
+                onClick={() => {
+                  setPollError('');
+                  stopWaiting();
+                }}
+              >
+                Parar de aguardar
+              </button>
+            )}
           </p>
         )}
         <div ref={threadEnd} />

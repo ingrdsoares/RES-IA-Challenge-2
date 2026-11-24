@@ -52,17 +52,25 @@ flowchart TD
 > **Foco:** Modelagem do RAG factual com legislação tributária, extração de entidades fiscais (NER fiscal), engenharia de prompts com guardrails e avaliação de fidelidade.
 
 #### Arquivos e Módulos Entregues no Código:
-* [`src/rag/chunker.py`](../../src/rag/chunker.py): **Chunking Hierárquico Jurídico** — particionamento de leis e resoluções respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (*Context Injection*) para eliminar chunks órfãos.
+* [`src/rag/chunker.py`](../../src/rag/chunker.py): **Chunking Hierárquico Jurídico** — particionamento de leis e resoluções respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (*Context Injection*) para eliminar chunks órfãos e normalização de quebras de linha (`\r\n` -> `\n`) para robustez em ambientes heterogêneos.
 * [`src/rag/vector_store.py`](../../src/rag/vector_store.py): **Vector Store Híbrido** — persistência em SQLite com busca por similaridade de cosseno (embeddings densos) combinada com correspondência léxica ponderada e fallback gracioso sem internet.
 * [`src/rag/ingest.py`](../../src/rag/ingest.py): **Pipeline de Ingestão Vetorial** — conversão automatizada dos documentos legais de `data/raw/` para o índice processado `data/processed/vector_index.db`.
 * [`src/rag/entity_extractor.py`](../../src/rag/entity_extractor.py): **Extrator de Entidades Fiscais (NER Fiscal)** — identificação de intenções tributárias, extração de códigos CNAE, CNPJs, valores monetários em R$, alíquotas e expansão de queries com sinônimos legais.
-* [`src/rag/prompts.py`](../../src/rag/prompts.py): **Engenharia de Prompts e Guardrails** — diretrizes de *Zero Alucinação*, imposição mandatória de planos em 3 passos, citação de fontes oficiais, abstenção proativa contra fraudes e disclaimer legal do CRC.
+* [`src/rag/prompts.py`](../../src/rag/prompts.py) e [`backend/api/app/models.py`](../../backend/api/app/models.py): **Engenharia de Prompts e Guardrails Calibrados** — diretrizes de *Zero Alucinação*, imposição mandatória de planos em 3 passos, citação de fontes oficiais, abstenção proativa contra fraudes e disclaimer legal do CRC. Inclui calibração fina de `ESCLARECIMENTO_PROMPT` para evitar falsos positivos de esclarecimento em direitos/vedações em tese (ex.: restituição MEI e créditos de ICMS).
 * [`src/rag/service.py`](../../src/rag/service.py): **`RAGService` e `RespostaCopiloto`** — orquestrador central que une a busca vetorial da lei com o motor determinístico em Python.
+* [`backend/api/app/esclarecimento.py`](../../backend/api/app/esclarecimento.py): **Módulo Determinístico de Esclarecimento** — guardrail léxico com 100% de precisão (28/28 casos) que detecta perguntas vagas ou desprovidas de contexto antes do acionamento de modelos generativos.
+
+#### Documentação e Métricas de Avaliação Entregues:
+* [`docs/avaliacao/metricas-avaliacao-rag.md`](../avaliacao/metricas-avaliacao-rag.md): **Avaliação Experimental do Copiloto RAG & Guardrails** — formalização dos benchmarks nos datasets oficiais (15 casos canônicos e 30 casos ampliados), destacando a Seção 5.3 sobre o Trade-off de Guardrails (100% esclarecimento, 90% abstenção ética) e a política ótima de `slots=6` com *retry* em caso de recusa inicial, reduzindo falsas recusas em até 33%.
+* [`docs/entrega/entrega2_semana3_llm_rag.pdf`](../entrega/entrega2_semana3_llm_rag.pdf): Relatório Comparativo LLM x RAG evidenciando a eliminação de alucinações tributárias com o RAG.
 
 #### Suítes de Validação e Testes Entregues:
 * [`test_pipeline.py`](../../test_pipeline.py): 4 casos canônicos de recuperação vetorial (**100% de sucesso**).
 * [`test_entity_extractor.py`](../../test_entity_extractor.py): 5 casos de extração de entidades fiscais + teste de integração tripla (**100% de sucesso**).
 * [`test_rag_service.py`](../../test_rag_service.py): 5 cenários de governança, fidelidade (*faithfulness*) e abstenção ética (**100% de sucesso**).
+* **Suíte Completa de RAG e Guardrails no Backend (88 testes aprovados):**
+  * `backend/api/tests/test_guardrails.py` e `test_esclarecimento.py`: 28 testes canônicos de guardrails e pedidos de esclarecimento (**100% de sucesso**).
+  * `backend/api/tests/test_citacoes_normas.py`, `test_sinonimos.py`, `test_lgpd_sanitizer.py`, `test_trecho_seguinte.py`, `test_compostas.py`, `test_assistant_extractor.py`: testes unitários e de integração de extração, sanitização LGPD e citação legal.
 
 ---
 
@@ -127,7 +135,8 @@ flowchart TD
 | **Motor Determinístico Fiscal** | Lucas | Consumido pelo `RAGService` de Jhessica | Integrado e testado |
 | **Pipeline e Vector Store** | Jhessica | Consumido pelo `RAGService` para grounding legal | Integrado e testado |
 | **Extrator de Entidades (NER)** | Jhessica | Conecta perguntas de usuários aos dados do Lucas | Integrado e testado |
-| **RAGService com Guardrails** | Jhessica | Base para os endpoints FastAPI do Lucas | Pronto para exposição na API |
+| **RAGService & Guardrails Calibrados** | Jhessica | Base para os endpoints FastAPI do Lucas | Integrado e testado (88 testes) |
+| **Métricas e Trade-off de Avaliação** | Jhessica | Referência para auditoria de MLOps de Ingrid | Documentado e validado |
 | **Topologia e Diretrizes Éticas** | Clara e Nasser | Implementadas no `RAGService` e `FiscalCalculator` | 100% aderente |
 | **Documentação & GitHub Pages** | Ingrid | Hospeda relatórios, PDFs e entregáveis de todas as frentes | Ativo e automatizado |
 | **CI/CD Quality Gate & MLOps** | Ingrid | Protege a branch `main` contra regressões e alucinações | Integrado no GitHub Actions |
