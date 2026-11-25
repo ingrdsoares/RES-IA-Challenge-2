@@ -1,9 +1,9 @@
 # Pipeline de Ingestão, RAG Tributário e Extração de Entidades Fiscais — Sócio Digital
 
-> **Frente:** Ciência de Dados  
-> **Responsável:** Jhessica  
+> **Frente:** Ciência de Dados & Inteligência Artificial  
+> **Responsável:** Jhessica Evelyn (`jhessevelyn`)  
 > **Projeto:** Sócio Digital — Copiloto de Gestão Fiscal para Pequenos Negócios (Challenge 2)  
-> **Data de Atualização:** 06/11/2026 (Alinhamento com Plano de Entrega de 09/11/2026)
+> **Data de Atualização:** 24/11/2026 (Consolidação da Fase 0b do Plano de Fine-Tuning e Integração Multiagente)
 
 ---
 
@@ -113,3 +113,32 @@ Os pontos têm id estável (versão + índice do chunk), então reexecutar não 
 `recorte_csv` grava em `vigencia_fonte` a data do ato (publicação, senão edição) em AAAA-MM-DD, lida dos metadados do coletor e, na falta, do título. Não é início de vigência. Texto consolidado (visão multivigente da RFB, anotações "alterado(a) pelo(a)", "Redação dada pela") fica vazio: a data do ato original não é a da redação atual. Ver `vigencia.py`.
 
 Para CSV já gerado, `csv_para_qdrant --vigencia-do-titulo` deriva `effective_date` do título (", de 3 de janeiro de 2005") e da linha "PUBLICADA NO DODF" quando a coluna está vazia. Sem a flag a carga não muda.
+
+---
+
+## 5. Avanços Recentes de Ciência de Dados & Roadmap de Fine-Tuning
+
+### 5.1 Normalização de Quebras Normativas e Redução de Falsos Positivos (Fase 0 — PR #32)
+* **Normalização Pré-Chunking (`_split_by_articles` em `src/rag/chunker.py`):**
+  - Correção de quebras de linha em artigos e parágrafos normativos (`Art.\nN` e `§\nN`), evitando a perda do atributo estrutural de artigo em diplomas como a LC 214/2025 e a EC 132/2023.
+* **Redução de Falsos Positivos de Esclarecimento (`backend/api/app/esclarecimento.py` e `context.py`):**
+  - Ajuste de heurísticas para que perguntas conceituais de MEI e Simples Nacional não solicitem dados contábeis/financeiros desnecessários quando a resposta já estiver fundamentada no acervo legal.
+
+### 5.2 Normalização Determinística de Citações e Contrato de Síntese Multiagente (Fase 0b — PR #36)
+* **Alinhamento Automático de Citações (`align_citations` em `backend/api/app/assistant/agents/validation.py`):**
+  - Mapeamento determinístico dos marcadores sequenciais gerados pelo LLM (`[1]`, `[2]`) para os `legal:N` reais validados pelos especialistas.
+  - Injeção mandatória de marcadores caso o modelo omita colchetes e garantia de presença de todas as fontes sustentadas.
+* **Tratamento Gracioso de Contexto Insuficiente (`backend/api/app/assistant/agents/executor.py`):**
+  - Descarte de fontes inventadas pela síntese.
+  - Resposta padronizada com `status="insufficient_context"` quando o jurídico não encontra normas suficientes, eliminando o erro `agent_execution_failed`.
+* **Resolução Completa da Auditoria:**
+  - Resolução comprovada com 100% de sucesso para os 7 casos históricos de falha da bateria de 50 agentes (A03, A04, A05, A07, A09, A12 e A13).
+
+### 5.3 Calibração Vetorial no Acervo Curado (46 Docs Centrais)
+* Calibração de hiperparâmetros de busca no Qdrant:
+  - Configuração recomendada: `TOP_K = 5 a 10` e `SCORE_THRESHOLD = 0.30 a 0.35`.
+  - Desempenho quantitativo: **MRR de 0,943** e **Recall@10 de 93,2%** contra o benchmark anotado (`data/benchmark/ground_truth_25_perguntas.json` e `backend/evaluation/data/teste_ampliado_2026-11-12.jsonl`).
+
+### 5.4 Próximas Entregas de Ciência de Dados
+1. **Fase 1 (Fine-Tuning do Reranker `bge-reranker-v2-m3`):** Geração de tripletas com 1 positivo e 7 hard negatives via Qdrant, com filtro estrito anti-vazamento (cosseno $> 0,90$ vs conjunto de teste).
+2. **Fase 2 (Classificador Leve de Esclarecimento):** Treinamento de classificador logístico/MLP sobre embeddings `qwen3-embedding:0.6b` para decisões determinísticas de `missing_fields`.

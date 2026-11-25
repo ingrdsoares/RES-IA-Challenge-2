@@ -48,21 +48,33 @@ flowchart TD
 
 ## 2. Detalhamento das Entregas por Integrante
 
-### 1. Jhessica — Ciência de Dados
-> **Foco:** Modelagem do RAG factual com legislação tributária, extração de entidades fiscais (NER fiscal), engenharia de prompts com guardrails e avaliação de fidelidade.
+### 1. Jhessica — Ciência de Dados & IA
+> **Foco:** Modelagem do RAG factual com legislação tributária, extração de entidades fiscais (NER fiscal), estratégias de chunking hierárquico, calibração vetorial no Qdrant, alinhamento determinístico de citações multiagente (Fase 0b) e roadmap de fine-tuning.
 
 #### Arquivos e Módulos Entregues no Código:
-* [`src/rag/chunker.py`](../../src/rag/chunker.py): **Chunking Hierárquico Jurídico** — particionamento de leis e resoluções respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (*Context Injection*) para eliminar chunks órfãos.
-* [`src/rag/vector_store.py`](../../src/rag/vector_store.py): **Vector Store Híbrido** — persistência em SQLite com busca por similaridade de cosseno (embeddings densos) combinada com correspondência léxica ponderada e fallback gracioso sem internet.
-* [`src/rag/ingest.py`](../../src/rag/ingest.py): **Pipeline de Ingestão Vetorial** — conversão automatizada dos documentos legais de `data/raw/` para o índice processado `data/processed/vector_index.db`.
-* [`src/rag/entity_extractor.py`](../../src/rag/entity_extractor.py): **Extrator de Entidades Fiscais (NER Fiscal)** — identificação de intenções tributárias, extração de códigos CNAE, CNPJs, valores monetários em R$, alíquotas e expansão de queries com sinônimos legais.
+* [`src/rag/chunker.py`](../../src/rag/chunker.py): **Chunking Hierárquico Jurídico (2000c / 200o)** — particionamento de leis e resoluções respeitando Artigos, Parágrafos e Incisos, com injeção de contexto (*Context Injection*) e normalização de quebras de linha (`Art.\nN` e `§\nN`) para preservar atributos de artigos da LC 214 e EC 132 (Fase 0).
+* [`src/rag/vector_store.py`](../../src/rag/vector_store.py): **Vector Store Híbrido e Qdrant** — padronização para `qwen3-embedding:0.6b` (1024d, Cosseno) integrado ao Qdrant oficial com fallback determinístico resiliente (TF-IDF) para CI.
+* [`src/rag/ingest.py`](../../src/rag/ingest.py): **Pipeline de Ingestão Vetorial** — conversão automatizada dos documentos legais de `data/raw/` e recorte curado de 46 docs centrais para o índice processado `data/processed/vector_index.db` e `qdrant_points.jsonl`.
+* [`src/rag/entity_extractor.py`](../../src/rag/entity_extractor.py): **Extrator de Entidades Fiscais (NER Fiscal)** — identificação de intenções tributárias, extração de códigos CNAE, CNPJs, valores monetários em R$, alíquotas e expansão de queries com sinônimos legais (unificado ao assistente multiagente no PR #30).
 * [`src/rag/prompts.py`](../../src/rag/prompts.py): **Engenharia de Prompts e Guardrails** — diretrizes de *Zero Alucinação*, imposição mandatória de planos em 3 passos, citação de fontes oficiais, abstenção proativa contra fraudes e disclaimer legal do CRC.
+* [`backend/api/app/assistant/agents/validation.py`](../../backend/api/app/assistant/agents/validation.py): **Alinhamento Determinístico de Citações (`align_citations`)** — normalização no servidor que mapeia marcadores sequenciais do LLM (`[1]`, `[2]`) para os `legal:N` reais dos especialistas, eliminando falhas por inconsistência de citações (Fase 0b).
+* [`backend/api/app/assistant/agents/executor.py`](../../backend/api/app/assistant/agents/executor.py): **Tratamento Gracioso de Contexto Insuficiente** — descarte de fontes inventadas pela síntese e conversão para resposta padronizada sem quebra do fluxo (`agent_execution_failed`).
+* [`backend/api/app/esclarecimento.py`](../../backend/api/app/esclarecimento.py): **Redução de Falsos Positivos de Esclarecimento** — eliminação de pedidos desnecessários de dados cadastrais/financeiros em perguntas de MEI respondíveis pela legislação.
 * [`src/rag/service.py`](../../src/rag/service.py): **`RAGService` e `RespostaCopiloto`** — orquestrador central que une a busca vetorial da lei com o motor determinístico em Python.
 
-#### Suítes de Validação e Testes Entregues:
+#### Suítes de Validação, Benchmarks e Testes Entregues:
 * [`test_pipeline.py`](../../test_pipeline.py): 4 casos canônicos de recuperação vetorial (**100% de sucesso**).
 * [`test_entity_extractor.py`](../../test_entity_extractor.py): 5 casos de extração de entidades fiscais + teste de integração tripla (**100% de sucesso**).
 * [`test_rag_service.py`](../../test_rag_service.py): 5 cenários de governança, fidelidade (*faithfulness*) e abstenção ética (**100% de sucesso**).
+* [`backend/api/tests/test_agent_validation.py`](../../backend/api/tests/test_agent_validation.py): 8 testes unitários de contratos de agentes, incluindo replay dos 7 casos auditados (A03 a A13) com **100% de aprovação**.
+* **Calibração de Hiperparâmetros:** `TOP_K = 5..10` e `SCORE_THRESHOLD = 0.30..0.35` com **MRR de 0,943** e **Recall@10 de 93,2%**.
+
+#### Principais Pull Requests de Ciência de Dados:
+* **PR #6:** Pipeline de ingestão e NER fiscal.
+* **PR #11:** Ingestão com dados refinados, recorte demo 46 docs, embeddings Qwen 1024d e calibração Qdrant.
+* **PR #30:** Unificação do extrator de entidades fiscais, guardrails e expansão de busca ao assistente multiagente.
+* **PR #32 (Fase 0):** Normalização de quebras de linha normativas no chunker e redução de falsos positivos de esclarecimento.
+* **PR #36 (Fase 0b):** Normalização determinística de citações inline da síntese e tratamento de contexto insuficiente.
 
 ---
 
