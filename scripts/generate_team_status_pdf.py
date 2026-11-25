@@ -381,9 +381,13 @@ class DocumentBuilder:
 
 
 def generate_document():
-    pdf_path = Path(
-        "/Users/aluno2/RES-IA-Challenge-2/docs/entrega/status-entregas-equipe-grupo-08.pdf"
+    pdf_path = (
+        Path(__file__).resolve().parents[1]
+        / "docs"
+        / "entrega"
+        / "status-entregas-equipe-grupo-08.pdf"
     )
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
     doc = DocumentBuilder(str(pdf_path))
 
     # ========================================================
