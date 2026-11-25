@@ -18,7 +18,7 @@ export type ProgressItem = {
 };
 
 export const STAGE_LABELS: Record<string, string> = {
-  document: 'Lendo a guia',
+  document: 'Lendo o documento',
   plan: 'Entendendo a pergunta',
   legal: 'Buscando normas vigentes',
   fiscal: 'Conferindo a situação fiscal',
@@ -52,8 +52,8 @@ export function failureReason(op: OperationDetail | null): string {
   const failure = op?.run?.stages.filter((stage) => stage.error).at(-1);
   if (failure?.name === 'document') {
     return failure.error === 'dependency_unavailable'
-      ? 'O serviço de leitura da guia está indisponível.'
-      : 'A leitura da guia falhou. Confira a imagem ou selecione outra.';
+      ? 'O serviço de leitura do documento está indisponível.'
+      : 'A leitura do documento falhou. Confira o arquivo ou selecione outro.';
   }
   return (failure?.error && REASONS[failure.error]) || GENERIC_REASON;
 }

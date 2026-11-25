@@ -14,6 +14,16 @@ GUIDE_IMAGE_SIGNATURES = {
     "image/png": b"\x89PNG\r\n\x1a\n",
     "image/jpeg": b"\xff\xd8\xff",
 }
+PDF_MEDIA_TYPE = "application/pdf"
+PDF_SIGNATURE = b"%PDF-"
+# Evidence kinds the assistant reads: guide images (vision) and DASN-SIMEI PDFs (local parser).
+ASSISTANT_DOCUMENT_KINDS = ("guide", "declaration")
+
+
+def assistant_document_supported(kind: str, media_type: str | None, vision: bool) -> bool:
+    if kind == "declaration":
+        return media_type == PDF_MEDIA_TYPE
+    return vision and media_type in GUIDE_IMAGE_SIGNATURES
 
 
 def require_evidence(db, account_id, evidence_id, lock=False):
@@ -67,8 +77,12 @@ def delete_obligation(db, obligation):
 
 def require_guide_attachment(db, account_id, company_id, evidence_id) -> Evidence:
     evidence = require_evidence(db, account_id, evidence_id)
-    if evidence.company_id != company_id or evidence.kind != "guide" or not evidence.storage_key:
-        raise HTTPException(404, "Imagem da guia não encontrada")
+    if (
+        evidence.company_id != company_id
+        or evidence.kind not in ASSISTANT_DOCUMENT_KINDS
+        or not evidence.storage_key
+    ):
+        raise HTTPException(404, "Documento não encontrado")
     return evidence
 
 
@@ -103,7 +117,7 @@ def record_evidence(db, company_id, account_id, data, key):
 
 def store_file(db, evidence, content, content_type, storage):
     signatures = {
-        "application/pdf": b"%PDF-",
+        PDF_MEDIA_TYPE: PDF_SIGNATURE,
         **GUIDE_IMAGE_SIGNATURES,
     }
     if content_type not in signatures or not content.startswith(signatures[content_type]):

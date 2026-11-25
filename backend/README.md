@@ -407,6 +407,25 @@ print(usage["model"], usage["latency_ms"], "ms")
 PYTEST
 ```
 
+## Leitura de declarações DASN-SIMEI no Assistente
+
+A declaração anual do MEI em PDF é lida no próprio servidor por um extrator
+determinístico (`app/assistant/agents/declaration.py`), sem modelo de linguagem e sem
+envio externo. Por isso funciona mesmo com `GUIDE_VISION_ENABLED=false`.
+
+1. Na [tela Fiscal](http://localhost:3000/#fiscal?scope=obligations), adicione um
+   documento do tipo **Declaração** e anexe
+   `data/benchmark/multimodal/dasn_simei_excesso_92k.pdf`.
+2. No Assistente, abra **Conferir um documento**, selecione a declaração e pergunte
+   “O que diz esta declaração?” ou “Estourei o limite do MEI?”.
+3. Confira no cartão **Dados lidos na declaração**: ano-calendário 2025, receita bruta de
+   R$ 92.000,00, excesso de R$ 11.000,00 (13,58%) e desenquadramento a partir de 01/01/2026.
+
+Os valores entram na etapa `document` e chegam ao agente fiscal como fonte
+`evidence:<id>`, que ele cita sem refazer contas. O extrator foi feito para o layout
+dos arquivos de `data/benchmark/multimodal/`; um PDF que ele não reconhece gera a
+resposta “Não consegui ler a declaração…”.
+
 ## Jobs e armazenamento S3 local
 
 O serviço `storage` usa SeaweedFS 4.53 (compatível com S3). A proposta inicial
