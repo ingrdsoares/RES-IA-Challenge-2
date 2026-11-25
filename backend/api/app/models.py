@@ -150,9 +150,16 @@ class LocalModels:
         settings: Settings,
         client: ollama.Client | None = None,
         http_client: httpx.Client | None = None,
+        embedding_client: httpx.Client | None = None,
     ):
         self.settings = settings
-        # Só para geração na nuvem (LLM_PROVIDER google/deepseek); embeddings seguem no Ollama.
+        # Embeddings pelo serviço próprio quando EMBEDDING_URL existe; senão, pelo Ollama.
+        self.embedding_client = embedding_client or (
+            httpx.Client(base_url=str(settings.embedding_url), timeout=settings.embedding_timeout)
+            if settings.embedding_url
+            else None
+        )
+        # Só para geração na nuvem (LLM_PROVIDER google/deepseek).
         self.http_client = http_client or (
             httpx.Client(timeout=settings.ollama_timeout)
             if settings.llm_provider != "ollama"
@@ -168,34 +175,53 @@ class LocalModels:
         )
 
     def check_models(self) -> None:
-        with dependency_errors("Ollama"):
-            available = {item.model for item in self.client.list().models}
-        required = {self.settings.embedding_model}
+        required = set()
+        if self.embedding_client is not None:
+            with dependency_errors("Serviço de embeddings"):
+                self.embedding_client.get("/health").raise_for_status()
+        else:
+            required.add(self.settings.embedding_model)
         if self.settings.llm_provider == "ollama":
             required.add(self.settings.generation_model)
+        if not required:
+            return
+        with dependency_errors("Ollama"):
+            available = {item.model for item in self.client.list().models}
         if not required <= available:
             raise DependencyUnavailable("Os modelos configurados não estão instalados no Ollama.")
 
+    def _embed(self, text: str, **ollama_options) -> list[float]:
+        if self.embedding_client is not None:
+            with dependency_errors("Serviço de embeddings"):
+                response = self.embedding_client.post("/embed", json={"texts": [text]})
+                response.raise_for_status()
+                vectors = response.json().get("embeddings") or []
+            service = "serviço de embeddings"
+        else:
+            with dependency_errors("Ollama"):
+                vectors = self.client.embed(
+                    model=self.settings.embedding_model,
+                    input=text,
+                    truncate=False,
+                    **ollama_options,
+                ).embeddings
+            service = "Ollama"
+        vector = vectors[0] if len(vectors) == 1 else []
+        if (
+            len(vector) != self.settings.embedding_dimensions
+            or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in vector)
+            or not any(vector)
+        ):
+            raise DependencyUnavailable(f"Embedding inválido retornado pelo {service}.")
+        return list(vector)
+
     def embed_question(self, question: str) -> list[float]:
-        with dependency_errors("Ollama"):
-            response = self.client.embed(
-                model=self.settings.embedding_model,
-                input=QUERY_INSTRUCTION + question,
-                truncate=False,
-                # Uma pergunta leva 0,1 s na CPU; na GPU os 2 GB faltam à geração.
-                options={"num_gpu": 0},
-            )
-            vectors = response.embeddings
-            if len(vectors) != 1:
-                raise DependencyUnavailable("Embedding inválido retornado pelo Ollama.")
-            vector = vectors[0]
-            if (
-                len(vector) != self.settings.embedding_dimensions
-                or not all(math.isfinite(v) for v in vector)
-                or not any(vector)
-            ):
-                raise DependencyUnavailable("Embedding inválido retornado pelo Ollama.")
-            return list(vector)
+        # Uma pergunta leva 0,1 s na CPU; no Ollama, a GPU fica livre para a geração.
+        return self._embed(QUERY_INSTRUCTION + question, options={"num_gpu": 0})
+
+    def embed_document(self, text: str) -> list[float]:
+        """Trechos indexados vão sem a instrução de consulta (modelo assimétrico)."""
+        return self._embed(text)
 
     def answer(self, question: str, sources: list[Source], ausentes: Sequence[str] = ()) -> str:
         if (
@@ -257,3 +283,5 @@ class LocalModels:
         self.client.close()
         if self.http_client is not None:
             self.http_client.close()
+        if self.embedding_client is not None:
+            self.embedding_client.close()

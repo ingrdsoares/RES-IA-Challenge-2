@@ -35,9 +35,7 @@ def main():
                         db,
                         index,
                         storage_from_settings(settings),
-                        lambda text: model.client.embed(
-                            model=settings.embedding_model, input=text, truncate=False
-                        ).embeddings[0],
+                        model.embed_document,
                         settings.embedding_dimensions,
                     )
                     print(generation.id)

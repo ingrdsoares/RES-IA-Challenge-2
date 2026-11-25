@@ -125,8 +125,11 @@ class Settings(BaseSettings):
     max_context_chars: int = Field(default=12000, ge=1, le=40960)
     reranker_url: HttpUrl | None = None
     reranker_timeout: float = Field(default=10, gt=0, le=120, allow_inf_nan=False)
+    # Serviço próprio de embeddings (backend/embeddings). Vazio: embeddings pelo Ollama.
+    embedding_url: HttpUrl | None = None
+    embedding_timeout: float = Field(default=30, gt=0, le=120, allow_inf_nan=False)
 
-    @field_validator("reranker_url", "frontend_url", mode="before")
+    @field_validator("reranker_url", "frontend_url", "embedding_url", mode="before")
     @classmethod
     def optional_url(cls, value):
         return value or None
