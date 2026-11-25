@@ -81,17 +81,16 @@ Totais: 5.833 tokens de entrada e 198 de saída, com mediana de 1,52 s por leitu
 | L4 | Valor e vencimento não chegam aos especialistas | O supervisor recebe a leitura; o agente fiscal recebe só a competência. |
 | L5 | Avaliação com 1 guia fictícia e 8 variações | Não há conjunto de guias reais com gabarito. |
 | L6 | Modelo fixo no código | Trocar o provedor de visão exige mudança de código. |
-| L7 | Valor exibido como "R$ 81.05" | Formato não brasileiro no cartão da resposta. |
 
 ### PDF
 | # | Limitação | Consequência |
 |---|---|---|
-| L8 | Não ligado ao Assistente | O usuário ainda não pergunta sobre um PDF enviado. |
-| L9 | Depende da camada de texto | PDF digitalizado volta `UNKNOWN` com confiança 0; não há OCR nem desvio para a visão. |
-| L10 | PDF com senha | Não há checagem própria; a falha de leitura cai no retorno `UNKNOWN`. |
-| L11 | Regras feitas para o layout dos arquivos de teste | PDFs reais do portal podem ter rótulos diferentes; confiança fixa (0,98 ou 0,70), não calibrada. |
-| L12 | Vários anos no mesmo arquivo | Lê o primeiro recibo encontrado. Não há validação cruzada com o ano consultado. |
-| L13 | Valores em `float` e formato americano no bloco do prompt | O motor fiscal usa `Decimal`; o bloco mostra "92,000.00". |
+| L7 | Não ligado ao Assistente | O usuário ainda não pergunta sobre um PDF enviado. |
+| L8 | Depende da camada de texto | PDF digitalizado volta `UNKNOWN` com confiança 0; não há OCR nem desvio para a visão. |
+| L9 | PDF com senha | Não há checagem própria; a falha de leitura cai no retorno `UNKNOWN`. |
+| L10 | Regras feitas para o layout dos arquivos de teste | PDFs reais do portal podem ter rótulos diferentes; confiança fixa (0,98 ou 0,70), não calibrada. |
+| L11 | Vários anos no mesmo arquivo | Lê o primeiro recibo encontrado. Não há validação cruzada com o ano consultado. |
+| L12 | Valores em `float` e formato americano no bloco do prompt | O motor fiscal usa `Decimal`; o bloco mostra "92,000.00". |
 
 ## 5. Casos de falha e mitigação
 
