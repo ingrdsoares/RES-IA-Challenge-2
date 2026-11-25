@@ -31,6 +31,7 @@ BACKEND_API = Path(__file__).resolve().parents[2] / "backend" / "api"
 if str(BACKEND_API) not in sys.path:
     sys.path.insert(0, str(BACKEND_API))
 
+import httpx  # noqa: E402
 from app.config import Settings  # noqa: E402
 from app.errors import DependencyUnavailable, dependency_errors  # noqa: E402
 from app.models import LocalModels  # noqa: E402
@@ -490,6 +491,26 @@ def embedder_ollama(settings: Settings) -> Embed:
     return embed
 
 
+def embedder_servico(settings: Settings, cliente: httpx.Client | None = None) -> Embed:
+    """Embeddings pelo serviço backend/embeddings (EMBEDDING_URL), em lotes de até 64."""
+    cliente = cliente or httpx.Client(base_url=str(settings.embedding_url), timeout=300)
+
+    def embed(textos: list[str]) -> list[list[float]]:
+        vetores: list[list[float]] = []
+        for inicio in range(0, len(textos), 64):
+            with dependency_errors("Serviço de embeddings"):
+                resposta = cliente.post("/embed", json={"texts": textos[inicio : inicio + 64]})
+                resposta.raise_for_status()
+                vetores += resposta.json()["embeddings"]
+        if len(vetores) != len(textos) or any(
+            len(v) != settings.embedding_dimensions for v in vetores
+        ):
+            raise DependencyUnavailable("Embedding inválido retornado pelo serviço de embeddings.")
+        return vetores
+
+    return embed
+
+
 def main(
     argv: list[str] | None = None,
     *,
@@ -561,7 +582,9 @@ def main(
     if client is None:
         client = QdrantClient(url=str(settings.qdrant_url), timeout=TIMEOUT_QDRANT_CARGA)
     if embed is None:
-        embed = com_retentativas(embedder_ollama(settings))
+        embed = com_retentativas(
+            embedder_servico(settings) if settings.embedding_url else embedder_ollama(settings)
+        )
     r = ingerir(
         args.csv,
         settings=settings,

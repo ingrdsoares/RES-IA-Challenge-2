@@ -115,6 +115,9 @@ services:
   embeddings:
     build:
       context: ./embeddings
+    ports:
+      # Para a carga em massa da base, que roda fora do Docker (src/rag/csv_para_qdrant).
+      - "127.0.0.1:18081:8080"
     volumes:
       - embeddings_modelos:/modelos
     healthcheck:
