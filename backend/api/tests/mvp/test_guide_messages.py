@@ -54,7 +54,8 @@ def test_guide_options_include_existing_png_and_jpeg_only(client, monkeypatch):
     assert response.status_code == 200
     assert response.json()["enabled"] is True
     assert {item["id"] for item in response.json()["items"]} == {png, jpeg}
-    assert set(response.json()["items"][0]) == {"id", "period", "created_at"}
+    assert set(response.json()["items"][0]) == {"id", "period", "created_at", "kind", "media_type"}
+    assert {item["media_type"] for item in response.json()["items"]} == {"image/png", "image/jpeg"}
 
 
 def test_rejects_foreign_or_unavailable_guide(client, monkeypatch):

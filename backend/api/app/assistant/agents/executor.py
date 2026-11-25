@@ -25,6 +25,7 @@ from app.assistant.agents.contracts import (
     LegalResult,
     SupervisorPlan,
 )
+from app.assistant.agents.declaration import DeclarationReading, read_declaration
 from app.assistant.agents.guide_vision import GuideReading, read_guide
 from app.assistant.agents.llm import AgentModel
 from app.assistant.agents.models import AgentRun, AgentStep
@@ -34,7 +35,12 @@ from app.assistant.models import Conversation, Message
 from app.companies.service import require_company
 from app.config import Settings
 from app.errors import DependencyUnavailable
-from app.evidence.service import GUIDE_IMAGE_SIGNATURES, require_guide_attachment
+from app.evidence.service import (
+    GUIDE_IMAGE_SIGNATURES,
+    PDF_MEDIA_TYPE,
+    PDF_SIGNATURE,
+    require_guide_attachment,
+)
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
 from app.legal.ingest import storage_from_settings
@@ -71,6 +77,20 @@ def _read_stored_guide(settings, evidence, timeout):
     if not image.startswith(signature) or hashlib.sha256(image).hexdigest() != evidence.checksum:
         raise ValueError("Imagem da guia inválida")
     return read_guide(settings, image, media_type, timeout=timeout)
+
+
+def _read_stored_declaration(settings, evidence):
+    storage = storage_from_settings(settings)
+    try:
+        if storage.content_type(evidence.storage_key, private=True) != PDF_MEDIA_TYPE:
+            raise ValueError("Formato de declaração incompatível")
+        pdf = storage.get(evidence.storage_key, private=True)
+    except (BotoCoreError, ClientError):
+        raise DependencyUnavailable("Armazenamento indisponível") from None
+    if not pdf.startswith(PDF_SIGNATURE) or hashlib.sha256(pdf).hexdigest() != evidence.checksum:
+        raise ValueError("PDF da declaração inválido")
+    # Local, deterministic parser: the PDF never leaves the server.
+    return read_declaration(pdf)
 
 
 def execute_run(factory, operation_id, model=None, tools=None, settings=None):
@@ -161,8 +181,9 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                 raise StaleLease("Contexto alterado")
             current.status = "awaiting_data"
             paused_context = {**current.context, "missing_fields": fields}
-            if "guide_reading" in context:
-                paused_context["guide_reading"] = context["guide_reading"]
+            for key in ("guide_reading", "declaration_reading"):
+                if key in context:
+                    paused_context[key] = context[key]
             current.context = paused_context
             op = db.get(Operation, operation_id)
             op.status, op.result = (
@@ -175,6 +196,7 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
 
     try:
         reading = None
+        declaration = None
         period_conflicts = False
         if evidence_id:
             document_input = {"evidence_id": evidence_id}
@@ -189,17 +211,30 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                         AgentStep.input_hash == fingerprint(document_input),
                     )
                 )
-            if previous is not None:
-                reading = GuideReading.model_validate(previous)
-            else:
-                reading, _ = stage(
-                    "document",
-                    GuideReading,
-                    document_input,
-                    generate=lambda timeout: _read_stored_guide(settings, evidence, timeout),
+            if evidence.kind == "declaration":
+                schema, read = (
+                    DeclarationReading,
+                    lambda timeout: _read_stored_declaration(settings, evidence),
                 )
-            context["guide_reading"] = {**document_input, **reading.model_dump(mode="json")}
-            if not context.get("guide_period_confirmed"):
+            else:
+                schema, read = (
+                    GuideReading,
+                    lambda timeout: _read_stored_guide(settings, evidence, timeout),
+                )
+            if previous is not None:
+                document = schema.model_validate(previous)
+            else:
+                document, _ = stage("document", schema, document_input, generate=read)
+            if evidence.kind == "declaration":
+                declaration = document
+                context["declaration_reading"] = {
+                    **document_input,
+                    **document.model_dump(mode="json"),
+                }
+            else:
+                reading = document
+                context["guide_reading"] = {**document_input, **reading.model_dump(mode="json")}
+            if reading is not None and not context.get("guide_period_confirmed"):
                 period_conflicts = bool(
                     context.get("guide_period_ambiguous")
                     or (
@@ -217,6 +252,7 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
         if (
             not plan.agents
             and reading is None
+            and declaration is None
             and not plan.missing_fields
             and not re.fullmatch(
                 r"(?:oi|olá|ola|bom dia|boa tarde|boa noite|obrigad[oa]|valeu)[!.\s]*",
@@ -236,6 +272,9 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                 or (context.get("guide_needs_period") and not context.get("period"))
             ):
                 missing_fields = list(dict.fromkeys([*missing_fields, "period"]))
+        if declaration is not None:
+            # The DASN-SIMEI is annual; a month is never required to answer from it.
+            missing_fields = [field for field in missing_fields if field != "period"]
         if missing_fields:
             pause(missing_fields)
             return
@@ -265,6 +304,8 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                 "period": context.get("period"),
                 "calculation": calculation,
             }
+            if declaration is not None:
+                fiscal_payload["declaration"] = evidence_id
 
             def prepare(step):
                 facts = tools.fiscal_status(context.get("period"))
@@ -278,6 +319,11 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                     evidence = facts[scope]["latest_evidence"]
                     if evidence:
                         payload["support"]["evidence:" + evidence["id"]] = evidence
+                if declaration is not None and declaration.legible:
+                    # Values come from the local parser; the agent cites them, never recomputes.
+                    read = declaration.model_dump(mode="json")
+                    payload["support"]["evidence:" + evidence_id] = read
+                    payload["declaration"] = read
                 if calculation:
                     computed = tools.calculate(calculation, step.id)
                     payload["support"]["calculation:" + computed["id"]] = computed
@@ -326,6 +372,15 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
                     "Consulte os dados lidos na guia. O pagamento não foi verificado."
                     if any((reading.period, reading.due_date, reading.amount is not None))
                     else "Não consegui ler os campos da guia. Envie uma imagem mais nítida."
+                )
+            )
+        elif declaration is not None and not plan.agents:
+            result = FinalAnswer(
+                answer=(
+                    "Consulte os dados lidos na declaração."
+                    if declaration.legible
+                    else "Não consegui ler a declaração. Envie o PDF original da DASN-SIMEI "
+                    "gerado no portal do Simples Nacional."
                 )
             )
         else:
