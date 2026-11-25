@@ -38,6 +38,6 @@ Qualquer extrator (PyPDF, pdfplumber, DeepSeek Flash ou outra LLM) deve mapear o
 
 ## 4. Integração com o Assistente
 
-Ainda não há integração: o extrator é chamado apenas por `backend/api/tests/test_assistant_multimodal.py`. O método `to_prompt_context()` já gera o bloco de texto que um agente receberia. Ligar esse bloco ao fluxo multiagente é o próximo passo.
+Uma declaração cadastrada na tela Fiscal como **Declaração** (PDF) pode ser escolhida em **Conferir um documento** no Assistente. A etapa `document` lê o arquivo com `backend/api/app/assistant/agents/declaration.py` (sobre o `pdf_parser.py`), sem modelo e sem envio externo, e o agente fiscal recebe os dados como fonte citável.
 
-Em 25/11/2026 o extrator acertou 34 de 34 campos do `metadados_esperados.json` nos dois arquivos, em 11 a 43 ms.
+Em 25/11/2026 o extrator acertou 34 de 34 campos do `metadados_esperados.json` nos dois arquivos, em 10 a 43 ms, e o fluxo completo pelo Assistente respondeu sobre o excesso de faturamento a partir de `dasn_simei_excesso_92k.pdf`.
