@@ -118,6 +118,9 @@ def test_fiscal_agent_receives_declaration_as_citable_support(client):
     support = seen["support"]["evidence:" + declaration]
     assert support["receita_total"] == "92000.00"
     assert seen["declaration"]["excesso_percentual"] == "13.58"
+    answer = client.get(f"/conversas/{chat['id']}/mensagens").json()["items"][-1]["text"]
+    assert "receita bruta de R$ 92.000,00, acima do limite anual de R$ 81.000,00" in answer
+    assert "desenquadramento a partir de 01/01/2026" in answer
 
 
 def test_unreadable_declaration_says_so_without_values(client):

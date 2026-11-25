@@ -88,6 +88,35 @@ def align_citations(text: str, legal_refs: list[str]) -> str:
     return new_text
 
 
+def _brl(value: str) -> str:
+    # Exact decimal string ("92000.00") to pt-BR currency, without float math.
+    whole, _, cents = value.partition(".")
+    return "R$ " + f"{int(whole):,}".replace(",", ".") + "," + (cents + "00")[:2]
+
+
+def _declaration_line(reading: dict) -> str:
+    """Server-written DASN-SIMEI summary; fiscal values never come from model prose."""
+    head = (
+        f"Declaração DASN-SIMEI de {reading['ano_calendario']}: receita bruta de "
+        f"{_brl(reading['receita_total'])}, "
+    )
+    limit = _brl(reading["limite_anual"])
+    if reading["faixa_excesso"] == "dentro_do_limite":
+        return head + f"dentro do limite anual de {limit}. Permanece no SIMEI."
+    date = "/".join(reversed((reading.get("data_efeito") or "").split("-")))
+    band = (
+        "Excesso de até 20%: desenquadramento a partir de "
+        if reading["faixa_excesso"] == "ate_20_porcento"
+        else "Excesso acima de 20%: desenquadramento retroativo a "
+    )
+    return (
+        head
+        + f"acima do limite anual de {limit} (excesso de {_brl(reading['excesso_valor'])}, "
+        + reading["excesso_percentual"].replace(".", ",")
+        + f"%). {band}{date}."
+    )
+
+
 def render_answer(final, support, has_fiscal, has_legal=False):
     text = final.get("answer", "")
     if has_legal and not final.get("legal_claims") and not has_fiscal:
@@ -102,6 +131,8 @@ def render_answer(final, support, has_fiscal, has_legal=False):
                     )
                 else:
                     parts.append(value.get("reason") or value["status"])
+            elif key.startswith("evidence:") and value.get("legible") and "receita_total" in value:
+                parts.append(_declaration_line(value))
         parts.append(
             "Situação fiscal: não verificada oficialmente. Evidências declaradas não comprovam pagamento nem regularidade."
         )
