@@ -75,6 +75,7 @@ Valores fiscais nunca são publicados a partir do texto livre do modelo: cartõe
 | L8 | PDF | Depende da camada de texto | PDF digitalizado não é lido nem convertido em imagem. |
 | L9 | PDF | Só DASN-SIMEI | Outros PDFs fiscais não são interpretados. |
 | L10 | PDF | Vários anos no mesmo arquivo | Lê o primeiro recibo; sem validação cruzada com o ano da pergunta. |
+| L11 | Texto | A pergunta e os trechos recuperados vão para a DeepSeek | O aviso na tela cobre só a imagem. Demonstrações e testes usam só dados fictícios; o PDF não sai do servidor, mas os campos extraídos da DASN (inclusive CNPJ e razão social) vão ao agente fiscal. |
 
 ## 5. Casos de falha e mitigação
 
