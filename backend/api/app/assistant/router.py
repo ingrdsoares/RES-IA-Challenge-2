@@ -21,7 +21,11 @@ from app.companies.service import require_company
 from app.db import get_db
 from app.dependencies import require_account
 from app.evidence.models import Evidence
-from app.evidence.service import GUIDE_IMAGE_SIGNATURES, guide_attachment_media_type
+from app.evidence.service import (
+    ASSISTANT_DOCUMENT_KINDS,
+    assistant_document_supported,
+    guide_attachment_media_type,
+)
 from app.legal.ingest import storage_from_settings
 from app.pagination import page
 from app.rate_limit import RateLimiter
@@ -77,13 +81,14 @@ def guide_options(
 ):
     require_company(db, account.id, company_id)
     settings = request.app.state.settings
-    if not settings.guide_vision_available:
-        return GuideOptionsView(enabled=False, items=[], next_cursor=None)
+    vision = settings.guide_vision_available
+    # Declarations are read locally, so they stay available when image reading is off.
+    kinds = ASSISTANT_DOCUMENT_KINDS if vision else ("declaration",)
     candidates = page(
         db,
         select(Evidence).where(
             Evidence.company_id == company_id,
-            Evidence.kind == "guide",
+            Evidence.kind.in_(kinds),
             Evidence.storage_key.is_not(None),
         ),
         Evidence,
@@ -92,12 +97,20 @@ def guide_options(
         cursor,
     )
     storage = storage_from_settings(settings)
-    items = [
-        GuideOption.model_validate(row)
-        for row in candidates["items"]
-        if guide_attachment_media_type(storage, row.storage_key) in GUIDE_IMAGE_SIGNATURES
-    ]
-    return GuideOptionsView(enabled=True, items=items, next_cursor=candidates["next_cursor"])
+    items = []
+    for row in candidates["items"]:
+        media_type = guide_attachment_media_type(storage, row.storage_key)
+        if assistant_document_supported(row.kind, media_type, vision):
+            items.append(
+                GuideOption(
+                    id=row.id,
+                    period=row.period,
+                    created_at=row.created_at,
+                    kind=row.kind,
+                    media_type=media_type,
+                )
+            )
+    return GuideOptionsView(enabled=vision, items=items, next_cursor=candidates["next_cursor"])
 
 
 @router.get("/conversas/{conversation_id}", response_model=ConversationView)

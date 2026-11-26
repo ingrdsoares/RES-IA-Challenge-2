@@ -246,8 +246,8 @@ test('envia pergunta com a guia selecionada e mostra os dados lidos', async ({ p
     } : { enabled: true, items: [], next_cursor: 'segunda-pagina' } });
   });
 
-  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
-  const guide = page.getByLabel('Guia cadastrada');
+  await page.getByRole('button', { name: 'Conferir um documento' }).click();
+  const guide = page.getByLabel('Documento cadastrado');
   await expect(guide).toBeEnabled();
   await expect(page.getByText(/imagem selecionada será enviada à DeepSeek/)).toBeVisible();
   await guide.selectOption(guideId);
@@ -269,7 +269,7 @@ test('envia pergunta com a guia selecionada e mostra os dados lidos', async ({ p
   const sent = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
   await page.getByRole('button', { name: 'Enviar', exact: true }).click();
   expect((await sent).postDataJSON()).toEqual({ text: question, evidence_id: guideId });
-  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toContainText('Lendo a guia');
+  await expect(page.getByRole('status', { name: 'Andamento da consulta' })).toContainText('Lendo o documento');
 
   mock.messages.splice(1, 1, {
     ...userMsg, id: 'm-guide', operation_id: 'op2', text: question, status: 'answered',
@@ -317,13 +317,13 @@ test('mantém a guia ao tentar novamente e preserva o chat por texto', async ({ 
   await page.route('**/api/empresas/empresa-teste/guias-para-assistente**', (route) =>
     route.fulfill({ json: { enabled: false, items: [], next_cursor: null } }));
   await expect(page.getByText('Envie uma imagem mais nítida para conferir os campos ilegíveis.')).toBeVisible();
-  await expect(page.getByRole('alert')).toContainText('A leitura da guia falhou.');
+  await expect(page.getByRole('alert')).toContainText('A leitura do documento falhou.');
 
   const retried = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
   await page.getByRole('button', { name: 'Tentar de novo' }).click();
   expect((await retried).postDataJSON()).toEqual({ text: userMsg.text, evidence_id: guideId, calculation });
 
-  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
+  await page.getByRole('button', { name: 'Conferir um documento' }).click();
   await expect(page.getByText('A leitura por imagem está indisponível.')).toBeVisible();
   const sent = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
   await page.getByRole('button', { name: 'Perguntar sobre pagamento' }).click();
@@ -346,12 +346,12 @@ test('limpa a guia selecionada ao trocar de empresa', async ({ page }) => {
   await page.route('**/api/empresas/outra-empresa/guias-para-assistente**', (route) =>
     route.fulfill({ json: { enabled: true, items: [], next_cursor: null } }));
   await page.reload();
-  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
-  await page.getByLabel('Guia cadastrada').selectOption(guideId);
+  await page.getByRole('button', { name: 'Conferir um documento' }).click();
+  await page.getByLabel('Documento cadastrado').selectOption(guideId);
   await page.getByLabel('Empresa ativa').selectOption('outra-empresa');
-  await expect(page.getByLabel('Guia cadastrada')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Conferir uma guia' }).click();
-  await expect(page.getByText('Nenhuma guia em PNG ou JPEG.')).toBeVisible();
+  await expect(page.getByLabel('Documento cadastrado')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Conferir um documento' }).click();
+  await expect(page.getByText('Nenhuma guia em PNG ou JPEG nem declaração DASN-SIMEI em PDF.')).toBeVisible();
 });
 
 
@@ -363,4 +363,55 @@ test('mostra a competência da pergunta e da guia antes de confirmar', async ({ 
   const confirmation = page.getByRole('form', { name: 'Confirmação de contexto' });
   await expect(confirmation).toContainText('A guia indica 10/2026. A pergunta indica 11/2026.');
   await expect(confirmation.getByLabel('Qual competência deseja consultar?')).toHaveValue('');
+});
+
+const declarationId = 'evidence-dasn-id';
+const declarationReading = {
+  evidence_id: declarationId, legible: true, ano_calendario: 2025, cnpj: '12.345.678/0001-90',
+  razao_social: 'SILVA SERVICOS DE TECNOLOGIA LTDA MEI', receita_total: '92000.00', limite_anual: '81000.00',
+  excesso_valor: '11000.00', excesso_percentual: '13.58', faixa_excesso: 'ate_20_porcento',
+  efeito_enquadramento: 'desenquadramento_ano_subsequente', data_efeito: '2026-01-01',
+  fundamentacao_legal: 'Art. 18-A da LC 123/2006 e Art. 115 da Resolução CGSN 140/2018',
+};
+
+test('oferece a DASN em PDF mesmo sem leitura por imagem e envia com a pergunta', async ({ page }) => {
+  await openChat(page, { messages: [userMsg] });
+  await page.route('**/api/empresas/empresa-teste/guias-para-assistente**', (route) => route.fulfill({ json: {
+    enabled: false, next_cursor: null,
+    items: [{ id: declarationId, period: null, created_at: '2026-11-25T12:00:00Z', kind: 'declaration', media_type: 'application/pdf' }],
+  } }));
+  await page.getByRole('button', { name: 'Conferir um documento' }).click();
+  const doc = page.getByLabel('Documento cadastrado');
+  await doc.selectOption(declarationId);
+  await expect(page.getByText('O PDF é lido no próprio servidor, sem envio a serviços externos.')).toBeVisible();
+  await expect(page.getByText(/enviada à DeepSeek/)).toHaveCount(0);
+  await page.getByRole('textbox', { name: 'Mensagem' }).fill('Estourei o limite do MEI?');
+  const sent = page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/conversas/c1/mensagens'));
+  await page.getByRole('button', { name: 'Enviar', exact: true }).click();
+  expect((await sent).postDataJSON()).toEqual({ text: 'Estourei o limite do MEI?', evidence_id: declarationId });
+});
+
+test('mostra os dados lidos da declaração na resposta', async ({ page }) => {
+  await openChat(page, { messages: [
+    { ...userMsg, text: 'O que diz esta declaração?', context: { evidence_id: declarationId } },
+    { ...answerMsg, text: 'Consulte os dados lidos na declaração.', citations: [], context: { declaration_reading: declarationReading } },
+  ] });
+  const card = page.getByRole('region', { name: 'Dados lidos na declaração' });
+  await expect(card).toContainText('2025');
+  await expect(card).toContainText(/R\$\s92\.000,00/);
+  await expect(card).toContainText(/R\$\s11\.000,00 \(13,58%\)/);
+  await expect(card).toContainText('Excesso de até 20%');
+  await expect(card).toContainText('Desenquadramento a partir de 01/01/2026');
+  await expect(card).toContainText('Art. 18-A da LC 123/2006');
+  await expect(card.getByRole('link', { name: 'Ver declaração na tela Fiscal' }))
+    .toHaveAttribute('href', '#fiscal?scope=obligations&evidence=' + declarationId);
+});
+
+test('declaração ilegível pede o PDF original', async ({ page }) => {
+  await openChat(page, { messages: [
+    { ...userMsg, context: { evidence_id: declarationId } },
+    { ...answerMsg, citations: [], text: 'Não consegui ler a declaração.', context: { declaration_reading: { evidence_id: declarationId, legible: false } } },
+  ] });
+  await expect(page.getByRole('region', { name: 'Dados lidos na declaração' }))
+    .toContainText('Envie o PDF original da DASN-SIMEI gerado no portal do Simples Nacional.');
 });

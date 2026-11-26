@@ -26,6 +26,7 @@ import { OperationProgress } from './assistente/OperationProgress';
 import { FailedNotice } from './assistente/FailedNotice';
 import { GuidePicker } from './assistente/GuidePicker';
 import { GuideReadingCard, guideHref, type GuideReading } from './assistente/GuideReading';
+import { DeclarationReadingCard, type DeclarationReading } from './assistente/DeclarationReading';
 import { suggestions } from './Empresas';
 import { SLOW_AFTER_MS, type OperationDetail } from './assistente/operacao';
 
@@ -65,6 +66,7 @@ type Message = {
     missing_fields?: string[];
     evidence_id?: string;
     guide_reading?: GuideReading;
+    declaration_reading?: DeclarationReading;
     guide_retry_calculation?: Record<string, unknown>;
     calculation_input?: Record<string, unknown>;
     period?: string;
@@ -252,7 +254,7 @@ function Answer({
   const [tasks, setTasks] = useState<Record<number, string>>({});
   const [taskError, setTaskError] = useState('');
   const [wholeTaskState, setWholeTaskState] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const { calculation, fiscal_status, guide_reading } = message.context;
+  const { calculation, fiscal_status, guide_reading, declaration_reading } = message.context;
 
   async function createWholeTask() {
     setTaskError('');
@@ -297,6 +299,7 @@ function Answer({
   return (
     <>
       {guide_reading && <GuideReadingCard reading={guide_reading} />}
+      {declaration_reading && <DeclarationReadingCard reading={declaration_reading} />}
       {message.citations.length > 0 && (
         <section className="space-y-2 border-t border-slate-200 pt-3">
           <h4 className="flex items-center gap-2 text-sm font-semibold">
@@ -1096,7 +1099,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
                 <>
                   <p className="message-copy whitespace-pre-wrap">{message.text}</p>
                   {message.context.evidence_id && (
-                    <a className="underline" href={guideHref(message.context.evidence_id)}>Guia anexada</a>
+                    <a className="underline" href={guideHref(message.context.evidence_id)}>Documento anexado</a>
                   )}
                 </>
               )}
@@ -1204,7 +1207,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
       />
       {!welcome && !guideOpen && (
         <button className="text-link self-start text-sm underline" type="button"
-          onClick={() => setGuideOpen(true)} disabled={busy}>Conferir uma guia</button>
+          onClick={() => setGuideOpen(true)} disabled={busy}>Conferir um documento</button>
       )}
       {welcome && (
         <div className="assistant-choices">
@@ -1213,7 +1216,7 @@ function Chat({ accountId, companyId, conversation, messageId, onCreated }: Chat
             onClick={() => setGuideOpen(true)}
             disabled={busy || guideOpen}
           >
-            <FileCheck2 /> Conferir uma guia
+            <FileCheck2 /> Conferir um documento
           </button>
           <button
             type="button"

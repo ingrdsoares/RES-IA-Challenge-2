@@ -169,3 +169,53 @@ def test_audit_seven_failures_are_resolved():
         else:
             assert val["support_ids"] == []
             assert "suficiente" in val["answer"]
+
+
+def _declaration(**overrides):
+    return {
+        "legible": True,
+        "ano_calendario": 2025,
+        "receita_total": "92000.00",
+        "limite_anual": "81000.00",
+        "excesso_valor": "11000.00",
+        "excesso_percentual": "13.58",
+        "faixa_excesso": "ate_20_porcento",
+        "efeito_enquadramento": "desenquadramento_ano_subsequente",
+        "data_efeito": "2026-01-01",
+        **overrides,
+    }
+
+
+def test_render_answer_states_declaration_values_from_server_not_model():
+    from app.assistant.agents.validation import render_answer
+
+    final = {"answer": "Texto livre do modelo com R$ 999.", "legal_claims": []}
+    text = render_answer(final, {"evidence:dasn": _declaration()}, True)
+    assert "999" not in text
+    assert (
+        "Declaração DASN-SIMEI de 2025: receita bruta de R$ 92.000,00, acima do limite anual "
+        "de R$ 81.000,00 (excesso de R$ 11.000,00, 13,58%). Excesso de até 20%: "
+        "desenquadramento a partir de 01/01/2026."
+    ) in text
+    assert text.endswith(
+        "Situação fiscal: não verificada oficialmente. Evidências declaradas não comprovam "
+        "pagamento nem regularidade."
+    )
+
+
+def test_render_answer_declaration_within_limit():
+    from app.assistant.agents.validation import render_answer
+
+    reading = _declaration(
+        receita_total="60000.00",
+        excesso_valor="0.00",
+        excesso_percentual="0.00",
+        faixa_excesso="dentro_do_limite",
+        efeito_enquadramento="manutencao_simei",
+        data_efeito=None,
+    )
+    text = render_answer({"answer": "x", "legal_claims": []}, {"evidence:dasn": reading}, True)
+    assert (
+        "Declaração DASN-SIMEI de 2025: receita bruta de R$ 60.000,00, dentro do limite anual "
+        "de R$ 81.000,00. Permanece no SIMEI."
+    ) in text

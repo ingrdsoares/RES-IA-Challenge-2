@@ -863,6 +863,13 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "guide" | "declaration";
+            /** Media Type */
+            media_type: string;
         };
         /** GuideOptionsView */
         GuideOptionsView: {

@@ -10,6 +10,7 @@ from app.companies.service import require_company, snapshot
 from app.config import Settings
 from app.evidence.service import (
     GUIDE_IMAGE_SIGNATURES,
+    PDF_MEDIA_TYPE,
     guide_attachment_media_type,
     require_guide_attachment,
 )
@@ -116,21 +117,26 @@ def submit_message(
         if request.confirmation:
             raise HTTPException(422, "Confirmação exige operação de origem")
         operation = receipt
+        evidence = None
         if request.evidence_id:
-            if not settings.guide_vision_available:
-                raise HTTPException(503, "Leitura de guias indisponível")
             evidence = require_guide_attachment(db, account_id, company.id, request.evidence_id)
+            if evidence.kind == "guide" and not settings.guide_vision_available:
+                raise HTTPException(503, "Leitura de guias indisponível")
             media_type = guide_attachment_media_type(
                 storage_from_settings(settings), evidence.storage_key
             )
             if media_type is None:
-                raise HTTPException(404, "Imagem da guia não encontrada")
-            if media_type not in GUIDE_IMAGE_SIGNATURES:
+                raise HTTPException(404, "Documento não encontrado")
+            if evidence.kind == "declaration" and media_type != PDF_MEDIA_TYPE:
+                raise HTTPException(422, "Selecione uma DASN-SIMEI em PDF")
+            if evidence.kind == "guide" and media_type not in GUIDE_IMAGE_SIGNATURES:
                 raise HTTPException(422, "Selecione uma guia em PNG ou JPEG")
         decision = resolve_context(snapshot(company), request)
-        if request.evidence_id and "period" in decision.missing_fields:
+        if evidence is not None and "period" in decision.missing_fields:
+            # A guide brings its own month; a DASN-SIMEI covers a whole year.
             decision.missing_fields.remove("period")
-            decision.context["guide_needs_period"] = True
+            if evidence.kind == "guide":
+                decision.context["guide_needs_period"] = True
         context = {**decision.context, "missing_fields": decision.missing_fields}
         if request.evidence_id:
             context["evidence_id"] = str(request.evidence_id)

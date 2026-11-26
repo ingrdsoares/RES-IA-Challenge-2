@@ -6,8 +6,7 @@ Este diretório contém os arquivos canônicos de teste (fixtures) utilizados pa
 
 ## 1. Objetivo dos Casos de Teste
 
-O edital da semana exige que o assistente processe pelo menos **duas modalidades** (no nosso caso: **Texto** + **PDF**). 
-Os documentos aqui presentes representam a declaração oficial da **DASN-SIMEI (Declaração Anual Simplificada do MEI)** emitida pela Receita Federal do Brasil / Simples Nacional.
+Os documentos aqui presentes imitam a declaração **DASN-SIMEI (Declaração Anual Simplificada do MEI)**. Eles são gerados por `build_multimodal_fixtures.py` e servem para medir o extrator de PDF (`backend/api/app/assistant/multimodal/pdf_parser.py`). No produto, as modalidades integradas ao Assistente são texto e imagem da guia DAS; ver [multimodal-limitacoes-e-mitigacoes.md](../../../docs/arquitetura/multimodal-limitacoes-e-mitigacoes.md).
 
 ---
 
@@ -39,6 +38,6 @@ Qualquer extrator (PyPDF, pdfplumber, DeepSeek Flash ou outra LLM) deve mapear o
 
 ## 4. Integração com o Assistente
 
-Os dados extraídos desses documentos alimentam diretamente:
-* O `TaxEntityExtractor` em `backend/api/app/assistant/extractor.py` (populando `rbt12` e `cnaes`);
-* O **Agente Fiscal** para apuração do desenquadramento e geração das orientações práticas ao microempreendedor.
+Uma declaração cadastrada na tela Fiscal como **Declaração** (PDF) pode ser escolhida em **Conferir um documento** no Assistente. A etapa `document` lê o arquivo com `backend/api/app/assistant/agents/declaration.py` (sobre o `pdf_parser.py`), sem modelo e sem envio externo, e o agente fiscal recebe os dados como fonte citável.
+
+Em 25/11/2026 o extrator acertou 34 de 34 campos do `metadados_esperados.json` nos dois arquivos, em 10 a 43 ms, e o fluxo completo pelo Assistente respondeu sobre o excesso de faturamento a partir de `dasn_simei_excesso_92k.pdf`.

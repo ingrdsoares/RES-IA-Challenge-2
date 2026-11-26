@@ -75,6 +75,8 @@ class GuideOption(BaseModel):
     id: UUID
     period: Period | None
     created_at: datetime
+    kind: Literal["guide", "declaration"]
+    media_type: str
 
 
 class GuideOptionsView(BaseModel):
