@@ -4,7 +4,7 @@
 > **Frente:** DevOps, MLOps e Governança de Entregas  
 > **Responsável:** Ingrid Soares  
 > **Status:** Mandatório para todas as entregas do projeto Sócio Digital  
-> **Última Atualização:** 14/11/2026  
+> **Última Atualização:** 26/11/2026 (stack migrada para DeepSeek)  
 
 ---
 
@@ -16,7 +16,7 @@ Este documento estabelece o **protocolo operacional padronizado (SOP)** que deve
 Nas iterações da Semana 3, identificou-se o risco de divergência entre:
 1. **Números sintéticos preliminares:** Métricas artificiais geradas no início do projeto em protótipos de 14 chunks / 46 documentos (que reportavam Recall de 96% e Fidelidade de 99%, incompatíveis com a realidade);
 2. **Resultados de rodadas parciais:** Conjuntos reduzidos de 20 perguntas ou 35 cenários de desenvolvimento com referências ainda não totalmente homologadas;
-3. **Métricas empíricas reais de produção:** Resultados medidos no benchmark ampliado oficial de **81 perguntas com 3 repetições (243 execuções)** sobre a base de conhecimento de produção no Qdrant (`knowledge_base_v2` com 155.781 chunks) usando o stack oficial (`qwen3:8b`, `qwen3-embedding:0.6b` e `bge-reranker-v2-m3`).
+3. **Métricas empíricas reais de produção:** Resultados medidos no benchmark ampliado oficial de **81 perguntas com 3 repetições (243 execuções)** sobre a base de conhecimento de produção no Qdrant (`knowledge_base_v2` com 155.781 chunks) usando o stack da época (`qwen3:8b` via Ollama, `qwen3-embedding:0.6b` e `bge-reranker-v2-m3`). Esses números continuam válidos como resultado da Semana 3, mas devem ser citados como medidos com `qwen3:8b`, não com o stack atual (seção 2).
 
 A partir de agora, **nenhum documento ou PDF de entrega pode ser gerado com números desatualizados, estimativas arbitrárias ou sem seguir este checklist**.
 
@@ -24,22 +24,28 @@ A partir de agora, **nenhum documento ou PDF de entrega pode ser gerado com núm
 
 ## 2. Stack Oficial e Especificações de Modelos
 
-Toda documentação, benchmark e código de produção do **Sócio Digital** deve obedecer estritamente aos seguintes componentes homologados:
+Desde 25/11/2026, a geração e a leitura de imagens usam **somente a API da DeepSeek**. O Ollama não faz mais parte do stack. Toda documentação, benchmark e código de produção do **Sócio Digital** deve obedecer aos componentes abaixo. Passo a passo de configuração: [`docs/guia-deepseek.md`](../guia-deepseek.md).
 
-| Componente | Especificação Oficial Homologada | Configuração Operacional | Observações de Engenharia |
+| Componente | Especificação Oficial | Configuração Operacional | Observações de Engenharia |
 | :--- | :--- | :--- | :--- |
-| **LLM Geradora** | `qwen3:8b` via Ollama local | `temperature=0`, `seed=42`, `num_ctx=8192` | Nunca usar APIs externas pagas para dados de microempresas (conformidade LGPD). Com contexto > 8192 estoura VRAM de 12 GB. |
-| **Modelo de Embedding** | `qwen3-embedding:0.6b` | 1024 dimensões, distância Cosseno | Modelo assimétrico: perguntas recebem prefixo de instrução; trechos são indexados sem o prefixo. |
-| **Reranker (Cross-Encoder)** | `bge-reranker-v2-m3` | FastAPI / GPU local, reordenação Top-30 $\rightarrow$ Top-8 | Responsável pelo salto de +64% no MRR@8 (de 0,288 para 0,473). |
+| **LLM Geradora (RAG e agentes)** | `deepseek-chat` via API DeepSeek | `LLM_PROVIDER=deepseek`, `GENERATION_MODEL=deepseek-chat`, `temperature=0`, `NUM_PREDICT=1024` | Usar `deepseek-chat` (sem raciocínio). Com `deepseek-flash` o modelo raciocina, esgota os 1.024 tokens e a resposta volta vazia. API paga: sem crédito responde `HTTP 402`. |
+| **Leitura de imagem (guia DAS)** | `deepseek-flash`, raciocínio desligado | `GUIDE_VISION_ENABLED=true` | Modelo fixo no código (`guide_vision.py`). A imagem inteira vai para a DeepSeek; a tela avisa antes do envio. |
+| **Leitura de PDF (DASN-SIMEI)** | Extrator determinístico no servidor | Sem configuração | O PDF não sai da máquina. |
+| **Modelo de Embedding** | `Qwen3-Embedding-0.6B` no serviço `embeddings` do Compose | 1024 dimensões, distância Cosseno, `EMBEDDING_URL=http://embeddings:8080` | Mesmo modelo do antigo `qwen3-embedding:0.6b` (cosseno médio 0,999 com os vetores gravados): a base não precisa ser reindexada. Modelo assimétrico: perguntas recebem prefixo de instrução; trechos são indexados sem o prefixo. A DeepSeek não oferece API de embeddings. |
+| **Reranker (Cross-Encoder)** | `bge-reranker-v2-m3` | Serviço `reranker` (perfil `gpu`) ou nativo no Mac, `RERANKER_URL`; reordenação Top-30 $
+ightarrow$ Top-8 | Responsável pelo salto de +64% no MRR@8 (de 0,288 para 0,473). Sem `RERANKER_URL` a busca funciona com recall menor. |
 | **Banco Vetorial** | Qdrant | Coleção `knowledge_base_v2` (155.781 chunks) ou `v3` (103.540 chunks) | `SCORE_THRESHOLD=0.50`, `LEGISLATION_BOOST=0.20` (1.2x para leis). |
-| **Hardware de Referência** | GPU dedicada $\ge 12$ GB (ex.: RTX 3080 Ti ou Apple M4 24 GB) | VRAM $\ge 12$ GB necessária para rodar LLM + Embedding + Reranker simultâneos | Máquinas com GPU integrada (Intel/Radeon compartilhada) rodam apenas avaliação em CPU/serviço remoto. |
+| **Hardware de Referência** | Qualquer máquina com Docker; GPU só para o reranker | A geração roda na nuvem; embeddings de pergunta rodam em CPU | A carga completa da base em CPU é lenta (horas); prefira GPU para recarregar a coleção. |
+
+> [!WARNING]
+> **Dados e LGPD:** com a DeepSeek, a pergunta do usuário, os trechos recuperados do acervo e as imagens enviadas para leitura saem da máquina. Em demonstrações e benchmarks, use apenas empresas de teste com dados fictícios, e todo relatório deve declarar esse envio externo nas limitações.
 
 > [!IMPORTANT]
 > **Status de Execução Local:**
-> Sempre verificar se o Ollama está rodando e se os modelos estão na memória antes de disparar scripts de avaliação ou inferência:
-> - Verificar status do serviço: `curl -s http://localhost:11434/api/tags`
-> - Verificar modelo carregado em VRAM: `curl -s http://localhost:11434/api/ps` ou `ollama ps`
-> - Se o modelo não estiver em execução: `ollama run qwen3:8b` e `ollama run qwen3-embedding:0.6b`
+> Antes de disparar avaliação ou inferência, confirme que o ambiente responde:
+> - Chave configurada: `DEEPSEEK_API_KEY` preenchida em `backend/.env` (nunca commitar nem colar a chave em chat ou documento)
+> - Serviços no ar: `docker compose -f backend/compose.yaml up -d --wait`
+> - Prontidão (Qdrant, coleção e embeddings): `curl -s -i http://localhost:8000/ready` deve responder `200`
 
 ---
 
@@ -95,10 +101,10 @@ Antes de gerar qualquer PDF ou submeter artefatos, o responsável DEVE seguir os
 
 ```markdown
 ### [ ] FASE 1: Verificação de Modelos e Serviços
-- [ ] 1.1. Verificar se o Ollama está rodando: `curl -s http://localhost:11434/api/tags`
-- [ ] 1.2. Confirmar se o modelo gerador oficial é `qwen3:8b`
-- [ ] 1.3. Confirmar se o modelo de embedding é `qwen3-embedding:0.6b` (1024 dimensões)
-- [ ] 1.4. Confirmar se o Qdrant está acessível com a base `knowledge_base_v2` ou `v3`
+- [ ] 1.1. Confirmar `LLM_PROVIDER=deepseek` e `GENERATION_MODEL=deepseek-chat` em `backend/.env`
+- [ ] 1.2. Confirmar que `GET /ready` responde `200` (Qdrant, coleção e serviço de embeddings)
+- [ ] 1.3. Confirmar se o Qdrant está acessível com a base `knowledge_base_v2` ou `v3` completa (contagem de pontos igual à esperada)
+- [ ] 1.4. Confirmar que demonstrações usam só empresas de teste com dados fictícios e que o relatório declara o envio externo à DeepSeek
 
 ### [ ] FASE 2: Validação de Fontes e Dados de Benchmark
 - [ ] 2.1. Validar que as métricas reportadas vieram de `teste_ampliado_2026-11-12.jsonl` (81 perguntas x 3)
@@ -129,11 +135,11 @@ Antes de gerar qualquer PDF ou submeter artefatos, o responsável DEVE seguir os
 
 ### Checagem de Ambiente
 ```bash
-# Verificar se o Ollama está respondendo
-curl -s http://localhost:11434/api/tags | jq .
+# Verificar prontidão da API (Qdrant, coleção e embeddings)
+curl -s -i http://localhost:8000/ready
 
-# Listar modelos carregados em memória
-curl -s http://localhost:11434/api/ps | jq .
+# Verificar o serviço de embeddings
+curl -s http://localhost:18081/health
 
 # Verificar containers Docker ativos
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
