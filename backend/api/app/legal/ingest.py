@@ -2,7 +2,6 @@ import hashlib
 from pathlib import Path
 from uuid import UUID
 
-import ollama
 from fastapi import HTTPException
 from qdrant_client import QdrantClient
 from sqlalchemy import func, select
@@ -140,16 +139,14 @@ def handle_ingestion(db, operation):
     version = db.get(NormVersion, UUID(operation.payload["version_id"]))
     storage = storage_from_settings(settings)
     index = QdrantClient(url=str(settings.qdrant_url), timeout=settings.qdrant_timeout)
-    model = ollama.Client(host=str(settings.ollama_url), timeout=settings.ollama_timeout)
+    from app.models import LocalModels
+
+    model = LocalModels(settings)
     try:
-
-        def embed(text):
-            return model.embed(
-                model=settings.embedding_model, input=text, truncate=False
-            ).embeddings[0]
-
-        process_version(db, version, storage, index, embed, settings.embedding_dimensions)
+        process_version(
+            db, version, storage, index, model.embed_document, settings.embedding_dimensions
+        )
         return {"version_id": str(version.id)}
     finally:
         index.close()
-        model._client.close()
+        model.close()

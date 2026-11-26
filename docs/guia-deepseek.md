@@ -7,7 +7,7 @@ Passo a passo para gerar as respostas do RAG e do assistente pelo DeepSeek, a pa
 | Parte | Onde roda |
 |---|---|
 | Geração de respostas e agentes | DeepSeek (API na nuvem) |
-| Embedding das perguntas e da base | Local, `qwen3-embedding:0.6b` no Ollama (a pergunta roda em CPU) |
+| Embedding das perguntas e da base | Local, `Qwen3-Embedding-0.6B` no serviço `embeddings` do Docker (CPU), sem Ollama |
 | Reranker (`bge-reranker-v2-m3`) | Local: Docker com GPU NVIDIA no Windows, nativo com GPU da Apple no Mac |
 | Qdrant, Postgres, Redis, storage | Docker local |
 
@@ -24,17 +24,15 @@ cd E:\RES-IA-Challenge-2
 ## 1. Pré-requisitos
 
 - **Docker Desktop** aberto.
-- **Ollama** instalado e aberto. Se `ollama` não estiver no PATH, use `& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe"` no lugar.
 - **Só no Mac:** [uv](https://docs.astral.sh/uv/), para o reranker nativo (seção 3).
 - **Chave do DeepSeek:** crie em https://platform.deepseek.com/api_keys. A API é paga, então a conta precisa ter crédito. Sem crédito, a API responde `HTTP 402`.
 
 ```powershell
 git checkout main
 git pull
-ollama pull qwen3-embedding:0.6b
 ```
 
-O `qwen3:8b` não é usado com o DeepSeek. Para liberar 5 GB: `ollama rm qwen3:8b`.
+O Ollama não é necessário. Os embeddings rodam no serviço `embeddings` (`backend/embeddings`), com o mesmo modelo usado para indexar a base: os vetores coincidem com os já gravados no Qdrant (cosseno médio 0,999), então nada precisa ser reindexado. Na primeira subida, o serviço baixa o modelo (cerca de 1,2 GB) para o volume `embeddings_modelos`.
 
 ---
 
@@ -65,7 +63,7 @@ No Mac, use `RERANKER_URL=http://host.docker.internal:18080` (o reranker roda fo
 
 - **A chave:** não compartilhe e não commite. O `backend/.env` já está no `.gitignore`. Cópias como `.env.bak` **não** estão, então não deixe cópias dentro do repositório.
 - **Voltar para o Gemini:** troque `LLM_PROVIDER=google`, com `GOOGLE_API_KEY` preenchida. As duas chaves podem ficar no arquivo ao mesmo tempo.
-- **Voltar para o modelo local:** `LLM_PROVIDER=ollama` e `GENERATION_MODEL=qwen3:8b`, que precisa estar baixado.
+- **Voltar para o modelo local:** `LLM_PROVIDER=ollama` e `GENERATION_MODEL=qwen3:8b`; aí o Ollama volta a ser necessário, só para a geração.
 
 ---
 
@@ -75,7 +73,7 @@ No Mac, use `RERANKER_URL=http://host.docker.internal:18080` (o reranker roda fo
 $compose = @("--env-file", "backend/.env", "-f", "backend/compose.yaml")
 docker compose @compose up -d --wait postgres redis storage qdrant
 docker compose @compose run --rm --build api alembic upgrade head
-docker compose @compose up -d --build --wait api worker dispatcher frontend
+docker compose @compose up -d --build --wait embeddings api worker dispatcher frontend
 curl.exe -i http://localhost:8000/ready
 ```
 
@@ -85,11 +83,11 @@ No Mac (zsh), troque a variável `$compose` por uma função:
 dc() { docker compose --env-file backend/.env -f backend/compose.yaml "$@"; }
 dc up -d --wait postgres redis storage qdrant
 dc run --rm --build api alembic upgrade head
-dc up -d --build --wait api worker dispatcher frontend
+dc up -d --build --wait embeddings api worker dispatcher frontend
 curl -i http://localhost:8000/ready
 ```
 
-O `/ready` deve responder `HTTP/1.1 200`. Com o DeepSeek, ele confere só o Qdrant, a coleção e o modelo de embedding no Ollama. Ele não chama o DeepSeek.
+O `/ready` deve responder `HTTP/1.1 200`. Com o DeepSeek, ele confere o Qdrant, a coleção e o serviço de embeddings. Ele não chama o DeepSeek. Na primeira subida, o `--wait` espera o download do modelo de embeddings.
 
 Sempre que mudar o `backend/.env`, recrie os containers para que leiam a nova configuração:
 
@@ -242,10 +240,10 @@ Também dá para testar pela interface em http://localhost:3000.
 ```powershell
 docker exec socio-digital-api-1 sh -c 'echo "$LLM_PROVIDER $GENERATION_MODEL"'
 docker exec socio-digital-worker-1 sh -c 'echo "$LLM_PROVIDER $GENERATION_MODEL"'
-ollama ps
+curl.exe http://localhost:8000/ready
 ```
 
-O primeiro e o segundo comandos devem mostrar `deepseek deepseek-chat`. O `ollama ps` deve mostrar só o `qwen3-embedding:0.6b`.
+Os dois primeiros comandos devem mostrar `deepseek deepseek-chat`. O Ollama pode ficar fechado.
 
 ---
 
@@ -267,7 +265,7 @@ docker logs socio-digital-worker-1 --tail 30
 | `DeepSeek respondeu HTTP 400` | Nome de modelo inválido | Confira `GENERATION_MODEL` na documentação do DeepSeek |
 | 503 `O modelo não retornou uma resposta utilizável.` em perguntas longas | `GENERATION_MODEL=deepseek-flash`, que raciocina e esgota os tokens | Use `deepseek-chat` (seção 2) |
 | `Tempo de espera excedido: DeepSeek.` | Resposta passou de `OLLAMA_TIMEOUT` (120 s) | Tente de novo ou aumente `OLLAMA_TIMEOUT` no `.env` (máximo 600) |
-| `/ready` com 503 | Ollama fechado ou base sem coleção | Abra o Ollama, confira com `curl.exe http://localhost:11434/api/tags` e a seção 4 |
+| `/ready` com 503 | Serviço `embeddings` ainda baixando o modelo, ou base sem coleção | `docker logs socio-digital-embeddings-1`; espere o `healthy` em `docker ps`; veja a seção 4 |
 | `empty_knowledge_base` | Coleção vazia | Seção 4 |
 | Assistente: `Não encontrei contexto normativo publicado e vigente suficiente para responder.` | Catálogo jurídico vazio | Seção 4, "Catálogo jurídico do assistente" |
 | Log: `RERANKER_URL não definida` ou `Reranker indisponível` | Reranker desligado ou fora do ar | Seção 3, "Reranker"; a busca segue sem ele, com recall menor |

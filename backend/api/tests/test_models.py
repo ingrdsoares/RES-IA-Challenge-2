@@ -261,3 +261,74 @@ def test_check_models_nuvem_nao_exige_modelo_de_geracao_no_ollama():
         ),
     )
     LocalModels(settings, client).check_models()
+
+
+def make_service_models(handler, ollama_handler=None, **settings):
+    def no_ollama(request):
+        raise AssertionError("Ollama não deve ser chamado: " + request.url.path)
+
+    client = ollama.Client(
+        host="http://ollama.test", transport=httpx.MockTransport(ollama_handler or no_ollama)
+    )
+    service = httpx.Client(
+        base_url="http://embeddings.test", transport=httpx.MockTransport(handler)
+    )
+    return LocalModels(
+        Settings(
+            embedding_url="http://embeddings.test",
+            llm_provider="deepseek",
+            deepseek_api_key="k",
+            generation_model="deepseek-chat",
+            **settings,
+        ),
+        client,
+        embedding_client=service,
+    )
+
+
+def test_embedding_service_receives_query_with_instruction_and_document_raw():
+    sent = []
+
+    def handler(request):
+        assert request.url.path == "/embed"
+        sent.append(json.loads(request.content)["texts"])
+        return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023]})
+
+    models = make_service_models(handler)
+    try:
+        assert models.embed_question("Como funciona?") == [1.0] + [0.0] * 1023
+        assert models.embed_document("Art. 13.") == [1.0] + [0.0] * 1023
+    finally:
+        models.close()
+    assert sent == [
+        [
+            "Instruct: Given a web search query, retrieve relevant passages "
+            "that answer the query\nQuery:Como funciona?"
+        ],
+        ["Art. 13."],
+    ]
+
+
+@pytest.mark.parametrize("vector", [[1.0], [0.0] * 1024, []])
+def test_invalid_vector_from_service_is_rejected(vector):
+    models = make_service_models(lambda request: httpx.Response(200, json={"embeddings": [vector]}))
+    with pytest.raises(DependencyUnavailable):
+        models.embed_question("Pergunta")
+    models.close()
+
+
+def test_embedding_service_down_is_dependency_unavailable():
+    models = make_service_models(lambda request: httpx.Response(503))
+    with pytest.raises(DependencyUnavailable):
+        models.embed_question("Pergunta")
+    models.close()
+
+
+def test_cloud_generation_with_embedding_service_needs_no_ollama():
+    def handler(request):
+        assert request.url.path == "/health"
+        return httpx.Response(200, json={"status": "ok"})
+
+    models = make_service_models(handler)
+    models.check_models()
+    models.close()

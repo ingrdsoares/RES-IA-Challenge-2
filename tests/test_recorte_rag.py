@@ -620,3 +620,25 @@ def test_retomar_pula_documento_completo_e_refaz_o_incompleto(run, tmp_path):
     )
     assert (r["gravados"], r["pulados"]) == (len(doc_a), 1)
     assert client.count(COLECAO, exact=True).count == total
+
+
+def test_carga_usa_servico_de_embeddings_em_lotes_sem_ollama():
+    import json
+
+    import httpx
+    from app.config import Settings
+
+    from src.rag.csv_para_qdrant import embedder_servico
+
+    pedidos = []
+
+    def handler(request):
+        assert request.url.path == "/embed"
+        textos = json.loads(request.content)["texts"]
+        pedidos.append(len(textos))
+        return httpx.Response(200, json={"embeddings": [[1.0] + [0.0] * 1023 for _ in textos]})
+
+    cliente = httpx.Client(base_url="http://emb.test", transport=httpx.MockTransport(handler))
+    embed = embedder_servico(Settings(embedding_url="http://emb.test"), cliente)
+    assert len(embed(["a"] * 70)) == 70
+    assert pedidos == [64, 6]
