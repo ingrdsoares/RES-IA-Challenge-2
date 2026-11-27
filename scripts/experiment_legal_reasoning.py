@@ -15,15 +15,18 @@ sys.path.insert(0, str(ROOT / "backend/api"))
 import ollama
 from app.assistant.agents.contracts import LegalResult
 from app.assistant.agents.llm import transport_schema
-from app.assistant.agents.prompts import PROMPTS
 from app.config import Settings
+from app.llm_client import chat
+from app.prompt_management import load_prompt
 
 
 def main():
+    prompt = load_prompt("assistant/agent-legal")
     raw = json.loads((ROOT / "docs/avaliacao/2026-11-17-bateria-50-agentes.json").read_text())
     output = ROOT / "docs/avaliacao/2026-11-17-experimento-raciocinio-juridico.json"
     results = {
         "condition": "Original legal prompt, exact original evidence and question; think=True; num_predict=4096 instead of 1024. Two settings change together; this is not a pure thinking ablation.",
+        "prompt_version": prompt.version,
         "cases": [],
     }
     settings = Settings()
@@ -41,31 +44,27 @@ def main():
             print("START", case["id"], flush=True)
             started = time.monotonic()
             try:
-                response = client.chat(
-                    model=settings.generation_model,
-                    messages=[
-                        {"role": "system", "content": PROMPTS["legal"]},
+                response = chat(
+                    settings.model_copy(update={"llm_provider": "ollama"}),
+                    [
+                        {"role": "system", "content": prompt.text},
                         {
                             "role": "user",
                             "content": json.dumps(original["tool_result"], ensure_ascii=False),
                         },
                     ],
-                    format=transport_schema(LegalResult.model_json_schema()),
-                    stream=False,
+                    prompt=prompt,
+                    schema=transport_schema(LegalResult.model_json_schema()),
                     think=True,
-                    options={
-                        "temperature": 0,
-                        "seed": 42,
-                        "num_ctx": settings.num_ctx,
-                        "num_predict": 4096,
-                    },
+                    max_tokens=4096,
+                    ollama_client=client,
                 )
-                record["result"] = LegalResult.model_validate_json(
-                    response.message.content
-                ).model_dump(mode="json")
+                record["result"] = LegalResult.model_validate_json(response.texto).model_dump(
+                    mode="json"
+                )
                 record["usage"] = {
-                    "input_tokens": response.prompt_eval_count,
-                    "output_tokens": response.eval_count,
+                    "input_tokens": response.tokens_in,
+                    "output_tokens": response.tokens_out,
                 }
             except Exception as error:
                 record["error"] = {"type": type(error).__name__, "message": str(error)[:1000]}

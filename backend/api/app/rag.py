@@ -9,6 +9,7 @@ from app.esclarecimento import caso_proprio, pedir_esclarecimento, texto_pedido
 from app.guardrails import e_recusa, pede_dados
 from app.models import LocalModels, citacoes_validas, prepare_sources
 from app.normas import artigos_citados, chaves_normas
+from app.prompt_management import load_prompt, traced
 from app.reranker import Reranker
 from app.schemas import QueryResponse, Source
 from app.vector_store import VectorStore
@@ -112,6 +113,7 @@ class RagService:
         self.reranker = Reranker(settings)
         self._query_lock = Lock()
 
+    @traced("rag.query", as_type="chain")
     def query(self, question: str) -> QueryResponse:
         if not self._query_lock.acquire(blocking=False):
             raise QueryBusy()
@@ -167,6 +169,7 @@ class RagService:
         finally:
             self._query_lock.release()
 
+    @traced("rag.retrieve", as_type="retriever")
     def _contexto(self, question: str, vector: list[float]):
         """Fontes escolhidas para a pergunta (já cortadas ao orçamento) e normas ausentes."""
         citados, ausentes = self.store.search_norms(vector, chaves_normas(question))
@@ -228,6 +231,14 @@ class RagService:
     def ready(self) -> None:
         self.store.ensure_collection()
         self.models.check_models()
+        load_prompt("rag/embedding-query", question="")
+        load_prompt("rag/answer")
+        load_prompt("rag/question", documents="", question="", missing="")
+        load_prompt("rag/missing-source", names="")
+        if self.settings.esclarecimento_modelo:
+            load_prompt("rag/clarification")
+            if self.settings.llm_provider != "ollama":
+                load_prompt("transport/json-schema", schema="{}")
 
     def close(self) -> None:
         try:

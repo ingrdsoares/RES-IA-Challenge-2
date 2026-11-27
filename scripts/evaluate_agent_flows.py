@@ -33,6 +33,7 @@ from app.legal.hybrid import active_collection
 from app.legal.models import NormVersion
 from app.main import create_app
 from app.models import LocalModels
+from app.prompt_management import prompt_scope
 from app.reranker import Reranker
 from app.tasks.models import Task
 from fastapi.testclient import TestClient
@@ -77,7 +78,7 @@ class VerifiedRerankerClient:
 
 
 def evaluation_parameters(settings, dataset_bytes, thinking=False):
-    from app.assistant.agents.prompts import VERSION
+    from app.assistant.agents.prompts import AGENT_ROLES, agent_prompt
 
     return {
         "model": settings.generation_model,
@@ -90,7 +91,7 @@ def evaluation_parameters(settings, dataset_bytes, thinking=False):
         "agent_timeout": settings.agent_timeout,
         "agent_round_seconds": settings.agent_round_seconds,
         "agent_step_attempts": settings.agent_step_attempts,
-        "prompt_version": VERSION,
+        "prompt_versions": {role: agent_prompt(role).version for role in AGENT_ROLES},
         "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
         "score_threshold": settings.score_threshold,
         "top_k": settings.top_k,
@@ -137,6 +138,7 @@ def execute_until_terminal(execute, get_status, max_attempts):
     return operation
 
 
+@prompt_scope()
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

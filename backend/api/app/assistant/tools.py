@@ -5,8 +5,10 @@ from qdrant_client import models
 
 from app.legal.index import COLLECTION
 from app.legal.models import NormVersion
+from app.prompt_management import traced
 
 
+@traced("assistant.retrieve", as_type="retriever")
 def retrieve_legal(
     db,
     index,

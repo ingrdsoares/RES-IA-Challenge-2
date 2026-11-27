@@ -10,15 +10,13 @@ Sem TOPOLOGIA, vale o sistema completo (RAG híbrido com reranker).
 import os
 
 from app.errors import dependency_errors
+from app.llm_client import chat
 from app.models import prepare_sources
+from app.prompt_management import load_prompt, traced
 from app.schemas import QueryResponse
 
 from evaluation.adapter import InternalRagClient
 
-SISTEMA_LLM_PURA = (
-    "Você é um assistente contábil e tributário para pequenos negócios no Brasil. "
-    "Responda em português, de forma clara e objetiva."
-)
 SEM_CONTEXTO = QueryResponse(
     status="insufficient_context",
     answer="Não há contexto suficiente na base para fundamentar uma resposta à pergunta.",
@@ -37,28 +35,22 @@ class TopologiaClient(InternalRagClient):
             hits = self.service.store._densa(vector, limite)
         return self.service.store._fontes(hits)
 
+    @traced("evaluation.topology")
     def query(self, question):
         s = self.settings
         if self.topologia == "llm_pura":
-            with dependency_errors("Ollama"):
-                r = self.service.models.client.chat(
-                    model=s.generation_model,
-                    messages=[
-                        {"role": "system", "content": SISTEMA_LLM_PURA},
-                        {"role": "user", "content": question},
-                    ],
-                    stream=False,
-                    think=False,
-                    options={
-                        "num_ctx": s.num_ctx,
-                        "num_predict": s.num_predict,
-                        "temperature": 0,
-                        "seed": 42,
-                    },
-                )
-            return QueryResponse(
-                status="answered", answer=(r.message.content or "").strip(), sources=[]
+            prompt = load_prompt("evaluation/llm-only")
+            response = chat(
+                s.model_copy(update={"llm_provider": "ollama"}),
+                [
+                    {"role": "system", "content": prompt.text},
+                    {"role": "user", "content": question},
+                ],
+                prompt=prompt,
+                max_tokens=s.num_predict,
+                ollama_client=self.service.models.client,
             )
+            return QueryResponse(status="answered", answer=response.texto.strip(), sources=[])
         if self.topologia == "rag_sem_llm":
             fontes = self._densa(question, 3)
             if not fontes:

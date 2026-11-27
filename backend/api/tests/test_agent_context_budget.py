@@ -22,7 +22,7 @@ def test_smaller_window_still_bounds_utf8_prompt_and_preserves_ids():
     from app.assistant.agents.context import legal_payload
     from app.assistant.agents.contracts import LegalResult
     from app.assistant.agents.llm import transport_schema
-    from app.assistant.agents.prompts import PROMPTS
+    from app.assistant.agents.prompts import agent_prompt
 
     settings = Settings(num_ctx=8192)
     payload = legal_payload(
@@ -31,7 +31,7 @@ def test_smaller_window_still_bounds_utf8_prompt_and_preserves_ids():
     assert 0 < sum(len(p["text"]) for p in payload["sources"].values()) < 24000
     size = len(
         (
-            PROMPTS["legal"]
+            agent_prompt("legal").text
             + json.dumps(payload, ensure_ascii=False)
             + json.dumps(transport_schema(LegalResult.model_json_schema()))
         ).encode()

@@ -5,7 +5,8 @@ import ollama
 import pytest
 from app.config import Settings
 from app.errors import DependencyTimeout, DependencyUnavailable
-from app.models import SYSTEM_PROMPT, LocalModels, prepare_sources
+from app.models import LocalModels, prepare_sources
+from app.prompt_management import load_prompt
 from app.schemas import Source
 
 
@@ -153,8 +154,8 @@ def test_contexto_de_12000_caracteres_cabe_em_8192_tokens():
 
 
 def test_ausencia_de_mencao_nao_e_negacao_no_prompt():
-    assert "ausência de menção" in SYSTEM_PROMPT.lower()
-    assert "caso específico" in SYSTEM_PROMPT
+    assert "ausência de menção" in load_prompt("rag/answer").text.lower()
+    assert "caso específico" in load_prompt("rag/answer").text
 
 
 def test_unicode_context_is_trimmed_to_fit_prompt_budget():

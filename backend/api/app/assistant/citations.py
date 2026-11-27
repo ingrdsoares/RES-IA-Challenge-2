@@ -1,3 +1,6 @@
+from app.prompt_management import traced
+
+
 def validate_citations(citations: list[dict], passages: list[dict]) -> list[dict]:
     allowed = {(p["document_id"], p["version_id"], p["anchor_id"]) for p in passages}
     checked = []
@@ -10,6 +13,7 @@ def validate_citations(citations: list[dict], passages: list[dict]) -> list[dict
     return checked
 
 
+@traced("assistant.citations", as_type="guardrail")
 def validate_answer_citations(
     answer: str, declared_indices: list[int], passages: list[dict]
 ) -> list[dict]:

@@ -2,7 +2,7 @@
 
 Reusa a configuração, o cliente Ollama e o VectorStore da API (backend/api/app).
 Documentos são embeddados sem o prefixo de instrução que a API põe na pergunta
-(QUERY_INSTRUCTION em app/models.py): o prefixo é só do lado da consulta.
+(prompt rag/embedding-query no Langfuse): o prefixo é só do lado da consulta.
 
 Antes de embeddar, o texto do chunk recebe duas regras de fonte (só aqui; o CSV não muda):
 - remove spans ~~riscado~~ e blocos "> Marcadores da fonte: tachado" (o bloco é o

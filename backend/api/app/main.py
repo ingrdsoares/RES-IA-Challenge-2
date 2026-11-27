@@ -25,6 +25,7 @@ from app.fiscal.router import router as fiscal_router
 from app.jobs.router import router as jobs_router
 from app.legal.router import router as legal_router
 from app.models import LocalModels
+from app.prompt_management import PromptUnavailable
 from app.rag import RagService
 from app.rate_limit import RateLimiter
 from app.schemas import QueryRequest, QueryResponse
@@ -141,6 +142,8 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
             status, detail = 504, "Tempo de espera excedido ao consultar um serviço do RAG."
         elif isinstance(exc, CollectionIncompatible):
             detail = "A coleção vetorial é incompatível com a configuração do backend."
+        elif isinstance(exc, PromptUnavailable):
+            detail = "Um prompt necessário está indisponível no Langfuse."
         elif isinstance(exc, QueryBusy):
             detail = "Já existe uma consulta em andamento. Tente novamente após sua conclusão."
         logger.warning(
@@ -165,6 +168,8 @@ def create_app(settings: Settings | None = None, service: RagService | None = No
     def ready(request: Request):
         try:
             request.app.state.rag.ready()
+        except PromptUnavailable:
+            raise HTTPException(503, "Prompts do RAG indisponíveis no Langfuse.") from None
         except DependencyUnavailable:
             raise HTTPException(
                 503, "Qdrant, coleção ou modelos Ollama não estão prontos."

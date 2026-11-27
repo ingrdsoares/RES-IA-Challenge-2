@@ -76,8 +76,13 @@ def run_operation(operation_id: str) -> None:
             is_assistant = operation is not None and operation.kind == "assistant.answer"
         if is_assistant:
             from app.assistant.agents.executor import execute_run
+            from app.prompt_management import flush
 
-            execute_run(factory, UUID(operation_id), settings=settings)
+            try:
+                execute_run(factory, UUID(operation_id), settings=settings)
+            finally:
+                # RQ exits the forked job process without running SDK exit hooks.
+                flush()
         else:
             execute(factory, UUID(operation_id), HANDLERS)
     finally:

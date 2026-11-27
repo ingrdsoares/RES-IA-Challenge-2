@@ -1,6 +1,9 @@
 import re
 
+from app.prompt_management import traced
 
+
+@traced("assistant.validate", as_type="guardrail")
 def validate_results(support, legal, fiscal, actions, final):
     used = set()
     for result, prefixes in ((legal, ("legal:",)), (fiscal, ("evidence:", "calculation:"))):
