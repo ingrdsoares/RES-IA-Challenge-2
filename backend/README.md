@@ -662,3 +662,42 @@ MULTIAGENT_TEST_URL=http://localhost:11434 MULTIAGENT_QDRANT_URL=http://localhos
 O teste usa norma demonstrativa e coleção temporária própria. Não publica regra fiscal real.
 
 Contexto Qwen local: 8.192 tokens por padrão, com até 12.000 caracteres de texto recuperado. Para usar a janela ampliada do modelo local, configure explicitamente NUM_CTX=40960 e MAX_CONTEXT_CHARS=40960. O agente jurídico usa orçamento dinâmico para evidências, reservando saída, instruções, schema e metadados; o corte fixo de 2.200 caracteres foi removido. NUM_PREDICT continua 1.024. O limite de contexto não altera vigência nem reindexa documentos.
+
+## Prompts e observabilidade no Langfuse
+
+O Langfuse é a fonte dos prompts usados pelo RAG, pelo assistente e pelos experimentos.
+A API e o worker usam o label `production`. Configure `LANGFUSE_BASE_URL`,
+`LANGFUSE_PUBLIC_KEY` e `LANGFUSE_SECRET_KEY` com os dados do projeto em
+`backend/.env` ou no gerenciador de segredos do ambiente. Use a URL da região
+correspondente ou da instância própria.
+
+Com essas variáveis exportadas no terminal e as dependências de
+`backend/api/requirements.txt` instaladas, publique os prompts iniciais a partir da raiz:
+
+```bash
+python scripts/import_langfuse_prompts.py
+docker compose --env-file backend/.env -f backend/compose.yaml up -d --build api worker
+```
+
+O importador usa `backend/api/prompt_catalog.json` para criar os prompts ausentes.
+Pode ser executado novamente e preserva as versões já publicadas. Se um prompt
+existir sem o label `production`, selecione a versão no painel antes de repetir a
+importação. O catálogo também alimenta os testes offline e fica fora da imagem
+de execução da aplicação.
+
+Confira `/ready` para validar os prompts do RAG. Para verificar o assistente, faça
+uma consulta com dados sintéticos e abra o trace `assistant.execute` no Langfuse.
+As gerações mostram a versão do prompt principal e, em `prompt_versions`, as
+versões dos componentes adicionais usados. Os traces registram etapas, modelo,
+provedor, latência, contagens de tokens quando disponíveis e a categoria do erro.
+O conteúdo de conversas, respostas, documentos e mensagens de exceção fica fora
+dos traces.
+
+O SDK mantém cache em memória. A API reutiliza o cache entre consultas e cada
+processo de tarefa do RQ mantém seu próprio cache até terminar. Se o Langfuse
+estiver indisponível quando um processo precisar buscar um prompt pela primeira
+vez, o fluxo de IA afetado retorna um erro de dependência ou usa as tentativas já
+configuradas no worker. Para reverter uma edição, mova o label `production` para a
+versão anterior. Preserve as variáveis do template ao editar. Uma alteração em
+`rag/embedding-query` também altera a entrada do modelo de embeddings e deve ser
+validada com a avaliação de recuperação.

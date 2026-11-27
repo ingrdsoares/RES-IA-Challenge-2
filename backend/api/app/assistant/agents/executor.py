@@ -44,6 +44,7 @@ from app.evidence.service import (
 from app.jobs.errors import JobDeferred
 from app.jobs.models import Operation
 from app.legal.ingest import storage_from_settings
+from app.prompt_management import observation, traced
 
 
 def ensure_run(db, operation, conversation, context):
@@ -93,6 +94,7 @@ def _read_stored_declaration(settings, evidence):
     return read_declaration(pdf)
 
 
+@traced("assistant.execute", as_type="chain")
 def execute_run(factory, operation_id, model=None, tools=None, settings=None):
     settings = settings or Settings()
     model = model or AgentModel(settings)
@@ -148,31 +150,34 @@ def execute_run(factory, operation_id, model=None, tools=None, settings=None):
     tools = tools or AgentTools(factory, owner_id, company_id, context, settings)
 
     def stage(name, schema, payload, prepare=None, *, generate=None):
-        step = claim_step(factory, run_id, name, revision, payload, settings)
-        if step.status == "succeeded":
-            return schema.model_validate(step.result), step
-        try:
-            actual = step.tool_result
-            if actual is None:
-                actual = prepare(step) if prepare else payload
-                actual = save_tool_result(factory, step.id, step.token, actual)
-                step.tool_result = actual
-            timeout = min(
-                settings.agent_timeout,
-                max(1, (step.lease_until - datetime.now(UTC)).total_seconds() - 15),
-            )
-            if generate is None:
-                result, usage = model.generate(name, schema, actual, timeout, settings.num_predict)
-            else:
-                result, usage = generate(timeout)
-            finish_step(factory, step.id, step.token, result.model_dump(mode="json"), usage)
-            return result, step
-        except (httpx.HTTPError, ConnectionError, TimeoutError, DependencyUnavailable):
-            fail_step(factory, step.id, step.token, "dependency_unavailable", True)
-            raise JobDeferred() from None
-        except (ValueError, ValidationError):
-            fail_step(factory, step.id, step.token, "invalid_agent_result", False)
-            raise
+        with observation(f"assistant.stage.{name}", as_type="agent"):
+            step = claim_step(factory, run_id, name, revision, payload, settings)
+            if step.status == "succeeded":
+                return schema.model_validate(step.result), step
+            try:
+                actual = step.tool_result
+                if actual is None:
+                    actual = prepare(step) if prepare else payload
+                    actual = save_tool_result(factory, step.id, step.token, actual)
+                    step.tool_result = actual
+                timeout = min(
+                    settings.agent_timeout,
+                    max(1, (step.lease_until - datetime.now(UTC)).total_seconds() - 15),
+                )
+                if generate is None:
+                    result, usage = model.generate(
+                        name, schema, actual, timeout, settings.num_predict
+                    )
+                else:
+                    result, usage = generate(timeout)
+                finish_step(factory, step.id, step.token, result.model_dump(mode="json"), usage)
+                return result, step
+            except (httpx.HTTPError, ConnectionError, TimeoutError, DependencyUnavailable):
+                fail_step(factory, step.id, step.token, "dependency_unavailable", True)
+                raise JobDeferred() from None
+            except (ValueError, ValidationError):
+                fail_step(factory, step.id, step.token, "invalid_agent_result", False)
+                raise
 
     def pause(fields):
         with factory.begin() as db:
