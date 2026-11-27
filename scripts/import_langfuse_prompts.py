@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 
-from langfuse.api.resources.commons.errors.not_found_error import NotFoundError
+from langfuse.api import NotFoundError
 
 API = Path(__file__).resolve().parents[1] / "backend" / "api"
 sys.path.insert(0, str(API))
