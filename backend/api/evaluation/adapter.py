@@ -4,7 +4,8 @@ from typing import Protocol
 from urllib.parse import urlsplit, urlunsplit
 
 from app.config import Settings
-from app.models import SYSTEM_PROMPT, LocalModels
+from app.models import LocalModels
+from app.prompt_management import load_prompt
 from app.rag import RagService
 from app.vector_store import VectorStore
 
@@ -43,10 +44,12 @@ class InternalRagClient:
             git_sha = ""
         collection = self.service.store.client.get_collection(self.settings.collection_name)
         models = self.service.models.client.list()
+        prompt = load_prompt("rag/answer")
         return {
             "settings": config,
             "git_sha": git_sha or "unavailable",
-            "prompt_hash": hashlib.sha256(SYSTEM_PROMPT.encode()).hexdigest(),
+            "prompt_hash": hashlib.sha256(prompt.text.encode()).hexdigest(),
+            "prompt_version": prompt.version,
             "collection": collection.config.model_dump(mode="json"),
             "points": self.service.store.count(),
             "models": [{"model": m.model, "digest": m.digest} for m in models.models],

@@ -17,6 +17,8 @@ from test_conversations import conversation
 def test_multiagent_real_qwen(client, monkeypatch, scenario):
     if not os.getenv("MULTIAGENT_TEST_URL"):
         pytest.skip("requires MULTIAGENT_TEST_URL and MULTIAGENT_QDRANT_URL")
+    if not os.getenv("LANGFUSE_PUBLIC_KEY") or not os.getenv("LANGFUSE_SECRET_KEY"):
+        pytest.skip("requires a seeded Langfuse project")
     from app.assistant.agents.executor import execute_run
     from app.assistant.agents.models import AgentRun, AgentStep
     from app.assistant.agents.tools import AgentTools

@@ -1,7 +1,7 @@
 import json
 import time
 
-from app.assistant.agents.prompts import PROMPTS, VERSION
+from app.assistant.agents.prompts import agent_prompt
 from app.llm_client import chat
 
 
@@ -28,12 +28,12 @@ class AgentModel:
         self.http_client = http_client
 
     def generate(self, role, schema, payload, timeout, output_tokens):
-        prompt = PROMPTS[role]
+        prompt = agent_prompt(role)
         content = json.dumps(payload, ensure_ascii=False)
         grammar = transport_schema(schema.model_json_schema())
         # Conservative one byte per token bound, including transport schema.
         if (
-            len((prompt + content + json.dumps(grammar)).encode())
+            len((prompt.text + content + json.dumps(grammar)).encode())
             > self.settings.num_ctx - output_tokens - 256
         ):
             raise ValueError("Contexto dos agentes excede orçamento")
@@ -41,9 +41,10 @@ class AgentModel:
         response = chat(
             self.settings,
             [
-                {"role": "system", "content": prompt},
+                {"role": "system", "content": prompt.text},
                 {"role": "user", "content": content},
             ],
+            prompt=prompt,
             max_tokens=output_tokens,
             schema=grammar,
             timeout=timeout,
@@ -53,7 +54,7 @@ class AgentModel:
         result = schema.model_validate_json(response.texto)
         return result, {
             "model": self.settings.generation_model,
-            "prompt_version": VERSION,
+            "prompt_version": prompt.version,
             "input_tokens": response.tokens_in,
             "output_tokens": response.tokens_out,
             "latency_ms": round((time.monotonic() - started) * 1000),

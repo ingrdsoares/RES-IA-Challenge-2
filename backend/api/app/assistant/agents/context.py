@@ -4,13 +4,14 @@ import json
 
 from app.assistant.agents.contracts import LegalResult
 from app.assistant.agents.llm import transport_schema
-from app.assistant.agents.prompts import PROMPTS
+from app.assistant.agents.prompts import agent_prompt
 
 
 def legal_payload(question, passages, settings):
     payload = {"question": question, "sources": {}}
     schema = json.dumps(transport_schema(LegalResult.model_json_schema()))
     budget = settings.num_ctx - settings.num_predict - 256
+    prompt = agent_prompt("legal").text
     remaining = settings.max_context_chars
     for number, passage in enumerate(passages, 1):
         if remaining <= 0:
@@ -23,9 +24,7 @@ def legal_payload(question, passages, settings):
                 **payload,
                 "sources": {**payload["sources"], key: {**passage, "text": passage["text"][:mid]}},
             }
-            size = len(
-                (PROMPTS["legal"] + json.dumps(candidate, ensure_ascii=False) + schema).encode()
-            )
+            size = len((prompt + json.dumps(candidate, ensure_ascii=False) + schema).encode())
             if size <= budget:
                 low = mid
             else:

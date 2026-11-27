@@ -5,6 +5,7 @@ RUN pip install --no-cache-dir -r requirements-eval.txt
 COPY app app
 COPY evaluation evaluation
 COPY tests tests
+COPY prompt_catalog.json .
 COPY pytest.ini .
 ENV MPLCONFIGDIR=/tmp/evaluation-matplotlib
 CMD ["python", "-m", "evaluation", "--help"]

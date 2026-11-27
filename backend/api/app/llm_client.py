@@ -9,6 +9,7 @@ import ollama
 
 from app.config import Settings
 from app.errors import DependencyUnavailable, dependency_errors
+from app.prompt_management import ManagedPrompt, load_prompt, observation, update_observation
 
 _NOMES = {"ollama": "Ollama", "google": "Google Gemini", "deepseek": "DeepSeek"}
 
@@ -39,6 +40,8 @@ def chat(
     messages: list[dict[str, str | list[TextPart | ImagePart]]],
     *,
     max_tokens: int,
+    prompt: ManagedPrompt | None = None,
+    prompt_versions: dict[str, str] | None = None,
     schema: dict | None = None,
     think: bool = False,
     num_ctx: int | None = None,
@@ -53,14 +56,53 @@ def chat(
     `reasoning_effort` (GOOGLE_REASONING_EFFORT); no DeepSeek o modelo decide.
     """
     timeout = timeout or settings.ollama_timeout
-    with dependency_errors(_NOMES[settings.llm_provider]):
+    metadata: dict = {"provider": settings.llm_provider}
+    versions = dict(prompt_versions or {})
+    if versions:
+        metadata["prompt_versions"] = versions
+    with (
+        observation(
+            prompt.remote.name if prompt else "llm.chat",
+            as_type="generation",
+            model=settings.generation_model,
+            metadata=metadata,
+            prompt=prompt.remote if prompt else None,
+        ) as generation,
+        dependency_errors(_NOMES[settings.llm_provider]),
+    ):
         if settings.llm_provider == "ollama":
-            return _ollama(
+            response = _ollama(
                 settings, messages, max_tokens, schema, think, num_ctx, timeout, ollama_client
             )
-        return _nuvem(
-            settings, messages, max_tokens, schema, think, timeout, http_client, deepseek_thinking
-        )
+        else:
+            if schema is not None:
+                schema_prompt = load_prompt("transport/json-schema", schema=json.dumps(schema))
+                versions["transport/json-schema"] = schema_prompt.version
+                update_observation(generation, metadata={**metadata, "prompt_versions": versions})
+                messages = _schema_no_sistema(messages, schema_prompt.text)
+            response = _nuvem(
+                settings,
+                messages,
+                max_tokens,
+                schema,
+                think,
+                timeout,
+                http_client,
+                deepseek_thinking,
+            )
+        if generation is not None:
+            update_observation(
+                generation,
+                usage_details={
+                    key: value
+                    for key, value in {
+                        "input": response.tokens_in,
+                        "output": response.tokens_out,
+                    }.items()
+                    if value is not None
+                },
+            )
+        return response
 
 
 def _ollama(settings, messages, max_tokens, schema, think, num_ctx, timeout, client):
@@ -103,7 +145,6 @@ def _nuvem(settings, messages, max_tokens, schema, think, timeout, client, deeps
         # Os schemas do Pydantic ($defs, anyOf, pattern) não passam em todo provedor:
         # pede só JSON válido, o schema vai no prompt e o Pydantic valida depois.
         corpo["response_format"] = {"type": "json_object"}
-        corpo["messages"] = _schema_no_sistema(messages, schema)
     owned = client is None
     client = client or httpx.Client(timeout=timeout)
     try:
@@ -136,8 +177,7 @@ def _nuvem(settings, messages, max_tokens, schema, think, timeout, client, deeps
     return Resposta(texto, usage.get("prompt_tokens"), usage.get("completion_tokens"))
 
 
-def _schema_no_sistema(messages, schema):
-    instrucao = "\n\nResponda só com JSON que siga este schema: " + json.dumps(schema)
+def _schema_no_sistema(messages, instrucao):
     if messages and messages[0]["role"] == "system":
         return [{**messages[0], "content": messages[0]["content"] + instrucao}, *messages[1:]]
     return [{"role": "system", "content": instrucao.strip()}, *messages]

@@ -133,17 +133,20 @@ def main(argv=None, client_factory=None, bert_factory=None):
 
                 client_factory = InternalRagClient
             client = client_factory()
-            try:
-                manifest = make_manifest(selection, config.run, client.metadata())
-                from evaluation.collect import collect_run
+            from app.prompt_management import prompt_scope
 
-                with RunStore(args.run_dir) as store:
-                    store.initialize(manifest)
-                    print(
-                        json.dumps(
-                            collect_run(client, store, args.retry_failed, args.retry_uncertain)
+            try:
+                with prompt_scope():
+                    manifest = make_manifest(selection, config.run, client.metadata())
+                    from evaluation.collect import collect_run
+
+                    with RunStore(args.run_dir) as store:
+                        store.initialize(manifest)
+                        print(
+                            json.dumps(
+                                collect_run(client, store, args.retry_failed, args.retry_uncertain)
+                            )
                         )
-                    )
             finally:
                 client.close()
             if args.command == "collect":
